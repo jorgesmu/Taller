@@ -2,10 +2,14 @@
 
 int main( int argc, char* args[] )
 {
-    //Start SDL
+
+	SDL_Surface* screen;
     SDL_Init( SDL_INIT_EVERYTHING );
-    
-    //Quit SDL
+
+	screen = SDL_SetVideoMode( 640, 480, 32, SDL_SWSURFACE );
+	SDL_Flip( screen );
+	SDL_Delay( 2000 );
+
     SDL_Quit();
     
     return 0;    

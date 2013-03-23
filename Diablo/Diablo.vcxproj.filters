@@ -21,9 +21,15 @@
     <ClCompile Include="source\utilities\timer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="source\utilities\surface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\utilities\timer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\utilities\surface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

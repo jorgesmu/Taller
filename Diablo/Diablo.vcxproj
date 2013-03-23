@@ -12,9 +12,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="source\utilities\surface.cpp" />
     <ClCompile Include="source\utilities\timer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="source\utilities\surface.h" />
     <ClInclude Include="source\utilities\timer.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

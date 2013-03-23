@@ -12,6 +12,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="source\utilities\timer.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="source\utilities\timer.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{A9A2FD3D-2740-4ADA-8DF2-0E25D8612B48}</ProjectGuid>

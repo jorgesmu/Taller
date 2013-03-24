@@ -28,6 +28,14 @@ void Surface::blit(SDL_Surface* destination, const int x, const int y) {
 	SDL_BlitSurface(image, NULL, destination, &destino);
 }
 
-void Surface::blit(SDL_Surface* destination, const int x, const int y, const SDL_Rect& clip) {
+void Surface::blit(SDL_Surface* destination, const int x, const int y, SDL_Rect& clip) {
+	//load destination SDL_Rect
+	SDL_Rect destino;
+	destino.x = x;
+	destino.y = y;
+	destino.w = image->w;
+	destino.h = image->h;
 
+	//Blitting
+	SDL_BlitSurface(image, &clip, destination, &destino);
 }

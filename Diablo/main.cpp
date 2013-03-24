@@ -19,6 +19,15 @@ int main(int argc, char* args[]) {
 	screen = SDL_SetVideoMode(640, 480, 32, SDL_SWSURFACE);
 	// Draw el bmp
 	surf.blit(screen, 50, 50);
+	
+	// Draw el rect del bmp que indica clippedRect
+	//SDL_Rect clippedRect;
+	//clippedRect.x = 0;
+	//clippedRect.y = 0;
+	//clippedRect.h = 100;
+	//clippedRect.w = 200;
+
+	//surf.blit(screen, 50, 50, clippedRect);
 
 	// Actualizar la pantalla
 	SDL_Flip(screen);

@@ -25,7 +25,7 @@ class Surface {
 	// Toma como argumentos la surface de destino (aka screen) y offset coords x, y
 	void blit(SDL_Surface* destination, const int x, const int y);
 	// Idem anterior pero lleva un parametro extra para clippear (spritesheets)
-	void blit(SDL_Surface* destination, const int x, const int y, const SDL_Rect& clip);
+	void blit(SDL_Surface* destination, const int x, const int y, SDL_Rect& clip);
 
 };
 

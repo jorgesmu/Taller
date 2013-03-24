@@ -8,7 +8,7 @@
 class Surface {
 
 	private:
-	SDL_Surface* surf;
+	SDL_Surface* image;
 	
 	public:
 	// Constructor

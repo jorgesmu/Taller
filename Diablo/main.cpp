@@ -22,6 +22,10 @@ int main(int argc, char* args[]) {
 
 	// Actualizar la pantalla
 	SDL_Flip(screen);
+
+	// Libera la memoriae la surface de la imagen
+	surf.destroy();
+
 	// Arranca el timer
 	test_timer.start();
 
@@ -29,8 +33,6 @@ int main(int argc, char* args[]) {
 	while(test_timer.getTicks() < 5000) {
 		SDL_Delay(1); // Hacemos algo en el loop para que no explote el CPU
 	}
-
-	surf.destroy();
 
     SDL_Quit();
     

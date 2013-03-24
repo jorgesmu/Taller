@@ -6,9 +6,9 @@ Surface::Surface() {
 Surface::~Surface() {
 }
 
-void Surface::load(const std::string& filename) {
+void Surface::load(const char* filename) {
 	//load the image in the surface
-	SDL_Surface *imagen = SDL_LoadBMP("Imagenes/test.bmp");
+	SDL_Surface *imagen = SDL_LoadBMP(filename);
 	image = imagen;
 }
 

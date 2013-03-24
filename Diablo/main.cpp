@@ -14,7 +14,7 @@ int main(int argc, char* args[]) {
 	// Surface de prueba
 	Surface surf;
 	// No tiene manejo de error todavia, es de prueba
-	surf.load("test.bmp");
+	surf.load("Imagenes/tile.bmp");
 	// Init the window
 	screen = SDL_SetVideoMode(640, 480, 32, SDL_SWSURFACE);
 	// Draw el bmp

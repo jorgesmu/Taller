@@ -18,7 +18,7 @@ class Surface {
 	~Surface();
 	// Carga y optimiza la surface del archivo filename
 	// Tira un exception en caso de error?
-	void load(const std::string& filename);
+	void load(const char* filename);
 	// Destruye la superficie y libera la memoria
 	void destroy();
 	// Para dibujar la superficie

@@ -44,9 +44,9 @@ void Timer::unpause() {
 float Timer::getTicks() const {
     if(started) {
         if(paused) {
-            return pausedTicks;
+            return float(pausedTicks);
         }else{
-            return double(SDL_GetTicks()) - startTicks;
+            return float(double(SDL_GetTicks()) - startTicks);
         }
     }
     return 0;

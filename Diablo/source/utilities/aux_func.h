@@ -1,5 +1,4 @@
-#ifndef AUX_FUNC_H
-#define AUX_FUNC_H
+#pragma once
 
 #include "SDL.h"
 
@@ -7,5 +6,3 @@
 // La primera deja height y widght undefined
 SDL_Rect makeRect(int x, int y);
 SDL_Rect makeRect(int x, int y, int w, int h);
-
-#endif

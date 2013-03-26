@@ -1,5 +1,4 @@
-#ifndef SURFACE_H
-#define SURFACE_H
+#pragma once
 
 #include <string>
 
@@ -31,5 +30,3 @@ class Surface {
 	void blit(SDL_Surface* destination, int x, int y, SDL_Rect& clip);
 
 };
-
-#endif

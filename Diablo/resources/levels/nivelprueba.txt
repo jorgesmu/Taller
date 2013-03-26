@@ -1,0 +1,39 @@
+pantalla:
+- ancho: 800
+- alto: 600
+configuracion:
+- vel_personaje : 3
+- margen_scroll : 30
+entidades:
+- nombre: arbol
+imagen: path/a/imagen.png
+- nombre: castillo
+imagen: path/a/imagen.png
+ancho_base: 2
+alto_base: 2
+pixel_ref_x: 30
+pixel_ref_y: 40
+- nombre: orco
+imagen: path/a/imagen.png
+fps: 10
+delay: 5
+- nombre: frodo
+imagen: path/a/imagen.png
+fps: 10
+- nombre: tierra
+imagen: path/a/imagen.png
+- nombre: agua
+imagen: path/a/imagen.png
+escenarios:
+- nombre: bosque_encantado
+size_x: 100
+size_y: 100
+entidadesDef:
+- {x: 10, y: 15, entidad: tierra}
+- {x: 15, y: 20, entidad: tierra}
+- {x: 10, y: 15, entidad: agua}
+- {x: 30, y: 55, entidad: castillo}
+protagonista:
+- tipoEntidad: frodo
+x: 50
+y: 50

@@ -9,7 +9,7 @@
 int main(int argc, char* args[]) {
 
 	//Prueba parser YAML
-	//parser_test();
+	parser_test();
 
 	// Ventana de prueba
 	SDL_Surface* screen;

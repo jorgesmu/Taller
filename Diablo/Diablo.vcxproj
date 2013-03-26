@@ -12,14 +12,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="parser.cpp" />
     <ClCompile Include="source\utilities\aux_func.cpp" />
+    <ClCompile Include="source\utilities\parser.cpp" />
     <ClCompile Include="source\utilities\surface.cpp" />
     <ClCompile Include="source\utilities\timer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="parser.h" />
     <ClInclude Include="source\utilities\aux_func.h" />
+    <ClInclude Include="source\utilities\parser.h" />
     <ClInclude Include="source\utilities\surface.h" />
     <ClInclude Include="source\utilities\timer.h" />
   </ItemGroup>
@@ -54,12 +54,18 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LibraryPath>yaml-cpp\lib;SDL-1.2.15\lib\x86;$(LibraryPath)</LibraryPath>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PreprocessorDefinitions>_ITERATOR_DEBUG_LEVEL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <DebugInformationFormat>OldStyle</DebugInformationFormat>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

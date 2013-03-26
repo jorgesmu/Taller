@@ -27,7 +27,7 @@
     <ClCompile Include="source\utilities\aux_func.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="parser.cpp">
+    <ClCompile Include="source\utilities\parser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -41,7 +41,7 @@
     <ClInclude Include="source\utilities\aux_func.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="parser.h">
+    <ClInclude Include="source\utilities\parser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

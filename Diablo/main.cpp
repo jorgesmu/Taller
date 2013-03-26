@@ -4,8 +4,12 @@
 #include "source/utilities/timer.h"
 #include "source/utilities/surface.h"
 #include "source/utilities/aux_func.h"
+#include "source/utilities/parser.h"
 
 int main(int argc, char* args[]) {
+
+	//Prueba parser YAML
+	//parser_test();
 
 	// Ventana de prueba
 	SDL_Surface* screen;

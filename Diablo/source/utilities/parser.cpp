@@ -2,13 +2,13 @@
 
 //Intenta leer un archivo de prueba
 int parser_test() {
-	/*std::ifstream fin("test.yml");
+	std::ifstream fin("test.yml");
     YAML::Parser parser(fin);
 
-    YAML::Node doc;
+    /*YAML::Node doc;
     while(parser.GetNextDocument(doc)) {
        // ...
-    }
-	*/
+    }*/
+	
     return 0;
 }

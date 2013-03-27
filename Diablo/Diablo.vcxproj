@@ -13,12 +13,20 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="source\utilities\aux_func.cpp" />
+    <ClCompile Include="source\utilities\config_entidad.cpp" />
+    <ClCompile Include="source\utilities\config_escenario.cpp" />
+    <ClCompile Include="source\utilities\config_general.cpp" />
+    <ClCompile Include="source\utilities\config_pantalla.cpp" />
     <ClCompile Include="source\utilities\parser.cpp" />
     <ClCompile Include="source\utilities\surface.cpp" />
     <ClCompile Include="source\utilities\timer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\utilities\aux_func.h" />
+    <ClInclude Include="source\utilities\config_entidad.h" />
+    <ClInclude Include="source\utilities\config_escenario.h" />
+    <ClInclude Include="source\utilities\config_general.h" />
+    <ClInclude Include="source\utilities\config_pantalla.h" />
     <ClInclude Include="source\utilities\parser.h" />
     <ClInclude Include="source\utilities\surface.h" />
     <ClInclude Include="source\utilities\timer.h" />

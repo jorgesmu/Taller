@@ -30,6 +30,18 @@
     <ClCompile Include="source\utilities\parser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="source\utilities\config_escenario.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\utilities\config_entidad.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\utilities\config_pantalla.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\utilities\config_general.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\utilities\timer.h">
@@ -42,6 +54,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="source\utilities\parser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\utilities\config_escenario.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\utilities\config_entidad.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\utilities\config_pantalla.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\utilities\config_general.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

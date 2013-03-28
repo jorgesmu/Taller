@@ -10,6 +10,7 @@ ImagenEstatica::ImagenEstatica(const char* path) {
 	if (this -> surface.load(path)){
 		this -> setAlto(this -> surface.height());
 		this -> setAncho(this -> surface.width());
+		this -> setPath(path);
 	} else {
 		this -> setAlto(0);
 		this -> setAncho(0);
@@ -27,6 +28,7 @@ ImagenEstatica::ImagenEstatica(const char* path , const int colorKey) {
 	if (this -> surface.load(path) , colorKey){
 		this -> setAlto(this -> surface.height());
 		this -> setAncho(this -> surface.width());
+		this -> setPath(path);
 	} else {
 		this -> setAlto(0);
 		this -> setAncho(0);

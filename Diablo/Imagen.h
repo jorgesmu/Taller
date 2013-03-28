@@ -8,6 +8,10 @@ class Imagen
 {
 public:
 
+	const static int ALTO_DEFAULT = 100;
+
+	const static int ANCHO_DEFAULT = 100;
+
 	const static int COLOR_KEY = 0x00000000;
 
 private:

@@ -12,6 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="source\display\camara.cpp" />
     <ClCompile Include="source\utilities\aux_func.cpp" />
     <ClCompile Include="source\utilities\config_entidad.cpp" />
     <ClCompile Include="source\utilities\config_escenario.cpp" />
@@ -22,6 +23,8 @@
     <ClCompile Include="source\utilities\timer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="source\constants\model.h" />
+    <ClInclude Include="source\display\camara.h" />
     <ClInclude Include="source\utilities\aux_func.h" />
     <ClInclude Include="source\utilities\config_entidad.h" />
     <ClInclude Include="source\utilities\config_escenario.h" />

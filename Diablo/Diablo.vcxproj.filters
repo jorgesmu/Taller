@@ -42,6 +42,9 @@
     <ClCompile Include="source\utilities\config_general.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="source\display\camara.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\utilities\timer.h">
@@ -66,6 +69,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="source\utilities\config_general.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\display\camara.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\constants\model.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

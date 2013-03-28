@@ -7,8 +7,8 @@
 class Imagen
 {
 public:
-	const static int COLOR_KEY = 0x00000000;
 
+	const static int COLOR_KEY = 0x00000000;
 
 private:
 	

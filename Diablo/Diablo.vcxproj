@@ -23,6 +23,7 @@
     <ClCompile Include="source\utilities\parser.cpp" />
     <ClCompile Include="source\utilities\surface.cpp" />
     <ClCompile Include="source\utilities\timer.cpp" />
+    <ClCompile Include="Test.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Imagen.h" />
@@ -37,6 +38,7 @@
     <ClInclude Include="source\utilities\parser.h" />
     <ClInclude Include="source\utilities\surface.h" />
     <ClInclude Include="source\utilities\timer.h" />
+    <ClInclude Include="Test.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{A9A2FD3D-2740-4ADA-8DF2-0E25D8612B48}</ProjectGuid>

@@ -51,5 +51,16 @@ public:
 		Post: Se liberan los recursos asociados a la instancia.
 	**/
 	~ImagenAnimada();
+
+protected:
+
+	/*
+		Pre:
+
+		Post: Se ha actualizado surfaceActual
+	*/
+	void nextSprite();
 };
+
+
 

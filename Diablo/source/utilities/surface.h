@@ -43,4 +43,17 @@ class Surface {
 	void blit(SDL_Surface* destination, int x, int y, SDL_Rect& clip);
 	// Retorna el Surface contenido.
 	SDL_Surface* getSDL_Surface();
+	/*
+		Nota: 
+			Como obtener vídeo info:
+			const SDL_VideoInfo vi* SDL_GetVideoInfo ();
+	*/
+	void nuevoSurfaceConfigurado(const int alto , const int ancho , const SDL_VideoInfo* vi , 
+								const int colorKey);
+	/*
+		Nota: 
+			Como obtener vídeo info:
+			const SDL_VideoInfo vi* SDL_GetVideoInfo ();
+	*/
+	void nuevoSurfaceConfigurado(const int alto , const int ancho , const SDL_VideoInfo* vi);
 };

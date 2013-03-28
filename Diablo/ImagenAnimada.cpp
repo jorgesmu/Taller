@@ -69,6 +69,10 @@ ImagenAnimada::ImagenAnimada(const char* path , int altoSprite , int anchoSprite
 			this -> maxFilas = 1;
 		}
 		this -> filaActual = 0;
+		// creo la imagen actual
+		const SDL_VideoInfo *vi;
+		this -> surfaceActual.nuevoSurfaceConfigurado(this -> getAlto() ,
+											this -> getAncho() , vi , colorKey);
 	} else {
 		this -> setPath(NULL);
 		this -> maxFilas = 0;
@@ -87,4 +91,22 @@ ImagenAnimada::~ImagenAnimada() {
 	this -> setPath(NULL);
 	this -> surfaceOrigen.destroy();
 	this -> surfaceActual.destroy();
+}
+
+/*
+	Pre:
+
+	Post: Se ha actualizado surfaceActual
+*/
+void ImagenAnimada::nextSprite(){
+	if ((this -> maxColumnas > 0) && (this -> maxFilas > 0) ) {
+		this -> columnaActual++;
+		if (this -> columnaActual >= this -> maxColumnas) {
+			this -> columnaActual = 0;
+			this -> filaActual++;
+			if (this -> filaActual >= this -> maxFilas) {
+				this -> filaActual = 0;
+			}
+		}
+	}
 }

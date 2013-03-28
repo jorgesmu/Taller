@@ -7,6 +7,7 @@
 class Surface {
 
 	private:
+
 	SDL_Surface* image;
 	
 	public:
@@ -28,5 +29,6 @@ class Surface {
 	void blit(SDL_Surface* destination, int x, int y);
 	// Idem anterior pero lleva un parametro extra para clippear (spritesheets)
 	void blit(SDL_Surface* destination, int x, int y, SDL_Rect& clip);
-
+	// Retorna el Surface contenido.
+	SDL_Surface* getSDL_Surface();
 };

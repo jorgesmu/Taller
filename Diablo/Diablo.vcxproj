@@ -11,6 +11,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Imagen.cpp" />
+    <ClCompile Include="ImagenEstatica.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="source\display\camara.cpp" />
     <ClCompile Include="source\utilities\aux_func.cpp" />
@@ -23,6 +25,8 @@
     <ClCompile Include="source\utilities\timer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Imagen.h" />
+    <ClInclude Include="ImagenEstatica.h" />
     <ClInclude Include="source\constants\model.h" />
     <ClInclude Include="source\display\camara.h" />
     <ClInclude Include="source\utilities\aux_func.h" />

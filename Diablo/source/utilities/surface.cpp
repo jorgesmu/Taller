@@ -8,7 +8,10 @@ Surface::Surface() {
 }
 
 Surface::~Surface() {
-	// Nada
+	if(image != NULL) {
+		SDL_FreeSurface(image);
+	}
+	this -> image = NULL;
 }
 
 bool Surface::load(const std::string& filename) {
@@ -32,6 +35,7 @@ bool Surface::load(const std::string& filename) {
 void Surface::destroy() {
 	if(image != NULL) {
 		SDL_FreeSurface(image);
+		this -> image = NULL;
 	}
 }
 
@@ -64,4 +68,8 @@ int Surface::height() const {
 int Surface::width() const {
 	assert(image != NULL);
 	return image->w;
+}
+
+SDL_Surface* Surface::getSDL_Surface() {
+	return this -> image;
 }

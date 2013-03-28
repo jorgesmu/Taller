@@ -1,4 +1,4 @@
-#include "SDL.h"
+#include "source/utilities/surface.h"
 
 /*
 	Una instancia de esta clase permite manejar una imagen determinada, a partir
@@ -54,7 +54,7 @@ public:
 		NOTA: En caso de que la instancia no se encuentre en un estado válido se 
 		retorna un puntero nulo.
 	**/
-	virtual const SDL_Surface* getSurface() = 0;
+	virtual const Surface* getSurface() = 0;
 		
 protected:
 

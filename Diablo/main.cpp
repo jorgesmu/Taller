@@ -84,7 +84,7 @@ int main(int argc, char* args[]) {
 
 	}
 
-	//Test::testImagenEstatica();
+	Test::testImagenEstatica();
 
 	surf.destroy();
 

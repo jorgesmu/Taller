@@ -1,6 +1,5 @@
 #pragma once
 #include "Imagen.h"
-#include "source/utilities/surface.h"
 
 class ImagenEstatica:public Imagen {
 
@@ -35,5 +34,5 @@ public:
 		NOTA: En caso de que la instancia no se encuentre en un estado válido se 
 		retorna un puntero nulo.
 	**/
-	virtual SDL_Surface* getSurface();
+	virtual Surface* getSurface();
 };

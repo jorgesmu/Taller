@@ -10,6 +10,8 @@ ImagenEstatica::ImagenEstatica(const char* path) {
 	if (this -> surface.load(path)){
 		this -> setAlto(this -> surface.height());
 		this -> setAncho(this -> surface.width());
+		SDL_SetColorKey(this->surface.getSDL_Surface(), SDL_SRCCOLORKEY , 
+						this -> COLOR_KEY);
 	} else {
 		this -> setAlto(0);
 		this -> setAncho(0);
@@ -37,6 +39,6 @@ ImagenEstatica::~ImagenEstatica() {
 	NOTA: En caso de que la instancia no se encuentre en un estado válido se 
 	retorna un puntero nulo.
 **/
-SDL_Surface* ImagenEstatica::getSurface(){
-	return this -> surface.getSDL_Surface();
+Surface* ImagenEstatica::getSurface(){
+	return & (this -> surface);
 }

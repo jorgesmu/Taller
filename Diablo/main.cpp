@@ -9,7 +9,7 @@
 #include "source\display\camara.h"
 
 #include "source/constants/model.h"
-
+#include "Test.h"
 int main(int argc, char* args[]) {
 
 	//Prueba parser YAML

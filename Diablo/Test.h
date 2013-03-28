@@ -1,5 +1,6 @@
 #pragma once
 #include "ImagenEstatica.h"
+
 class Test
 {
 private:

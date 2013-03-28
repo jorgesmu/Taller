@@ -76,7 +76,7 @@ int main(int argc, char* args[]) {
 		// Despues se movera a donde corresponda
 		SDL_FillRect(screen, NULL, 0);
 		// Draw el bmp
-		surf.blit(screen, 50 - camara.getX(), 50 - camara.getY()); // Este usa coordenadas relativas basadas en la camara
+		surf.blit(screen,(int) (50 - camara.getX()), (int) (50 - camara.getY())); // Este usa coordenadas relativas basadas en la camara
 		surf.blit(screen, 300, 300, makeRect(115, 0, surf.width(), surf.height())); // Este no
 
 		// Actualizar la pantalla

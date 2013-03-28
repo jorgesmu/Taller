@@ -9,5 +9,5 @@
 
 	//Test Imagen Estatica
 	bool Test::testImagenEstatica() {
-		
+		ImagenEstatica("../resources/test.bmp");
 	}

@@ -38,4 +38,5 @@ ImagenEstatica::~ImagenEstatica() {
 	retorna un puntero nulo.
 **/
 SDL_Surface* ImagenEstatica::getSurface(){
-	return this -> surface;
+	return this -> surface.getSDL_Surface();
+}

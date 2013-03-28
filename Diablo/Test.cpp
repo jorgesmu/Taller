@@ -2,7 +2,7 @@
 	
 	//Todos los tests
 	bool Test::test() {
-		bool retorno = True;
+		bool retorno = true;
 		retorno = testImagenEstatica()&& retorno;
 		return retorno;
 	}

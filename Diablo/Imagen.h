@@ -50,9 +50,7 @@ public:
 
 		Post: Se retorna un puntero a una imagen en memoria de vídeo, cuya destrucción
 		es responsabilidad de esta instancia.
-		
-		NOTA: En caso de que la instancia no se encuentre en un estado válido se 
-		retorna un puntero nulo.
+
 	**/
 	virtual const Surface* getSurface() = 0;
 		

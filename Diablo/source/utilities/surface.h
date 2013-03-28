@@ -6,6 +6,16 @@
 
 class Surface {
 
+	public:
+
+	static const int BMP_TRANSPARENCIA = 0x000000;
+
+	static const int RGB_VERDE = 0x00ff00;
+
+	static const int RGB_AZUL = 0x0000ff;
+
+	static const int RGB_ROJO = 0xff0000;
+	
 	private:
 
 	SDL_Surface* image;
@@ -19,6 +29,8 @@ class Surface {
 	// Carga y optimiza la surface del archivo filename
 	// Devuelve true o false para success of fail
 	bool load(const std::string& filename);
+	// Devuelve true o false para success of fail
+	bool load(const std::string& filename , const int colorKey);
 	// Destruye la superficie y libera la memoria
 	void destroy();
 	// Getters para las propiedades de la imagen

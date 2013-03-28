@@ -29,7 +29,7 @@ int main(int argc, char* args[]) {
 	// Surface de prueba
 	Surface surf;
 	// No tiene manejo de error todavia, es de prueba
-	surf.load("../resources/test.bmp");
+	surf.load("../resources/test.bmp" , Surface::RGB_AZUL);
 
 	double curr_time = SDL_GetTicks();
     double accum = 0.0;

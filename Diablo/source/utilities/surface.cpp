@@ -23,8 +23,26 @@ bool Surface::load(const std::string& filename) {
 		image = SDL_DisplayFormat(temp_surf);
 		SDL_FreeSurface(temp_surf);
 		// Apply color key
-		Uint32 ckey = SDL_MapRGB(image->format, 0, 0xFF, 0);
+		Uint32 ckey = SDL_MapRGB(image -> format , 0, Surface::BMP_TRANSPARENCIA, 0);
 		SDL_SetColorKey(image, SDL_SRCCOLORKEY, ckey);
+		return true;
+	}else{
+		std::cerr << "Error loading " << filename << "\n";
+		return false;
+	}
+}
+
+bool Surface::load(const std::string& filename , const int colorKey) {
+	// Load the image in the surface
+	SDL_Surface *temp_surf = SDL_LoadBMP(filename.c_str());
+	// Check for errors
+	if(temp_surf != NULL) {
+		// Optimized format
+		image = SDL_DisplayFormat(temp_surf);
+		SDL_FreeSurface(temp_surf);
+		// Apply color key
+		Uint32 ckey = SDL_MapRGB(image -> format , 0 , colorKey , 0);
+		SDL_SetColorKey(image, SDL_SRCCOLORKEY , ckey);
 		return true;
 	}else{
 		std::cerr << "Error loading " << filename << "\n";

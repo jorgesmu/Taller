@@ -12,7 +12,7 @@
 		//pantalla de prueba
 		SDL_Surface* pantallaDePrueba = SDL_SetVideoMode( 800, 600 , 32, SDL_DOUBLEBUF);
 		//imagen estática a cargar
-		ImagenEstatica imagen("../resources/arbol.bmp");
+		ImagenEstatica imagen("../resources/arbol.bmp" , Surface::BMP_TRANSPARENCIA);
 		//retorno del test
 		bool retorno = true;
 		//primera evaluación de imagen cargada correctamente
@@ -20,11 +20,11 @@
 		Surface* imagenEstatica = imagen.getSurface();
 		//Si imagen distinto de nulo
 		if (imagenEstatica -> getSDL_Surface() != NULL) {
-			SDL_FillRect(pantallaDePrueba, NULL,0x00ff00);
-			imagenEstatica->blit(pantallaDePrueba,0,0);
+			SDL_FillRect(pantallaDePrueba , NULL , Surface::RGB_VERDE );
+			imagenEstatica->blit(pantallaDePrueba , 0 , 0);
 		} else {
 			// Se pone roja si hay error
-			SDL_FillRect(pantallaDePrueba, NULL,0xff0000);
+			SDL_FillRect(pantallaDePrueba , NULL , Surface::RGB_ROJO);
 			retorno = false;
 		}
 		//Actualizar

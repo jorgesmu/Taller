@@ -1,7 +1,8 @@
 #pragma once
-#include "imagen.h"
+#include "Imagen.h"
 #include <time.h>
-class ImagenAnimada : public Imagen {
+
+class ImagenAnimada:public Imagen {
 
 protected:
 
@@ -42,8 +43,8 @@ public:
 		Post: Si se logra abrir el archivo y tomar memoria, la instancia se
 		iniciliza de acuerdo a la imagen dada por el path.
 	**/
-	ImagenAnimada(const char* path , int altoSprite , int anchoSprite , 
-		const int fps , const int delay , const int colorKey);
+	ImagenAnimada(const char* path , const int altoSprite , const int anchoSprite , 
+				const int fps , const int delay , const int colorKey);
 
 	/**
 		Pre: La instancia ha sido creada.
@@ -51,6 +52,15 @@ public:
 		Post: Se liberan los recursos asociados a la instancia.
 	**/
 	~ImagenAnimada();
+
+	/**
+		Pre: La instancia ha sido creada.
+
+		Post: Se retorna un puntero a una imagen en memoria de vídeo, cuya destrucción
+		es responsabilidad de esta instancia.
+		
+	**/
+	virtual Surface* getSurface();
 
 protected:
 
@@ -61,6 +71,3 @@ protected:
 	*/
 	void nextSprite();
 };
-
-
-

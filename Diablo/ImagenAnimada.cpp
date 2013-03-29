@@ -17,7 +17,7 @@
 	Post: Si se logra abrir el archivo y tomar memoria, la instancia se
 	iniciliza de acuerdo a la imagen dada por el path.
 **/
-ImagenAnimada::ImagenAnimada(const char* path , int altoSprite , int anchoSprite , 
+ImagenAnimada::ImagenAnimada(const char* path , const int altoSprite , const int anchoSprite , 
 				const int fps , const int delay , const int colorKey){
 	
 	//seteo de dimensiones sprite
@@ -70,9 +70,12 @@ ImagenAnimada::ImagenAnimada(const char* path , int altoSprite , int anchoSprite
 		}
 		this -> filaActual = 0;
 		// creo la imagen actual
-		const SDL_VideoInfo *vi;
+		const SDL_VideoInfo *vi = SDL_GetVideoInfo();
 		this -> surfaceActual.nuevoSurfaceConfigurado(this -> getAlto() ,
 											this -> getAncho() , vi , colorKey);
+		this ->columnaActual = -1;
+		this -> filaActual = -1;
+		this -> nextSprite();
 	} else {
 		this -> setPath(NULL);
 		this -> maxFilas = 0;
@@ -98,7 +101,7 @@ ImagenAnimada::~ImagenAnimada() {
 
 	Post: Se ha actualizado surfaceActual
 */
-void ImagenAnimada::nextSprite(){
+void ImagenAnimada::nextSprite() {
 	if ((this -> maxColumnas > 0) && (this -> maxFilas > 0) ) {
 		this -> columnaActual++;
 		if (this -> columnaActual >= this -> maxColumnas) {
@@ -109,4 +112,16 @@ void ImagenAnimada::nextSprite(){
 			}
 		}
 	}
+}
+
+/**
+	Pre: La instancia ha sido creada.
+
+	Post: Se retorna un puntero a una imagen en memoria de vídeo, cuya destrucción
+	es responsabilidad de esta instancia.
+		
+**/
+Surface* ImagenAnimada::getSurface() {
+	this -> nextSprite();
+	return & (this -> surfaceActual);
 }

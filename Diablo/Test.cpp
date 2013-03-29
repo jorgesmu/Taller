@@ -3,7 +3,8 @@
 	//Todos los tests
 	bool Test::test() {
 		bool retorno = true;
-		retorno = testImagenEstatica()&& retorno;
+		retorno &= testImagenEstatica()&& retorno;
+		//retorno &= Test::testImagenAnimada();
 		return retorno;
 	}
 
@@ -36,5 +37,42 @@
 		//Destruir principal
 		SDL_FreeSurface(pantallaDePrueba);
 
+		return retorno;
+	}
+
+	//Test Imagen Animada
+	bool Test::testImagenAnimada() {
+		//retorno del test
+		bool retorno = true;
+		//pantalla de prueba
+		SDL_Surface* pantallaDePrueba = SDL_SetVideoMode( 800, 600 , 32, SDL_DOUBLEBUF);
+		
+		//imagen animada a cargar
+		ImagenAnimada imagen("../resources/Soldado.bmp" , 100 , 100 , 10 , 500 
+								, Surface::BMP_TRANSPARENCIA);
+				
+		//primera evaluación de imagen cargada correctamente
+		
+		Surface* imagenAnimada = imagen.getSurface();
+		retorno &= (imagenAnimada != NULL);
+		//Si imagen distinto de nulo
+		if (imagenAnimada -> getSDL_Surface() != NULL) {
+			SDL_FillRect(pantallaDePrueba , NULL , Surface::RGB_VERDE );
+			imagenAnimada -> blit(pantallaDePrueba , 0 , 0);
+		} else {
+			// Se pone roja si hay error
+			SDL_FillRect(pantallaDePrueba , NULL , Surface::RGB_ROJO);
+			retorno = false;
+		}
+		
+		//Actualizar
+		SDL_Flip(pantallaDePrueba);
+	
+		//tiempo de espera
+		SDL_Delay( 1000 );
+	
+		//Destruir principal
+		SDL_FreeSurface(pantallaDePrueba);
+		
 		return retorno;
 	}

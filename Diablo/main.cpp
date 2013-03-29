@@ -85,8 +85,8 @@ int main(int argc, char* args[]) {
 
 	}
 
-	Test::testImagenEstatica();
-
+	Test::test();
+	
 	surf.destroy();
 
     SDL_Quit();

@@ -1,11 +1,11 @@
+#pragma once
 #include "source/utilities/surface.h"
 
 /*
 	Una instancia de esta clase permite manejar una imagen determinada, a partir
 	de un mapa de bits.
 */
-class Imagen
-{
+class Imagen {
 public:
 
 	const static int ALTO_DEFAULT = 100;
@@ -56,7 +56,7 @@ public:
 		es responsabilidad de esta instancia.
 
 	**/
-	virtual const Surface* getSurface() = 0;
+	virtual Surface* getSurface() = 0;
 		
 protected:
 

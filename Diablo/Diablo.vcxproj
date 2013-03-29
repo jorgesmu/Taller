@@ -21,6 +21,7 @@
     <ClCompile Include="source\utilities\config_escenario.cpp" />
     <ClCompile Include="source\utilities\config_general.cpp" />
     <ClCompile Include="source\utilities\config_pantalla.cpp" />
+    <ClCompile Include="source\utilities\coordenadas.cpp" />
     <ClCompile Include="source\utilities\parser.cpp" />
     <ClCompile Include="source\utilities\surface.cpp" />
     <ClCompile Include="source\utilities\timer.cpp" />
@@ -37,6 +38,7 @@
     <ClInclude Include="source\utilities\config_escenario.h" />
     <ClInclude Include="source\utilities\config_general.h" />
     <ClInclude Include="source\utilities\config_pantalla.h" />
+    <ClInclude Include="source\utilities\coordenadas.h" />
     <ClInclude Include="source\utilities\parser.h" />
     <ClInclude Include="source\utilities\surface.h" />
     <ClInclude Include="source\utilities\timer.h" />

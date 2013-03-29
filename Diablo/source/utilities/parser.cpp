@@ -1,7 +1,7 @@
 #include "parser.h"
 #include <iostream>
 #include <fstream>
-#include <Windows.h>
+
 using namespace std;
 //lee e imprime un archivo
 void imprimir_documento(char* path){
@@ -20,18 +20,39 @@ void imprimir_documento(char* path){
 		archivo.close();
 		return;
 }
+void parser_test_arrays(){
+	char* path = "../resources/levels/test3.yml";
+	imprimir_documento(path);
+
+	cout << endl << "Test parsear Array." << endl << "Contenido parseado con Yaml:" << endl;
+	
+	std::ifstream archivo(path);
+	YAML::Parser parser(archivo);
+	YAML::Node doc;    
+	parser.GetNextDocument(doc);
+
+	for(YAML::Iterator it=doc.begin();it!=doc.end();++it) {
+		std::string clave, valor;
+		it.first() >> clave;
+		it.second() >> valor;
+		std::cout << "Clave: " << clave << ", valor: " << valor << std::endl;
+	}
+	archivo.close();
+	return;
+
+}
 void parser_test_lista() {
 
 
 	char* path="../resources/levels/test2.yml";
 	imprimir_documento(path);
 
-	cout << endl << "Contenido parseado con Yaml:" << endl;
+	cout << endl << "Test parsear Lista." << endl << "Contenido parseado con Yaml:" << endl;
 	
 	std::ifstream archivo(path);
 	YAML::Parser parser(archivo);
-	YAML::Node doc;    // already parsed
-	bool test=parser.GetNextDocument(doc);
+	YAML::Node doc;
+	parser.GetNextDocument(doc);
 
 	for(YAML::Iterator it=doc.begin();it!=doc.end();it ++) {
 		std::string scalar;
@@ -39,7 +60,7 @@ void parser_test_lista() {
 		std::cout << "Found scalar: " << scalar << std::endl;
 	}
 	archivo.close();
-
+	return;
 }
 void parser_test_escalar() {
 
@@ -53,7 +74,7 @@ void parser_test_escalar() {
 		parser.GetNextDocument(doc);
 		std::string unValor;
 		doc >> unValor;
-		std::cout << endl << "El valor del escalar tomado con Yaml: " << unValor << std::endl;
+		std::cout << endl << "Test parsear escalar." << endl << "El valor del escalar tomado con Yaml: " << unValor << std::endl;
 
 		archivo.close();
 
@@ -62,12 +83,13 @@ void parser_test_escalar() {
 	return;
 }
 void parser_test(){
-	//ejemplos tomados de https://code.google.com/p/yaml-cpp/wiki/HowToParseADocument
+	//ejemplos tomados y basados en: https://code.google.com/p/yaml-cpp/wiki/HowToParseADocument
 
 	cout << "Comienza Yaml parsing." << endl;
 	try{
 		parser_test_escalar();
 		parser_test_lista();
+		parser_test_arrays();
 	}catch (exception e){
 		cout << endl << endl << "Ocurrio un error con la Yaml";
 	}

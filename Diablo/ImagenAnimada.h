@@ -34,6 +34,8 @@ private:
 
 	clock_t deltaFrame; //distancia en segundos entre cada frame
 
+	int colorKey;
+
 public:
 	
 	/**

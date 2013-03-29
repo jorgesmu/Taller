@@ -19,5 +19,8 @@ public:
 
 	//Test Imagen Animada
 	static bool testImagenAnimada();
+
+	//Test Surface
+	static bool testSurface();
 };
 

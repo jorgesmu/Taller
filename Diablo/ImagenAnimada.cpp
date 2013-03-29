@@ -53,7 +53,7 @@ ImagenAnimada::ImagenAnimada(const char* path , const int altoSprite , const int
 	this -> tiempoFinDelay = tiempoActual + this -> delay;
 	
 	//lectura de imagen de origen
-	if (this -> surfaceOrigen.load(path) , colorKey){
+	if (this -> surfaceOrigen.load(path , colorKey)){
 		this -> setPath(path);
 		//calculo cantidad de filas y columnas
 		if (this-> getAncho() <= this -> surfaceOrigen.width()) {
@@ -67,21 +67,15 @@ ImagenAnimada::ImagenAnimada(const char* path , const int altoSprite , const int
 		} else {
 			this -> setAlto(this -> surfaceOrigen.height());
 			this -> maxFilas = 1;
-		}
-		this -> filaActual = 0;
-		// creo la imagen actual
-		const SDL_VideoInfo *vi = SDL_GetVideoInfo();
-		this -> surfaceActual.nuevoSurfaceConfigurado(this -> getAlto() ,
-											this -> getAncho() , vi , colorKey);
-		this ->columnaActual = -1;
-		this -> filaActual = -1;
-		this -> nextSprite();
+		}		
 	} else {
 		this -> setPath(NULL);
 		this -> maxFilas = 0;
 		this -> maxColumnas = 0;
-		this -> filaActual = -1;
 	}	
+	this -> filaActual = 0;
+	this -> columnaActual = -1;
+	this -> colorKey = colorKey;
 }
 
 /**
@@ -102,6 +96,8 @@ ImagenAnimada::~ImagenAnimada() {
 	Post: Se ha actualizado surfaceActual
 */
 void ImagenAnimada::nextSprite() {
+	this -> surfaceActual.nuevoSurfaceConfigurado(this -> getAlto() ,
+					this -> getAncho() , SDL_GetVideoInfo() , colorKey);
 	if ((this -> maxColumnas > 0) && (this -> maxFilas > 0) ) {
 		this -> columnaActual++;
 		if (this -> columnaActual >= this -> maxColumnas) {
@@ -111,6 +107,12 @@ void ImagenAnimada::nextSprite() {
 				this -> filaActual = 0;
 			}
 		}
+		SDL_Rect rect;
+		rect.h = this -> getAlto();
+		rect.w = this ->getAncho();
+		rect.x = this -> columnaActual * this -> getAncho();
+		rect.y = this -> filaActual * this -> getAlto();
+		this -> surfaceOrigen.blit( (this -> surfaceActual).getSDL_Surface() , 0 , 0, rect);
 	}
 }
 

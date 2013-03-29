@@ -3,8 +3,40 @@
 	//Todos los tests
 	bool Test::test() {
 		bool retorno = true;
-		retorno &= testImagenEstatica()&& retorno;
-		//retorno &= Test::testImagenAnimada();
+		retorno &= testSurface();
+		retorno &= testImagenEstatica();
+		retorno &= Test::testImagenAnimada();
+		return retorno;
+	}
+	
+	//Test Surface
+	bool Test::testSurface() {
+		//retorno del test
+		bool retorno = true;
+		//pantalla de prueba
+		SDL_Surface* pantallaDePrueba = SDL_SetVideoMode( 800, 600 , 32, SDL_DOUBLEBUF);
+		//surface
+		Surface surface;
+		//surface con nueva configuracion
+		surface.nuevoSurfaceConfigurado(100 , 100 , SDL_GetVideoInfo() , Surface::BMP_TRANSPARENCIA );
+		if (surface.getSDL_Surface() != NULL) {
+			SDL_FillRect(pantallaDePrueba , NULL , Surface::RGB_VERDE );
+			SDL_FillRect(surface.getSDL_Surface() , NULL , Surface::RGB_AZUL); 
+			surface.blit(pantallaDePrueba , 0 , 0);
+		} else {
+			// Se pone roja si hay error
+			SDL_FillRect(pantallaDePrueba , NULL , Surface::RGB_ROJO);
+			retorno = false;
+		}
+		//Actualizar
+		SDL_Flip(pantallaDePrueba);
+	
+		//tiempo de espera
+		SDL_Delay( 500 );
+	
+		//Destruir principal
+		SDL_FreeSurface(pantallaDePrueba);
+		
 		return retorno;
 	}
 
@@ -21,18 +53,20 @@
 		Surface* imagenEstatica = imagen.getSurface();
 		//Si imagen distinto de nulo
 		if (imagenEstatica -> getSDL_Surface() != NULL) {
-			SDL_FillRect(pantallaDePrueba , NULL , Surface::RGB_VERDE );
-			imagenEstatica->blit(pantallaDePrueba , 0 , 0);
+			for (int i = 0 ; i < 10 ; i++) {
+				imagenEstatica -> blit(pantallaDePrueba , 0 , 0);
+				imagenEstatica = imagen.getSurface();
+				SDL_Flip(pantallaDePrueba);
+				SDL_Delay( 200 );
+			}
 		} else {
-			// Se pone roja si hay error
-			SDL_FillRect(pantallaDePrueba , NULL , Surface::RGB_ROJO);
 			retorno = false;
 		}
 		//Actualizar
 		SDL_Flip(pantallaDePrueba);
 	
 		//tiempo de espera
-		SDL_Delay( 1000 );
+		SDL_Delay( 100 );
 	
 		//Destruir principal
 		SDL_FreeSurface(pantallaDePrueba);
@@ -53,14 +87,19 @@
 				
 		//primera evaluación de imagen cargada correctamente
 		
-		Surface* imagenAnimada = imagen.getSurface();
-		retorno &= (imagenAnimada != NULL);
+		Surface* surfaceImagenAnimada = imagen.getSurface();
+		retorno &= (surfaceImagenAnimada != NULL);
 		//Si imagen distinto de nulo
-		if (imagenAnimada -> getSDL_Surface() != NULL) {
-			SDL_FillRect(pantallaDePrueba , NULL , Surface::RGB_VERDE );
-			imagenAnimada -> blit(pantallaDePrueba , 0 , 0);
+		if (surfaceImagenAnimada != NULL) {
+			for (int i = 0 ; i < 300 ; i++) {
+				SDL_FillRect(pantallaDePrueba , NULL , Surface::RGB_VERDE);
+				surfaceImagenAnimada -> blit(pantallaDePrueba , 0 , 0);
+				SDL_Flip(pantallaDePrueba);
+				SDL_Delay( 100 );
+				surfaceImagenAnimada = imagen.getSurface();
+			}
+
 		} else {
-			// Se pone roja si hay error
 			SDL_FillRect(pantallaDePrueba , NULL , Surface::RGB_ROJO);
 			retorno = false;
 		}
@@ -69,7 +108,7 @@
 		SDL_Flip(pantallaDePrueba);
 	
 		//tiempo de espera
-		SDL_Delay( 1000 );
+		SDL_Delay( 200 );
 	
 		//Destruir principal
 		SDL_FreeSurface(pantallaDePrueba);

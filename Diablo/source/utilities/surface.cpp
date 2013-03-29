@@ -9,7 +9,7 @@ Surface::Surface() {
 
 void Surface::nuevoSurfaceConfigurado(const int alto , const int ancho , const SDL_VideoInfo* vi ,
 									const int colorKey) {
-	if (this ->image != NULL) {
+	if (this -> image != NULL) {
 		SDL_FreeSurface(image);
 		this -> image = NULL;
 	}
@@ -21,7 +21,7 @@ void Surface::nuevoSurfaceConfigurado(const int alto , const int ancho , const S
 }
 
 void Surface::nuevoSurfaceConfigurado(const int alto , const int ancho , const SDL_VideoInfo* vi) {
-	if (this ->image != NULL) {
+	if (this -> image != NULL) {
 		SDL_FreeSurface(image);
 		this -> image = NULL;
 	}

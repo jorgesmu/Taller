@@ -24,7 +24,7 @@ public:
 	const static unsigned int AT_OESTE = 14;
 	const static unsigned int AT_SUROESTE = 15;
 
-	//Estático
+	//Estatico
 	const static unsigned int EST_SUR = 16;
 	const static unsigned int EST_SURESTE = 17;
 	const static unsigned int EST_ESTE = 18;
@@ -62,7 +62,7 @@ public:
 		Post: Si se logra abrir el archivo y tomar memoria, la instancia se
 			inicializa de acuerdo a la imagen dada por el path.
 
-		Nota: Setea en la acción EST_SUR.
+		Nota: Setea en la accion EST_SUR.
 	**/
 	ImagenPersonaje(const char* path , const int altoSprite , const int anchoSprite , 
 				const int fps , const int delay , const int colorKey);
@@ -70,14 +70,14 @@ public:
 	virtual ~ImagenPersonaje();
 
 	/*
-		Pre: La instancia ha sido creada y el parámetro es una acción entre 0 y 24.
+		Pre: La instancia ha sido creada y el parametro es una accion entre 0 y 24.
 
-		Post: Se ha seteado la acción.
+		Post: Se ha seteado la accion.
 	*/
 	void setAccion(unsigned int accion);
 	
 	/*
-		Pre: Se han inicilizado todos los parámetros.
+		Pre: Se han inicilizado todos los parametros.
 
 		Post: Se ha actualizado surfaceActual
 	*/

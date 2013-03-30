@@ -45,14 +45,14 @@ class Surface {
 	SDL_Surface* getSDL_Surface();
 	/*
 		Nota: 
-			Como obtener vídeo info:
+			Como obtener video info:
 			const SDL_VideoInfo vi* SDL_GetVideoInfo ();
 	*/
 	void nuevoSurfaceConfigurado(const int alto , const int ancho , const SDL_VideoInfo* vi , 
 								const int colorKey);
 	/*
 		Nota: 
-			Como obtener vídeo info:
+			Como obtener video info:
 			const SDL_VideoInfo vi* SDL_GetVideoInfo ();
 	*/
 	void nuevoSurfaceConfigurado(const int alto , const int ancho , const SDL_VideoInfo* vi);

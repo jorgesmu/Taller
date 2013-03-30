@@ -37,7 +37,7 @@ protected:
 public:
 	
 	/**
-		Pre: El parámetro path es una ruta no nula y los parámetros alto y ancho son
+		Pre: El parametro path es una ruta no nula y los parametros alto y ancho son
 		positivos.
 	
 		Post: Si se logra abrir el archivo y tomar memoria, la instancia se
@@ -56,7 +56,7 @@ public:
 	/**
 		Pre: La instancia ha sido creada.
 
-		Post: Se retorna un puntero a una imagen en memoria de vídeo, cuya destrucción
+		Post: Se retorna un puntero a una imagen en memoria de video, cuya destruccion
 		es responsabilidad de esta instancia.
 		
 	**/
@@ -81,7 +81,7 @@ public:
 protected:
 
 	/*
-		Pre: Se han inicilizado todos los parámetros.
+		Pre: Se han inicilizado todos los parametros.
 
 		Post: Se ha actualizado surfaceActual
 	*/

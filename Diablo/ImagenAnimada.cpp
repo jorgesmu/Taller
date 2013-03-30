@@ -90,7 +90,7 @@ ImagenAnimada::~ImagenAnimada() {
 }
 
 /*
-	Pre: Se han inicilizado todos los parámetros.
+	Pre: Se han inicilizado todos los parametros.
 
 	Post: Se ha actualizado surfaceActual
 */
@@ -123,7 +123,7 @@ void ImagenAnimada::nextSprite() {
 /**
 	Pre: La instancia ha sido creada.
 
-	Post: Se retorna un puntero a una imagen en memoria de vídeo, cuya destrucción
+	Post: Se retorna un puntero a una imagen en memoria de video, cuya destruccion
 	es responsabilidad de esta instancia.
 		
 **/

@@ -1,0 +1,2 @@
+#include "entidad.h"
+

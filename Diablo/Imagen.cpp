@@ -6,7 +6,7 @@
 
 	Post: Se retorna un puntero al path de la instancia.
 
-	NOTA: La destrucción de la misma queda a cargo de esta instancia. 
+	NOTA: La destruccion de la misma queda a cargo de esta instancia. 
 
 **/
 const char* Imagen::getPath() {
@@ -34,7 +34,7 @@ const int Imagen::getAncho() {
 }
 
 /**
-	Pre: El parámetro es un número positivo.
+	Pre: El parametro es un numero positivo.
 
 	Post: Se setea el acho de la imagen.
 **/
@@ -43,7 +43,7 @@ void Imagen::setAncho(const int ancho) {
 }
 
 /**
-	Pre: El parámetro es un número positivo.
+	Pre: El parametro es un n?ero positivo.
 
 	Post: Se setea el alto de la instancia.
 **/
@@ -52,11 +52,11 @@ void Imagen::setAlto(const int alto) {
 }
 
 /**
-	Pre: El parámetro es una cadena de caracteres no nula,
+	Pre: El parametro es una cadena de caracteres no nula,
 	la cual define un path.
 
 	Post: Se setea el path de la instancia con una copia de la candena
-	de caracteres pasada por parámetro.
+	de caracteres pasada por par?etro.
 **/
 void Imagen::setPath(const char* path) {
 	this -> path = NULL;

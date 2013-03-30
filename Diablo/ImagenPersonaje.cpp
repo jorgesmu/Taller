@@ -17,7 +17,7 @@
 	Post: Si se logra abrir el archivo y tomar memoria, la instancia se
 	inicializa de acuerdo a la imagen dada por el path.
 	
-	Nota: Setea en la acción EST_SUR.
+	Nota: Setea en la accion EST_SUR.
 **/
 ImagenPersonaje::ImagenPersonaje(const char* path , const int altoSprite , const int anchoSprite , 
 				const int fps , const int delay , const int colorKey) : 
@@ -39,9 +39,9 @@ ImagenPersonaje::~ImagenPersonaje() {
 }
 
 /*
-	Pre: La instancia ha sido creada y el parámetro es una acción entre 0 y 24.
+	Pre: La instancia ha sido creada y el parametro es una accion entre 0 y 24.
 
-	Post: Se ha seteado la acción.
+	Post: Se ha seteado la accion.
 */
 void ImagenPersonaje::setAccion(unsigned int accion) {
 	if ((accion < this -> maxFilas) && (accion < 25)) {
@@ -115,11 +115,11 @@ void ImagenPersonaje::setAccion(unsigned int accion) {
 								this -> accionActual =+ 8;
 								this -> columnaActual = 0;
 							} else {
-								// Siguiente Estático actual Desplazamiento
+								// Siguiente Estatico actual Desplazamiento
 								if (this -> accionActual < ImagenPersonaje::MUERTE) {
 									this -> accionActual =+16;
 									this -> columnaActual = 0;
-								// Siguiente Estático actual Muerte
+								// Siguiente Estatico actual Muerte
 								} else {
 									this -> accionActual = ImagenPersonaje::EST_SUR;
 									this -> columnaActual = 0;
@@ -140,7 +140,7 @@ void ImagenPersonaje::setAccion(unsigned int accion) {
 }
 
 /*
-	Pre: Se han inicilizado todos los parámetros.
+	Pre: Se han inicilizado todos los parametros.
 
 	Post: Se ha actualizado surfaceActual
 */

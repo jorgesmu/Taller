@@ -54,6 +54,27 @@ void imprimir_documento(char* path){
 		archivo.close();
 		return;
 }
+void parser_nivel(char* path){
+
+	imprimir_documento(path);
+
+
+	cout << endl << "Test parsear completo." << endl << "Contenido parseado con Yaml: " << endl;
+	
+	std::ifstream fin(path);
+	YAML::Parser parser(fin);
+	YAML::Node doc;
+	parser.GetNextDocument(doc);
+
+		
+	for(YAML::Iterator it=doc.begin();it!=doc.end();++it) {
+		std::string clave, valor;
+		it.first() >> clave;
+		it.second() >> valor;
+		std::cout << "Clave: " << clave << ", valor: " << valor << std::endl;
+	}
+	
+}
 void parser_test_completo(){
 	char* path="../resources/levels/test5.yaml";
 	imprimir_documento(path);
@@ -175,6 +196,18 @@ void parser_test(){
 		parser_test_arrays();
 		parser_test_vector();
 		parser_test_completo();
+	}catch (exception e){
+		cout << endl << endl << "Ocurrio un error con la Yaml";
+	}
+
+	return;
+}
+void parsear(char* path){
+	//ejemplos basado en: https://code.google.com/p/yaml-cpp/wiki/HowToParseADocument
+	
+	cout << endl << endl << "Comienza Yaml parsing de nivel." << endl;
+	try{
+		parser_nivel(path);
 	}catch (exception e){
 		cout << endl << endl << "Ocurrio un error con la Yaml";
 	}

@@ -5,3 +5,5 @@
 
 //Intenta leer un archivo de prueba
 void parser_test();
+//Parsea un nivel
+void parsear(char* path);

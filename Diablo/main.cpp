@@ -16,6 +16,8 @@ int main(int argc, char* args[]) {
 	//Prueba parser YAML
 	parser_test();
 
+	//parseo un nivel
+	parsear("../resources/levels/nivel1.yaml");
 	// Ventana de prueba
 	SDL_Surface* screen;
     SDL_Init(SDL_INIT_EVERYTHING);

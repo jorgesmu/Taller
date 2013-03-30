@@ -31,7 +31,7 @@ public:
 		Post: Se liberan los recursos asociados a la instancia.
 
 	**/
-	~ImagenEstatica();
+	virtual ~ImagenEstatica();
 	
 	/**
 		Pre: La instancia ha sido creada.

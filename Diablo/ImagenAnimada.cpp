@@ -15,7 +15,7 @@
 		colorKey: cualquier entero para representar un RGB de 32 bits.
 
 	Post: Si se logra abrir el archivo y tomar memoria, la instancia se
-	iniciliza de acuerdo a la imagen dada por el path.
+	inicializa de acuerdo a la imagen dada por el path.
 **/
 ImagenAnimada::ImagenAnimada(const char* path , const int altoSprite , const int anchoSprite , 
 				const int fps , const int delay , const int colorKey){
@@ -50,7 +50,6 @@ ImagenAnimada::ImagenAnimada(const char* path , const int altoSprite , const int
 	//calculo de tiempos
 	clock_t tiempoActual = clock();
 	this -> tiempoProximoFrame = tiempoActual + deltaFrame;
-	this -> tiempoFinDelay = tiempoActual + this -> delay;
 	
 	//lectura de imagen de origen
 	if (this -> surfaceOrigen.load(path , colorKey)){
@@ -91,28 +90,33 @@ ImagenAnimada::~ImagenAnimada() {
 }
 
 /*
-	Pre:
+	Pre: Se han inicilizado todos los parámetros.
 
 	Post: Se ha actualizado surfaceActual
 */
 void ImagenAnimada::nextSprite() {
-	this -> surfaceActual.nuevoSurfaceConfigurado(this -> getAlto() ,
+	clock_t tiempoActual = clock();
+	if (this -> tiempoProximoFrame <= tiempoActual) {
+		this -> surfaceActual.nuevoSurfaceConfigurado(this -> getAlto() ,
 					this -> getAncho() , SDL_GetVideoInfo() , colorKey);
-	if ((this -> maxColumnas > 0) && (this -> maxFilas > 0) ) {
-		this -> columnaActual++;
-		if (this -> columnaActual >= this -> maxColumnas) {
-			this -> columnaActual = 0;
-			this -> filaActual++;
-			if (this -> filaActual >= this -> maxFilas) {
-				this -> filaActual = 0;
+		if ((this -> maxColumnas > 0) && (this -> maxFilas > 0) ) {
+			this -> columnaActual++;
+			this -> tiempoProximoFrame += this -> deltaFrame;
+			if (this -> columnaActual >= this -> maxColumnas) {
+				this -> columnaActual = 0;
+				this -> filaActual++;
+				if (this -> filaActual >= this -> maxFilas) {
+					this -> filaActual = 0;
+				}
+				this -> tiempoProximoFrame += this -> delay;
 			}
+			SDL_Rect rect;
+			rect.h = this -> getAlto();
+			rect.w = this ->getAncho();
+			rect.x = this -> columnaActual * this -> getAncho();
+			rect.y = this -> filaActual * this -> getAlto();
+			this -> surfaceOrigen.blit( (this -> surfaceActual).getSDL_Surface() , 0 , 0, rect);
 		}
-		SDL_Rect rect;
-		rect.h = this -> getAlto();
-		rect.w = this ->getAncho();
-		rect.x = this -> columnaActual * this -> getAncho();
-		rect.y = this -> filaActual * this -> getAlto();
-		this -> surfaceOrigen.blit( (this -> surfaceActual).getSDL_Surface() , 0 , 0, rect);
 	}
 }
 
@@ -126,4 +130,24 @@ void ImagenAnimada::nextSprite() {
 Surface* ImagenAnimada::getSurface() {
 	this -> nextSprite();
 	return & (this -> surfaceActual);
+}
+
+/**
+	Pre: La instancia ha sido creada.
+
+	Post: Se retorna la cantidad de FPS.
+		
+**/
+int ImagenAnimada::getFPS() {
+	return this -> fps;
+}
+
+/**
+	Pre: La instancia ha sido creada.
+
+	Post: Se retorna el Delay.
+		
+**/
+int ImagenAnimada::getDelay() {
+	return this -> delay;
 }

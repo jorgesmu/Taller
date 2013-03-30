@@ -14,6 +14,7 @@
     <ClCompile Include="Imagen.cpp" />
     <ClCompile Include="ImagenAnimada.cpp" />
     <ClCompile Include="ImagenEstatica.cpp" />
+    <ClCompile Include="ImagenPersonaje.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="source\display\camara.cpp" />
     <ClCompile Include="source\utilities\aux_func.cpp" />
@@ -31,6 +32,7 @@
     <ClInclude Include="Imagen.h" />
     <ClInclude Include="ImagenAnimada.h" />
     <ClInclude Include="ImagenEstatica.h" />
+    <ClInclude Include="ImagenPersonaje.h" />
     <ClInclude Include="source\constants\model.h" />
     <ClInclude Include="source\display\camara.h" />
     <ClInclude Include="source\utilities\aux_func.h" />

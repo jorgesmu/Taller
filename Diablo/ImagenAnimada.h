@@ -10,7 +10,7 @@ protected:
 
 	const static int DELAY_DEFAULT = 100;
 
-private:
+protected:
 
 	Surface surfaceOrigen;
 
@@ -27,8 +27,6 @@ private:
 	int fps;
 
 	int delay;
-
-	clock_t tiempoFinDelay;
 
 	clock_t tiempoProximoFrame;
 
@@ -53,7 +51,7 @@ public:
 
 		Post: Se liberan los recursos asociados a la instancia.
 	**/
-	~ImagenAnimada();
+	virtual ~ImagenAnimada();
 
 	/**
 		Pre: La instancia ha sido creada.
@@ -63,13 +61,31 @@ public:
 		
 	**/
 	virtual Surface* getSurface();
+	
+	/**
+		Pre: La instancia ha sido creada.
+
+		Post: Se retorna la cantidad de FPS.
+		
+	**/
+	int getFPS();
+
+	/**
+		Pre: La instancia ha sido creada.
+
+		Post: Se retorna el Delay.
+		
+	**/
+	int getDelay();
 
 protected:
 
 	/*
-		Pre:
+		Pre: Se han inicilizado todos los parámetros.
 
 		Post: Se ha actualizado surfaceActual
 	*/
-	void nextSprite();
+	virtual void nextSprite();
+	
 };
+

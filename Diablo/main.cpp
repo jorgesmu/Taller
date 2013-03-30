@@ -85,7 +85,7 @@ int main(int argc, char* args[]) {
 
 	}
 
-	Test::test();
+	//Test::test();
 	
 	surf.destroy();
 

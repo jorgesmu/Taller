@@ -31,6 +31,7 @@
     <ClCompile Include="source\utilities\surface.cpp" />
     <ClCompile Include="source\utilities\Test.cpp" />
     <ClCompile Include="source\utilities\timer.cpp" />
+    <ClCompile Include="TestMapa.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\constants\model.h" />

@@ -23,6 +23,7 @@ ImagenPersonaje::ImagenPersonaje(const char* path , const int altoSprite , const
 				const int fps , const int delay , const int colorKey) : 
 				ImagenAnimada(path , altoSprite , anchoSprite , fps , delay , colorKey) {
 	
+	this -> accionActual = ImagenPersonaje::EST_SUR;
 	this -> setAccion(ImagenPersonaje::EST_SUR);
 }
 
@@ -44,7 +45,7 @@ ImagenPersonaje::~ImagenPersonaje() {
 	Post: Se ha seteado la accion.
 */
 void ImagenPersonaje::setAccion(unsigned int accion) {
-	if ((accion < this -> maxFilas) && (accion < 25)) {
+	if ((accion < (unsigned int) this -> maxFilas) && (accion < 25)) {
 		this -> accionSiguiente = accion;
 		int delta = this -> accionSiguiente	- this -> accionActual;	
 		if (delta != 0) {
@@ -53,9 +54,25 @@ void ImagenPersonaje::setAccion(unsigned int accion) {
 				//Ambos desplazamientos
 				if (this -> accionActual < ImagenPersonaje::AT_SUR){
 					if (delta > 0) {
-						this -> accionActual++;
+						if (delta <=3) {
+							this -> accionActual++;
+						} else {
+							if (this -> accionActual == DES_SUR) {
+								this -> accionActual = DES_SUROESTE;
+							} else {
+								this -> accionActual--;
+							}
+						}
 					} else {
-						this -> accionActual--;
+						if (delta >=-3) {
+							this -> accionActual--;
+						} else {
+							if (this -> accionActual == DES_SUROESTE) {
+								this -> accionActual = DES_SUR;
+							} else {
+								this -> accionActual++;
+							}
+						}
 					}
 				} else {
 					// Siguiente Desplazamiento y Actual Ataque
@@ -86,9 +103,25 @@ void ImagenPersonaje::setAccion(unsigned int accion) {
 						// Siguiente Ataque y Actual Ataque
 						if (this -> accionActual < ImagenPersonaje::EST_SUR) {
 							if (delta > 0) {
-								this -> accionActual++;
+								if (delta <=3) {
+									this -> accionActual++;
+								} else {
+									if (this -> accionActual == AT_SUR) {
+										this -> accionActual = AT_SUROESTE;
+									} else {
+										this -> accionActual--;
+									}
+								}
 							} else {
-								this -> accionActual--;
+								if (delta >=-3) {
+									this -> accionActual--;
+								} else {
+									if (this -> accionActual == AT_SUROESTE) {
+										this -> accionActual = AT_SUR;
+									} else {
+										this -> accionActual++;
+									}
+								}
 							}
 						} else {
 							// Siguiente Ataque y Actual Estatico
@@ -107,18 +140,37 @@ void ImagenPersonaje::setAccion(unsigned int accion) {
 					if (this -> accionSiguiente < ImagenPersonaje::MUERTE){
 						// Siguiente Estatico actual Desplazamiento
 						if (this -> accionActual < ImagenPersonaje::AT_SUR) {
-							this -> accionActual +=16;
+							this -> accionActual += 16;
 							this -> columnaActual = 0;
 						} else {
 							// Siguiente Estatico actual Ataque
 							if (this -> accionActual < ImagenPersonaje::EST_SUR){
-								this -> accionActual =+ 8;
-								this -> columnaActual = 0;
+								this -> accionActual += 8;
+								//this -> columnaActual = 0;
 							} else {
-								// Siguiente Estatico actual Desplazamiento
+								// Siguiente Estatico actual Estatico
 								if (this -> accionActual < ImagenPersonaje::MUERTE) {
-									this -> accionActual =+16;
-									this -> columnaActual = 0;
+									if (delta > 0) {
+										if (delta <=3) {
+											this -> accionActual++;
+										} else {
+											if (this -> accionActual == EST_SUR) {
+												this -> accionActual = EST_SUROESTE;
+											} else {
+												this -> accionActual--;
+											}
+										}
+									} else {
+									if (delta >=-3) {
+										this -> accionActual--;
+									} else {
+										if (this -> accionActual == EST_SUROESTE) {
+											this -> accionActual = EST_SUR;
+										} else {
+											this -> accionActual++;
+										}
+									}
+								}										
 								// Siguiente Estatico actual Muerte
 								} else {
 									this -> accionActual = ImagenPersonaje::EST_SUR;
@@ -133,9 +185,9 @@ void ImagenPersonaje::setAccion(unsigned int accion) {
 					}
 				}
 			}
-			//seteo de fila
-			this -> filaActual = this -> accionActual;
 		}
+		//seteo de fila
+		this -> filaActual = this -> accionActual;
 	}
 }
 
@@ -150,14 +202,11 @@ void ImagenPersonaje::nextSprite() {
 		this -> surfaceActual.nuevoSurfaceConfigurado(this -> getAlto() ,
 					this -> getAncho() , SDL_GetVideoInfo() , colorKey);
 		if ((this -> maxColumnas > 0) && (this -> maxFilas > 0) ) {
+			this -> setAccion(this -> accionSiguiente);
 			this -> columnaActual++;
 			this -> tiempoProximoFrame += this -> deltaFrame;
 			if (this -> columnaActual >= this -> maxColumnas) {
 				this -> columnaActual = 0;
-				this -> filaActual++;
-				if (this -> filaActual >= this -> maxFilas) {
-					this -> filaActual = 0;
-				}
 				this -> tiempoProximoFrame += this -> delay;
 			}
 			SDL_Rect rect;

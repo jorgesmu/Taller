@@ -6,6 +6,7 @@
 		//retorno &= testSurface();
 		//retorno &= testImagenEstatica();
 		//retorno &= Test::testImagenAnimada();
+		retorno &= Test::testImagenPersonaje();
 		return retorno;
 	}
 	
@@ -99,6 +100,61 @@
 				surfaceImagenAnimada = imagen.getSurface();
 			}
 
+		} else {
+			SDL_FillRect(pantallaDePrueba , NULL , Surface::RGB_ROJO);
+			retorno = false;
+		}
+		
+		//Actualizar
+		SDL_Flip(pantallaDePrueba);
+	
+		//tiempo de espera
+		SDL_Delay( 200 );
+	
+		//Destruir principal
+		SDL_FreeSurface(pantallaDePrueba);
+		
+		return retorno;
+	}
+
+	//Test Imagen Personaje
+	bool Test::testImagenPersonaje() {
+		//retorno del test
+		bool retorno = true;
+		//pantalla de prueba
+		SDL_Surface* pantallaDePrueba = SDL_SetVideoMode( 800, 600 , 32, SDL_DOUBLEBUF);
+		
+		//imagen animada a cargar
+		ImagenPersonaje imagen("../resources/Soldado.bmp" , 100 , 100 , 10 , 500 
+								, Surface::BMP_TRANSPARENCIA);
+				
+		//primera evaluación de imagen cargada correctamente
+		
+		Surface* surfaceImagenPersonaje = imagen.getSurface();
+		retorno &= (surfaceImagenPersonaje != NULL);
+		//Si imagen distinto de nulo
+		if (surfaceImagenPersonaje != NULL) {
+			
+			for (unsigned int accion = ImagenPersonaje::DES_SUR ; accion <= ImagenPersonaje::MUERTE ; accion++) {
+				for(int volver = 1 ; volver < accion ; volver++) {
+					imagen.setAccion(accion);
+					for (int i = 0 ; i < 12 ; i++) {
+						SDL_FillRect(pantallaDePrueba , NULL , Surface::RGB_VERDE);
+						surfaceImagenPersonaje -> blit(pantallaDePrueba , 0 , 0);
+						SDL_Flip(pantallaDePrueba);
+						SDL_Delay( 100 );
+						surfaceImagenPersonaje = imagen.getSurface();
+					}
+					imagen.setAccion(accion-volver);
+					for (int i = 0 ; i < 12 ; i++) {
+						SDL_FillRect(pantallaDePrueba , NULL , Surface::RGB_VERDE);
+						surfaceImagenPersonaje -> blit(pantallaDePrueba , 0 , 0);
+						SDL_Flip(pantallaDePrueba);
+						SDL_Delay( 150 );
+						surfaceImagenPersonaje = imagen.getSurface();
+					}
+				}
+			}
 		} else {
 			SDL_FillRect(pantallaDePrueba , NULL , Surface::RGB_ROJO);
 			retorno = false;

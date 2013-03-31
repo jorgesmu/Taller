@@ -1,6 +1,7 @@
 #pragma once
 #include "ImagenEstatica.h"
 #include "ImagenAnimada.h"
+#include "ImagenPersonaje.h"
 class Test
 {
 private:
@@ -19,6 +20,10 @@ public:
 
 	//Test Imagen Animada
 	static bool testImagenAnimada();
+
+	
+	//Test Imagen Personaje
+	static bool testImagenPersonaje();
 
 	//Test Surface
 	static bool testSurface();

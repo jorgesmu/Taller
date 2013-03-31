@@ -132,19 +132,19 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="source\utilities\Imagen.h">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="source\utilities\ImagenAnimada.h">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="source\utilities\ImagenEstatica.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="source\utilities\ImagenPersonaje.h">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="source\utilities\Test.h">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\utilities\ImagenPersonaje.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -1,5 +1,5 @@
 #include "Test.h"
-	
+
 	//Todos los tests
 	bool Test::test() {
 		bool retorno = true;

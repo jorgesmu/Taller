@@ -1,4 +1,6 @@
 #include "Test.h"
+#include "../display/entidad.h"
+
 
 	//Todos los tests
 	bool Test::test() {
@@ -6,7 +8,7 @@
 		//retorno &= testSurface();
 		//retorno &= testImagenEstatica();
 		//retorno &= Test::testImagenAnimada();
-		retorno &= Test::testImagenPersonaje();
+		//retorno &= Test::testImagenPersonaje();
 		return retorno;
 	}
 	

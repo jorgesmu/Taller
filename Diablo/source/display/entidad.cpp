@@ -4,7 +4,7 @@
 		Pre:-
 		 
 		Post: Se ha inicializado la instancia con los atributos x, y, w y h en cero, surf e 
-		imagenPersonaje en NULL, y name y path como cadenas vacías.
+		imagenPersonaje en NULL, y name y path como cadenas vac?s.
 	*/
 	Entidad::Entidad(){
 		this -> h = 0;
@@ -20,7 +20,7 @@
 	/*
 		Pre:-
 		 
-		Post: Se ha inicializado la instancia segun el archivo y los parámetros.
+		Post: Se ha inicializado la instancia segun el archivo y los par?etros.
 
 		NOTA: ImagenAnimada
 	*/
@@ -40,7 +40,7 @@
 	/*
 		Pre:-
 		 
-		Post: Se ha inicializado la instancia segun el archivo y los parámetros.
+		Post: Se ha inicializado la instancia segun el archivo y los par?etros.
 
 		NOTA: ImagenAnimada
 	*/

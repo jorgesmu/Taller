@@ -7,6 +7,8 @@
 #include "source/utilities/parser.h"
 
 #include "source\display\camara.h"
+#include "source\display\mapa.h"
+#include "source\display\resman.h"
 
 #include "source/constants/model.h"
 #include "source/utilities/Test.h"
@@ -29,10 +31,17 @@ int main(int argc, char* args[]) {
 	// Camara
 	Camara camara;
 	camara.init(640, 480, 30);
-	// Surface de prueba
-	Surface surf;
-	// No tiene manejo de error todavia, es de prueba
-	surf.load("../resources/test.bmp" , Surface::RGB_AZUL);
+
+	// Mapa
+	ResMan resman;
+	resman.addRes("cemento", "../resources/tile.bmp");
+	Entidad2 cem_test;
+	cem_test.init("cemento", resman);
+	Mapa mapa;
+	mapa.resize(20, 20);
+	mapa.getTile(0, 0).addEntidad(cem_test);
+	mapa.getTile(0, 1).addEntidad(cem_test);
+	mapa.getTile(1, 0).addEntidad(cem_test);
 
 	double curr_time = SDL_GetTicks();
     double accum = 0.0;
@@ -78,18 +87,15 @@ int main(int argc, char* args[]) {
 		// Aca se hace el blitteo
 		// Despues se movera a donde corresponda
 		SDL_FillRect(screen, NULL, 0);
-		// Draw el bmp
-		surf.blit(screen,(int) (50 - camara.getX()), (int) (50 - camara.getY())); // Este usa coordenadas relativas basadas en la camara
-		surf.blit(screen, 300, 300, makeRect(115, 0, surf.width(), surf.height())); // Este no
-
+		// Draw el mapa
+		mapa.blit(screen, camara);
 		// Actualizar la pantalla
 		SDL_Flip(screen);
 
 	}
 
-	//Test::test();
-	
-	surf.destroy();
+	mapa.clean();
+	resman.clean();
 
     SDL_Quit();
 

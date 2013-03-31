@@ -14,6 +14,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="source\display\camara.cpp" />
     <ClCompile Include="source\display\entidad.cpp" />
+    <ClCompile Include="source\display\entidad2.cpp" />
     <ClCompile Include="source\display\mapa.cpp" />
     <ClCompile Include="source\display\resman.cpp" />
     <ClCompile Include="source\display\tile.cpp" />
@@ -31,12 +32,12 @@
     <ClCompile Include="source\utilities\surface.cpp" />
     <ClCompile Include="source\utilities\Test.cpp" />
     <ClCompile Include="source\utilities\timer.cpp" />
-    <ClCompile Include="TestMapa.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\constants\model.h" />
     <ClInclude Include="source\display\camara.h" />
     <ClInclude Include="source\display\entidad.h" />
+    <ClInclude Include="source\display\entidad2.h" />
     <ClInclude Include="source\display\mapa.h" />
     <ClInclude Include="source\display\resman.h" />
     <ClInclude Include="source\display\tile.h" />

@@ -75,7 +75,7 @@
     <ClCompile Include="source\utilities\Test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="TestMapa.cpp">
+    <ClCompile Include="source\display\entidad2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -144,6 +144,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="source\utilities\ImagenPersonaje.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\display\entidad2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

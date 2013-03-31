@@ -29,14 +29,14 @@ class Entidad {
 		Pre:-
 		 
 		Post: Se ha inicializado la instancia con los atributos x, y, w y h en cero, surf e 
-		imagen en NULL, y name y path como cadenas vacías.
+		imagen en NULL, y name y path como cadenas vac?s.
 	*/
 	Entidad();
 
 	/*
 		Pre:-
 		 
-		Post: Se ha inicializado la instancia segun el archivo y los parámetros.
+		Post: Se ha inicializado la instancia segun el archivo y los par?etros.
 
 		NOTA: ImagenEstatica
 	*/
@@ -45,7 +45,7 @@ class Entidad {
 	/*
 		Pre:-
 		 
-		Post: Se ha inicializado la instancia segun el archivo y los parámetros.
+		Post: Se ha inicializado la instancia segun el archivo y los par?etros.
 
 		NOTA: ImagenEstatica
 	*/
@@ -54,7 +54,7 @@ class Entidad {
 	/*
 		Pre:-
 		 
-		Post: Se ha inicializado la instancia segun el archivo y los parámetros.
+		Post: Se ha inicializado la instancia segun el archivo y los par?etros.
 
 		NOTA: ImagenEstatica
 	*/
@@ -63,7 +63,7 @@ class Entidad {
 	/*
 		Pre:-
 		 
-		Post: Se ha inicializado la instancia segun el archivo y los parámetros.
+		Post: Se ha inicializado la instancia segun el archivo y los par?etros.
 
 		NOTA: ImagenEstatica
 	*/
@@ -72,7 +72,7 @@ class Entidad {
 	/*
 		Pre:-
 		 
-		Post: Se ha inicializado la instancia segun el archivo y los parámetros.
+		Post: Se ha inicializado la instancia segun el archivo y los par?etros.
 
 		NOTA: ImagenAnimada
 	*/
@@ -82,7 +82,7 @@ class Entidad {
 	/*
 		Pre:-
 		 
-		Post: Se ha inicializado la instancia segun el archivo y los parámetros.
+		Post: Se ha inicializado la instancia segun el archivo y los par?etros.
 
 		NOTA: ImagenAnimada
 	*/

@@ -1,5 +1,5 @@
 #pragma once
-#include "source/utilities/surface.h"
+#include "surface.h"
 
 /*
 	Una instancia de esta clase permite manejar una imagen determinada, a partir
@@ -82,4 +82,6 @@ protected:
 		de caracteres pasada por par?etro.
 	**/
 	void setPath(const char* path);
+
+	
 };

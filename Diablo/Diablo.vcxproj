@@ -11,10 +11,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Imagen.cpp" />
-    <ClCompile Include="ImagenAnimada.cpp" />
-    <ClCompile Include="ImagenEstatica.cpp" />
-    <ClCompile Include="ImagenPersonaje.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="source\display\camara.cpp" />
     <ClCompile Include="source\display\entidad.cpp" />
@@ -27,16 +23,16 @@
     <ClCompile Include="source\utilities\config_general.cpp" />
     <ClCompile Include="source\utilities\config_pantalla.cpp" />
     <ClCompile Include="source\utilities\coordenadas.cpp" />
+    <ClCompile Include="source\utilities\Imagen.cpp" />
+    <ClCompile Include="source\utilities\ImagenAnimada.cpp" />
+    <ClCompile Include="source\utilities\ImagenEstatica.cpp" />
+    <ClCompile Include="source\utilities\ImagenPersonaje.cpp" />
     <ClCompile Include="source\utilities\parser.cpp" />
     <ClCompile Include="source\utilities\surface.cpp" />
+    <ClCompile Include="source\utilities\Test.cpp" />
     <ClCompile Include="source\utilities\timer.cpp" />
-    <ClCompile Include="Test.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Imagen.h" />
-    <ClInclude Include="ImagenAnimada.h" />
-    <ClInclude Include="ImagenEstatica.h" />
-    <ClInclude Include="ImagenPersonaje.h" />
     <ClInclude Include="source\constants\model.h" />
     <ClInclude Include="source\display\camara.h" />
     <ClInclude Include="source\display\entidad.h" />
@@ -49,9 +45,14 @@
     <ClInclude Include="source\utilities\config_general.h" />
     <ClInclude Include="source\utilities\config_pantalla.h" />
     <ClInclude Include="source\utilities\coordenadas.h" />
+    <ClInclude Include="source\utilities\Imagen.h" />
+    <ClInclude Include="source\utilities\ImagenAnimada.h" />
+    <ClInclude Include="source\utilities\ImagenEstatica.h" />
+    <ClInclude Include="source\utilities\ImagenPersonaje.h" />
     <ClInclude Include="source\utilities\imagen_error.h" />
     <ClInclude Include="source\utilities\parser.h" />
     <ClInclude Include="source\utilities\surface.h" />
+    <ClInclude Include="source\utilities\Test.h" />
     <ClInclude Include="source\utilities\timer.h" />
     <ClInclude Include="Test.h" />
   </ItemGroup>

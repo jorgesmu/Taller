@@ -45,22 +45,7 @@
     <ClCompile Include="source\display\camara.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ImagenEstatica.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Imagen.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Test.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ImagenAnimada.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="source\utilities\coordenadas.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ImagenPersonaje.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\display\entidad.cpp">
@@ -73,6 +58,21 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\display\tile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\utilities\Imagen.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\utilities\ImagenAnimada.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\utilities\ImagenEstatica.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\utilities\ImagenPersonaje.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\utilities\Test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -107,22 +107,10 @@
     <ClInclude Include="source\constants\model.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ImagenEstatica.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Imagen.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Test.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ImagenAnimada.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="source\utilities\coordenadas.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ImagenPersonaje.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="source\display\entidad.h">
@@ -139,6 +127,21 @@
     </ClInclude>
     <ClInclude Include="source\utilities\imagen_error.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\utilities\Imagen.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\utilities\ImagenAnimada.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\utilities\ImagenEstatica.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\utilities\ImagenPersonaje.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\utilities\Test.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

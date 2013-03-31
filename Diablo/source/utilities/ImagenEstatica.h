@@ -1,5 +1,6 @@
 #pragma once
 #include "Imagen.h"
+#include "surface.h"
 
 class ImagenEstatica:public Imagen {
 

@@ -97,7 +97,7 @@ int main(int argc, char* args[]) {
 	mapa.clean();
 	resman.clean();
 
-    Test::test();
+    //Test::test();
 
 	SDL_Quit();
 

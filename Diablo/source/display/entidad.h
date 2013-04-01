@@ -21,7 +21,7 @@ class Entidad {
 		
 		Imagen* imagen;
 
-		int w, h; // Ancho y alto de la base en la grilla
+		int w , h; // Ancho y alto de la base en la grilla
 
 	public:
 	
@@ -129,5 +129,9 @@ class Entidad {
 	
 	// Dibuja la entidad
 	void blit(SDL_Surface* dest, SDL_Rect& cam);
+	
+	int getH();
+
+	int getW();
 
 };

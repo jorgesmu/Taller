@@ -110,9 +110,6 @@
     <ClInclude Include="source\constants\model.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Test.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="source\utilities\coordenadas.h">
       <Filter>Header Files</Filter>
     </ClInclude>

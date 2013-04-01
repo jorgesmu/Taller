@@ -9,6 +9,7 @@
 		//retorno &= testImagenEstatica();
 		//retorno &= Test::testImagenAnimada();
 		//retorno &= Test::testImagenPersonaje();
+		retorno &= Test::testEntidad();
 		return retorno;
 	}
 	
@@ -171,5 +172,40 @@
 		//Destruir principal
 		SDL_FreeSurface(pantallaDePrueba);
 		
+		return retorno;
+	}
+
+	//Test Entidad
+	bool Test::testEntidad() {
+		//retorno del test
+		bool retorno = true;
+		//pantalla de prueba
+		SDL_Surface* pantallaDePrueba = SDL_SetVideoMode( 800, 600 , 32, SDL_DOUBLEBUF);
+		//imagen estatica a cargar
+		Entidad entidadArbol("arbol" , "../resources/Arbol.bmp", Imagen::COLOR_KEY);
+		SDL_Rect rect;
+		rect.h = entidadArbol.getH();
+		rect.w = entidadArbol.getW();
+		rect.x = 0;
+		rect.y = 0;
+		entidadArbol.blit(pantallaDePrueba , rect);
+		SDL_Flip(pantallaDePrueba);
+		SDL_Delay( 1000 );
+		//entidadArbol.update();
+		entidadArbol.mover(100,100);
+		entidadArbol.blit(pantallaDePrueba , rect);
+		//Actualizar
+		SDL_Flip(pantallaDePrueba);
+		//tiempo de espera
+		SDL_Delay( 2000 );
+		
+		Entidad entidadAnimada("soldado","../resources/Soldado.bmp" , 100 , 100 , 10 , 500 
+								, Surface::BMP_TRANSPARENCIA);
+		rect.h = entidadAnimada.getH();
+		rect.w = entidadAnimada.getW();
+		//entidadAnimada.blit(pantallaDePrueba , rect);
+
+		//Destruir principal
+		SDL_FreeSurface(pantallaDePrueba);
 		return retorno;
 	}

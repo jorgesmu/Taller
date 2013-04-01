@@ -29,7 +29,9 @@
 		this -> imagen	= new ImagenAnimada(path.c_str() , this -> h , this -> w , fps , 
 														delay , Imagen::COLOR_KEY);
 		this -> name = name;
-		this -> path = this -> imagen -> getPath();
+		if ( this -> imagen -> getPath() != NULL){
+			this -> path = this -> imagen -> getPath();
+		}
 		this -> x = 0;
 		this -> y = 0;
 		this -> w = this -> imagen -> getAncho(); 
@@ -48,7 +50,9 @@
 					const unsigned int h , const int fps , const int delay , const int colorKey) {
 		this -> imagen	= new ImagenAnimada(path.c_str() , this -> h , this -> w , fps , delay , colorKey);
 		this -> name = name;
-		this -> path = this -> imagen -> getPath();
+		if ( this -> imagen -> getPath() != NULL){
+			this -> path = this -> imagen -> getPath();
+		}
 		this -> x = 0;
 		this -> y = 0;
 		this -> w = this -> imagen -> getAncho(); 
@@ -72,7 +76,9 @@
 		this -> imagen	= new ImagenAnimada(path.c_str() , this -> h , this -> w , fps , 
 														delay , Imagen::COLOR_KEY);
 		this -> name = name;
-		this -> path = this -> imagen -> getPath();
+		if ( this -> imagen -> getPath() != NULL){
+			this -> path = this -> imagen -> getPath();
+		}
 		this -> x = 0;
 		this -> y = 0;
 		this -> w = this -> imagen -> getAncho(); 
@@ -96,7 +102,9 @@
 		this -> imagen	= new ImagenAnimada(path.c_str() , this -> h , this -> w , fps , 
 														delay , Imagen::COLOR_KEY);
 		this -> name = name;
-		this -> path = this -> imagen -> getPath();
+		if ( this -> imagen -> getPath() != NULL){
+			this -> path = this -> imagen -> getPath();
+		}
 		this -> x = 0;
 		this -> y = 0;
 		this -> w = this -> imagen -> getAncho(); 
@@ -118,7 +126,9 @@
 		}
 		this -> imagen	= new ImagenEstatica(path.c_str() , Imagen::COLOR_KEY);
 		this -> name = name;
-		this -> path = this -> imagen -> getPath();
+		if ( this -> imagen -> getPath() != NULL){
+			this -> path = this -> imagen -> getPath();
+		}
 		this -> x = 0;
 		this -> y = 0;
 		this -> w = this -> imagen -> getAncho(); 
@@ -140,7 +150,49 @@
 		}
 		this -> imagen	= new ImagenEstatica(path.c_str() , colorKey);
 		this -> name = name;
-		this -> path = this -> imagen -> getPath();
+		if ( this -> imagen -> getPath() != NULL){
+			this -> path = this -> imagen -> getPath();
+		}
+		this -> x = 0;
+		this -> y = 0;
+		this -> w = this -> imagen -> getAncho(); 
+		this -> h = this -> imagen -> getAlto();
+		this -> surf = this -> imagen -> getSurface();
+	}
+
+	/*
+		Pre:
+
+		Post:
+
+		NOTA: ImagenEstatica
+	*/
+	Entidad::Entidad(const std::string& name , const std::string& path ){
+		this -> imagen	= new ImagenEstatica(path.c_str());
+		this -> name = name;
+		if ( this -> imagen -> getPath() != NULL){
+			this -> path = this -> imagen -> getPath();
+		}
+		this -> x = 0;
+		this -> y = 0;
+		this -> w = this -> imagen -> getAncho(); 
+		this -> h = this -> imagen -> getAlto();
+		this -> surf = this -> imagen -> getSurface();
+	}
+
+	/*
+		Pre:
+
+		Post:
+
+		NOTA: ImagenEstatica
+	*/
+	Entidad::Entidad(const std::string& name , const std::string& path , const int colorKey){
+		this -> imagen	= new ImagenEstatica(path.c_str() , colorKey);
+		this -> name = name;
+		if ( this -> imagen -> getPath() != NULL){
+			this -> path = this -> imagen -> getPath();
+		}
 		this -> x = 0;
 		this -> y = 0;
 		this -> w = this -> imagen -> getAncho(); 
@@ -163,7 +215,8 @@
 
 	// Cambia la posicion de la entidad
 	void Entidad::mover(int x, int y) {
-
+		this -> x = x;
+		this -> y = y;
 	}
 	
 	// Getters para la posicion
@@ -182,4 +235,13 @@
 	// Dibuja la entidad
 	void Entidad::blit(SDL_Surface* dest, SDL_Rect& cam){
 		(this -> surf) -> blit(dest , this -> x , this -> y , cam);
+		
+	}
+
+	int Entidad::getH(){
+		return h;
+	}
+
+	int Entidad::getW(){
+		return w;
 	}

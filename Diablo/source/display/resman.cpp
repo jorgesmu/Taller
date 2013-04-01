@@ -73,6 +73,7 @@ Surface* ResMan::getRes(const std::string& name) const {
 	}else{
 		std::cerr << "Error, resource <" << name << "> requested\n";
 		Surface* rubbish;
+		rubbish = NULL;
 		return rubbish; // Deberia devolver la surface de error precargada (TODO)
 	}
 }

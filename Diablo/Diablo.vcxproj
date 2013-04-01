@@ -56,7 +56,6 @@
     <ClInclude Include="source\utilities\surface.h" />
     <ClInclude Include="source\utilities\Test.h" />
     <ClInclude Include="source\utilities\timer.h" />
-    <ClInclude Include="Test.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{A9A2FD3D-2740-4ADA-8DF2-0E25D8612B48}</ProjectGuid>

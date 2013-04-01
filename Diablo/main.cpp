@@ -93,11 +93,13 @@ int main(int argc, char* args[]) {
 		SDL_Flip(screen);
 
 	}
-
+	
 	mapa.clean();
 	resman.clean();
 
-    SDL_Quit();
+    Test::test();
+
+	SDL_Quit();
 
  
     return 0;    

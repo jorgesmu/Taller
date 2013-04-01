@@ -25,7 +25,7 @@ ImagenEstatica::ImagenEstatica(const char* path) {
 	iniciliza de acuerdo a la imagen dada por el path.
 **/
 ImagenEstatica::ImagenEstatica(const char* path , const int colorKey) {
-	if (this -> surface.load(path) , colorKey){
+	if (this -> surface.load(path , colorKey)){
 		this -> setAlto(this -> surface.height());
 		this -> setAncho(this -> surface.width());
 		this -> setPath(path);

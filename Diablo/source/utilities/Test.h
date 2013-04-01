@@ -1,7 +1,7 @@
 #pragma once
-#include "ImagenEstatica.h"
-#include "ImagenAnimada.h"
-#include "ImagenPersonaje.h"
+#include "../utilities/ImagenEstatica.h"
+#include "../utilities/ImagenAnimada.h"
+#include "../utilities/ImagenPersonaje.h"
 class Test
 {
 private:
@@ -24,6 +24,9 @@ public:
 	
 	//Test Imagen Personaje
 	static bool testImagenPersonaje();
+
+	//Test Entidad
+	static bool testEntidad();
 
 	//Test Surface
 	static bool testSurface();

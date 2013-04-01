@@ -234,8 +234,11 @@
 	
 	// Dibuja la entidad
 	void Entidad::blit(SDL_Surface* dest, SDL_Rect& cam){
-		(this -> surf) -> blit(dest , this -> x , this -> y , cam);
-		
+		if ( (this -> imagen != NULL) && (this -> surf != NULL)) {
+			if(this -> surf -> getSDL_Surface() != NULL){
+				(this -> surf) -> blit(dest , this -> x , this -> y , cam);
+			}
+		}
 	}
 
 	int Entidad::getH(){

@@ -97,7 +97,7 @@
 		if (surfaceImagenAnimada != NULL) {
 			for (int i = 0 ; i < 300 ; i++) {
 				SDL_FillRect(pantallaDePrueba , NULL , Surface::RGB_VERDE);
-				surfaceImagenAnimada -> blit(pantallaDePrueba , 0 , 0);
+				surfaceImagenAnimada -> blit(pantallaDePrueba , 100 , 100);
 				SDL_Flip(pantallaDePrueba);
 				SDL_Delay( 100 );
 				surfaceImagenAnimada = imagen.getSurface();
@@ -198,13 +198,16 @@
 		SDL_Flip(pantallaDePrueba);
 		//tiempo de espera
 		SDL_Delay( 2000 );
-		
-		Entidad entidadAnimada("soldado","../resources/Soldado.bmp" , 100 , 100 , 10 , 500 
-								, Surface::BMP_TRANSPARENCIA);
-		rect.h = entidadAnimada.getH();
-		rect.w = entidadAnimada.getW();
-		//entidadAnimada.blit(pantallaDePrueba , rect);
-
+		Entidad entidadAnimada("soldado","../resources/Arbol.bmp" , 100 , 100 , 10 , 500);
+		rect.h = 100;
+		rect.w = 100;
+		rect.x = 0;
+		rect.y = 0;
+		entidadAnimada.blit(pantallaDePrueba , rect);
+		//Actualizar
+		SDL_Flip(pantallaDePrueba);
+		//tiempo de espera
+		SDL_Delay( 2000 );
 		//Destruir principal
 		SDL_FreeSurface(pantallaDePrueba);
 		return retorno;

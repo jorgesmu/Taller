@@ -25,23 +25,37 @@ int main(int argc, char* args[]) {
     SDL_Init(SDL_INIT_EVERYTHING);
 	// Para confinar el mouse a la ventana
 	SDL_WM_GrabInput(SDL_GRAB_ON);
-	SDL_WarpMouse(640/2, 480/2);
+	SDL_WarpMouse(800/2, 600/2);
 	// Init the window
-	screen = SDL_SetVideoMode(640, 480, 32, SDL_SWSURFACE);
+	screen = SDL_SetVideoMode(800, 600, 32, SDL_SWSURFACE);
 	// Camara
 	Camara camara;
-	camara.init(640, 480, 30);
+	camara.init(800, 600, 50);
 
 	// Mapa
 	ResMan resman;
-	resman.addRes("cemento", "../resources/tile.bmp");
+	resman.addRes("tierra", "../resources/tile.bmp", 255);
+	resman.addRes("cemento", "../resources/tile2.bmp", 255);
+	Entidad2 tierra_test;
+	tierra_test.init("tierra", resman);
 	Entidad2 cem_test;
 	cem_test.init("cemento", resman);
 	Mapa mapa;
-	mapa.resize(20, 20);
-	mapa.getTile(0, 0).addEntidad(cem_test);
-	mapa.getTile(0, 1).addEntidad(cem_test);
-	mapa.getTile(1, 0).addEntidad(cem_test);
+	// Mapa de size random
+	mapa.resize(intRand(20, 100), intRand(20, 100));
+	//mapa.resize(7, 3);
+	// Llenamos el mapa con entidades random
+	for(auto it = mapa.allTiles().begin();it != mapa.allTiles().end(); ++it) {
+		if(intRand(0,1) == 0) {
+			it->addEntidad(tierra_test);
+		}else{
+			it->addEntidad(cem_test);
+		}
+	}
+	// Aca muestra como se agregan a mano
+	//mapa.getTile(0, 0).addEntidad(cem_test);
+	//mapa.getTile(0, 1).addEntidad(cem_test);
+	//mapa.getTile(1, 0).addEntidad(tierra_test);
 
 	double curr_time = SDL_GetTicks();
     double accum = 0.0;

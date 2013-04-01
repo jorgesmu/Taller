@@ -42,19 +42,24 @@ void Camara::update() {
 // Actualiza la velocidad basado en la posicion del mouse
 void Camara::update_speed(const SDL_Rect& mouse_coords) {
 	bool anymod = false;
-
+	// Primero detectamos si estamos dentro del margen de scrolleo
+	// Despues se calcula un factor entre [0,1] para aplicar la velocidad de scrolleo de la camara
 	if(mouse_coords.x < margen) {
-		vx = -DRAG_SPEED;
+		const float spd_factor = 1.0f - (mouse_coords.x / float(margen));
+		vx = -spd_factor*DRAG_SPEED;
 		anymod = true;
 	}else if(mouse_coords.x > w-margen) {
-		vx = DRAG_SPEED;
+		const float spd_factor = (mouse_coords.x - w + margen) / float(margen);
+		vx = spd_factor*DRAG_SPEED;
 		anymod = true;
 	}
 	if(mouse_coords.y < margen) {
-		vy = -DRAG_SPEED;
+		const float spd_factor = 1.0f - (mouse_coords.y / float(margen));
+		vy = -spd_factor*DRAG_SPEED;
 		anymod = true;
 	}else if(mouse_coords.y > h-margen) {
-		vy = DRAG_SPEED;
+		const float spd_factor = (mouse_coords.y - h + margen) / float(margen);
+		vy = spd_factor*DRAG_SPEED;
 		anymod = true;
 	}
 	if(!anymod) {

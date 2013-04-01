@@ -6,6 +6,8 @@ Mapa::Mapa() {
 	w = h = 0;
 }
 
+
+
 // Hace un resize del mapa, es indefinido que pasa si el mapa no estaba en size 0
 void Mapa::resize(int w, int h) {
 	this->w = w;
@@ -15,8 +17,10 @@ void Mapa::resize(int w, int h) {
 }
 
 // Getter para cada tile
+//#include <iostream>
 Tile& Mapa::getTile(int x, int y) {
-	return tiles[x*w + y];
+	//std::cout << "Accessing tile (" << x << ";" << y << "): " << x*h + y << "\n";
+	return tiles[x*h + y];
 }
 
 // Getter para el vector de tiles, para recorrerlo entero

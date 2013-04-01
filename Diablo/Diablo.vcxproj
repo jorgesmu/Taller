@@ -29,6 +29,7 @@
     <ClCompile Include="source\utilities\ImagenEstatica.cpp" />
     <ClCompile Include="source\utilities\ImagenPersonaje.cpp" />
     <ClCompile Include="source\utilities\parser.cpp" />
+    <ClCompile Include="source\utilities\Personaje.cpp" />
     <ClCompile Include="source\utilities\surface.cpp" />
     <ClCompile Include="source\utilities\Test.cpp" />
     <ClCompile Include="source\utilities\timer.cpp" />
@@ -53,6 +54,7 @@
     <ClInclude Include="source\utilities\ImagenPersonaje.h" />
     <ClInclude Include="source\utilities\imagen_error.h" />
     <ClInclude Include="source\utilities\parser.h" />
+    <ClInclude Include="source\utilities\Personaje.h" />
     <ClInclude Include="source\utilities\surface.h" />
     <ClInclude Include="source\utilities\Test.h" />
     <ClInclude Include="source\utilities\timer.h" />

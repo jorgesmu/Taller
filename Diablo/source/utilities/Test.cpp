@@ -9,7 +9,7 @@
 		//retorno &= testImagenEstatica();
 		//retorno &= Test::testImagenAnimada();
 		//retorno &= Test::testImagenPersonaje();
-		retorno &= Test::testEntidad();
+		//retorno &= Test::testEntidad();
 		return retorno;
 	}
 	

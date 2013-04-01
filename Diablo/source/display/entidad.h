@@ -23,6 +23,8 @@ class Entidad {
 
 		int w , h; // Ancho y alto de la base en la grilla
 
+		
+
 	public:
 	
 	/*
@@ -58,7 +60,7 @@ class Entidad {
 
 		NOTA: ImagenEstatica
 	*/
-	void init(const std::string& name , const std::string& path);
+	virtual void init(const std::string& name , const std::string& path);
 
 	/*
 		Pre:-
@@ -67,7 +69,7 @@ class Entidad {
 
 		NOTA: ImagenEstatica
 	*/
-	void init(const std::string& name , const std::string& path , const int colorKey);
+	virtual void init(const std::string& name , const std::string& path , const int colorKey);
 
 	/*
 		Pre:-
@@ -96,7 +98,7 @@ class Entidad {
 
 		NOTA: ImagenAnimada
 	*/
-	void init(const std::string& name, const std::string& path , const unsigned int w , 
+	virtual void init(const std::string& name, const std::string& path , const unsigned int w , 
 				const unsigned int h , const int fps , const int delay);
 	
 	/*
@@ -106,7 +108,7 @@ class Entidad {
 
 		NOTA: ImagenAnimada
 	*/
-	void init(const std::string& name, const std::string& path , const unsigned int w , 
+	virtual void init(const std::string& name, const std::string& path , const unsigned int w , 
 				const unsigned int h , const int fps , const int delay , const int colorKey);
 		
 	/*
@@ -114,10 +116,10 @@ class Entidad {
 		 
 		Post: Se ha destruido la instancia liberando los recursos asociados.
 	*/
-	~Entidad();
+	virtual ~Entidad();
 		
 	// Cambia la posicion de la entidad
-	void mover(int x, int y);
+	virtual void mover(int x, int y);
 	
 	// Getters para la posicion
 	int getX() const;
@@ -125,14 +127,13 @@ class Entidad {
 	int getY() const;
 	// Actualiza las cosas internas, si hubiese
 	
-	void update();
+	virtual void update();
 	
 	// Dibuja la entidad
-	void blit(SDL_Surface* dest, SDL_Rect& cam);
+	virtual void blit(SDL_Surface* dest, SDL_Rect& cam);
 	
 	int getH();
 
 	int getW();
-
-	
+		
 };

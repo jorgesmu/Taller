@@ -2,17 +2,25 @@
 
 	/*
 		Pre:-
-		 
-		Post: Se ha inicializado la instancia con los atributos x, y, w y h en cero, surf e 
-		imagenPersonaje en NULL, y name y path como cadenas vac?s.
+
+		Post: Inicializa los atributos con los valores por defecto.
 	*/
-	Entidad::Entidad(){
-		this -> h = 0;
-		this -> w = 0;
-		this -> x = 0;
-		this -> y = 0;
+	void Entidad::inicializarAtributosEnValoresDefault() {
+		//posicion
+		this -> posPixelX = 0;
+		this -> posPixelY = 0;
+		this -> posTileX = 0;
+		this -> posPixelY = 0;
+		//dimensiones
+		this -> highInTiles = 1;
+		this -> widthInTiles = 1;
+		//pixel de referencia
+		this -> pixel_ref_x = Entidad::PIXEL_REF_X_DEFAULT;
+		this -> pixel_ref_y = Entidad::PIXEL_REF_Y_DEFAULT;
+		//nombre y path
 		this -> name = "";
 		this -> path = "";
+		//surf e imagen
 		this -> surf = NULL;
 		this -> imagen = NULL;
 	}
@@ -20,23 +28,30 @@
 	/*
 		Pre:-
 		 
+		Post: Se ha creado la instancia con los valores por defecto.
+	*/
+	Entidad::Entidad(){
+		// seteo del puntero a imagen
+		this -> imagen = NULL;
+		// Se setean los atributos a sus valores por defecto.
+		this -> inicializarAtributosEnValoresDefault();
+	}
+
+	/*
+		Pre:-
+		 
 		Post: Se ha inicializado la instancia segun el archivo y los par?etros.
 
-		NOTA: ImagenAnimada
+		NOTA: ImagenEstatica
 	*/
-	Entidad::Entidad(const std::string& name, const std::string& path , const unsigned int w , 
-					const unsigned int h , const int fps , const int delay) {
-		this -> imagen	= new ImagenAnimada(path.c_str() , this -> h , this -> w , fps , 
-														delay , Imagen::COLOR_KEY);
-		this -> name = name;
-		if ( this -> imagen -> getPath() != NULL){
-			this -> path = this -> imagen -> getPath();
-		}
-		this -> x = 0;
-		this -> y = 0;
-		this -> w = this -> imagen -> getAncho(); 
-		this -> h = this -> imagen -> getAlto();
-		this -> surf = this -> imagen -> getSurface();
+	Entidad::Entidad(const std::string& name, const std::string& path , 
+					const unsigned int wTiles , const unsigned int hTiles ,
+					int pixel_ref_x ,int pixel_ref_y,
+					int posTileX, int posTileY , const int colorKey){
+		// seteo del puntero a imagen
+		this -> imagen = NULL;
+		//carga de imagen y configuración inicial.
+		init(name , path , wTiles , hTiles , pixel_ref_x , pixel_ref_y, posTileX, posTileY , colorKey);
 	}
 
 	/*
@@ -46,160 +61,95 @@
 
 		NOTA: ImagenAnimada
 	*/
-	Entidad::Entidad(const std::string& name, const std::string& path , const unsigned int w , 
-					const unsigned int h , const int fps , const int delay , const int colorKey) {
-		this -> imagen	= new ImagenAnimada(path.c_str() , this -> h , this -> w , fps , delay , colorKey);
-		this -> name = name;
-		if ( this -> imagen -> getPath() != NULL){
-			this -> path = this -> imagen -> getPath();
-		}
-		this -> x = 0;
-		this -> y = 0;
-		this -> w = this -> imagen -> getAncho(); 
-		this -> h = this -> imagen -> getAlto();
-		this -> surf = this -> imagen -> getSurface();
+	Entidad::Entidad(const std::string& name, const std::string& path , 
+					const unsigned int wTiles , const unsigned int hTiles , 
+					const int fps , const int delay , 
+					int pixel_ref_x ,int pixel_ref_y,
+					int posTileX, int posTileY , const int colorKey){
+		// seteo del puntero a imagen
+		this -> imagen = NULL;
+		//carga de imagen y configuración inicial.
+		init(name , path , wTiles , hTiles , fps , delay , pixel_ref_x , pixel_ref_y, 
+			posTileX, posTileY , colorKey);
 	}
-
+	
 	/*
-		Pre:
-
-		Post:
+		Pre:-
+		 
+		Post: Se ha inicializado la instancia segun el archivo y los par?etros.
 
 		NOTA: ImagenAnimada
 	*/
-	void Entidad::init(const std::string& name , const std::string& path , const unsigned int w , 
-						const unsigned int h , const int fps , const int delay){
+	void Entidad::init(const std::string& name, const std::string& path , 
+					const unsigned int wTiles , const unsigned int hTiles , 
+					const int fps , const int delay , 
+					int pixel_ref_x ,int pixel_ref_y,
+					int posTileX, int posTileY , const int colorKey) {
+		// Se destruyen imagenes previas
 		if (this -> imagen != NULL) {
 			delete(this -> imagen);
-			this -> imagen = NULL;
 		}
-		this -> imagen	= new ImagenAnimada(path.c_str() , this -> h , this -> w , fps , 
-														delay , Imagen::COLOR_KEY);
+		// Se setean los atributos a sus valores por defecto.
+		this -> inicializarAtributosEnValoresDefault();
+		// Se carga la nueva imagen
+		this -> imagen	= new ImagenAnimada(path.c_str() ,Imagen::ALTO_DEFAULT , Imagen::ANCHO_DEFAULT , 
+											fps , delay , colorKey);
+		// Seteo de nombre y path
 		this -> name = name;
 		if ( this -> imagen -> getPath() != NULL){
 			this -> path = this -> imagen -> getPath();
 		}
-		this -> x = 0;
-		this -> y = 0;
-		this -> w = this -> imagen -> getAncho(); 
-		this -> h = this -> imagen -> getAlto();
+		// Seteo del Surface
 		this -> surf = this -> imagen -> getSurface();
+		//Seteo de dimensiones
+		this -> highInTiles = hTiles;
+		this -> widthInTiles = wTiles;
+		//pixel de referencia
+		this -> pixel_ref_x = pixel_ref_x ;
+		this -> pixel_ref_y = pixel_ref_y;
+		//posicion en Tiles
+		this -> posTileX = posTileX;
+		this -> posTileY = posTileY;
 	}
 
 	/*
-		Pre:
+		Pre: La instancia ha sido creada.
 
-		Post:
-
-		NOTA: ImagenAnimada
-	*/
-	void Entidad::init(const std::string& name , const std::string& path , const unsigned int w , 
-						const unsigned int h , const int fps , const int delay , const int colorKey){
-		if (this -> imagen != NULL) {
-			delete(this -> imagen);
-			this -> imagen = NULL;
-		}
-		this -> imagen	= new ImagenAnimada(path.c_str() , this -> h , this -> w , fps , 
-														delay , Imagen::COLOR_KEY);
-		this -> name = name;
-		if ( this -> imagen -> getPath() != NULL){
-			this -> path = this -> imagen -> getPath();
-		}
-		this -> x = 0;
-		this -> y = 0;
-		this -> w = this -> imagen -> getAncho(); 
-		this -> h = this -> imagen -> getAlto();
-		this -> surf = this -> imagen -> getSurface();
-	}
-
-	/*
-		Pre:
-
-		Post:
+		Post: Se ha configurado la instancia de acuerdo a a los parametros.
 
 		NOTA: ImagenEstatica
 	*/
-	void Entidad::init(const std::string& name , const std::string& path){
+	void Entidad::init(const std::string& name, const std::string& path , 
+					const unsigned int wTiles , const unsigned int hTiles , 
+					int pixel_ref_x ,int pixel_ref_y , 
+					int posTileX, int posTileY , 
+					const int colorKey){
+		// Se destruyen imagenes previas
 		if (this -> imagen != NULL) {
 			delete(this -> imagen);
-			this -> imagen = NULL;
 		}
-		this -> imagen	= new ImagenEstatica(path.c_str() , Imagen::COLOR_KEY);
-		this -> name = name;
-		if ( this -> imagen -> getPath() != NULL){
-			this -> path = this -> imagen -> getPath();
-		}
-		this -> x = 0;
-		this -> y = 0;
-		this -> w = this -> imagen -> getAncho(); 
-		this -> h = this -> imagen -> getAlto();
-		this -> surf = this -> imagen -> getSurface();
-	}
-
-	/*
-		Pre:
-
-		Post:
-
-		NOTA: ImagenEstatica
-	*/
-	void Entidad::init(const std::string& name , const std::string& path , const int colorKey){
-		if (this -> imagen != NULL) {
-			delete(this -> imagen);
-			this -> imagen = NULL;
-		}
+		// Se setean los atributos a sus valores por defecto.
+		this -> inicializarAtributosEnValoresDefault();
+		// Se carga la nueva imagen
 		this -> imagen	= new ImagenEstatica(path.c_str() , colorKey);
+		// Seteo de nombre y path
 		this -> name = name;
 		if ( this -> imagen -> getPath() != NULL){
 			this -> path = this -> imagen -> getPath();
 		}
-		this -> x = 0;
-		this -> y = 0;
-		this -> w = this -> imagen -> getAncho(); 
-		this -> h = this -> imagen -> getAlto();
+		// Seteo del Surface
 		this -> surf = this -> imagen -> getSurface();
+		//Seteo de dimensiones
+		this -> highInTiles = hTiles;
+		this -> widthInTiles = wTiles;
+		//pixel de referencia
+		this -> pixel_ref_x = pixel_ref_x ;
+		this -> pixel_ref_y = pixel_ref_y;
+		//posicion en Tiles
+		this -> posTileX = posTileX;
+		this -> posTileY = posTileY;
 	}
-
-	/*
-		Pre:
-
-		Post:
-
-		NOTA: ImagenEstatica
-	*/
-	Entidad::Entidad(const std::string& name , const std::string& path ){
-		this -> imagen	= new ImagenEstatica(path.c_str());
-		this -> name = name;
-		if ( this -> imagen -> getPath() != NULL){
-			this -> path = this -> imagen -> getPath();
-		}
-		this -> x = 0;
-		this -> y = 0;
-		this -> w = this -> imagen -> getAncho(); 
-		this -> h = this -> imagen -> getAlto();
-		this -> surf = this -> imagen -> getSurface();
-	}
-
-	/*
-		Pre:
-
-		Post:
-
-		NOTA: ImagenEstatica
-	*/
-	Entidad::Entidad(const std::string& name , const std::string& path , const int colorKey){
-		this -> imagen	= new ImagenEstatica(path.c_str() , colorKey);
-		this -> name = name;
-		if ( this -> imagen -> getPath() != NULL){
-			this -> path = this -> imagen -> getPath();
-		}
-		this -> x = 0;
-		this -> y = 0;
-		this -> w = this -> imagen -> getAncho(); 
-		this -> h = this -> imagen -> getAlto();
-		this -> surf = this -> imagen -> getSurface();
-	}
-
+	
 	/*
 		Pre: La instancia ha sido creada.
 		 
@@ -214,19 +164,39 @@
 	}
 
 	// Cambia la posicion de la entidad
-	void Entidad::mover(int x, int y) {
-		this -> x = x;
-		this -> y = y;
+	void Entidad::mover(const unsigned int x , const unsigned int y , 
+						const unsigned int altoTileEnPixeles , const unsigned int anchoTileEnPixeles) {
+		
 	}
 	
-	// Getters para la posicion
-	int Entidad::getX() const {
-		return this -> x;
-	}
-	int Entidad::getY() const{
-		return this -> y;
+	/*
+		Retorna la posición X en Tiles
+	*/
+	int Entidad::getPosTileX() const {
+		return this -> posTileX;
 	}
 	
+	/*
+		Retorna la posición Y en Tiles
+	*/
+	int Entidad::getPosTileY() const {
+		return this -> posTileY;
+	}
+			
+	/*
+		retorna el alto en tiles
+	*/
+	int Entidad::getHighInTiles() {
+		return this -> highInTiles;
+	}
+
+	/*
+		retorna el ancho en tiles
+	*/
+	int Entidad::getWidthInTiles() {
+		return this -> widthInTiles;
+	}
+
 	// Actualiza las cosas internas, si hubiese
 	void Entidad::update() {
 		this -> surf = this -> imagen -> getSurface();
@@ -236,15 +206,7 @@
 	void Entidad::blit(SDL_Surface* dest, SDL_Rect& cam){
 		if ( (this -> imagen != NULL) && (this -> surf != NULL)) {
 			if(this -> surf -> getSDL_Surface() != NULL){
-				(this -> surf) -> blit(dest , this -> x , this -> y , cam);
+				(this -> surf) -> blit(dest ,0 , 0 , cam);
 			}
 		}
-	}
-
-	int Entidad::getH(){
-		return h;
-	}
-
-	int Entidad::getW(){
-		return w;
 	}

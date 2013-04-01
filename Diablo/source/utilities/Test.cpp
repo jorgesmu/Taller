@@ -177,8 +177,10 @@
 
 	//Test Entidad
 	bool Test::testEntidad() {
+		
 		//retorno del test
 		bool retorno = true;
+		/*
 		//pantalla de prueba
 		SDL_Surface* pantallaDePrueba = SDL_SetVideoMode( 800, 600 , 32, SDL_DOUBLEBUF);
 		//imagen estatica a cargar
@@ -209,6 +211,6 @@
 		//tiempo de espera
 		SDL_Delay( 2000 );
 		//Destruir principal
-		SDL_FreeSurface(pantallaDePrueba);
+		SDL_FreeSurface(pantallaDePrueba);*/
 		return retorno;
 	}

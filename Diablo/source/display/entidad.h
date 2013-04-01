@@ -5,7 +5,9 @@
 #include "../utilities/Imagen.h"
 #include "../utilities/ImagenEstatica.h"
 #include "../utilities/ImagenAnimada.h"
+#include "../display/camara.h"
 #include "SDL.h"
+
 /*	
 	Axiomas de Entidad:
 
@@ -28,7 +30,7 @@ class Entidad {
 		
 		int posTileX, posTileY; // Posicion en la grilla [en tiles]
 		
-		int posPixelX, posPixelY; // Posicion en la grilla [en pixeles]
+		int offsetTileX, offsetTileY; // Posicion en el Tile
 
 		Surface* surf; // Puntero a la surface de esta entidad (traida desde el resource manager on load)
 		
@@ -109,7 +111,8 @@ class Entidad {
 			
 	// Cambia la posicion de la entidad
 	virtual void mover(const unsigned int x , const unsigned int y , 
-					const unsigned int altoTileEnPixeles , const unsigned int anchoTileEnPixeles);
+					const unsigned int altoTileEnPixeles , 
+					const unsigned int anchoTileEnPixeles);
 	
 	/*
 		Retorna la posición X en Tiles
@@ -136,7 +139,9 @@ class Entidad {
 	virtual void update();
 	
 	// Dibuja la entidad
-	virtual void blit(SDL_Surface* dest, SDL_Rect& cam);
+	virtual void blit(SDL_Surface* dest, const Camara& camara , 
+					const unsigned int altoTileEnPixeles , 
+					const unsigned int anchoTileEnPixeles);
 
 protected:	
 		

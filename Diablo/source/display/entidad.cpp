@@ -7,10 +7,10 @@
 	*/
 	void Entidad::inicializarAtributosEnValoresDefault() {
 		//posicion
-		this -> posPixelX = 0;
-		this -> posPixelY = 0;
+		this -> offsetTileX = 0;
+		this -> offsetTileY = 0;
 		this -> posTileX = 0;
-		this -> posPixelY = 0;
+		this -> posTileY = 0;
 		//dimensiones
 		this -> highInTiles = 1;
 		this -> widthInTiles = 1;
@@ -166,7 +166,15 @@
 	// Cambia la posicion de la entidad
 	void Entidad::mover(const unsigned int x , const unsigned int y , 
 						const unsigned int altoTileEnPixeles , const unsigned int anchoTileEnPixeles) {
-		
+		/*
+		int posicionEnMapaX = this -> offsetTileX + anchoTileEnPixeles * this -> posTileX + this -> pixel_ref_x;
+		int posicionEnMapaY = this -> offsetTileY + altoTileEnPixeles * this -> posTileY + this -> pixel_ref_y;
+		*/
+
+		//Por ahora lo muevo de Tile en Tile
+
+		this ->posTileX = x;
+		this ->posTileY = y;
 	}
 	
 	/*
@@ -203,10 +211,18 @@
 	}
 	
 	// Dibuja la entidad
-	void Entidad::blit(SDL_Surface* dest, SDL_Rect& cam){
+	void Entidad::blit(SDL_Surface* dest, const Camara& camara , 
+					const unsigned int altoTileEnPixeles , 
+					const unsigned int anchoTileEnPixeles){
 		if ( (this -> imagen != NULL) && (this -> surf != NULL)) {
 			if(this -> surf -> getSDL_Surface() != NULL){
-				(this -> surf) -> blit(dest ,0 , 0 , cam);
+				int posicionEnMapaX = this -> offsetTileX + anchoTileEnPixeles * this -> posTileX - 
+										this -> pixel_ref_x;
+				int posicionEnMapaY = this -> offsetTileY + altoTileEnPixeles * this -> posTileY - 
+										this -> pixel_ref_y;
+				
+				(this -> surf) -> blit(dest , posicionEnMapaX - (int) camara.getX(),
+												posicionEnMapaY - (int) camara.getY());
 			}
 		}
 	}

@@ -29,7 +29,7 @@ ImagenAnimada::ImagenAnimada(const char* path , const int altoSprite , const int
 	if (anchoSprite >= 0){
 		this -> setAncho(anchoSprite);
 	} else{
-		this -> setAlto(Imagen::ANCHO_DEFAULT);
+		this -> setAncho(Imagen::ANCHO_DEFAULT);
 	}
 	
 	//seteo de tiempos de delay y fps

@@ -100,7 +100,6 @@ int main(int argc, char* args[]) {
     //Test::test();
 
 	SDL_Quit();
-
- 
+	 
     return 0;    
 }

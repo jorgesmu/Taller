@@ -198,7 +198,7 @@
 		SDL_Flip(pantallaDePrueba);
 		//tiempo de espera
 		SDL_Delay( 2000 );
-		Entidad entidadAnimada("soldado","../resources/Arbol.bmp" , 100 , 100 , 10 , 500);
+		Entidad entidadAnimada("soldado","../resources/Soldado.bmp" , 100 , 100 , 10 , 500);
 		rect.h = 100;
 		rect.w = 100;
 		rect.x = 0;

@@ -37,16 +37,10 @@ void Mapa::clean() {
 }
 
 void Mapa::assignTileCoords() {
-	int x = 0;
-	int y = 0;
-	for(auto it = tiles.begin(); it != tiles.end(); ++it) {
-		// TODO- fix para grilla isometrica
-		it->setBlitCoords(x, y);
-		if(x >= w) {
-			x = 0;
-			y += Tile::TILE_ALTO;
-		}else{
-			x += Tile::TILE_ANCHO;
+	int x, y;
+	for(x = 0;x < w;x++) {
+		for(y = 0;y < h;y++) {
+			getTile(x,y).setBlitCoords((x-y)*Tile::TILE_ANCHO/2, (x+y)*Tile::TILE_ALTO/2);
 		}
 	}
 }

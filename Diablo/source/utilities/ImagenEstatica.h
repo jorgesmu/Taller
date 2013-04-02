@@ -1,12 +1,15 @@
 #pragma once
 #include "Imagen.h"
 #include "surface.h"
+#include "../display/resman.h"
 
 class ImagenEstatica:public Imagen {
 
 private:
 	
-	Surface surface; //imagen
+	Surface* surface; //imagen
+
+	bool compartida; //si la imagen esta compartida
 
 public:
 	
@@ -25,6 +28,23 @@ public:
 		iniciliza de acuerdo a la imagen dada por el path.
 	**/
 	ImagenEstatica(const char* path , const int ckey);
+
+	/**
+		Pre: El parámetro path es una ruta no nula.
+		
+		Post: Si se logra abrir el archivo y tomar memoria, la instancia se
+		iniciliza de acuerdo a la imagen dada por el path.
+	**/
+	ImagenEstatica(const char* path , const char* name , ResMan& rm);
+	
+	/**
+		Pre: El parámetro path es una ruta no nula.
+		
+		Post: Si se logra abrir el archivo y tomar memoria, la instancia se
+		iniciliza de acuerdo a la imagen dada por el path.
+	**/
+	ImagenEstatica(const char* path , const char* name , 
+					ResMan& rm, const int ckey);
 
 	/**
 		Pre: La instancia ha sido creada.

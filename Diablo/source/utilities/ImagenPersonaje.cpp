@@ -19,13 +19,40 @@
 	
 	Nota: Setea en la accion EST_SUR.
 **/
-ImagenPersonaje::ImagenPersonaje(const char* path , const int altoSprite , const int anchoSprite , 
-				const int fps , const int delay , const int colorKey) : 
-				ImagenAnimada(path , altoSprite , anchoSprite , fps , delay , colorKey) {
-	
+ImagenPersonaje::ImagenPersonaje(const char* path , const char* name , const int altoSprite , 
+				const int anchoSprite , const int fps , const int delay , ResMan& rm ,
+				const int colorKey) : 
+				ImagenAnimada(path , name ,altoSprite , anchoSprite , fps , delay , rm , colorKey) {
 	this -> accionActual = ImagenPersonaje::EST_SUR;
 	this -> setAccion(ImagenPersonaje::EST_SUR);
 }
+
+/**
+	Pre: Condiciones sobre la entrada:
+		
+		path: no nulo, caso contrario se vuelca a NULL
+
+		altoSprite y anchoSprite: mayores iguales a cero, caso contrario se
+		vuelca a default
+
+		fps: mayor que cero, caso contario se vuelca a default
+
+		delay: mayor o igual a cero, caso contrario se vuelca a 0.
+
+		colorKey: cualquier entero para representar un RGB de 32 bits.
+
+	Post: Si se logra abrir el archivo y tomar memoria, la instancia se
+	inicializa de acuerdo a la imagen dada por el path.
+	
+	Nota: Setea en la accion EST_SUR.
+**/
+ImagenPersonaje::ImagenPersonaje(const char* path , const int altoSprite , const int anchoSprite , 
+				const int fps , const int delay , const int colorKey) : 
+				ImagenAnimada(path , altoSprite , anchoSprite , fps , delay , colorKey) {
+	this -> accionActual = ImagenPersonaje::EST_SUR;
+	this -> setAccion(ImagenPersonaje::EST_SUR);
+}
+
 
 /**
 	Pre: La instancia ha sido creada.
@@ -35,7 +62,11 @@ ImagenPersonaje::ImagenPersonaje(const char* path , const int altoSprite , const
 ImagenPersonaje::~ImagenPersonaje() {
 	delete[] this -> getPath();
 	this -> setPath(NULL);
-	this -> surfaceOrigen.destroy();
+	if (!(this -> compartida)) {	
+		this -> surfaceOrigen -> destroy();
+		delete(this -> surfaceOrigen);
+		this -> surfaceOrigen = NULL;
+	}
 	this -> surfaceActual.destroy();
 }
 
@@ -214,7 +245,9 @@ void ImagenPersonaje::nextSprite() {
 			rect.w = this ->getAncho();
 			rect.x = this -> columnaActual * this -> getAncho();
 			rect.y = this -> filaActual * this -> getAlto();
-			this -> surfaceOrigen.blit( (this -> surfaceActual).getSDL_Surface() , 0 , 0, rect);
+			if (this ->surfaceOrigen != NULL) {
+				this -> surfaceOrigen -> blit( (this -> surfaceActual).getSDL_Surface() , 0 , 0, rect);
+			}
 		}
 	}
 }

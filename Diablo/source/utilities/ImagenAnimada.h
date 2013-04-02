@@ -1,10 +1,11 @@
 #pragma once
 #include "Imagen.h"
 #include <time.h>
+#include "../display/resman.h"
 
 class ImagenAnimada:public Imagen {
 
-protected:
+public:
 
 	const static int FPS_DEFAULT = 10;
 
@@ -12,7 +13,7 @@ protected:
 
 protected:
 
-	Surface surfaceOrigen;
+	Surface* surfaceOrigen;
 
 	Surface surfaceActual;
 
@@ -34,6 +35,10 @@ protected:
 
 	int colorKey;
 
+protected:
+
+	bool compartida;
+
 public:
 	
 	/**
@@ -45,6 +50,17 @@ public:
 	**/
 	ImagenAnimada(const char* path , const int altoSprite , const int anchoSprite , 
 				const int fps , const int delay , const int colorKey);
+
+	/**
+		Pre: El parametro path es una ruta no nula y los parametros alto y ancho son
+		positivos.
+	
+		Post: Si se logra abrir el archivo y tomar memoria, la instancia se
+		iniciliza de acuerdo a la imagen dada por el path.
+	**/
+	ImagenAnimada(const char* path , const char* name , const int altoSprite , 
+				const int anchoSprite , const int fps , const int delay , ResMan& rm ,
+				const int colorKey);
 
 	/**
 		Pre: La instancia ha sido creada.

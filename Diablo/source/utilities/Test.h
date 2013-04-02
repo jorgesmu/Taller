@@ -30,5 +30,14 @@ public:
 
 	//Test Surface
 	static bool testSurface();
+
+	//Test imagen estatica con resource manager
+	static bool testImagenEstaticaConResourceManager();
+
+	//Test imagen animada con resource manager
+	static bool testImagenAnimadaConResourceManager();
+	
+	//Test imagen personaje con resource manager
+	static bool testImagenPersonajeConResourceManager();
 };
 

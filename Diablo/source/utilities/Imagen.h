@@ -1,5 +1,5 @@
 #pragma once
-#include "surface.h"
+#include "../utilities/surface.h"
 
 /*
 	Una instancia de esta clase permite manejar una imagen determinada, a partir

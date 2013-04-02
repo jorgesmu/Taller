@@ -70,7 +70,7 @@
 		this -> imagen = NULL;
 		//carga de imagen y configuración inicial.
 		init(name , path , wTiles , hTiles , fps , delay , pixel_ref_x , pixel_ref_y, 
-			posTileX, posTileY , colorKey);
+			posTileX , posTileY , colorKey);
 	}
 	
 	/*
@@ -220,7 +220,6 @@
 										this -> pixel_ref_x;
 				int posicionEnMapaY = this -> offsetTileY + altoTileEnPixeles * this -> posTileY - 
 										this -> pixel_ref_y;
-				
 				(this -> surf) -> blit(dest , posicionEnMapaX - (int) camara.getX(),
 												posicionEnMapaY - (int) camara.getY());
 			}

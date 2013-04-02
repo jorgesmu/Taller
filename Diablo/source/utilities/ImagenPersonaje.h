@@ -67,6 +67,34 @@ public:
 	ImagenPersonaje(const char* path , const int altoSprite , const int anchoSprite , 
 				const int fps , const int delay , const int colorKey);
 
+	/**
+		Pre: Condiciones sobre la entrada:
+		
+			path: no nulo, caso contrario se vuelca a NULL
+
+			altoSprite y anchoSprite: mayores iguales a cero, caso contrario se
+			vuelca a default
+
+			fps: mayor que cero, caso contario se vuelca a default
+
+			delay: mayor o igual a cero, caso contrario se vuelca a 0.
+
+			colorKey: cualquier entero para representar un RGB de 32 bits.
+
+		Post: Si se logra abrir el archivo y tomar memoria, la instancia se
+			inicializa de acuerdo a la imagen dada por el path.
+
+		Nota: Setea en la accion EST_SUR.
+	**/
+	ImagenPersonaje(const char* path , const char* name , const int altoSprite , 
+				const int anchoSprite , const int fps , const int delay , ResMan& rm ,
+				const int colorKey);
+
+	/*
+		Pre: La instancia ha sido creada.
+
+		Post: Se destruye la instancia liberando los recursos asociados.
+	*/
 	virtual ~ImagenPersonaje();
 
 	/*

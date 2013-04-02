@@ -2,6 +2,7 @@
 #include "../display/entidad.h"
 #include "../display/camara.h"
 #include "../display/resman.h"
+#include "../utilities/Personaje.h"
 
 	//Todos los tests
 	bool Test::test() {
@@ -14,6 +15,7 @@
 		//retorno &= Test::testImagenEstaticaConResourceManager();
 		//retorno &= Test::testImagenAnimadaConResourceManager();
 		//retorno &= Test::testImagenPersonajeConResourceManager();
+		//retorno &= Test::testPersonaje();
 		return retorno;
 	}
 	
@@ -159,7 +161,7 @@
 		if (surfaceImagenPersonaje != NULL) {
 			
 			for (unsigned int accion = ImagenPersonaje::DES_SUR ; (accion <= ImagenPersonaje::MUERTE)&&(!salida()) ; accion++) {
-				for(int volver = 1 ; volver < accion ; volver++) {
+				for(int volver = 1 ; volver < (int) accion ; volver++) {
 					imagen.setAccion(accion);
 					for (int i = 0 ;i < 12; i++) {
 						SDL_FillRect(pantallaDePrueba , NULL , Surface::RGB_VERDE);
@@ -365,7 +367,7 @@
 		if (surfaceImagenPersonaje != NULL) {
 			
 			for (unsigned int accion = ImagenPersonaje::DES_SUR ; (accion <= ImagenPersonaje::MUERTE)&&(!salida()) ; accion++) {
-				for(int volver = 1 ; volver < accion ; volver++) {
+				for(int volver = 1 ; volver < (int) accion ; volver++) {
 					imagen.setAccion(accion);
 					for (int i = 0 ; i < 12 ; i++) {
 						SDL_FillRect(pantallaDePrueba , NULL , Surface::RGB_VERDE);
@@ -406,5 +408,42 @@
 		//liberacion de resman
 		resman.clean();
 
+		return retorno;
+	}
+
+	//Test Personaje
+	bool Test::testPersonaje() {
+		//retorno del test
+		bool retorno = true;
+		//pantalla de prueba
+		SDL_Surface* pantallaDePrueba = SDL_SetVideoMode( 800, 600 , 32, SDL_DOUBLEBUF);
+		SDL_WM_SetCaption( "Presione ESC para salir", NULL );
+		//camara
+		Camara camara;
+		camara.init(800,600,50);
+		//Resman
+		ResMan resman;		
+		//Personaje
+		Personaje personaje("soldado" , "../resources/Soldado.bmp", 
+							0 , 0 , 
+							10 , 500, 50,
+							0 , 0 , 
+							0 , 1 , resman ,
+							Imagen::COLOR_KEY);
+		int contador = 1;
+		while((!salida()) && (contador <8)) {
+			personaje.blit(pantallaDePrueba , camara , 100 , 100); 
+			SDL_Flip(pantallaDePrueba);
+			personaje.mover( contador , 1 , 100 , 100);	
+			personaje.update();
+			contador++;
+			SDL_Delay( 100 );
+		}
+		while(!salida()) {
+			SDL_Delay( 100 );
+		}
+		resman.clean();
+		//Destruir principal
+		SDL_FreeSurface(pantallaDePrueba);
 		return retorno;
 	}

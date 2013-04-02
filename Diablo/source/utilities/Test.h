@@ -28,6 +28,9 @@ public:
 	//Test Entidad
 	static bool testEntidad();
 
+	//Test Personaje
+	static bool testPersonaje();
+
 	//Test Surface
 	static bool testSurface();
 

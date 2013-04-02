@@ -48,8 +48,7 @@ class Entidad {
 	/*
 		Pre:-
 		 
-		Post: Se ha inicializado la instancia con los atributos x, y, w y h en cero, surf e 
-		imagen en NULL, y name y path como cadenas vac?s.
+		Post: Se ha inicializado la instancia con los atributos por defecto.
 	*/
 	Entidad();
 	
@@ -134,7 +133,7 @@ class Entidad {
 		retorna el ancho en tiles
 	*/
 	int getWidthInTiles();
-	
+
 	// Actualiza las cosas internas, si hubiese
 	
 	virtual void update();
@@ -143,7 +142,7 @@ class Entidad {
 	virtual void blit(SDL_Surface* dest, const Camara& camara , 
 					const unsigned int altoTileEnPixeles , 
 					const unsigned int anchoTileEnPixeles);
-
+	
 protected:	
 		
 	/*

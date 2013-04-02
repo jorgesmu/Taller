@@ -3,8 +3,6 @@
 /**
 	Pre: Condiciones sobre la entrada:
 		
-		path: no nulo, caso contrario se vuelca a NULL
-
 		altoSprite y anchoSprite: mayores iguales a cero, caso contrario se
 		vuelca a default
 
@@ -19,10 +17,10 @@
 	
 	Nota: Setea en la accion EST_SUR.
 **/
-ImagenPersonaje::ImagenPersonaje(const char* path , const char* name , const int altoSprite , 
+ImagenPersonaje::ImagenPersonaje(const char* name , const int altoSprite , 
 				const int anchoSprite , const int fps , const int delay , ResMan& rm ,
 				const int colorKey) : 
-				ImagenAnimada(path , name ,altoSprite , anchoSprite , fps , delay , rm , colorKey) {
+				ImagenAnimada(name ,altoSprite , anchoSprite , fps , delay , rm , colorKey) {
 	this -> accionActual = ImagenPersonaje::EST_SUR;
 	this -> setAccion(ImagenPersonaje::EST_SUR);
 }
@@ -60,8 +58,6 @@ ImagenPersonaje::ImagenPersonaje(const char* path , const int altoSprite , const
 	Post: Se liberan los recursos asociados a la instancia.
 **/
 ImagenPersonaje::~ImagenPersonaje() {
-	delete[] this -> getPath();
-	this -> setPath(NULL);
 	if (!(this -> compartida)) {	
 		this -> surfaceOrigen -> destroy();
 		delete(this -> surfaceOrigen);

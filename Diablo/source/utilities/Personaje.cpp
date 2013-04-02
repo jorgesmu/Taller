@@ -46,7 +46,7 @@ void Personaje::init(const std::string& name, const std::string& path ,
 					const int posTileX , const int posTileY , ResMan& rm , const int colorKey) {
 	this -> velocidad = velocidad;
 	//Se iniciliza a valores default padre
-	Entidad::init(name , path , wTiles , hTiles , fps , delay , pixel_ref_x , pixel_ref_y, 
+	Entidad::init(name, wTiles , hTiles , fps , delay , pixel_ref_x , pixel_ref_y, 
 			posTileX , posTileY , rm , colorKey);
 }
 

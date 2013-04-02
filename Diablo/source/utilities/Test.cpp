@@ -212,15 +212,17 @@
 		Camara camara;
 		camara.init(800,600,50);
 		//Resman
-		ResMan resman;		
+		ResMan resman;	
+		resman.addRes("arbol", "../resources/arbol.bmp", Surface::BMP_TRANSPARENCIA);
+		resman.addRes("soldado", "../resources/Soldado.bmp", Surface::BMP_TRANSPARENCIA);
 		//imagen estatica a cargar
 		
-		Entidad entidadArbol("arbol" , "../resources/Arbol.bmp", 
+		Entidad entidadArbol("arbol" , 
 							1 , 1 , 
 							0 , 0 , 
 							0 , 0, resman , Imagen::COLOR_KEY);
 		//imagen animada
-		Entidad entidadSoldado("soldado" , "../resources/Soldado.bmp", 
+		Entidad entidadSoldado("soldado" ,
 							0 , 0 , 
 							10 , 500,
 							0 , 0 , 
@@ -256,8 +258,8 @@
 		resman.addRes("arbol", "../resources/arbol.bmp", Surface::BMP_TRANSPARENCIA);
 		resman.addRes("arbol2", "../resources/arbol.bmp", Surface::BMP_TRANSPARENCIA);
 		//imagen estática a cargar
-		ImagenEstatica imagen("../resources/arbol.bmp" , "arbol" , resman);
-		ImagenEstatica imagen2("../resources/arbol.bmp" , "arbol3" , resman , Imagen::COLOR_KEY);
+		ImagenEstatica imagen("arbol" , resman);
+		ImagenEstatica imagen2("arbol3" , resman , Imagen::COLOR_KEY);
 		//retorno del test
 		bool retorno = true;
 		//primera evaluación de imagen cargada correctamente
@@ -309,9 +311,9 @@
 		//resman
 
 		ResMan resman;
-
+		resman.addRes("Soldado", "../resources/Soldado.bmp", Surface::BMP_TRANSPARENCIA);
 		//imagen animada a cargar
-		ImagenAnimada imagen("../resources/Soldado.bmp" ,"Soldado" ,100 , 100 , 10 , 500 
+		ImagenAnimada imagen("Soldado" ,100 , 100 , 10 , 500 
 								, resman , Surface::BMP_TRANSPARENCIA);
 				
 		//primera evaluación de imagen cargada correctamente
@@ -354,9 +356,9 @@
 		SDL_WM_SetCaption( "Presione ESC para salir", NULL );
 		//resman
 		ResMan resman;
-
+		resman.addRes("Soldado", "../resources/Soldado.bmp", Surface::BMP_TRANSPARENCIA);
 		//imagen animada a cargar
-		ImagenPersonaje imagen("../resources/Soldado.bmp" , "Soldado" , 100 , 100 , 10 , 500 
+		ImagenPersonaje imagen("Soldado" , 100 , 100 , 10 , 500 
 								, resman, Surface::BMP_TRANSPARENCIA);
 				
 		//primera evaluación de imagen cargada correctamente
@@ -423,6 +425,7 @@
 		camara.init(800,600,50);
 		//Resman
 		ResMan resman;		
+		resman.addRes("Soldado", "../resources/Soldado.bmp", Surface::BMP_TRANSPARENCIA);
 		//Personaje
 		Personaje personaje("soldado" , "../resources/Soldado.bmp", 
 							0 , 0 , 

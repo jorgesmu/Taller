@@ -56,7 +56,6 @@ ImagenAnimada::ImagenAnimada(const char* path , const int altoSprite , const int
 	if (this -> surfaceOrigen != NULL) {
 		//lectura de imagen de origen
 		if (this -> surfaceOrigen -> load(path , colorKey)){
-			this -> setPath(path);
 			//calculo cantidad de filas y columnas
 			if (this-> getAncho() <= this -> surfaceOrigen -> width()) {
 				this -> maxColumnas = this -> surfaceOrigen -> width() / this -> getAncho();
@@ -71,12 +70,10 @@ ImagenAnimada::ImagenAnimada(const char* path , const int altoSprite , const int
 				this -> maxFilas = 1;
 			}		
 		} else {
-			this -> setPath(NULL);
 			this -> maxFilas = 0;
 			this -> maxColumnas = 0;
 		}	
 	}else {
-		this -> setPath(NULL);
 		this -> maxFilas = 0;
 		this -> maxColumnas = 0;
 	}
@@ -88,8 +85,6 @@ ImagenAnimada::ImagenAnimada(const char* path , const int altoSprite , const int
 
 /**
 	Pre: Condiciones sobre la entrada:
-		
-		path: no nulo, caso contrario se vuelca a NULL
 
 		altoSprite y anchoSprite: mayores iguales a cero, caso contrario se
 		vuelca a default
@@ -103,7 +98,7 @@ ImagenAnimada::ImagenAnimada(const char* path , const int altoSprite , const int
 	Post: Si se logra abrir el archivo y tomar memoria, la instancia se
 	inicializa de acuerdo a la imagen dada por el path.
 **/
-ImagenAnimada::ImagenAnimada(const char* path , const char* name , const int altoSprite , 
+ImagenAnimada::ImagenAnimada(const char* name , const int altoSprite , 
 				const int anchoSprite , const int fps , const int delay , ResMan& rm , 
 				const int colorKey){
 	
@@ -142,13 +137,8 @@ ImagenAnimada::ImagenAnimada(const char* path , const char* name , const int alt
 	this -> surfaceOrigen = new Surface();
 	if (this -> surfaceOrigen != NULL) {
 		this -> surfaceOrigen = rm.getRes(name);
-		if (this -> surfaceOrigen == NULL) {
-			rm.addRes(name , path , colorKey);
-			this -> surfaceOrigen = rm.getRes(name);
-		}
 		//lectura de imagen de origen
 		if (this ->surfaceOrigen != NULL){
-			this -> setPath(path);
 			//calculo cantidad de filas y columnas
 			if (this-> getAncho() <= this -> surfaceOrigen -> width()) {
 				this -> maxColumnas = this -> surfaceOrigen -> width() / this -> getAncho();
@@ -163,12 +153,10 @@ ImagenAnimada::ImagenAnimada(const char* path , const char* name , const int alt
 				this -> maxFilas = 1;
 			}		
 		} else {
-			this -> setPath(NULL);
 			this -> maxFilas = 0;
 			this -> maxColumnas = 0;
 		}	
 	}else {
-		this -> setPath(NULL);
 		this -> maxFilas = 0;
 		this -> maxColumnas = 0;
 	}
@@ -184,8 +172,6 @@ ImagenAnimada::ImagenAnimada(const char* path , const char* name , const int alt
 	Post: Se liberan los recursos asociados a la instancia.
 **/
 ImagenAnimada::~ImagenAnimada() {
-	delete[] this -> getPath();
-	this -> setPath(NULL);
 	if (!(this -> compartida)) {	
 		this -> surfaceOrigen -> destroy();
 		delete(this -> surfaceOrigen);

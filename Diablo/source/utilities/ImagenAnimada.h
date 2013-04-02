@@ -52,13 +52,12 @@ public:
 				const int fps , const int delay , const int colorKey);
 
 	/**
-		Pre: El parametro path es una ruta no nula y los parametros alto y ancho son
-		positivos.
+		Pre: -
 	
 		Post: Si se logra abrir el archivo y tomar memoria, la instancia se
 		iniciliza de acuerdo a la imagen dada por el path.
 	**/
-	ImagenAnimada(const char* path , const char* name , const int altoSprite , 
+	ImagenAnimada(const char* name , const int altoSprite , 
 				const int anchoSprite , const int fps , const int delay , ResMan& rm ,
 				const int colorKey);
 

@@ -26,9 +26,7 @@ class Entidad {
 	protected:
 		
 		std::string name; // Nombre de la entidad
-		
-		std::string path; // Path a la imagen
-		
+			
 		int posTileX, posTileY; // Posicion en la grilla [en tiles]
 		
 		int offsetTileX, offsetTileY; // Posicion en el Tile
@@ -59,7 +57,7 @@ class Entidad {
 
 		NOTA: ImagenEstatica
 	*/
-	Entidad(const std::string& name, const std::string& path , 
+	Entidad(const std::string& name,
 			const unsigned int wTiles , const unsigned int hTiles ,
 			const int pixel_ref_x , const int pixel_ref_y,
 			const int posTileX , const int posTileY , ResMan& rm , const int colorKey);
@@ -71,7 +69,7 @@ class Entidad {
 
 		NOTA: ImagenAnimada
 	*/
-	Entidad(const std::string& name, const std::string& path , 
+	Entidad(const std::string& name, 
 			const unsigned int wTiles , const unsigned int hTiles , 
 			const int fps , const int delay , 
 			const int pixel_ref_x , const int pixel_ref_y,
@@ -91,7 +89,7 @@ class Entidad {
 
 		NOTA: ImagenEstatica
 	*/
-	virtual void init(const std::string& name, const std::string& path , 
+	virtual void init(const std::string& name, 
 					const unsigned int wTiles , const unsigned int hTiles , 
 					const int pixel_ref_x , const int pixel_ref_y , 
 					const int posTileX, const int posTileY , ResMan& rm , const int colorKey);
@@ -103,7 +101,7 @@ class Entidad {
 
 		NOTA: ImagenAnimada
 	*/
-	virtual void init(const std::string& name, const std::string& path , 
+	virtual void init(const std::string& name,
 					const unsigned int wTiles , const unsigned int hTiles , 
 					const int fps , const int delay , 
 					const int pixel_ref_x , const int pixel_ref_y,

@@ -17,9 +17,8 @@
 		//pixel de referencia
 		this -> pixel_ref_x = Entidad::PIXEL_REF_X_DEFAULT;
 		this -> pixel_ref_y = Entidad::PIXEL_REF_Y_DEFAULT;
-		//nombre y path
+		//nombre
 		this -> name = "";
-		this -> path = "";
 		//surf e imagen
 		this -> surf = NULL;
 		this -> imagen = NULL;
@@ -44,14 +43,14 @@
 
 		NOTA: ImagenEstatica
 	*/
-	Entidad::Entidad(const std::string& name, const std::string& path , 
+	Entidad::Entidad(const std::string& name, 
 					const unsigned int wTiles , const unsigned int hTiles ,
 					int pixel_ref_x ,int pixel_ref_y,
 					int posTileX, int posTileY , ResMan& rm , const int colorKey){
 		// seteo del puntero a imagen
 		this -> imagen = NULL;
 		//carga de imagen y configuración inicial.
-		init(name , path , wTiles , hTiles , pixel_ref_x , pixel_ref_y, posTileX, posTileY , rm , colorKey);
+		init(name , wTiles , hTiles , pixel_ref_x , pixel_ref_y, posTileX, posTileY , rm , colorKey);
 	}
 
 	/*
@@ -61,7 +60,7 @@
 
 		NOTA: ImagenAnimada
 	*/
-	Entidad::Entidad(const std::string& name, const std::string& path , 
+	Entidad::Entidad(const std::string& name, 
 					const unsigned int wTiles , const unsigned int hTiles , 
 					const int fps , const int delay , 
 					int pixel_ref_x ,int pixel_ref_y,
@@ -69,7 +68,7 @@
 		// seteo del puntero a imagen
 		this -> imagen = NULL;
 		//carga de imagen y configuración inicial.
-		init(name , path , wTiles , hTiles , fps , delay , pixel_ref_x , pixel_ref_y, 
+		init(name , wTiles , hTiles , fps , delay , pixel_ref_x , pixel_ref_y, 
 			posTileX , posTileY , rm , colorKey);
 	}
 	
@@ -80,7 +79,7 @@
 
 		NOTA: ImagenAnimada
 	*/
-	void Entidad::init(const std::string& name, const std::string& path , 
+	void Entidad::init(const std::string& name, 
 					const unsigned int wTiles , const unsigned int hTiles , 
 					const int fps , const int delay , 
 					int pixel_ref_x ,int pixel_ref_y,
@@ -92,13 +91,10 @@
 		// Se setean los atributos a sus valores por defecto.
 		this -> inicializarAtributosEnValoresDefault();
 		// Se carga la nueva imagen
-		this -> imagen	= new ImagenAnimada(path.c_str() , name.c_str() ,Imagen::ALTO_DEFAULT , 
+		this -> imagen	= new ImagenAnimada(name.c_str() ,Imagen::ALTO_DEFAULT , 
 								Imagen::ANCHO_DEFAULT , fps , delay , rm ,colorKey);
-		// Seteo de nombre y path
+		// Seteo de nombre 
 		this -> name = name;
-		if ( this -> imagen -> getPath() != NULL){
-			this -> path = this -> imagen -> getPath();
-		}
 		// Seteo del Surface
 		this -> surf = this -> imagen -> getSurface();
 		//Seteo de dimensiones
@@ -119,7 +115,7 @@
 
 		NOTA: ImagenEstatica
 	*/
-	void Entidad::init(const std::string& name, const std::string& path , 
+	void Entidad::init(const std::string& name,  
 					const unsigned int wTiles , const unsigned int hTiles , 
 					int pixel_ref_x ,int pixel_ref_y , 
 					int posTileX, int posTileY , 
@@ -131,12 +127,9 @@
 		// Se setean los atributos a sus valores por defecto.
 		this -> inicializarAtributosEnValoresDefault();
 		// Se carga la nueva imagen
-		this -> imagen	= new ImagenEstatica(path.c_str() , name.c_str() , rm , colorKey);
-		// Seteo de nombre y path
+		this -> imagen	= new ImagenEstatica( name.c_str() , rm , colorKey);
+		// Seteo de nombre
 		this -> name = name;
-		if ( this -> imagen -> getPath() != NULL){
-			this -> path = this -> imagen -> getPath();
-		}
 		// Seteo del Surface
 		this -> surf = this -> imagen -> getSurface();
 		//Seteo de dimensiones

@@ -70,8 +70,6 @@ public:
 	/**
 		Pre: Condiciones sobre la entrada:
 		
-			path: no nulo, caso contrario se vuelca a NULL
-
 			altoSprite y anchoSprite: mayores iguales a cero, caso contrario se
 			vuelca a default
 
@@ -86,7 +84,7 @@ public:
 
 		Nota: Setea en la accion EST_SUR.
 	**/
-	ImagenPersonaje(const char* path , const char* name , const int altoSprite , 
+	ImagenPersonaje(const char* name , const int altoSprite , 
 				const int anchoSprite , const int fps , const int delay , ResMan& rm ,
 				const int colorKey);
 

@@ -30,21 +30,19 @@ public:
 	ImagenEstatica(const char* path , const int ckey);
 
 	/**
-		Pre: El parámetro path es una ruta no nula.
-		
+		Pre: -
 		Post: Si se logra abrir el archivo y tomar memoria, la instancia se
 		iniciliza de acuerdo a la imagen dada por el path.
 	**/
-	ImagenEstatica(const char* path , const char* name , ResMan& rm);
+	ImagenEstatica(const char* name , ResMan& rm);
 	
 	/**
-		Pre: El parámetro path es una ruta no nula.
+		Pre: -
 		
 		Post: Si se logra abrir el archivo y tomar memoria, la instancia se
 		iniciliza de acuerdo a la imagen dada por el path.
 	**/
-	ImagenEstatica(const char* path , const char* name , 
-					ResMan& rm, const int ckey);
+	ImagenEstatica(const char* name , ResMan& rm, const int ckey);
 
 	/**
 		Pre: La instancia ha sido creada.

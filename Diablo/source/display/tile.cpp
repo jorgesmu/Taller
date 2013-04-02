@@ -3,13 +3,13 @@
 Tile::Tile() {
 }
 
-void Tile::addEntidad(const Entidad2& ent){
-	(this ->entidades).push_back(ent);
+void Tile::addEntidad(Entidad* ent){
+	(this -> entidades).push_back(ent);
 }
 
 void Tile::blit(SDL_Surface* pantalla, const Camara& cam){
 	for(auto it = entidades.begin(); it != entidades.end(); ++it) {
-		it->blit(pantalla, cam, x, y);	
+		(*it) -> blit(pantalla, cam, x, y);	
 	}
 }
 

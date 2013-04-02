@@ -230,8 +230,8 @@
 							Imagen::COLOR_KEY);
 		int contador = 1;
 		while((!salida()) && (contador <5)) {
-			entidadArbol.blit(pantallaDePrueba , camara , 100 , 100); 
-			entidadSoldado.blit(pantallaDePrueba , camara , 100 , 100); 
+			entidadArbol.blit(pantallaDePrueba , camara , contador , 0); 
+			entidadSoldado.blit(pantallaDePrueba , camara , contador , 1); 
 			SDL_Flip(pantallaDePrueba);
 			entidadArbol.mover( (contador) , 0  , 100 , 100);
 			entidadSoldado.mover( contador , 1 , 100 , 100);	
@@ -435,7 +435,7 @@
 							Imagen::COLOR_KEY);
 		int contador = 1;
 		while((!salida()) && (contador <8)) {
-			personaje.blit(pantallaDePrueba , camara , 100 , 100); 
+			personaje.blit(pantallaDePrueba , camara , contador , 1); 
 			SDL_Flip(pantallaDePrueba);
 			personaje.mover( contador , 1 , 100 , 100);	
 			personaje.update();

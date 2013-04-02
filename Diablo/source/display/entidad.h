@@ -138,8 +138,8 @@ class Entidad {
 	
 	// Dibuja la entidad
 	virtual void blit(SDL_Surface* dest, const Camara& camara , 
-					const unsigned int altoTileEnPixeles , 
-					const unsigned int anchoTileEnPixeles);
+					const unsigned int tileX , 
+					const unsigned int tileY);
 	
 protected:	
 		

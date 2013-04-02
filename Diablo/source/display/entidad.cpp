@@ -87,6 +87,7 @@
 		// Se destruyen imagenes previas
 		if (this -> imagen != NULL) {
 			delete(this -> imagen);
+			this -> imagen = NULL;
 		}
 		// Se setean los atributos a sus valores por defecto.
 		this -> inicializarAtributosEnValoresDefault();
@@ -123,6 +124,7 @@
 		// Se destruyen imagenes previas
 		if (this -> imagen != NULL) {
 			delete(this -> imagen);
+			this -> imagen = NULL;
 		}
 		// Se setean los atributos a sus valores por defecto.
 		this -> inicializarAtributosEnValoresDefault();
@@ -205,16 +207,20 @@
 	
 	// Dibuja la entidad
 	void Entidad::blit(SDL_Surface* dest, const Camara& camara , 
-					const unsigned int altoTileEnPixeles , 
-					const unsigned int anchoTileEnPixeles){
+					const unsigned int tileX , 
+					const unsigned int tileY){
 		if ( (this -> imagen != NULL) && (this -> surf != NULL)) {
 			if(this -> surf -> getSDL_Surface() != NULL){
-				int posicionEnMapaX = this -> offsetTileX + anchoTileEnPixeles * this -> posTileX - 
+				this ->surf -> blit(dest , tileX - (int)camara.getX(), tileY - (int)camara.getY());		
+			}
+		}
+
+		/*
+		int posicionEnMapaX = this -> offsetTileX + anchoTileEnPixeles * this -> posTileX - 
 										this -> pixel_ref_x;
 				int posicionEnMapaY = this -> offsetTileY + altoTileEnPixeles * this -> posTileY - 
 										this -> pixel_ref_y;
 				(this -> surf) -> blit(dest , posicionEnMapaX - (int) camara.getX(),
 												posicionEnMapaY - (int) camara.getY());
-			}
-		}
+												*/
 	}

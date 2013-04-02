@@ -5,11 +5,10 @@
 #include "source/utilities/surface.h"
 #include "source/utilities/aux_func.h"
 #include "source/utilities/parser.h"
-
+#include "source/display/entidad.h"
 #include "source\display\camara.h"
 #include "source\display\mapa.h"
 #include "source\display\resman.h"
-
 #include "source/constants/model.h"
 #include "source/utilities/Test.h"
 
@@ -36,10 +35,16 @@ int main(int argc, char* args[]) {
 	ResMan resman;
 	resman.addRes("tierra", "../resources/tile.bmp", 255);
 	resman.addRes("cemento", "../resources/tile2.bmp", 255);
-	Entidad2 tierra_test;
-	tierra_test.init("tierra", resman);
-	Entidad2 cem_test;
-	cem_test.init("cemento", resman);
+	Entidad tierra_test;
+	tierra_test.init("tierra", 1 , 1 , 
+							   0 , 0 , 
+							   0 , 0 ,
+							   resman , Surface::RGB_VERDE);
+	Entidad cem_test;
+	cem_test.init("cemento", 1 , 1 , 
+							 0 , 0 , 
+							 0 , 0 ,
+							 resman , Surface::RGB_VERDE);
 	Mapa mapa;
 	// Mapa de size random
 	mapa.resize(intRand(20, 100), intRand(20, 100));
@@ -47,9 +52,9 @@ int main(int argc, char* args[]) {
 	// Llenamos el mapa con entidades random
 	for(auto it = mapa.allTiles().begin();it != mapa.allTiles().end(); ++it) {
 		if(intRand(0,1) == 0) {
-			it->addEntidad(tierra_test);
+			it->addEntidad(&tierra_test);
 		}else{
-			it->addEntidad(cem_test);
+			it->addEntidad(&cem_test);
 		}
 	}
 	// Aca muestra como se agregan a mano

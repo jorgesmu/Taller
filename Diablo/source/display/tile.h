@@ -1,12 +1,12 @@
 #pragma once
 
-#include "entidad2.h"
+#include "entidad.h"
 #include <vector>
 #include "SDL.h"
 
 class Tile {
 	private:
-	std::vector<Entidad2> entidades;
+	std::vector<Entidad*> entidades;
 	int x, y; // x,y son las coordenadas en pixels en la pantalla absoluta
 
 	public:
@@ -17,14 +17,14 @@ class Tile {
 		
 	// Ctor, no hace nada
 	Tile();
-
+	
 	void setX(int x);
 
 	//void setAlto(int h);
 
 	//void setAncho(int w);
 
-	void addEntidad(const Entidad2& ent);
+	void addEntidad(Entidad* ent);
 	//void deleteEntidad(const Entidad& ent);
 
 	void setBlitCoords(int x, int y);
@@ -34,4 +34,5 @@ class Tile {
 
 	// Libera recursos si hace falta
 	void clean();
+
 };

@@ -13,7 +13,7 @@
 		//retorno &= Test::testEntidad();
 		//retorno &= Test::testImagenEstaticaConResourceManager();
 		//retorno &= Test::testImagenAnimadaConResourceManager();
-		retorno &= Test::testImagenPersonajeConResourceManager();
+		//retorno &= Test::testImagenPersonajeConResourceManager();
 		return retorno;
 	}
 	
@@ -209,18 +209,20 @@
 		//camara
 		Camara camara;
 		camara.init(800,600,50);
+		//Resman
+		ResMan resman;		
 		//imagen estatica a cargar
 		
 		Entidad entidadArbol("arbol" , "../resources/Arbol.bmp", 
 							1 , 1 , 
 							0 , 0 , 
-							0 , 0, Imagen::COLOR_KEY);
+							0 , 0, resman , Imagen::COLOR_KEY);
 		//imagen animada
 		Entidad entidadSoldado("soldado" , "../resources/Soldado.bmp", 
 							0 , 0 , 
 							10 , 500,
 							0 , 0 , 
-							0 , 1 , 
+							0 , 1 , resman ,
 							Imagen::COLOR_KEY);
 		int contador = 1;
 		while((!salida()) && (contador <5)) {
@@ -236,6 +238,7 @@
 		while(!salida()) {
 			SDL_Delay( 100 );
 		}
+		resman.clean();
 		//Destruir principal
 		SDL_FreeSurface(pantallaDePrueba);
 		return retorno;

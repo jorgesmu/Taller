@@ -10,6 +10,8 @@ ResMan::ResMan() {
 
 // Dtor
 ResMan::~ResMan() {
+	//Se podria agregar un clean al destructor para evitar la assertion
+	//this -> clean();
 	// Checkeo que se hayan liberado todas las surfaces
 	assert(surface_map.size() == 0);
 }

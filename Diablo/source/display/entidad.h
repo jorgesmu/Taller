@@ -6,13 +6,14 @@
 #include "../utilities/ImagenEstatica.h"
 #include "../utilities/ImagenAnimada.h"
 #include "../display/camara.h"
+#include "../display/resman.h"
 #include "SDL.h"
 
 /*	
-	Axiomas de Entidad:
+	NOTA: Se mueve de a Tiles, aun no le encontre la vuelta para detectar en que Tile se encuentra
+	para asi usar el offset.
 
-	*	Entidad tiene la capacidad de moverse entre Tiles, de manera tal que para un movimiento se le
-	tiene que informar el tamaño del Tile correspondiente en pixeles.
+
 */
 class Entidad {
 
@@ -62,7 +63,7 @@ class Entidad {
 	Entidad(const std::string& name, const std::string& path , 
 			const unsigned int wTiles , const unsigned int hTiles ,
 			const int pixel_ref_x , const int pixel_ref_y,
-			const int posTileX , const int posTileY , const int colorKey);
+			const int posTileX , const int posTileY , ResMan& rm , const int colorKey);
 
 	/*
 		Pre:-
@@ -75,8 +76,8 @@ class Entidad {
 			const unsigned int wTiles , const unsigned int hTiles , 
 			const int fps , const int delay , 
 			const int pixel_ref_x , const int pixel_ref_y,
-			const int posTileX , const int posTileY , const int colorKey);
-	
+			const int posTileX , const int posTileY , ResMan& rm , const int colorKey);
+
 	/*
 		Pre: La instancia ha sido creada.
 		 
@@ -94,7 +95,7 @@ class Entidad {
 	virtual void init(const std::string& name, const std::string& path , 
 					const unsigned int wTiles , const unsigned int hTiles , 
 					const int pixel_ref_x , const int pixel_ref_y , 
-					const int posTileX, const int posTileY , const int colorKey);
+					const int posTileX, const int posTileY , ResMan& rm , const int colorKey);
 			
 	/*
 		Pre: Se ha creado la instancia.
@@ -107,7 +108,7 @@ class Entidad {
 					const unsigned int wTiles , const unsigned int hTiles , 
 					const int fps , const int delay , 
 					const int pixel_ref_x , const int pixel_ref_y,
-					const int posTileX , const int posTileY , const int colorKey);
+					const int posTileX , const int posTileY , ResMan& rm , const int colorKey);
 			
 	// Cambia la posicion de la entidad
 	virtual void mover(const unsigned int x , const unsigned int y , 

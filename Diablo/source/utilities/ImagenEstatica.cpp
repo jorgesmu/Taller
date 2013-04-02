@@ -58,7 +58,7 @@ ImagenEstatica::ImagenEstatica(const char* path , const int colorKey) {
 	Post: Si se logra abrir el archivo y tomar memoria, la instancia se
 	iniciliza de acuerdo a la imagen dada por el path.
 **/
-ImagenEstatica::ImagenEstatica(const char* path , const char*name , ResMan& rm) {
+ImagenEstatica::ImagenEstatica(const char* path , const char* name , ResMan& rm) {
 	this -> surface = rm.getRes(name);
 	if (this -> surface == NULL) {
 		rm.addRes(name , path , Imagen::COLOR_KEY);

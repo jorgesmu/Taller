@@ -47,11 +47,11 @@
 	Entidad::Entidad(const std::string& name, const std::string& path , 
 					const unsigned int wTiles , const unsigned int hTiles ,
 					int pixel_ref_x ,int pixel_ref_y,
-					int posTileX, int posTileY , const int colorKey){
+					int posTileX, int posTileY , ResMan& rm , const int colorKey){
 		// seteo del puntero a imagen
 		this -> imagen = NULL;
 		//carga de imagen y configuración inicial.
-		init(name , path , wTiles , hTiles , pixel_ref_x , pixel_ref_y, posTileX, posTileY , colorKey);
+		init(name , path , wTiles , hTiles , pixel_ref_x , pixel_ref_y, posTileX, posTileY , rm , colorKey);
 	}
 
 	/*
@@ -65,12 +65,12 @@
 					const unsigned int wTiles , const unsigned int hTiles , 
 					const int fps , const int delay , 
 					int pixel_ref_x ,int pixel_ref_y,
-					int posTileX, int posTileY , const int colorKey){
+					int posTileX, int posTileY , ResMan& rm , const int colorKey){
 		// seteo del puntero a imagen
 		this -> imagen = NULL;
 		//carga de imagen y configuración inicial.
 		init(name , path , wTiles , hTiles , fps , delay , pixel_ref_x , pixel_ref_y, 
-			posTileX , posTileY , colorKey);
+			posTileX , posTileY , rm , colorKey);
 	}
 	
 	/*
@@ -84,7 +84,7 @@
 					const unsigned int wTiles , const unsigned int hTiles , 
 					const int fps , const int delay , 
 					int pixel_ref_x ,int pixel_ref_y,
-					int posTileX, int posTileY , const int colorKey) {
+					int posTileX, int posTileY , ResMan& rm , const int colorKey) {
 		// Se destruyen imagenes previas
 		if (this -> imagen != NULL) {
 			delete(this -> imagen);
@@ -92,8 +92,8 @@
 		// Se setean los atributos a sus valores por defecto.
 		this -> inicializarAtributosEnValoresDefault();
 		// Se carga la nueva imagen
-		this -> imagen	= new ImagenAnimada(path.c_str() ,Imagen::ALTO_DEFAULT , Imagen::ANCHO_DEFAULT , 
-											fps , delay , colorKey);
+		this -> imagen	= new ImagenAnimada(path.c_str() , name.c_str() ,Imagen::ALTO_DEFAULT , 
+								Imagen::ANCHO_DEFAULT , fps , delay , rm ,colorKey);
 		// Seteo de nombre y path
 		this -> name = name;
 		if ( this -> imagen -> getPath() != NULL){
@@ -123,7 +123,7 @@
 					const unsigned int wTiles , const unsigned int hTiles , 
 					int pixel_ref_x ,int pixel_ref_y , 
 					int posTileX, int posTileY , 
-					const int colorKey){
+					ResMan& rm , const int colorKey){
 		// Se destruyen imagenes previas
 		if (this -> imagen != NULL) {
 			delete(this -> imagen);
@@ -131,7 +131,7 @@
 		// Se setean los atributos a sus valores por defecto.
 		this -> inicializarAtributosEnValoresDefault();
 		// Se carga la nueva imagen
-		this -> imagen	= new ImagenEstatica(path.c_str() , colorKey);
+		this -> imagen	= new ImagenEstatica(path.c_str() , name.c_str() , rm , colorKey);
 		// Seteo de nombre y path
 		this -> name = name;
 		if ( this -> imagen -> getPath() != NULL){

@@ -4,6 +4,7 @@
 #include "source/utilities/timer.h"
 #include "source/utilities/surface.h"
 #include "source/utilities/aux_func.h"
+#include "source/utilities/PruebasParser.h"
 #include "source/utilities/parser.h"
 #include "source/display/entidad.h"
 #include "source/utilities/Personaje.h"
@@ -17,10 +18,10 @@
 int main(int argc, char* args[]) {
 
 	//Prueba parser YAML
-	//parser_test();
-
+	parser_test();
+	system("PAUSE");
 	//parseo un nivel
-	//parsear("../resources/levels/nivel1.yaml");
+	parsear("../resources/levels/nivel1.yaml");
 	// Ventana de prueba
 	SDL_Surface* screen;
     SDL_Init(SDL_INIT_EVERYTHING);

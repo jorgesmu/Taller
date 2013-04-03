@@ -16,4 +16,11 @@ class config_pantalla {
 
 		int get_alto() { return alto;}
 
+		void set_alto(int nuevaMedida){
+			alto = nuevaMedida;
+		}
+		void set_ancho(int nuevaMedida){
+			ancho = nuevaMedida;
+		}
+
 };

@@ -3,6 +3,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include "config_pantalla.h"
 using namespace std;
 //estrutura de un vector de 3 dimensiones para correr los ejemplos de yaml-cpp
 struct Vector_3_dim {
@@ -54,26 +55,61 @@ void imprimir_documento(char* path){
 		archivo.close();
 		return;
 }
-void parser_nivel(char* path){
+void operator >> (const YAML::Node& node, config_pantalla& config) {
 
+   for(unsigned i=0;i<node.size();i++) {
+      	for(YAML::Iterator it=node[i].begin();it!=node[i].end();++it) {
+			//leo los atributos de pantalla
+			string clave;
+			int valor;
+			it.first() >> clave;
+			it.second() >> valor;
+			//y los asigno
+			if (clave == "ancho"){
+				config.set_ancho(valor);
+			}else if (clave == "alto"){
+				config.set_alto(valor);
+			}
+		}
+   }
+
+}
+void parser_nivel(char* path){
+	//imprimo el documento para mirar si lo que imprime yaml esta bien
 	imprimir_documento(path);
 
 
 	cout << endl << "Test parsear completo." << endl << "Contenido parseado con Yaml: " << endl;
-	
+	//abro el documento y parseo el nodo
 	std::ifstream fin(path);
 	YAML::Parser parser(fin);
 	YAML::Node doc;
 	parser.GetNextDocument(doc);
+	config_pantalla config(-1,-1);
 
-		
-	for(YAML::Iterator it=doc.begin();it!=doc.end();++it) {
-		std::string clave, valor;
-		it.first() >> clave;
-		it.second() >> valor;
-		std::cout << "Clave: " << clave << ", valor: " << valor << std::endl;
+	if(const YAML::Node *pName = doc.FindValue("pantalla")) {
+		cout << "pantalla existe" << endl;
+		doc["pantalla"] >> config;
+		cout << endl <<"valores:ancho_" << config.get_ancho() << ",alto_" << config.get_alto() << endl; 
+	}else{
+		cout << "LOG ERROR: pantalla no existe" << endl;
 	}
-	
+
+	if(const YAML::Node *pName = doc.FindValue("escenarios")) {
+		cout << "escenarios existe" << endl;
+	}else{
+		cout << "LOG ERROR: escenarios no existe" << endl;
+	}
+	if(const YAML::Node *pName = doc.FindValue("entidades")) {
+		cout << "entidades existe" << endl;
+	}else{
+		cout << "LOG ERROR: entidades no existe" << endl;
+	}
+	if(const YAML::Node *pName = doc.FindValue("configuracion")) {
+		cout << "configuracion existe" << endl;
+	}else{
+		cout << "LOG ERROR: configuracion no existe" << endl;
+	}
 }
 void parser_test_completo(){
 	char* path="../resources/levels/test5.yaml";

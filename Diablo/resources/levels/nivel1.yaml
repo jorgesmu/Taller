@@ -1,4 +1,6 @@
-pantalla: 12as
+pantalla:
+  - ancho: 45
+  - alto: 153
 configuracion: 23
 entidades: 44
 escenarios: 4

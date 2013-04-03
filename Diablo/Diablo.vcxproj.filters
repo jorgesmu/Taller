@@ -84,6 +84,9 @@
     <ClCompile Include="source\utilities\PruebasParser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="config_entidad_en_juego.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\utilities\timer.h">
@@ -159,6 +162,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="source\utilities\PruebasParser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config_entidad_en_juego.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

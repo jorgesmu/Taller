@@ -5,6 +5,7 @@
 #include <vector>
 #include "config_pantalla.h"
 #include "config_entidad.h"
+#include "config_general.h"
 using namespace std;
 //estrutura de un vector de 3 dimensiones para correr los ejemplos de yaml-cpp
 struct Vector_3_dim {
@@ -55,6 +56,27 @@ void imprimir_documento(char* path){
 		}
 		archivo.close();
 		return;
+}
+void operator >> (const YAML::Node& node, config_general& config) {
+
+   for(unsigned i=0;i<node.size();i++) {
+      	for(YAML::Iterator it=node[i].begin();it!=node[i].end();++it) {
+			//leo los atributos de la configuracion
+			string clave;
+			int valor;
+			it.first() >> clave;
+			it.second() >> valor;
+			//y los asigno
+			if (clave == "vel_personaje"){
+				config.set_vel_personaje(valor);
+			}else if (clave == "margen_scroll"){
+				config.set_margen_scroll(valor);
+			}else {
+				cout << "LOG ERROR: atributo de la configuracion erroeneo: " << clave <<endl;
+			}
+		}
+   }
+
 }
 void operator >> (const YAML::Node& node, config_pantalla& config) {
 
@@ -126,7 +148,7 @@ void parser_nivel(char* path){
 	parser.GetNextDocument(doc);
 	config_pantalla pantalla(-1,-1);
 	vector <config_entidad> entidades;
-
+	config_general config(-1,-1);
 	if(const YAML::Node *pName = doc.FindValue("pantalla")) {
 		cout << "pantalla existe" << endl;
 		doc["pantalla"] >> pantalla;
@@ -147,6 +169,7 @@ void parser_nivel(char* path){
 		cout << "LOG ERROR: entidades no existe" << endl;
 	}
 	if(const YAML::Node *pName = doc.FindValue("configuracion")) {
+		doc["configuracion"] >> config;
 		cout << "configuracion existe" << endl;
 	}else{
 		cout << "LOG ERROR: configuracion no existe" << endl;

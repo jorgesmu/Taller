@@ -1,6 +1,33 @@
 pantalla:
   - ancho: 45
   - alto: 153
-configuracion: 23
-entidades: 44
+configuracion:
+  - vel_personaje: 3
+  - margen_scroll: 30
+entidades:
+  - nombre: arbol
+    imagen: path/a/imagen.png
+  
+  - nombre: castillo
+    imagen: path/a/imagen.png
+    ancho_base: 2
+    alto_base: 2
+    pixel_ref_x: 30
+    pixel_ref_y: 40
+
+  - nombre: orco
+    imagen: path/a/imagen.png
+    fps: 10
+    delay: 5
+
+  - nombre: frodo
+    imagen: path/a/imagen.png
+    fps: 10
+
+  - nombre: tierra
+    imagen: path/a/imagen.png
+
+  - nombre: agua
+    imagen: path/a/imagen.png
+
 escenarios: 4

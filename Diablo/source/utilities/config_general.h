@@ -16,4 +16,10 @@ class config_general {
 
 		int get_margen_scroll() { return margen_scroll;}
 
+		//Setters
+		void set_vel_personaje(int newValue) { vel_personaje = newValue;}
+
+		void set_margen_scroll(int newValue) { margen_scroll = newValue;}
+
+
 };

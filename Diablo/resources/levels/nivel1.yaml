@@ -30,4 +30,16 @@ entidades:
   - nombre: agua
     imagen: path/a/imagen.png
 
-escenarios: 4
+escenarios:
+  - nombre: bosque_encantado
+    size_x: 100
+    size_y: 100
+    entidadesDef:
+      - {x: 10, y: 15, entidad: tierra}
+      - {x: 15, y: 20, entidad: tierra}
+      - {x: 10, y: 15, entidad: agua}
+      - {x: 30, y: 55, entidad: castillo}
+    protagonista:
+      - tipoEntidad: frodo
+        x: 50
+        y: 50

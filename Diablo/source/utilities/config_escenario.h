@@ -16,7 +16,7 @@ class config_escenario {
 		config_escenario(std::string nombre_inicial, int tam_x_inicial, int tam_y_inicial);
 
 		//Getters
-		std::string get_nombre() { return nombre;}
+		string get_nombre() { return nombre;}
 
 		int get_tam_x() { return tam_x;}
 
@@ -31,5 +31,18 @@ class config_escenario {
 			config_entidad_en_juego protagonistaVacio("",-1,-1);
 			return protagonistaVacio ;
 		}
-			
+		//Setters
+		string set_nombre(string newValue) { nombre = newValue ;}
+
+		int set_tam_x(int newValue) { tam_x = newValue;}
+
+		int set_tam_y(int newValue) { tam_y = newValue;}
+		
+		void void_entidad(config_entidad_en_juego unaEntidad) { 
+			entidades.push_back(unaEntidad);
+		}
+
+		void agregar_protagonista(config_entidad_en_juego unProtagonista) { 
+			protagonistas.push_back(unProtagonista);
+		}	
 };

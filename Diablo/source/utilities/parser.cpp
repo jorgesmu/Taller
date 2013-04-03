@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include "config_pantalla.h"
+#include "config_entidad.h"
 using namespace std;
 //estrutura de un vector de 3 dimensiones para correr los ejemplos de yaml-cpp
 struct Vector_3_dim {
@@ -69,8 +70,46 @@ void operator >> (const YAML::Node& node, config_pantalla& config) {
 				config.set_ancho(valor);
 			}else if (clave == "alto"){
 				config.set_alto(valor);
+			}else {
+				cout << "LOG ERROR: atributo de pantalla erroeneo: " << clave <<endl;
 			}
 		}
+   }
+
+}
+void operator >> (const YAML::Node& node, vector <config_entidad>& entidades) {
+   //aca itero cada entidad	
+    for(unsigned i=0;i<node.size();i++) {
+	    config_entidad nuevaEntidad("","",-1,-1,-1,-1,-1,-1);
+		//aca itero dentro de la entidad
+		for(YAML::Iterator it=node[i].begin();it!=node[i].end();++it) {
+			//leo los atributos de pantalla
+			string clave;
+			string valor;
+			it.first() >> clave;
+			it.second() >> valor;
+			//y los asigno
+			if (clave == "nombre"){
+				nuevaEntidad.set_nombre(valor); 
+			}else if (clave == "imagen"){
+				nuevaEntidad.set_path_imagen(valor);
+			}else if (clave == "ancho_base"){
+				nuevaEntidad.set_ancho_base(atoi(valor.c_str()));
+			}else if (clave == "alto_base"){
+				nuevaEntidad.set_alto_base(atoi(valor.c_str()));
+			}else if (clave == "pixel_ref_x"){
+				nuevaEntidad.set_pixel_ref_x(atoi(valor.c_str()));
+			}else if (clave == "pixel_ref_y"){
+				nuevaEntidad.set_pixel_ref_y(atoi(valor.c_str()));
+			}else if (clave == "fps"){
+				nuevaEntidad.set_fps(atoi(valor.c_str()));
+			}else if (clave == "delay"){
+				nuevaEntidad.set_delay(atoi(valor.c_str()));
+			}else {
+				cout << "LOG ERROR: atributo de entidad erroeneo: " << clave <<endl;
+			}
+		}
+		entidades.push_back(nuevaEntidad);
    }
 
 }
@@ -85,12 +124,13 @@ void parser_nivel(char* path){
 	YAML::Parser parser(fin);
 	YAML::Node doc;
 	parser.GetNextDocument(doc);
-	config_pantalla config(-1,-1);
+	config_pantalla pantalla(-1,-1);
+	vector <config_entidad> entidades;
 
 	if(const YAML::Node *pName = doc.FindValue("pantalla")) {
 		cout << "pantalla existe" << endl;
-		doc["pantalla"] >> config;
-		cout << endl <<"valores:ancho_" << config.get_ancho() << ",alto_" << config.get_alto() << endl; 
+		doc["pantalla"] >> pantalla;
+		cout << endl <<"valores:ancho_" << pantalla.get_ancho() << ",alto_" << pantalla.get_alto() << endl; 
 	}else{
 		cout << "LOG ERROR: pantalla no existe" << endl;
 	}
@@ -101,6 +141,7 @@ void parser_nivel(char* path){
 		cout << "LOG ERROR: escenarios no existe" << endl;
 	}
 	if(const YAML::Node *pName = doc.FindValue("entidades")) {
+		doc["entidades"] >> entidades;
 		cout << "entidades existe" << endl;
 	}else{
 		cout << "LOG ERROR: entidades no existe" << endl;

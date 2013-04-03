@@ -12,7 +12,7 @@ class config_entidad {
 	public:
 		//Constructor
 		//i: inicial
-		config_entidad(std::string nombre_i, int path_imagen_i, int ancho_base_i, int alto_base_i, int pixel_ref_x_i, int pixel_ref_y_i, int fps_i, int delay_i);
+		config_entidad(std::string nombre_i, std::string path_imagen_i, int ancho_base_i, int alto_base_i, int pixel_ref_x_i, int pixel_ref_y_i, int fps_i, int delay_i);
 
 		//Getters
 		std::string get_nombre() { return nombre;}
@@ -31,6 +31,22 @@ class config_entidad {
 
 		int get_delay() { return delay;}
 
+
+		//Setters
+		void set_nombre(std::string newValue) { nombre = newValue;}
+
+		void set_path_imagen(std::string newValue) { path_imagen = newValue;}
+		void set_ancho_base(int newValue) { ancho_base = newValue;}
+
+		void set_alto_base(int newValue) { alto_base = newValue;}
+
+		void set_pixel_ref_x(int newValue) { pixel_ref_x = newValue;}
+
+		void set_pixel_ref_y(int newValue) { pixel_ref_y = newValue;}
+
+		void set_fps(int newValue) { fps = newValue;}
+
+		void set_delay(int newValue) { delay = newValue;}
 		
 
 };

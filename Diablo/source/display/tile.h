@@ -12,8 +12,8 @@ class Tile {
 	public:
 
 	// Constantes para los tiles
-	static const int TILE_ANCHO = 200;
-	static const int TILE_ALTO = 100;
+	static const int TILE_ANCHO = 100;
+	static const int TILE_ALTO = 50;
 		
 	// Ctor, no hace nada
 	Tile();

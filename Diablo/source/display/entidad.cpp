@@ -281,8 +281,6 @@
 	void Entidad::update(Mapa* mapa) {
 		//actualizacion de posicion
 		this -> actualizarPosicion(mapa);
-		// Actualizacion del surface
-		this -> surf = this -> imagen -> getSurface();
 	}
 	
 	/*
@@ -381,15 +379,12 @@
 	void Entidad::actualizarPosicion(Mapa* mapa) {
 		//Calculo de direccion
 		unsigned int direccion = this -> calcularDireccion();
-		/*
-		printf("posDestX: %d posDestY: %d direccion: %u \n" , this->posTileDestinoX ,
-			this->posTileDestinoY , direccion);*/
-		/*
+		
 		// Si la direccion es centro se dirige al mismo
 		if (direccion == Entidad::CENTRO) {
-			
+			this -> actualizarImagen(direccion);
 		//Si es otro Tile se actualizacion posiciones hacia el mismo
-		} else {
+		} else {/*
 			//Obtengo el tile actual
 			Tile* tileActual = mapa -> getTile(this -> posTileX , this -> posTileY);
 			if (tileActual != NULL) {
@@ -441,8 +436,8 @@
 						}
 					}
 				}
-			}
-		}*/
+			}*/
+		}
 	}
 
 	void Entidad::calcularOffsetTentativo(unsigned int direccion , 
@@ -486,5 +481,12 @@
 					(*offsetTentativoX)-=this -> velocidad;
 					break;
 				}
+		}
+	}
+
+	void Entidad::actualizarImagen(const unsigned int direccion){
+		if(this -> imagen != NULL) {
+			// Actualizacion del surface
+			this -> surf = this -> imagen -> getSurface();
 		}
 	}

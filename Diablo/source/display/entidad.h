@@ -309,4 +309,6 @@ protected:
 	void calcularOffsetTentativo(unsigned int direccion , 
 									int* offsetTentativoX , int* offsetTentativoY);
 
+	virtual void actualizarImagen(const unsigned int direccion);
+
 };

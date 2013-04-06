@@ -36,6 +36,12 @@ public:
 
 	//Muerte
 	const static unsigned int MUERTE = 24;
+	//Avanzar direccion actual
+	const static unsigned int AVANCE_DIRECCION_ACTUAL = 25;
+	//Atacar en direccion actual
+	const static unsigned int ATAQUE_DIRECCION_ACTUAL = 26;
+	//Quieto en direccion actual
+	const static unsigned int ESTATICO_DIRECCION_ACTUAL = 27;
 
 private:
 
@@ -108,6 +114,16 @@ public:
 		Post: Se ha actualizado surfaceActual
 	*/
 	virtual void nextSprite();
-	
+
+	private:
+
+	/*
+		Pre: La instancia ha sido creada y el parametro es una accion entre 0 y 24.
+
+		Post: Se ha seteado la accion.
+	*/
+	void setAccionEfectiva(unsigned int accion);	
 };
+
+
 

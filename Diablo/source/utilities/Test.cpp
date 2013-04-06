@@ -159,7 +159,15 @@
 		retorno &= (surfaceImagenPersonaje != NULL);
 		//Si imagen distinto de nulo
 		if (surfaceImagenPersonaje != NULL) {
-			
+			imagen.setAccion(ImagenPersonaje::ESTATICO_DIRECCION_ACTUAL);
+			for (int i = 0 ;i < 12; i++) {
+				SDL_FillRect(pantallaDePrueba , NULL , Surface::RGB_VERDE);
+				surfaceImagenPersonaje -> blit(pantallaDePrueba , 0 , 0);
+				SDL_Flip(pantallaDePrueba);
+				SDL_Delay( 100 );
+				surfaceImagenPersonaje = imagen.getSurface();
+				if (salida()) exit(0);
+			}
 			for (unsigned int accion = ImagenPersonaje::DES_SUR ; (accion <= ImagenPersonaje::MUERTE)&&(!salida()) ; accion++) {
 				for(int volver = 1 ; volver < (int) accion ; volver++) {
 					imagen.setAccion(accion);

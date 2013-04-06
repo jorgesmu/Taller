@@ -97,3 +97,16 @@ void Personaje::mover(const unsigned int x , const unsigned int y) {
 			
 	}
 }
+
+void Personaje::actualizarImagen(const unsigned int direccion){
+	ImagenPersonaje* imagenPersonaje = static_cast<ImagenPersonaje*> (this -> imagen);
+	if (imagenPersonaje != NULL){
+		if (direccion == CENTRO) {
+			imagenPersonaje -> setAccion(ImagenPersonaje::ESTATICO_DIRECCION_ACTUAL);
+		} else {
+			imagenPersonaje -> setAccion(direccion);
+		}
+		// Actualizacion del surface
+		this -> surf = this -> imagen -> getSurface();
+	}
+}

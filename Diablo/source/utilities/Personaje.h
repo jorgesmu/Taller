@@ -54,4 +54,6 @@ public:
 		en algun Tile en el que no estaba, y se de de baja en alguno en cual estaba.
 	*/
 	virtual void mover(const unsigned int x , const unsigned int y);
+
+	virtual void actualizarImagen(const unsigned int direccion);
 };

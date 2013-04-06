@@ -71,8 +71,8 @@ ImagenPersonaje::~ImagenPersonaje() {
 
 	Post: Se ha seteado la accion.
 */
-void ImagenPersonaje::setAccion(unsigned int accion) {
-	if ((accion < (unsigned int) this -> maxFilas) && (accion < 25)) {
+void ImagenPersonaje::setAccionEfectiva(unsigned int accion) {
+	if ((accion < (unsigned int) this -> maxFilas) && (accion <= ImagenPersonaje::MUERTE)) {
 		this -> accionSiguiente = accion;
 		int delta = this -> accionSiguiente	- this -> accionActual;	
 		if (delta != 0) {
@@ -215,6 +215,54 @@ void ImagenPersonaje::setAccion(unsigned int accion) {
 		}
 		//seteo de fila
 		this -> filaActual = this -> accionActual;
+	}
+}
+
+/*
+	Pre: La instancia ha sido creada y el parametro es una accion entre 0 y 24.
+
+	Post: Se ha seteado la accion.
+*/
+void ImagenPersonaje::setAccion(unsigned int accion){
+	if (accion > ImagenPersonaje::MUERTE) {
+		if (accion <= ImagenPersonaje::AVANCE_DIRECCION_ACTUAL) {
+			switch (accion) {
+				case ImagenPersonaje::ESTATICO_DIRECCION_ACTUAL : {
+					if (this -> accionActual < ImagenPersonaje::AT_SUR){
+						this -> setAccionEfectiva(this -> accionActual + 16);
+					} else {
+						if (this -> accionActual < ImagenPersonaje::ESTATICO_DIRECCION_ACTUAL){
+							this -> setAccionEfectiva(this -> accionActual + 8);
+						} 
+					}
+					break;
+				}
+				case ImagenPersonaje::ATAQUE_DIRECCION_ACTUAL : {
+					if (this -> accionActual < ImagenPersonaje::AT_SUR){
+						this -> setAccionEfectiva(this -> accionActual + 8);
+					} else {
+						if ((this -> accionActual >= ImagenPersonaje::ESTATICO_DIRECCION_ACTUAL)
+							&& (accionActual < ImagenPersonaje::MUERTE)) {
+							this -> setAccionEfectiva(this -> accionActual-8);
+						}
+					}
+					break;
+				}
+				case ImagenPersonaje::AVANCE_DIRECCION_ACTUAL : {
+					if (this -> accionActual >= ImagenPersonaje::AT_SUR){
+						if (this -> accionActual < ImagenPersonaje::ESTATICO_DIRECCION_ACTUAL){
+							this -> setAccionEfectiva(this -> accionActual - 8);
+						} else {
+							if (accionActual < MUERTE)
+								this -> setAccionEfectiva( this -> accionActual-16);
+						}
+					}
+					break;
+				}
+			}
+		}	
+	} else {
+		this -> setAccionEfectiva(accion);
 	}
 }
 

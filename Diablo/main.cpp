@@ -48,7 +48,7 @@ int main(int argc, char* args[]) {
 							 resman , Surface::RGB_VERDE);
 	Mapa mapa;
 	// Mapa de size random
-	mapa.resize(intRand(20, 40), intRand(20, 40));
+	mapa.resize(intRand(50, 100), intRand(50, 100));
 	// Llenamos el mapa con entidad tierra
 	for(auto it = mapa.allTiles().begin();it != mapa.allTiles().end(); ++it) {
 		it->addEntidad(&tierra_test);

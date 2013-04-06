@@ -6,6 +6,7 @@
 #include "source/utilities/aux_func.h"
 #include "source/utilities/parser.h"
 #include "source/display/entidad.h"
+#include "source/utilities/Personaje.h"
 #include "source/display/camara.h"
 #include "source/display/mapa.h"
 #include "source/display/resman.h"
@@ -37,6 +38,7 @@ int main(int argc, char* args[]) {
 	resman.addRes("tierra", "../resources/tile.bmp", 255);
 	resman.addRes("cemento", "../resources/tile2.bmp", 255);
 	resman.addRes("agua", "../resources/tileAgua.bmp", Imagen::COLOR_KEY);
+	resman.addRes("soldado", "../resources/Soldado.bmp", Imagen::COLOR_KEY);
 	Entidad tierra_test;
 	tierra_test.init("tierra", 1 , 1 , 
 							   0 , 0 , 
@@ -52,12 +54,22 @@ int main(int argc, char* args[]) {
 							10 , 100, 
 							50, 100 ,
 							0 , 0 , 
-							0 , 1 , resman ,
+							0 , 0 , resman ,
+							Imagen::COLOR_KEY);
+	Personaje personaje("soldado" ,
+							1 , 1 , 
+							7 , 300, 
+							100, 100 ,
+							5,
+							0 , 70 ,
+							0 , 0 , resman ,
 							Imagen::COLOR_KEY);
 	Mapa mapa;
 	// Mapa de size random
 	mapa.resize(intRand(50, 100), intRand(50, 100));
 	// Llenamos el mapa con entidad tierra
+	bool agregar = true;
+
 	for(auto it = mapa.allTiles().begin();it != mapa.allTiles().end(); ++it) {
 		if(intRand(0,1) == 0) {
 			it->addEntidad(&tierra_test);
@@ -67,6 +79,10 @@ int main(int argc, char* args[]) {
 			} else {
 				it->addEntidad(&agua);
 			}
+		}
+		if ( agregar){
+			it->addEntidad(&personaje);
+			agregar =false;
 		}
 	}
 	// Aca muestra como se agregan a mano
@@ -171,7 +187,7 @@ int main(int argc, char* args[]) {
 		SDL_Flip(screen);
 		//ACtualizacion entidades
 		agua.update(&mapa);
-
+		personaje.update(&mapa);
 	}
 	
 	mapa.clean();

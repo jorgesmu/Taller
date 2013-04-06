@@ -447,7 +447,6 @@
 
 	void Entidad::calcularOffsetTentativo(unsigned int direccion , 
 									int* offsetTentativoX , int* offsetTentativoY){
-		
 		*offsetTentativoX = this -> offsetTileX;
 		*offsetTentativoY = this -> offsetTileY;
 		switch (direccion){
@@ -488,5 +487,4 @@
 					break;
 				}
 		}
-		
 	}

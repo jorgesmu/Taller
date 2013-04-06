@@ -6,11 +6,12 @@
 #include "source/utilities/aux_func.h"
 #include "source/utilities/parser.h"
 #include "source/display/entidad.h"
-#include "source\display\camara.h"
-#include "source\display\mapa.h"
-#include "source\display\resman.h"
+#include "source/display/camara.h"
+#include "source/display/mapa.h"
+#include "source/display/resman.h"
 #include "source/constants/model.h"
 #include "source/utilities/Test.h"
+#include "source/utilities/coordenadas.h"
 
 int main(int argc, char* args[]) {
 
@@ -23,7 +24,7 @@ int main(int argc, char* args[]) {
 	SDL_Surface* screen;
     SDL_Init(SDL_INIT_EVERYTHING);
 	// Para confinar el mouse a la ventana
-	SDL_WM_GrabInput(SDL_GRAB_ON);
+	//SDL_WM_GrabInput(SDL_GRAB_ON);
 	SDL_WarpMouse(800/2, 600/2);
 	// Init the window
 	screen = SDL_SetVideoMode(800, 600, 32, SDL_SWSURFACE);
@@ -47,15 +48,10 @@ int main(int argc, char* args[]) {
 							 resman , Surface::RGB_VERDE);
 	Mapa mapa;
 	// Mapa de size random
-	mapa.resize(intRand(20, 100), intRand(20, 100));
-	//mapa.resize(7, 3);
-	// Llenamos el mapa con entidades random
+	mapa.resize(intRand(20, 40), intRand(20, 40));
+	// Llenamos el mapa con entidad tierra
 	for(auto it = mapa.allTiles().begin();it != mapa.allTiles().end(); ++it) {
-		if(intRand(0,1) == 0) {
-			it->addEntidad(&tierra_test);
-		}else{
-			it->addEntidad(&cem_test);
-		}
+		it->addEntidad(&tierra_test);
 	}
 	// Aca muestra como se agregan a mano
 	//mapa.getTile(0, 0).addEntidad(cem_test);
@@ -81,6 +77,17 @@ int main(int argc, char* args[]) {
 			if(event.type == SDL_MOUSEMOTION) {
 				// Update para la camara
 				camara.update_speed(makeRect(event.motion.x, event.motion.y));
+			}
+			// Mouse clicks
+			if(event.type == SDL_MOUSEBUTTONDOWN) {
+				if(event.button.button == SDL_BUTTON_LEFT) {
+					vec2<int> tile_res = MouseCoords2Tile(vec2<int>(event.button.x, event.button.y), camara);
+					//std::cout << event.button.x << ";" << event.button.y <<  " || Tile: " << tile_res.x << ";" << tile_res.y << "\n";
+					if(mapa.tileExists(tile_res.x, tile_res.y)) {
+						mapa.getTile(tile_res.x, tile_res.y).clean();
+						mapa.getTile(tile_res.x, tile_res.y).addEntidad(&cem_test);
+					}
+				}
 			}
 		}
 

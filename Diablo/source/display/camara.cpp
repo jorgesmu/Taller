@@ -33,6 +33,15 @@ float Camara::getY() const {
 	return y;
 }
 
+// Getters para el tamaño
+int Camara::getW() const {
+	return w;
+}
+
+int Camara::getH() const {
+	return h;
+}
+
 // Actualiza la posicion basado en la velocidad usando Euler nomas
 void Camara::update() {
 	x += vx * CONST_DT;

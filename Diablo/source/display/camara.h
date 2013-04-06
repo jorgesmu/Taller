@@ -24,6 +24,8 @@ class Camara {
 	// Getters para la posicion
 	float getX() const;
 	float getY() const;
+	int getW() const;
+	int getH() const;
 	// Actualiza la posicion basado en la velocidad
 	void update();
 	// Actualiza la velocidad basado en la posicion del mouse

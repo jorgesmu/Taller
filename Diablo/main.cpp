@@ -65,6 +65,8 @@ int main(int argc, char* args[]) {
 	// Para guardar los eventos
 	SDL_Event event;
 
+	vec2<int> tw_test;
+
 	while(!quit) {
 
 		// Input handling (esto despues se movera a donde corresponda)
@@ -72,6 +74,40 @@ int main(int argc, char* args[]) {
 			// Detectar escape o quit
 			if(event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE || event.type == SDL_QUIT) {
 				quit = true;
+			}
+			// Para probar el tilewalk
+			vec2<int> test_next(-1, -1);
+			if(event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_KP2) {
+				test_next = tileWalk(tw_test, GDIR::S);
+			}
+			if(event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_KP8) {
+				test_next = tileWalk(tw_test, GDIR::N);
+			}
+			if(event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_KP4) {
+				test_next = tileWalk(tw_test, GDIR::E);
+			}
+			if(event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_KP6) {
+				test_next = tileWalk(tw_test, GDIR::O);
+			}
+			if(event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_KP7) {
+				test_next = tileWalk(tw_test, GDIR::NE);
+			}
+			if(event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_KP9) {
+				test_next = tileWalk(tw_test, GDIR::NO);
+			}
+			if(event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_KP1) {
+				test_next = tileWalk(tw_test, GDIR::SE);
+			}
+			if(event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_KP3) {
+				test_next = tileWalk(tw_test, GDIR::SO);
+			}
+			// Hacer el movimiento si es valido
+			if(mapa.tileExists(test_next.x, test_next.y)) {
+				mapa.getTile(tw_test.x, tw_test.y).clean();
+				mapa.getTile(tw_test.x, tw_test.y).addEntidad(&tierra_test);
+				mapa.getTile(test_next.x, test_next.y).clean();
+				mapa.getTile(test_next.x, test_next.y).addEntidad(&cem_test);
+				tw_test = test_next;
 			}
 			// Detectar mouse motion
 			if(event.type == SDL_MOUSEMOTION) {
@@ -82,7 +118,7 @@ int main(int argc, char* args[]) {
 			if(event.type == SDL_MOUSEBUTTONDOWN) {
 				if(event.button.button == SDL_BUTTON_LEFT) {
 					vec2<int> tile_res = MouseCoords2Tile(vec2<int>(event.button.x, event.button.y), camara);
-					//std::cout << event.button.x << ";" << event.button.y <<  " || Tile: " << tile_res.x << ";" << tile_res.y << "\n";
+					std::cout << event.button.x << ";" << event.button.y <<  " || Tile: " << tile_res.x << ";" << tile_res.y << "\n";
 					if(mapa.tileExists(tile_res.x, tile_res.y)) {
 						mapa.getTile(tile_res.x, tile_res.y).clean();
 						mapa.getTile(tile_res.x, tile_res.y).addEntidad(&cem_test);

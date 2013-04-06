@@ -204,7 +204,7 @@
 		
 		//retorno del test
 		bool retorno = true;
-		
+		/*
 		//pantalla de prueba
 		SDL_Surface* pantallaDePrueba = SDL_SetVideoMode( 800, 600 , 32, SDL_DOUBLEBUF);
 		SDL_WM_SetCaption( "Presione ESC para salir", NULL );
@@ -244,7 +244,7 @@
 		}
 		resman.clean();
 		//Destruir principal
-		SDL_FreeSurface(pantallaDePrueba);
+		SDL_FreeSurface(pantallaDePrueba);*/
 		return retorno;
 	}
 
@@ -417,6 +417,8 @@
 	bool Test::testPersonaje() {
 		//retorno del test
 		bool retorno = true;
+
+		/*
 		//pantalla de prueba
 		SDL_Surface* pantallaDePrueba = SDL_SetVideoMode( 800, 600 , 32, SDL_DOUBLEBUF);
 		SDL_WM_SetCaption( "Presione ESC para salir", NULL );
@@ -447,6 +449,6 @@
 		}
 		resman.clean();
 		//Destruir principal
-		SDL_FreeSurface(pantallaDePrueba);
+		SDL_FreeSurface(pantallaDePrueba); */
 		return retorno;
 	}

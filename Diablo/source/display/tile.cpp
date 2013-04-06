@@ -19,9 +19,9 @@ void Tile::deleteEntidad(Entidad* ent){
 	entidades.swap(new_ent);
 }
 
-void Tile::blit(SDL_Surface* pantalla, const Camara& cam){
+void Tile::blit(SDL_Surface* pantalla, Camara& cam){
 	for(auto it = entidades.begin(); it != entidades.end(); ++it) {
-		(*it)->blit(pantalla, cam, x, y);	
+		(*it)->blit(pantalla, &cam, NULL,x, y);	
 	}
 }
 

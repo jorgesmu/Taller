@@ -31,7 +31,7 @@ TileVec& Mapa::allTiles() {
 	return tiles;
 }
 
-void Mapa::blit(SDL_Surface* dest, const Camara& camara) {
+void Mapa::blit(SDL_Surface* dest, Camara& camara) {
 	// Primero calculamos cuantos tiles nos vamos a tener que mover horizontal y verticalmente
 	const int tile_count_x = (camara.getW() / Tile::TILE_ANCHO) + 2;
 	const int tile_count_y = 2*((camara.getH() / Tile::TILE_ALTO) + 2);

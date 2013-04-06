@@ -21,7 +21,7 @@ class Tile {
 	void deleteEntidad(Entidad* ent);
 	void setBlitCoords(int x, int y);
 	// Blittea todas las entidades en este tile (en el orden que estan en el vector)
-	void blit(SDL_Surface* pantalla, const Camara& cam);
+	void blit(SDL_Surface* pantalla, Camara& cam);
 	// Libera recursos si hace falta
 	void clean();
 

@@ -29,7 +29,7 @@ class Mapa {
 	// Getter para el vector de tiles, para recorrerlo entero
 	TileVec& allTiles();
 	// Blittea todo el mapa
-	void blit(SDL_Surface* dest, const Camara& camara);
+	void blit(SDL_Surface* dest, Camara& camara);
 	// Libera los recursos
 	void clean();
 };

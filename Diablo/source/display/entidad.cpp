@@ -381,8 +381,9 @@
 	void Entidad::actualizarPosicion(Mapa* mapa) {
 		//Calculo de direccion
 		unsigned int direccion = this -> calcularDireccion();
+		/*
 		printf("posDestX: %d posDestY: %d direccion: %u \n" , this->posTileDestinoX ,
-			this->posTileDestinoY , direccion);
+			this->posTileDestinoY , direccion);*/
 		/*
 		// Si la direccion es centro se dirige al mismo
 		if (direccion == Entidad::CENTRO) {

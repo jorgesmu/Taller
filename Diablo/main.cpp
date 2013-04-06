@@ -36,6 +36,7 @@ int main(int argc, char* args[]) {
 	ResMan resman;
 	resman.addRes("tierra", "../resources/tile.bmp", 255);
 	resman.addRes("cemento", "../resources/tile2.bmp", 255);
+	resman.addRes("agua", "../resources/tileAgua.bmp", Imagen::COLOR_KEY);
 	Entidad tierra_test;
 	tierra_test.init("tierra", 1 , 1 , 
 							   0 , 0 , 
@@ -46,12 +47,27 @@ int main(int argc, char* args[]) {
 							 0 , 0 , 
 							 0 , 0 ,
 							 resman , Surface::RGB_VERDE);
+	Entidad agua("agua" ,
+							1 , 1 , 
+							10 , 100, 
+							50, 100 ,
+							0 , 0 , 
+							0 , 1 , resman ,
+							Imagen::COLOR_KEY);
 	Mapa mapa;
 	// Mapa de size random
 	mapa.resize(intRand(50, 100), intRand(50, 100));
 	// Llenamos el mapa con entidad tierra
 	for(auto it = mapa.allTiles().begin();it != mapa.allTiles().end(); ++it) {
-		it->addEntidad(&tierra_test);
+		if(intRand(0,1) == 0) {
+			it->addEntidad(&tierra_test);
+		}else{
+			if(intRand(0,1) == 0) {
+				it->addEntidad(&cem_test);
+			} else {
+				it->addEntidad(&agua);
+			}
+		}
 	}
 	// Aca muestra como se agregan a mano
 	//mapa.getTile(0, 0).addEntidad(cem_test);
@@ -153,6 +169,8 @@ int main(int argc, char* args[]) {
 		mapa.blit(screen, camara);
 		// Actualizar la pantalla
 		SDL_Flip(screen);
+		//ACtualizacion entidades
+		agua.update(&mapa);
 
 	}
 	

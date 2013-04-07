@@ -6,6 +6,7 @@
 #include "config_pantalla.h"
 #include "config_entidad.h"
 #include "config_general.h"
+#include "config_escenario.h"
 using namespace std;
 
 //lee e imprime un archivo
@@ -73,7 +74,7 @@ void operator >> (const YAML::Node& node, vector <config_entidad>& entidades) {
 	    config_entidad nuevaEntidad("","",-1,-1,-1,-1,-1,-1);
 		//aca itero dentro de la entidad
 		for(YAML::Iterator it=node[i].begin();it!=node[i].end();++it) {
-			//leo los atributos de pantalla
+			//leo los atributos de entidad
 			string clave;
 			string valor;
 			it.first() >> clave;
@@ -103,6 +104,61 @@ void operator >> (const YAML::Node& node, vector <config_entidad>& entidades) {
    }
 
 }
+void parsear_protagonistas(const YAML::Node& node, config_escenario& unEscenario){
+	//aca itero por cada protagonista
+    for(unsigned i=0;i<node.size();i++) {
+		config_entidad_en_juego unProtagonista("",-1,-1);
+		//aca itero dentro de la entidad
+		for(YAML::Iterator it=node[i].begin();it!=node[i].end();++it) {
+			//leo los atributos de entidad
+			string clave;
+			string valor;
+			it.first() >> clave;
+			it.second() >> valor;
+			//y los asigno
+			if (clave == "tipoEntidad"){
+				unProtagonista.set_nombre(valor); 
+			}else if (clave == "x"){
+				unProtagonista.set_pos_x( atoi(valor.c_str()) );
+			}else if (clave == "y"){
+				unProtagonista.set_pos_y( atoi(valor.c_str()) );
+			}else {
+				cout << "LOG ERROR: atributo de entidad erroeneo: " << clave <<endl;
+			}
+		}
+		//agrego un protagonista al escenario
+		unEscenario.agregar_protagonista(unProtagonista);
+   }
+}
+void operator >> (const YAML::Node& node, vector <config_escenario>& escenarios) {
+    //aca itero para cada escenario	
+    for(unsigned i=0;i<node.size();i++) {
+		//aca itero dentro del escenario
+		config_escenario unEscenario("",-1,-1);
+		for(YAML::Iterator it=node[i].begin();it!=node[i].end();++it) {
+			string clave;
+			string valor;
+			it.first() >> clave;
+			//guardo los atributos
+			if ( clave == "nombre" ){
+				it.second() >> valor;
+				unEscenario.set_nombre(valor);
+			} else if (clave == "size_x"){
+				it.second() >> valor;
+				unEscenario.set_tam_x(atoi(valor.c_str()));
+			} else if (clave == "size_y"){
+				it.second() >> valor;
+				unEscenario.set_tam_y(atoi(valor.c_str()));
+			} else if (clave == "protagonista"){
+				parsear_protagonistas(it.second(),unEscenario);
+			}else{ 
+				cout << "LOG ERROR: atributo de escenario erroeneo: " << clave <<endl; 
+			}
+		}
+		//agrego un escenario
+		escenarios.push_back(unEscenario);
+    }
+}
 void parser_nivel(char* path){
 	//imprimo el documento para mirar si lo que imprime yaml esta bien
 	imprimir_documento(path);
@@ -117,6 +173,8 @@ void parser_nivel(char* path){
 	config_pantalla pantalla(-1,-1);
 	vector <config_entidad> entidades;
 	config_general config(-1,-1);
+	vector <config_escenario> escenarios;
+
 	if(const YAML::Node *pName = doc.FindValue("pantalla")) {
 		cout << "pantalla existe" << endl;
 		doc["pantalla"] >> pantalla;
@@ -127,6 +185,7 @@ void parser_nivel(char* path){
 
 	if(const YAML::Node *pName = doc.FindValue("escenarios")) {
 		cout << "escenarios existe" << endl;
+		doc["escenarios"] >> escenarios;
 	}else{
 		cout << "LOG ERROR: escenarios no existe" << endl;
 	}
@@ -142,6 +201,7 @@ void parser_nivel(char* path){
 	}else{
 		cout << "LOG ERROR: configuracion no existe" << endl;
 	}
+
 }
 
 void parsear(char* path){

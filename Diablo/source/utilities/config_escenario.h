@@ -23,6 +23,8 @@ class config_escenario {
 		int get_tam_y() { return tam_y;}
 		
 		vector<config_entidad_en_juego> get_entidades() { return entidades;}
+		
+		vector<config_entidad_en_juego> get_protagonitas() { return protagonistas;}
 
 		config_entidad_en_juego get_protagonista() { 
 			if ( protagonistas.size() > 0 ) {
@@ -32,11 +34,11 @@ class config_escenario {
 			return protagonistaVacio ;
 		}
 		//Setters
-		string set_nombre(string newValue) { nombre = newValue ;}
+		void set_nombre(string newValue) { nombre = newValue ;}
 
-		int set_tam_x(int newValue) { tam_x = newValue;}
+		void set_tam_x(int newValue) { tam_x = newValue;}
 
-		int set_tam_y(int newValue) { tam_y = newValue;}
+		void set_tam_y(int newValue) { tam_y = newValue;}
 		
 		void void_entidad(config_entidad_en_juego unaEntidad) { 
 			entidades.push_back(unaEntidad);

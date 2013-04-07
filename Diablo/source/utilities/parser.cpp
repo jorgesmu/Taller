@@ -108,9 +108,9 @@ void parsear_protagonistas(const YAML::Node& node, config_escenario& unEscenario
 	//aca itero por cada protagonista
     for(unsigned i=0;i<node.size();i++) {
 		config_entidad_en_juego unProtagonista("",-1,-1);
-		//aca itero dentro de la entidad
+		//aca itero dentro de un protagonista
 		for(YAML::Iterator it=node[i].begin();it!=node[i].end();++it) {
-			//leo los atributos de entidad
+			//leo los atributos del protagonista
 			string clave;
 			string valor;
 			it.first() >> clave;
@@ -128,6 +128,32 @@ void parsear_protagonistas(const YAML::Node& node, config_escenario& unEscenario
 		}
 		//agrego un protagonista al escenario
 		unEscenario.agregar_protagonista(unProtagonista);
+   }
+}
+void parsear_entidades(const YAML::Node& node, config_escenario& unEscenario){
+	//aca itero por cada entidad
+    for(unsigned i=0;i<node.size();i++) {
+		config_entidad_en_juego unaEntidad("",-1,-1);
+		//aca itero dentro de una entidad
+		for(YAML::Iterator it=node[i].begin();it!=node[i].end();++it) {
+			//leo los atributos del protagonista
+			string clave;
+			string valor;
+			it.first() >> clave;
+			it.second() >> valor;
+			//y los asigno
+			if (clave == "entidad"){
+				unaEntidad.set_nombre(valor); 
+			}else if (clave == "x"){
+				unaEntidad.set_pos_x( atoi(valor.c_str()) );
+			}else if (clave == "y"){
+				unaEntidad.set_pos_y( atoi(valor.c_str()) );
+			}else {
+				cout << "LOG ERROR: atributo de entidad erroeneo: " << clave <<endl;
+			}
+		}
+		//agrego una entidad al escenario
+		unEscenario.agregar_entidad(unaEntidad);
    }
 }
 void operator >> (const YAML::Node& node, vector <config_escenario>& escenarios) {
@@ -151,6 +177,8 @@ void operator >> (const YAML::Node& node, vector <config_escenario>& escenarios)
 				unEscenario.set_tam_y(atoi(valor.c_str()));
 			} else if (clave == "protagonista"){
 				parsear_protagonistas(it.second(),unEscenario);
+			}else if (clave == "entidadesDef"){
+				parsear_entidades(it.second(),unEscenario);
 			}else{ 
 				cout << "LOG ERROR: atributo de escenario erroeneo: " << clave <<endl; 
 			}

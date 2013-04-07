@@ -40,7 +40,7 @@ class config_escenario {
 
 		void set_tam_y(int newValue) { tam_y = newValue;}
 		
-		void void_entidad(config_entidad_en_juego unaEntidad) { 
+		void agregar_entidad(config_entidad_en_juego unaEntidad) { 
 			entidades.push_back(unaEntidad);
 		}
 

@@ -24,5 +24,8 @@ class Tile {
 	void blit(SDL_Surface* pantalla, Camara& cam);
 	// Libera recursos si hace falta
 	void clean();
+	
+	unsigned int getX();
 
+	unsigned int getY();
 };

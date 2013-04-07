@@ -23,7 +23,7 @@ class Mapa {
 	// Hace un resize del mapa, es indefinido que pasa si el mapa no estaba en size 0
 	void resize(int w, int h);
 	// Getter para cada tile
-	Tile& getTile(int x, int y);
+	Tile* getTile(int x, int y);
 	// Verifica si el tile existe
 	bool tileExists(int x, int y) const;
 	// Getter para el vector de tiles, para recorrerlo entero

@@ -12,11 +12,10 @@
 		//posicion
 		this -> offsetTileX = 0;
 		this -> offsetTileY = 0;
-		this -> posTileX = 0;
-		this -> posTileY = 0;
+		//tile actual
+		this -> tileActual = NULL;
 		//tile destino
-		this -> posTileDestinoX = this -> posTileX;
-		this -> posTileDestinoY = this -> posTileDestinoY;
+		this -> tileDestino = NULL;
 		//dimensiones
 		this -> highInTiles = 1;
 		this -> widthInTiles = 1;
@@ -54,12 +53,12 @@
 	Entidad::Entidad(const std::string& name, 
 					const unsigned int wTiles , const unsigned int hTiles ,
 					int pixel_ref_x ,int pixel_ref_y,
-					unsigned int posTileX, unsigned int posTileY , 
+					Tile* tile,
 					ResMan& rm , const int colorKey){
 		// seteo del puntero a imagen
 		this -> imagen = NULL;
 		//carga de imagen y configuración inicial.
-		init(name , wTiles , hTiles , pixel_ref_x , pixel_ref_y, posTileX, posTileY , rm , colorKey);
+		init(name , wTiles , hTiles , pixel_ref_x , pixel_ref_y, tile , rm , colorKey);
 	}
 
 	/*
@@ -73,7 +72,7 @@
 					const unsigned int wTiles , const unsigned int hTiles , 
 					const unsigned int fps , const unsigned int delay , 
 					int pixel_ref_x ,int pixel_ref_y,
-					unsigned int posTileX, unsigned int posTileY , 
+					Tile* tile , 
 					ResMan& rm , const int colorKey){
 		// seteo del puntero a imagen
 		this -> imagen = NULL;
@@ -82,7 +81,7 @@
 			Imagen::ALTO_DEFAULT , Imagen::ANCHO_DEFAULT ,
 			Entidad::VELOCIDAD_DEFAULT ,
 			pixel_ref_x , pixel_ref_y, 
-			posTileX , posTileY , rm , colorKey);
+			tile , rm , colorKey);
 	}
 	
 	/*
@@ -97,7 +96,7 @@
 			const unsigned int fps , const unsigned int delay , 
 			const unsigned int altoSprite , const unsigned int anchoSprite ,
 			const int pixel_ref_x , const int pixel_ref_y,
-			const unsigned int posTileX , const unsigned int posTileY , 
+			Tile* tile , 
 			ResMan& rm , const int colorKey){
 		// seteo del puntero a imagen
 		this -> imagen = NULL;
@@ -106,7 +105,7 @@
 			altoSprite , anchoSprite ,
 			Entidad::VELOCIDAD_DEFAULT ,
 			pixel_ref_x , pixel_ref_y, 
-			posTileX , posTileY , rm , colorKey);
+			tile, rm , colorKey);
 	}
 
 	/*
@@ -122,7 +121,7 @@
 			const unsigned int altoSprite , const unsigned int anchoSprite ,
 			const unsigned int velocidad , 
 			const int pixel_ref_x , const int pixel_ref_y,
-			const unsigned int posTileX , const unsigned int posTileY , 
+			Tile* tile , 
 			ResMan& rm , const int colorKey){
 		// seteo del puntero a imagen
 		this -> imagen = NULL;
@@ -131,7 +130,7 @@
 			altoSprite , anchoSprite ,
 			velocidad,
 			pixel_ref_x , pixel_ref_y, 
-			posTileX , posTileY , rm , colorKey);
+			tile , rm , colorKey);
 	}
 
 	/*
@@ -147,7 +146,7 @@
 					const unsigned int  altoSprite , const unsigned int anchoSprite ,
 					const unsigned int velocidad ,
 					int pixel_ref_x ,int pixel_ref_y,
-					unsigned int posTileX, unsigned int posTileY , 
+					Tile* tile , 
 					ResMan& rm , const int colorKey) {
 		// Se destruyen imagenes previas
 		if (this -> imagen != NULL) {
@@ -170,11 +169,15 @@
 		this -> pixel_ref_x = pixel_ref_x ;
 		this -> pixel_ref_y = pixel_ref_y;
 		//posicion en Tiles
-		this -> posTileX = posTileX;
-		this -> posTileY = posTileY;
+		if (this -> tileActual != NULL) {
+			this -> tileActual -> deleteEntidad(this);
+		}
+		this -> tileActual = tile;
+		if (tile != NULL) {
+			this -> tileActual -> addEntidad(this);
+		}
 		//tile destino
-		this -> posTileDestinoX = this -> posTileX;
-		this -> posTileDestinoY = this -> posTileY;
+		this -> tileDestino = tileActual;
 		//seteo de velocidad
 		this -> velocidad = velocidad;
 	}
@@ -189,7 +192,7 @@
 	void Entidad::init(const std::string& name,  
 					const unsigned int wTiles , const unsigned int hTiles , 
 					int pixel_ref_x ,int pixel_ref_y , 
-					unsigned int posTileX, unsigned int posTileY , 
+					Tile* tile , 
 					ResMan& rm , const int colorKey){
 		// Se destruyen imagenes previas
 		if (this -> imagen != NULL) {
@@ -211,11 +214,15 @@
 		this -> pixel_ref_x = pixel_ref_x ;
 		this -> pixel_ref_y = pixel_ref_y;
 		//posicion en Tiles
-		this -> posTileX = posTileX;
-		this -> posTileY = posTileY;
+		if (this -> tileActual != NULL) {
+			this -> tileActual -> deleteEntidad(this);
+		}
+		this -> tileActual = tile;
+		if (tile != NULL) {
+			this -> tileActual -> addEntidad(this);
+		}
 		//tile destino
-		this -> posTileDestinoX = this -> posTileX;
-		this -> posTileDestinoY = this -> posTileY;
+		this -> tileDestino = tileActual;
 	}
 	
 	/*
@@ -229,6 +236,8 @@
 			this -> imagen = NULL;
 		}
 		this -> surf = NULL;
+		this -> tileActual = NULL;
+		this -> tileDestino = NULL;
 	}
 
 	/*
@@ -244,25 +253,19 @@
 		Nota2: Los destinos no validos no traeran problemas al algoritmo, es decir que
 		le podes pasar cualquier destino aunque supere las dimensiones del mapa.
 	*/
-	void Entidad::mover(const unsigned int x , const unsigned int y) {
-		this -> posTileDestinoX = x;
-		this -> posTileDestinoY = y;
+	void Entidad::mover(Tile* tileDestino) {
+		if (tileDestino != NULL){
+			this -> tileDestino = tileDestino;
+		}
 	}
 	
 	/*
-		Retorna la posición X en Tiles
+		Retorna Tile Actual
 	*/
-	unsigned int Entidad::getPosTileX() const {
-		return this -> posTileX;
+	Tile* Entidad::getTileActual(){
+		return this -> tileActual;
 	}
-	
-	/*
-		Retorna la posición Y en Tiles
-	*/
-	unsigned int Entidad::getPosTileY() const {
-		return this -> posTileY;
-	}
-			
+				
 	/*
 		retorna el alto en tiles
 	*/
@@ -279,8 +282,14 @@
 
 	// Actualiza las cosas internas, si hubiese
 	void Entidad::update(Mapa* mapa) {
-		//actualizacion de posicion
-		this -> actualizarPosicion(mapa);
+		if (this->tileDestino != NULL) {
+			//actualizacion de posicion
+			//this -> actualizarPosicion(mapa);
+		} else {
+			if(this->imagen != NULL) {
+				this -> surf = this -> imagen -> getSurface();
+			}
+		}
 	}
 	
 	/*
@@ -305,7 +314,7 @@
 		especial.
 
 	*/
-	void Entidad::blit(SDL_Surface* dest, Camara* camara , Mapa* mapa,
+	void Entidad::blit(SDL_Surface* dest , Camara* camara , Mapa* mapa,
 						const unsigned int tileX ,	const unsigned int tileY){
 		if ( (this -> imagen != NULL) && (this -> surf != NULL) &&
 			(camara != NULL) ) {
@@ -339,37 +348,41 @@
 		aproximadamente al centro del mismo.
 	*/
 	unsigned int Entidad::calcularDireccion(){
-		int deltaX = this -> posTileDestinoX - this -> posTileX;
-		int deltaY = this -> posTileDestinoY - this -> posTileY;
-		if (deltaX > 0){
-			if(deltaY < 0){
-				return Entidad::ESTE;
-			} else{
-				if(deltaY == 0){
-					return Entidad::SURESTE;
-				} else {
-					return Entidad::OESTE;
-				}
-			}
-		}else {
-			if (deltaX < 0) {
-				if (deltaY < 0){
-					return Entidad::NORTE;
-				}else{
-					if (deltaY == 0) {
-						return Entidad::NOROESTE;
-					}else {
+		if ((tileDestino != NULL) && (tileActual != NULL)) {
+			int deltaX = this -> tileDestino -> getX() - this -> tileActual -> getX();
+			int deltaY = this -> tileDestino -> getY() - this -> tileActual -> getY();
+			printf("Actual %u %u Destino %u %u \n", tileActual->getX() , tileActual->getY() ,
+				tileDestino->getX() , tileDestino->getY());
+			if (deltaX > 0){
+				if(deltaY < 0){
+					return Entidad::ESTE;
+				} else{
+					if(deltaY == 0){
+						return Entidad::SURESTE;
+					} else {
 						return Entidad::OESTE;
 					}
 				}
-			}else{
-				if (deltaY < 0){
-					return Entidad::NORESTE;
-				} else{
-					if(deltaY == 0){
-						return Entidad::CENTRO;
+			}else {
+				if (deltaX < 0) {
+					if (deltaY < 0){
+						return Entidad::NORTE;
 					}else{
-						return Entidad::SUROESTE;
+						if (deltaY == 0) {
+							return Entidad::NOROESTE;
+						}else {
+							return Entidad::OESTE;
+						}
+					}
+				}else{
+					if (deltaY < 0){
+						return Entidad::NORESTE;
+					} else{
+						if(deltaY == 0){
+							return Entidad::CENTRO;
+						}else{
+							return Entidad::SUROESTE;
+						}
 					}
 				}
 			}
@@ -379,67 +392,57 @@
 	void Entidad::actualizarPosicion(Mapa* mapa) {
 		//Calculo de direccion
 		unsigned int direccion = this -> calcularDireccion();
-		
 		// Si la direccion es centro se dirige al mismo
 		if (direccion == Entidad::CENTRO) {
 			this -> actualizarImagen(direccion);
 		//Si es otro Tile se actualizacion posiciones hacia el mismo
-		} else {/*
-			//Obtengo el tile actual
-			Tile* tileActual = mapa -> getTile(this -> posTileX , this -> posTileY);
+		} else {
 			if (tileActual != NULL) {
-				// Calculo offset tentativo
+				// Calculo offset tentativo (sin tener en cuenta el pixel de referencia)
 				int offsetTentativoX = 0;
 				int offsetTentativoY = 0;
 				this -> calcularOffsetTentativo(direccion , &offsetTentativoX , 
 															&offsetTentativoY);
-				// Calculo posicion siguiente
+				// Calculo posicion siguiente (tomando en cuenta pixel de referencia y la posicion tile actual)
 				int posPixelSiguienteX = offsetTentativoX + tileActual -> getX() + this -> pixel_ref_x;
 				int posPixelSiguienteY = offsetTentativoY + tileActual -> getY() + this -> pixel_ref_y;
-				// Obtengo Tile origen
-				Tile* tileOrigen = mapa -> getTile(0,0);
 				// Obtengo el tile siguiente
-				coordenadas coordenadas(Tile::TILE_ALTO , Tile::TILE_ANCHO,
-										tileOrigen->getX(),tileOrigen->getY());
-				int* tileSiguienteXY = coordenadas.coordenadas_tile(posPixelSiguienteX,
-																posPixelSiguienteY);
-				if (tileSiguienteXY != NULL){
-					Tile* tileSiguiente = mapa -> getTile(tileSiguienteXY[0] , 
-															tileSiguienteXY[1]);
-					if (tileSiguiente != NULL){
-						//tileSiguiente distinto a tileActual
-						if(tileSiguiente != tileActual) {
-							// Actualizacion offset
-							if (offsetTileX > 0){
-								this -> offsetTileX = offsetTentativoX - (Tile::TILE_ANCHO/2); 
-							} else{
-								this -> offsetTileX = (Tile::TILE_ANCHO/2) + offsetTentativoX; 
-							}
-							if (offsetTileY > 0){
-								this -> offsetTileY = offsetTentativoY - (Tile::TILE_ALTO/2);
-							} else{
-								this -> offsetTileY = (Tile::TILE_ALTO/2) + offsetTentativoY;
-							}
-							// Remocion del Tile
-
-							// Colocacion en el tile siguiente
-
-							// Seteo de Entidad en nuevo Tile
-							this -> posTileX = tileSiguienteXY[0];
-							this -> posTileY = tileSiguienteXY[1];
-							
-						// tileSiguiente igual a tileActual
-						} else {
-							//actualizar offset
-							this -> offsetTileX = offsetTentativoX;
-							this -> offsetTileY = offsetTentativoY;
+				Tile* tileSiguiente = convertir_PosicionXY_En_Pixeles_A_Tiles(posPixelSiguienteX ,
+																		posPixelSiguienteY , mapa);
+				// Si el tileSiguiente es no nulo continua, sino no hace nada
+				if (tileSiguiente != NULL){
+					//tileSiguiente distinto a tileActual
+					if(tileSiguiente != tileActual) {
+						// Actualizacion offset
+						if (offsetTileX > 0){
+							this -> offsetTileX = offsetTentativoX - (Tile::TILE_ANCHO/2); 
+						} else{
+							this -> offsetTileX = (Tile::TILE_ANCHO/2) + offsetTentativoX; 
 						}
+						if (offsetTileY > 0){
+							this -> offsetTileY = offsetTentativoY - (Tile::TILE_ALTO/2);
+						} else{
+							this -> offsetTileY = (Tile::TILE_ALTO/2) + offsetTentativoY;
+						}
+						// Remocion del Tile
+						//this -> tileActual -> deleteEntidad(this);
+						// Colocacion en el tile siguiente
+						tileSiguiente -> addEntidad(this);
+						// Seteo de Entidad en nuevo Tile
+						this -> setTileActual(tileSiguiente);
+					// tileSiguiente igual a tileActual
+					} else {
+						//actualizar offset
+						this -> offsetTileX = offsetTentativoX;
+						this -> offsetTileY = offsetTentativoY;
 					}
 				}
-			}*/
+			}
 		}
 	}
-
+	/* 
+		El offset X Y sin tener en cuenta el pixel de origen
+	*/
 	void Entidad::calcularOffsetTentativo(unsigned int direccion , 
 									int* offsetTentativoX , int* offsetTentativoY){
 		*offsetTentativoX = this -> offsetTileX;
@@ -489,4 +492,29 @@
 			// Actualizacion del surface
 			this -> surf = this -> imagen -> getSurface();
 		}
+	}
+
+	/*
+		posX y posY en pixeles, es una posicion cualquiera en el mapa
+	*/
+	Tile* Entidad::convertir_PosicionXY_En_Pixeles_A_Tiles(const unsigned int posX , const unsigned int posY , 
+													Mapa* mapa){
+		Tile* retorno = NULL;
+		int x0 = posX - Tile::TILE_ANCHO/2;
+		int tileX;
+		int tileY;
+		tileX = (posY + (x0 / 2))/Tile::TILE_ALTO;
+		tileY = (posY - (x0 / 2))/Tile::TILE_ALTO;
+		if ((tileX >= 0) && (tileY >= 0)){
+			retorno = mapa -> getTile(tileX , tileY);
+		}
+		return retorno;
+	}
+
+	void Entidad::setTileActual(Tile* tile) {
+		this -> tileActual = tile;
+	}
+
+	void Entidad::setTileDestino(Tile* tile){
+		this -> tileDestino = tile;
 	}

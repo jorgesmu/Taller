@@ -1,6 +1,7 @@
 #pragma once
 #include "../display/entidad.h"
 #include "../utilities/ImagenPersonaje.h"
+class Tile;
 class Personaje : public Entidad {
 
 public:
@@ -24,7 +25,7 @@ public:
 			const unsigned int altoSprite , const unsigned  int anchoSprite ,
 			const unsigned int velocidad ,
 			const int pixel_ref_x , const int pixel_ref_y,
-			const unsigned int posTileX , const unsigned int posTileY , 
+			Tile* tile, 
 			ResMan& rm , const int colorKey);
 
 	/*
@@ -40,7 +41,7 @@ public:
 					const unsigned int altoSprite , const unsigned int anchoSprite ,
 					const unsigned int velocidad ,
 					const int pixel_ref_x , const int pixel_ref_y,
-					const unsigned int posTileX , const unsigned int posTileY , 
+					Tile* tile, 
 					ResMan& rm , const int colorKey);
 
 	/*
@@ -53,7 +54,7 @@ public:
 		Nota: Puede suceder que si una entidad ocupa varios Tiles la entidad se de de alta
 		en algun Tile en el que no estaba, y se de de baja en alguno en cual estaba.
 	*/
-	virtual void mover(const unsigned int x , const unsigned int y);
+	virtual void mover(Tile* tileDestino);
 
 	virtual void actualizarImagen(const unsigned int direccion);
 };

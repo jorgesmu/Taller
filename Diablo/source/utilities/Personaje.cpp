@@ -20,7 +20,7 @@ Personaje::Personaje(const std::string& name,
 			const unsigned int altoSprite , const unsigned int anchoSprite ,
 			const unsigned int velocidad , 
 			const int pixel_ref_x , const int pixel_ref_y,
-			const unsigned int posTileX , const unsigned int posTileY , 
+			Tile* tile , 
 			ResMan& rm , const int colorKey){
 	// seteo del puntero a imagen
 	this -> imagen = NULL;
@@ -29,7 +29,7 @@ Personaje::Personaje(const std::string& name,
 		altoSprite , anchoSprite ,
 		velocidad,
 		pixel_ref_x , pixel_ref_y, 
-		posTileX , posTileY , rm , colorKey);
+		tile , rm , colorKey);
 }
 
 /*
@@ -44,7 +44,7 @@ void Personaje::init(const std::string& name,
 		const unsigned int  altoSprite , const unsigned int anchoSprite ,
 		const unsigned int velocidad ,
 		int pixel_ref_x ,int pixel_ref_y,
-		unsigned int posTileX, unsigned int posTileY , 
+		Tile* tile, 
 		ResMan& rm , const int colorKey) {
 	// Se destruyen imagenes previas
 	if (this -> imagen != NULL) {
@@ -67,11 +67,9 @@ void Personaje::init(const std::string& name,
 	this -> pixel_ref_x = pixel_ref_x ;
 	this -> pixel_ref_y = pixel_ref_y;
 	//posicion en Tiles
-	this -> posTileX = posTileX;
-	this -> posTileY = posTileY;
+	this -> tileActual = tile;
 	//tile destino
-	this -> posTileDestinoX = this -> posTileX;
-	this -> posTileDestinoY = this -> posTileY;
+	this -> tileDestino = this -> tileActual;
 	//seteo de velocidad
 	this -> velocidad = velocidad;
 }
@@ -89,12 +87,14 @@ void Personaje::init(const std::string& name,
 	Nota2: Los destinos no validos no traeran problemas al algoritmo, es decir que
 	le podes pasar cualquier destino aunque supere las dimensiones del mapa.
 */
-void Personaje::mover(const unsigned int x , const unsigned int y) {
-	this -> posTileDestinoX = x;
-	this -> posTileDestinoY = y;
-	unsigned int direccion = this -> calcularDireccion();
-	if (direccion != CENTRO) {
+void Personaje::mover(Tile* tileDestino) {
+	if (tileDestino != NULL) {
+		this -> tileDestino = tileDestino;
+		unsigned int direccion = this -> calcularDireccion();
+		printf("Direccion %d \n", direccion);
+		if (direccion != CENTRO) {
 			
+		} 
 	}
 }
 

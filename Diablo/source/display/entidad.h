@@ -71,11 +71,11 @@ class Entidad {
 		
 		std::string name; // Nombre de la entidad
 			
-		unsigned int posTileX, posTileY; // Posicion actual en la grilla [en tiles]
+		Tile* tileActual; // Tile actual
 		
-		unsigned int posTileDestinoX, posTileDestinoY; // Posicion Tile destino [en tiles]
+		Tile* tileDestino; // Tile destino
 
-		int offsetTileX, offsetTileY; // Posicion en el Tile
+		int offsetTileX, offsetTileY; // Posicion en el Tile  [en pixeles]
 
 		Surface* surf; // Puntero a la surface de esta entidad (traida desde el resource manager on load)
 		
@@ -108,7 +108,7 @@ class Entidad {
 	Entidad(const std::string& name,
 			const unsigned int wTiles , const unsigned int hTiles ,
 			const int pixel_ref_x , const int pixel_ref_y,
-			const unsigned int posTileX , const unsigned int posTileY , 
+			Tile* tile , 
 			ResMan& rm , const int colorKey);
 
 	/*
@@ -122,7 +122,7 @@ class Entidad {
 			const unsigned int wTiles , const unsigned int hTiles , 
 			const unsigned int fps , const unsigned int delay , 
 			const int pixel_ref_x , const int pixel_ref_y,
-			const unsigned int posTileX , const unsigned int posTileY , 
+			Tile* tile,
 			ResMan& rm , const int colorKey);
 
 	/*
@@ -137,7 +137,7 @@ class Entidad {
 			const unsigned int fps , const unsigned int delay , 
 			const unsigned int altoSprite , const unsigned  int anchoSprite ,
 			const int pixel_ref_x , const int pixel_ref_y,
-			const unsigned int posTileX , const unsigned int posTileY , 
+			Tile* tile, 
 			ResMan& rm , const int colorKey);
 
 	/*
@@ -153,7 +153,7 @@ class Entidad {
 			const unsigned int altoSprite , const unsigned  int anchoSprite ,
 			const unsigned int velocidad ,
 			const int pixel_ref_x , const int pixel_ref_y,
-			const unsigned int posTileX , const unsigned int posTileY , 
+			Tile* tile , 
 			ResMan& rm , const int colorKey);
 
 	/*
@@ -173,7 +173,7 @@ class Entidad {
 	virtual void init(const std::string& name, 
 					const unsigned int wTiles , const unsigned int hTiles , 
 					const int pixel_ref_x , const int pixel_ref_y , 
-					const unsigned int posTileX, const unsigned int posTileY , 
+					Tile* tile , 
 					ResMan& rm , const int colorKey);
 					
 	/*
@@ -189,7 +189,7 @@ class Entidad {
 					const unsigned int altoSprite , const unsigned int anchoSprite ,
 					const unsigned int velocidad ,
 					const int pixel_ref_x , const int pixel_ref_y,
-					const unsigned int posTileX , const unsigned int posTileY , 
+					Tile* tile , 
 					ResMan& rm , const int colorKey);
 
 	/*
@@ -202,18 +202,13 @@ class Entidad {
 		Nota: Puede suceder que si una entidad ocupa varios Tiles la entidad se de de alta
 		en algun Tile en el que no estaba, y se de de baja en alguno en cual estaba.
 	*/
-	virtual void mover(const unsigned int x , const unsigned int y);
+	virtual void mover(Tile* tileDestino);
 	
 	/*
-		Retorna la posición X en Tiles
+		Retorna el Tile actual
 	*/
-	unsigned int getPosTileX() const;
+	Tile* getTileActual();
 	
-	/*
-		Retorna la posición Y en Tiles
-	*/
-	unsigned int getPosTileY() const;
-
 	/*
 		retorna el alto en tiles
 	*/
@@ -256,6 +251,10 @@ class Entidad {
 	virtual void blit(SDL_Surface* dest, Camara* camara , Mapa* mapa,
 					const unsigned int tileX ,	const unsigned int tileY);
 	
+	void setTileActual(Tile* tile);
+
+	void setTileDestino(Tile* tile);
+
 protected:	
 		
 	/*
@@ -310,5 +309,8 @@ protected:
 									int* offsetTentativoX , int* offsetTentativoY);
 
 	virtual void actualizarImagen(const unsigned int direccion);
+
+	Tile* convertir_PosicionXY_En_Pixeles_A_Tiles(const unsigned int posX , 
+									const unsigned int posY , Mapa* mapa);
 
 };

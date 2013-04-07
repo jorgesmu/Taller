@@ -41,22 +41,20 @@ int main(int argc, char* args[]) {
 	resman.addRes("cemento", "../resources/tile2.bmp", 255);
 	resman.addRes("agua", "../resources/tileAgua.bmp", Imagen::COLOR_KEY);
 	resman.addRes("soldado", "../resources/Soldado.bmp", Imagen::COLOR_KEY);
-	Entidad tierra_test;
-	tierra_test.init("tierra", 1 , 1 , 
+	Entidad tierra_test("tierra", 1 , 1 , 
 							   0 , 0 , 
-							   0 , 0 ,
+							   NULL,
 							   resman , Surface::RGB_VERDE);
-	Entidad cem_test;
-	cem_test.init("cemento", 1 , 1 , 
+	Entidad cem_test("cemento", 1 , 1 , 
 							 0 , 0 , 
-							 0 , 0 ,
-							 resman , Surface::RGB_VERDE);
+							  NULL,
+							  resman , Surface::RGB_VERDE);
 	Entidad agua("agua" ,
 							1 , 1 , 
 							10 , 100, 
 							50, 100 ,
 							0 , 0 , 
-							0 , 0 , resman ,
+							NULL , resman ,
 							Imagen::COLOR_KEY);
 	Personaje personaje("soldado" ,
 							1 , 1 , 
@@ -64,14 +62,13 @@ int main(int argc, char* args[]) {
 							100, 100 ,
 							5,
 							0 , 70 ,
-							0 , 0 , resman ,
+							NULL , resman ,
 							Imagen::COLOR_KEY);
 	Mapa mapa;
 	// Mapa de size random
 	mapa.resize(intRand(50, 100), intRand(50, 100));
 	// Llenamos el mapa con entidad tierra
-	bool agregar = true;
-
+	
 	for(auto it = mapa.allTiles().begin();it != mapa.allTiles().end(); ++it) {
 		if(intRand(0,1) == 0) {
 			it->addEntidad(&tierra_test);
@@ -82,11 +79,9 @@ int main(int argc, char* args[]) {
 				it->addEntidad(&agua);
 			}
 		}
-		if ( agregar){
-			it->addEntidad(&personaje);
-			agregar =false;
-		}
 	}
+
+	mapa.getTile(1,1) ->addEntidad(&personaje);
 	// Aca muestra como se agregan a mano
 	//mapa.getTile(0, 0).addEntidad(cem_test);
 	//mapa.getTile(0, 1).addEntidad(cem_test);
@@ -137,10 +132,10 @@ int main(int argc, char* args[]) {
 			}
 			// Hacer el movimiento si es valido
 			if(mapa.tileExists(test_next.x, test_next.y)) {
-				mapa.getTile(tw_test.x, tw_test.y).clean();
-				mapa.getTile(tw_test.x, tw_test.y).addEntidad(&tierra_test);
-				mapa.getTile(test_next.x, test_next.y).clean();
-				mapa.getTile(test_next.x, test_next.y).addEntidad(&cem_test);
+				mapa.getTile(tw_test.x, tw_test.y)->clean();
+				mapa.getTile(tw_test.x, tw_test.y)->addEntidad(&tierra_test);
+				mapa.getTile(test_next.x, test_next.y)->clean();
+				mapa.getTile(test_next.x, test_next.y)->addEntidad(&cem_test);
 				tw_test = test_next;
 			}
 			// Detectar mouse motion
@@ -154,8 +149,10 @@ int main(int argc, char* args[]) {
 					vec2<int> tile_res = MouseCoords2Tile(vec2<int>(event.button.x, event.button.y), camara);
 					std::cout << event.button.x << ";" << event.button.y <<  " || Tile: " << tile_res.x << ";" << tile_res.y << "\n";
 					if(mapa.tileExists(tile_res.x, tile_res.y)) {
-						mapa.getTile(tile_res.x, tile_res.y).clean();
-						mapa.getTile(tile_res.x, tile_res.y).addEntidad(&cem_test);
+						//mapa.getTile(tile_res.x, tile_res.y)->clean();
+						//mapa.getTile(tile_res.x, tile_res.y)->addEntidad(&cem_test);
+						printf("existe tile\n");
+						personaje.mover(mapa.getTile(tile_res.x,tile_res.y));
 					}
 				}
 			}

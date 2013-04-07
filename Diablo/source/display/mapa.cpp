@@ -17,8 +17,8 @@ void Mapa::resize(int w, int h) {
 }
 
 // Getter para cada tile
-Tile& Mapa::getTile(int x, int y) {
-	return tiles[x*h + y];
+Tile* Mapa::getTile(int x, int y) {
+	return &(tiles[x*h + y]);
 }
 
 // Chequea que el tile exista
@@ -48,7 +48,7 @@ void Mapa::blit(SDL_Surface* dest, Camara& camara) {
 		for(int x = 0;x < tile_count_x;x++) {
 			// Si el tile en el que estamos parados es valido, lo blitteamos
 			if(tileExists(curr_tile.x, curr_tile.y)) {
-				getTile(curr_tile.x, curr_tile.y).blit(dest, camara);
+				getTile(curr_tile.x, curr_tile.y)->blit(dest, camara);
 			}
 			// Nos movemos para el oeste
 			curr_tile = tileWalk(curr_tile, GDIR::O);
@@ -79,7 +79,7 @@ void Mapa::assignTileCoords() {
 	int x, y;
 	for(x = 0;x < w;x++) {
 		for(y = 0;y < h;y++) {
-			getTile(x,y).setBlitCoords((x-y)*Tile::TILE_ANCHO/2, (x+y)*Tile::TILE_ALTO/2);
+			getTile(x,y)->setBlitCoords((x-y)*Tile::TILE_ANCHO/2, (x+y)*Tile::TILE_ALTO/2);
 		}
 	}
 }

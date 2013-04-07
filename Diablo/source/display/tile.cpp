@@ -5,6 +5,7 @@ Tile::Tile() {
 
 void Tile::addEntidad(Entidad* ent){
 	entidades.push_back(ent);
+	ent->setTileActual(this);
 }
 
 void Tile::deleteEntidad(Entidad* ent){
@@ -26,10 +27,18 @@ void Tile::blit(SDL_Surface* pantalla, Camara& cam){
 }
 
 void Tile::setBlitCoords(int x, int y) {
-	this->x = x;
-	this->y = y;
+	this -> x = x;
+	this -> y = y;
 }
 
 void Tile::clean() {
 	entidades.clear();
+}
+
+unsigned int Tile::getX(){
+	return this -> x;
+}
+
+unsigned int Tile::getY(){
+	return this -> y;
 }

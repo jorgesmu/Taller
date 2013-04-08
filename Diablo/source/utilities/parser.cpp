@@ -196,15 +196,18 @@ config_juego parser_nivel(char* path){
 
 	cout << endl << "Test parsear completo." << endl << "Contenido parseado con Yaml: " << endl;
 	//abro el documento y parseo el nodo
-	std::ifstream fin(path);
-	YAML::Parser parser(fin);
+	std::ifstream archivo(path);
+	YAML::Parser parser(archivo);
 	YAML::Node doc;
 	parser.GetNextDocument(doc);
+	//declaro variables resultado
 	config_pantalla pantalla(-1,-1);
 	vector <config_entidad> entidades;
 	config_general config(-1,-1);
 	vector <config_escenario> escenarios;
 	config_juego juego;
+
+	//parseo pantalla
 	if(const YAML::Node *pName = doc.FindValue("pantalla")) {
 		cout << "pantalla existe" << endl;
 		doc["pantalla"] >> pantalla;
@@ -213,7 +216,7 @@ config_juego parser_nivel(char* path){
 	}else{
 		cout << "LOG ERROR: pantalla no existe" << endl;
 	}
-
+	//parseo escenarios
 	if(const YAML::Node *pName = doc.FindValue("escenarios")) {
 		cout << "escenarios existe" << endl;
 		doc["escenarios"] >> escenarios;
@@ -221,6 +224,7 @@ config_juego parser_nivel(char* path){
 	}else{
 		cout << "LOG ERROR: escenarios no existe" << endl;
 	}
+	//parseo entidades
 	if(const YAML::Node *pName = doc.FindValue("entidades")) {
 		doc["entidades"] >> entidades;
 		juego.set_entidades(entidades);
@@ -228,6 +232,7 @@ config_juego parser_nivel(char* path){
 	}else{
 		cout << "LOG ERROR: entidades no existe" << endl;
 	}
+	//parseo configuracion
 	if(const YAML::Node *pName = doc.FindValue("configuracion")) {
 		doc["configuracion"] >> config;
 		juego.set_configuracion(config);
@@ -235,6 +240,9 @@ config_juego parser_nivel(char* path){
 	}else{
 		cout << "LOG ERROR: configuracion no existe" << endl;
 	}
+	//cerramos la conexion
+	archivo.close();
+
 	return juego;
 }
 

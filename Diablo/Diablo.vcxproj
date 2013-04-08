@@ -30,6 +30,7 @@
     <ClCompile Include="source\utilities\ImagenAnimada.cpp" />
     <ClCompile Include="source\utilities\ImagenEstatica.cpp" />
     <ClCompile Include="source\utilities\ImagenPersonaje.cpp" />
+    <ClCompile Include="source\utilities\logErrores.cpp" />
     <ClCompile Include="source\utilities\parser.cpp" />
     <ClCompile Include="source\utilities\Personaje.cpp" />
     <ClCompile Include="source\utilities\PruebasParser.cpp" />
@@ -58,6 +59,7 @@
     <ClInclude Include="source\utilities\ImagenEstatica.h" />
     <ClInclude Include="source\utilities\ImagenPersonaje.h" />
     <ClInclude Include="source\utilities\imagen_error.h" />
+    <ClInclude Include="source\utilities\logErrores.h" />
     <ClInclude Include="source\utilities\parser.h" />
     <ClInclude Include="source\utilities\Personaje.h" />
     <ClInclude Include="source\utilities\PruebasParser.h" />

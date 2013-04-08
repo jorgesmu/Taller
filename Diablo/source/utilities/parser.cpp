@@ -8,6 +8,7 @@
 #include "config_general.h"
 #include "config_escenario.h"
 #include "config_juego.h"
+#include "logErrores.h"
 using namespace std;
 
 //lee e imprime un archivo
@@ -206,7 +207,11 @@ config_juego parser_nivel(char* path){
 	config_general config(-1,-1);
 	vector <config_escenario> escenarios;
 	config_juego juego;
-
+	//creo log errores
+	logErrores log("log.txt");
+	log.escribir("esta es mi linea1");
+	log.escribir("esta es mi linea2");
+	log.cerrarConexion();
 	//parseo pantalla
 	if(const YAML::Node *pName = doc.FindValue("pantalla")) {
 		cout << "pantalla existe" << endl;

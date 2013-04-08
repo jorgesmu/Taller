@@ -35,10 +35,10 @@ void Tile::clean() {
 	entidades.clear();
 }
 
-unsigned int Tile::getX(){
+int Tile::getX(){
 	return this -> x;
 }
 
-unsigned int Tile::getY(){
+int Tile::getY(){
 	return this -> y;
 }

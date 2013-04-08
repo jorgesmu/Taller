@@ -310,7 +310,7 @@ protected:
 
 	virtual void actualizarImagen(const unsigned int direccion);
 
-	Tile* convertir_PosicionXY_En_Pixeles_A_Tiles(const unsigned int posX , 
-									const unsigned int posY , Mapa* mapa);
+	Tile* convertir_PosicionXY_En_Pixeles_A_Tiles(const int posX , 
+									const int posY , Mapa* mapa);
 
 };

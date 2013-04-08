@@ -284,7 +284,7 @@
 	void Entidad::update(Mapa* mapa) {
 		if (this->tileDestino != NULL) {
 			//actualizacion de posicion
-			//this -> actualizarPosicion(mapa);
+			this -> actualizarPosicion(mapa);
 		} else {
 			if(this->imagen != NULL) {
 				this -> surf = this -> imagen -> getSurface();
@@ -351,37 +351,35 @@
 		if ((tileDestino != NULL) && (tileActual != NULL)) {
 			int deltaX = this -> tileDestino -> getX() - this -> tileActual -> getX();
 			int deltaY = this -> tileDestino -> getY() - this -> tileActual -> getY();
-			printf("Actual %u %u Destino %u %u \n", tileActual->getX() , tileActual->getY() ,
-				tileDestino->getX() , tileDestino->getY());
 			if (deltaX > 0){
 				if(deltaY < 0){
-					return Entidad::ESTE;
+					return Entidad::NORESTE;
 				} else{
 					if(deltaY == 0){
-						return Entidad::SURESTE;
+						return Entidad::ESTE;
 					} else {
-						return Entidad::OESTE;
+						return Entidad::SURESTE;
 					}
 				}
 			}else {
 				if (deltaX < 0) {
 					if (deltaY < 0){
-						return Entidad::NORTE;
+						return Entidad::NOROESTE;
 					}else{
 						if (deltaY == 0) {
-							return Entidad::NOROESTE;
-						}else {
 							return Entidad::OESTE;
+						}else {
+							return Entidad::SUROESTE;
 						}
 					}
 				}else{
 					if (deltaY < 0){
-						return Entidad::NORESTE;
+						return Entidad::NORTE;
 					} else{
 						if(deltaY == 0){
 							return Entidad::CENTRO;
 						}else{
-							return Entidad::SUROESTE;
+							return Entidad::SUR;
 						}
 					}
 				}
@@ -392,6 +390,8 @@
 	void Entidad::actualizarPosicion(Mapa* mapa) {
 		//Calculo de direccion
 		unsigned int direccion = this -> calcularDireccion();
+		printf("Actual %d %d Destino %d %d Direccion %u\n", tileActual->getX() , tileActual->getY() ,
+				tileDestino->getX() , tileDestino->getY() , direccion);
 		// Si la direccion es centro se dirige al mismo
 		if (direccion == Entidad::CENTRO) {
 			this -> actualizarImagen(direccion);
@@ -404,14 +404,18 @@
 				this -> calcularOffsetTentativo(direccion , &offsetTentativoX , 
 															&offsetTentativoY);
 				// Calculo posicion siguiente (tomando en cuenta pixel de referencia y la posicion tile actual)
-				int posPixelSiguienteX = offsetTentativoX + tileActual -> getX() + this -> pixel_ref_x;
-				int posPixelSiguienteY = offsetTentativoY + tileActual -> getY() + this -> pixel_ref_y;
+				int posPixelSiguienteX = offsetTentativoX + tileActual -> getX();
+				int posPixelSiguienteY = offsetTentativoY + tileActual -> getY();
 				// Obtengo el tile siguiente
-				Tile* tileSiguiente = convertir_PosicionXY_En_Pixeles_A_Tiles(posPixelSiguienteX ,
-																		posPixelSiguienteY , mapa);
+				Tile* tileSiguiente = this->convertir_PosicionXY_En_Pixeles_A_Tiles(posPixelSiguienteX , 
+											posPixelSiguienteY , mapa);
+				
+				printf("PixelSiguiente %d %d \n",posPixelSiguienteX , posPixelSiguienteY);
 				// Si el tileSiguiente es no nulo continua, sino no hace nada
 				if (tileSiguiente != NULL){
 					//tileSiguiente distinto a tileActual
+					printf("Siguiente %d %d \n",tileSiguiente->getX() , tileSiguiente->getY());
+					/*
 					if(tileSiguiente != tileActual) {
 						// Actualizacion offset
 						if (offsetTileX > 0){
@@ -436,6 +440,7 @@
 						this -> offsetTileX = offsetTentativoX;
 						this -> offsetTileY = offsetTentativoY;
 					}
+					*/
 				}
 			}
 		}
@@ -449,7 +454,6 @@
 		*offsetTentativoY = this -> offsetTileY;
 		switch (direccion){
 				case NORTE :  {
-					(*offsetTentativoX)-=this -> velocidad;
 					(*offsetTentativoY)-=this -> velocidad;
 					break;
 				}
@@ -497,18 +501,17 @@
 	/*
 		posX y posY en pixeles, es una posicion cualquiera en el mapa
 	*/
-	Tile* Entidad::convertir_PosicionXY_En_Pixeles_A_Tiles(const unsigned int posX , const unsigned int posY , 
+	Tile* Entidad::convertir_PosicionXY_En_Pixeles_A_Tiles(const int posX , const int posY , 
 													Mapa* mapa){
 		Tile* retorno = NULL;
-		int x0 = posX - Tile::TILE_ANCHO/2;
-		int tileX;
-		int tileY;
-		tileX = (posY + (x0 / 2))/Tile::TILE_ALTO;
-		tileY = (posY - (x0 / 2))/Tile::TILE_ALTO;
-		if ((tileX >= 0) && (tileY >= 0)){
-			retorno = mapa -> getTile(tileX , tileY);
-		}
-		return retorno;
+		int x0 = posX-(Tile::TILE_ANCHO/2);
+		int y0 = posY;
+		int x =  y0 + (x0 / 2);
+		int y = y0-(x0 / 2);
+		x/= Tile::TILE_ALTO;
+		y /= Tile::TILE_ALTO;
+		printf("Convertido X %d Y %d\n", x , y);
+		return mapa -> getTile(x , y);
 	}
 
 	void Entidad::setTileActual(Tile* tile) {

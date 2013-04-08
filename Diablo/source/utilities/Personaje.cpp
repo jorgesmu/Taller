@@ -90,11 +90,12 @@ void Personaje::init(const std::string& name,
 void Personaje::mover(Tile* tileDestino) {
 	if (tileDestino != NULL) {
 		this -> tileDestino = tileDestino;
+		/*
 		unsigned int direccion = this -> calcularDireccion();
 		printf("Direccion %d \n", direccion);
 		if (direccion != CENTRO) {
 			
-		} 
+		} */
 	}
 }
 

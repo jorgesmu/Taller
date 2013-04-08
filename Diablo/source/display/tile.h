@@ -25,7 +25,7 @@ class Tile {
 	// Libera recursos si hace falta
 	void clean();
 	
-	unsigned int getX();
+	int getX();
 
-	unsigned int getY();
+	int getY();
 };

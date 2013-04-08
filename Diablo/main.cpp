@@ -60,7 +60,7 @@ int main(int argc, char* args[]) {
 							1 , 1 , 
 							7 , 300, 
 							100, 100 ,
-							5,
+							25,
 							0 , 70 ,
 							NULL , resman ,
 							Imagen::COLOR_KEY);

@@ -407,14 +407,17 @@
 				int posPixelSiguienteX = offsetTentativoX + tileActual -> getX();
 				int posPixelSiguienteY = offsetTentativoY + tileActual -> getY();
 				// Obtengo el tile siguiente
-				Tile* tileSiguiente = this->convertir_PosicionXY_En_Pixeles_A_Tiles(posPixelSiguienteX , 
-											posPixelSiguienteY , mapa);
 				
 				printf("PixelSiguiente %d %d \n",posPixelSiguienteX , posPixelSiguienteY);
+
+				Tile* tileSiguiente = this->convertir_PosicionXY_En_Pixeles_A_Tiles(posPixelSiguienteX , 
+											posPixelSiguienteY , direccion , mapa);
+				
+				
 				// Si el tileSiguiente es no nulo continua, sino no hace nada
 				if (tileSiguiente != NULL){
 					//tileSiguiente distinto a tileActual
-					printf("Siguiente %d %d \n",tileSiguiente->getX() , tileSiguiente->getY());
+					//printf("Siguiente %d %d \n",tileSiguiente->getX() , tileSiguiente->getY());
 					/*
 					if(tileSiguiente != tileActual) {
 						// Actualizacion offset
@@ -458,34 +461,35 @@
 					break;
 				}
 				case NORESTE : {
+					(*offsetTentativoX)+=(2*this -> velocidad);
 					(*offsetTentativoY)-=this -> velocidad;
 					break;
 				}
 				case ESTE : {
-					(*offsetTentativoX)+=this -> velocidad;
-					(*offsetTentativoY)-=this -> velocidad;
+					(*offsetTentativoX)+=(2*this -> velocidad);
 					break;
 				}
 				case SURESTE : {
-					(*offsetTentativoX)+=this -> velocidad;
+					(*offsetTentativoX)+=(2*this -> velocidad);
+					(*offsetTentativoY)+=this -> velocidad;
 					break;
 				}
 				case SUR : {
-					(*offsetTentativoX)+=this -> velocidad;
 					(*offsetTentativoY)+=this -> velocidad;
 					break;
 				}
 				case SUROESTE : {
+					(*offsetTentativoX)-=(2*this -> velocidad);
 					(*offsetTentativoY)+=this -> velocidad;
 					break;
 				}
 				case OESTE : {
-					(*offsetTentativoX)-=this -> velocidad;
-					(*offsetTentativoY)+=this -> velocidad;
+					(*offsetTentativoX)-=(2*this -> velocidad);
 					break;
 				}
 				case NOROESTE : {
-					(*offsetTentativoX)-=this -> velocidad;
+					(*offsetTentativoX)-=(2*this -> velocidad);
+					(*offsetTentativoY)-=this -> velocidad;
 					break;
 				}
 		}
@@ -502,15 +506,93 @@
 		posX y posY en pixeles, es una posicion cualquiera en el mapa
 	*/
 	Tile* Entidad::convertir_PosicionXY_En_Pixeles_A_Tiles(const int posX , const int posY , 
-													Mapa* mapa){
+													const unsigned int direccion , Mapa* mapa){
 		Tile* retorno = NULL;
-		int x0 = posX-(Tile::TILE_ANCHO/2);
-		int y0 = posY;
-		int x =  y0 + (x0 / 2);
-		int y = y0-(x0 / 2);
-		x/= Tile::TILE_ALTO;
-		y /= Tile::TILE_ALTO;
-		printf("Convertido X %d Y %d\n", x , y);
+		int x = this -> tileActual -> getX();
+		int y = this -> tileActual -> getY();
+		int tileX = this -> tileActual -> getX();
+		int tileY = this -> tileActual -> getY();
+		switch (direccion){
+			case NORTE :  {
+				if (posY < tileY){
+					x = tileX;
+					y = tileY - Tile::TILE_ALTO;
+				}
+				break;
+			}
+			case NORESTE : {
+				float pendiente;
+				int yRectaSiguiente;
+				int yRectaReferencia;
+				pendiente= ((float)(posY - tileY))/((float)(posX - tileX));
+				yRectaSiguiente =(int) (tileY + pendiente*(Tile::TILE_ANCHO/2));
+				yRectaReferencia = tileY + Tile::TILE_ALTO/2;
+				printf("Recta Siguiente %d Recta Referencia %d Pediente %f\n",
+					yRectaSiguiente,yRectaReferencia,pendiente);
+				if (yRectaSiguiente < yRectaReferencia){				
+					x = tileX + Tile::TILE_ANCHO/2;
+					y = tileY - Tile::TILE_ALTO/2;
+				}
+				break;
+			}
+			case ESTE : {
+				if (posX > tileX){
+					x = tileX + Tile::TILE_ANCHO/2;
+					y = tileY;
+				}
+				break;
+			}
+			case SURESTE : {
+				
+				break;
+			}
+			case SUR : {
+				if (posY > tileY){
+					x = tileX;
+					y = tileY + Tile::TILE_ALTO;
+				}
+				break;
+			}
+			case SUROESTE : {
+				float pendiente;
+				int yRectaSiguiente;
+				int yRectaReferencia;
+				pendiente= ((float)(posY - tileY))/((float)(posX - tileX));
+				yRectaSiguiente =(int) (tileY + pendiente*((-1)*Tile::TILE_ANCHO/2));
+				yRectaReferencia = tileY + Tile::TILE_ALTO/2;
+				printf("Recta Siguiente %d Recta Referencia %d Pediente %f\n",
+					yRectaSiguiente,yRectaReferencia,pendiente);
+				if (yRectaSiguiente > yRectaReferencia){				
+					x = tileX - Tile::TILE_ANCHO/2;
+					y = tileY - Tile::TILE_ALTO/2;
+				}
+				break;
+			}
+			case OESTE : {
+				
+				if (posX < tileX){
+					x = tileX - Tile::TILE_ANCHO/2;
+					y = tileY;
+				}
+				break;
+			}
+			case NOROESTE : {
+				float pendiente;
+				int yRectaSiguiente;
+				int yRectaReferencia;
+				pendiente= ((float)(posY - tileY))/((float)(posX - tileX));
+				yRectaSiguiente =(int) (tileY + pendiente*((-1)*Tile::TILE_ANCHO/2));
+				yRectaReferencia = tileY + Tile::TILE_ALTO/2;
+				printf("Recta Siguiente %d Recta Referencia %d Pediente %f\n",
+					yRectaSiguiente,yRectaReferencia,pendiente);
+				if (yRectaSiguiente < yRectaReferencia){				
+					x = tileX - Tile::TILE_ANCHO/2;
+					y = tileY - Tile::TILE_ALTO/2;
+				}
+				break;
+			}
+		}
+		printf("Siguiente hallado x %d y %d\n",x,y);
 		return mapa -> getTile(x , y);
 	}
 

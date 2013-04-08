@@ -8,9 +8,10 @@ class config_general {
 		int vel_personaje,margen_scroll;
 
 	public:
-		//Constructor
+		//Constructores
 		config_general(int vel_personaje_i, int margen_scroll_i);
-
+		config_general();
+	
 		//Getters
 		int get_vel_personaje() { return vel_personaje;}
 

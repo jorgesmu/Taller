@@ -8,9 +8,9 @@ class config_pantalla {
 		int ancho,alto;
 
 	public:
-		//Constructor
+		//Constructores
 		config_pantalla(int ancho_i, int alto_i);
-
+		config_pantalla();
 		//Getters
 		int get_ancho() { return ancho;}
 

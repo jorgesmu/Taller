@@ -7,6 +7,7 @@
 #include "config_entidad.h"
 #include "config_general.h"
 #include "config_escenario.h"
+#include "config_juego.h"
 using namespace std;
 
 //lee e imprime un archivo
@@ -187,7 +188,8 @@ void operator >> (const YAML::Node& node, vector <config_escenario>& escenarios)
 		escenarios.push_back(unEscenario);
     }
 }
-void parser_nivel(char* path){
+config_juego parser_nivel(char* path){
+
 	//imprimo el documento para mirar si lo que imprime yaml esta bien
 	imprimir_documento(path);
 
@@ -202,10 +204,11 @@ void parser_nivel(char* path){
 	vector <config_entidad> entidades;
 	config_general config(-1,-1);
 	vector <config_escenario> escenarios;
-
+	config_juego juego;
 	if(const YAML::Node *pName = doc.FindValue("pantalla")) {
 		cout << "pantalla existe" << endl;
 		doc["pantalla"] >> pantalla;
+		juego.set_pantalla(pantalla);
 		cout << endl <<"valores:ancho_" << pantalla.get_ancho() << ",alto_" << pantalla.get_alto() << endl; 
 	}else{
 		cout << "LOG ERROR: pantalla no existe" << endl;
@@ -214,33 +217,37 @@ void parser_nivel(char* path){
 	if(const YAML::Node *pName = doc.FindValue("escenarios")) {
 		cout << "escenarios existe" << endl;
 		doc["escenarios"] >> escenarios;
+		juego.set_escenarios(escenarios);
 	}else{
 		cout << "LOG ERROR: escenarios no existe" << endl;
 	}
 	if(const YAML::Node *pName = doc.FindValue("entidades")) {
 		doc["entidades"] >> entidades;
+		juego.set_entidades(entidades);
 		cout << "entidades existe" << endl;
 	}else{
 		cout << "LOG ERROR: entidades no existe" << endl;
 	}
 	if(const YAML::Node *pName = doc.FindValue("configuracion")) {
 		doc["configuracion"] >> config;
+		juego.set_configuracion(config);
 		cout << "configuracion existe" << endl;
 	}else{
 		cout << "LOG ERROR: configuracion no existe" << endl;
 	}
-
+	return juego;
 }
 
-void parsear(char* path){
+config_juego parsear(char* path){
 	//ejemplos basado en: https://code.google.com/p/yaml-cpp/wiki/HowToParseADocument
 	
 	cout << endl << endl << "Comienza Yaml parsing de nivel." << endl;
+	config_juego juego;
 	try{
-		parser_nivel(path);
+		juego = parser_nivel(path);
 	}catch (exception e){
 		cout << endl << endl << "Ocurrio un error con la Yaml";
 	}
 
-	return;
+	return juego;
 }

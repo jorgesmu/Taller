@@ -407,14 +407,11 @@
 				int posPixelSiguienteX = offsetTentativoX + tileActual -> getX();
 				int posPixelSiguienteY = offsetTentativoY + tileActual -> getY();
 				// Obtengo el tile siguiente
-				//printf("PixelSiguiente %d %d \n",posPixelSiguienteX , posPixelSiguienteY);
 				Tile* tileSiguiente = this->convertir_PosicionXY_En_Pixeles_A_Tiles(posPixelSiguienteX , 
-											posPixelSiguienteY , direccion , mapa);
+										posPixelSiguienteY , direccion , mapa);
 				// Si el tileSiguiente es no nulo continua, sino no hace nada
 				if (tileSiguiente != NULL){
 					//tileSiguiente distinto a tileActual
-					printf("Siguiente %d %d \n",tileSiguiente->getX() , tileSiguiente->getY());
-					/*
 					if(tileSiguiente != tileActual) {
 						// Actualizacion offset
 						if (offsetTileX > 0){
@@ -428,18 +425,18 @@
 							this -> offsetTileY = (Tile::TILE_ALTO/2) + offsetTentativoY;
 						}
 						// Remocion del Tile
-						//this -> tileActual -> deleteEntidad(this);
+						this -> tileActual -> deleteEntidad(this);
 						// Colocacion en el tile siguiente
 						tileSiguiente -> addEntidad(this);
 						// Seteo de Entidad en nuevo Tile
 						this -> setTileActual(tileSiguiente);
+						this ->actualizarImagen(direccion);
 					// tileSiguiente igual a tileActual
 					} else {
 						//actualizar offset
 						this -> offsetTileX = offsetTentativoX;
 						this -> offsetTileY = offsetTentativoY;
 					}
-					*/
 				}
 			}
 		}
@@ -503,111 +500,13 @@
 	*/
 	Tile* Entidad::convertir_PosicionXY_En_Pixeles_A_Tiles(const int posX , const int posY , 
 													const unsigned int direccion , Mapa* mapa){
-		/*
-		Tile* retorno = NULL;
-		int x = this -> tileActual -> getX();
-		int y = this -> tileActual -> getY();
-		int tileX = this -> tileActual -> getX();
-		int tileY = this -> tileActual -> getY();
-		switch (direccion){
-			case NORTE :  {
-				if (posY < tileY){
-					x = tileX;
-					y = tileY - Tile::TILE_ALTO;
-				}
-				break;
-			}
-			case NORESTE : {
-				float pendiente;
-				int yRectaSiguiente;
-				int yRectaReferencia;
-				pendiente= ((float)(posY - tileY))/((float)(posX - tileX));
-				yRectaSiguiente =(int) (tileY + pendiente*(Tile::TILE_ANCHO/2));
-				yRectaReferencia = tileY + Tile::TILE_ALTO/2;
-				if (yRectaSiguiente < yRectaReferencia){				
-					x = tileX + Tile::TILE_ANCHO/2;
-					y = tileY - Tile::TILE_ALTO/2;
-				}
-				break;
-			}
-			case ESTE : {
-				if (posX > tileX){
-					x = tileX + Tile::TILE_ANCHO/2;
-					y = tileY;
-				}
-				break;
-			}
-			case SURESTE : {
-				float pendiente;
-				int yRectaSiguiente;
-				int yRectaReferencia;
-				pendiente= ((float)(posY - tileY-Tile::TILE_ALTO))/((float)(posX - tileX));
-				yRectaSiguiente =(int) (tileY+Tile::TILE_ALTO + 
-								pendiente*(Tile::TILE_ANCHO/2));
-				yRectaReferencia = tileY + Tile::TILE_ALTO/2;
-				if (yRectaSiguiente > yRectaReferencia){				
-					x = tileX + Tile::TILE_ANCHO/2;
-					y = tileY + Tile::TILE_ALTO/2;
-				}
-				break;
-			}
-			case SUR : {
-				if (posY > tileY){
-					x = tileX;
-					y = tileY + Tile::TILE_ALTO;
-				}
-				break;
-			}
-			case SUROESTE : {
-				float pendiente;
-				int yRectaSiguiente;
-				int yRectaReferencia;
-				pendiente= ((float)(posY - tileY-Tile::TILE_ALTO))/((float)(posX - tileX));
-				yRectaSiguiente =(int) (tileY+Tile::TILE_ALTO + 
-								pendiente*((-1)*Tile::TILE_ANCHO/2));
-				yRectaReferencia = tileY + Tile::TILE_ALTO/2;
-				if (yRectaSiguiente > yRectaReferencia){				
-					x = tileX - Tile::TILE_ANCHO/2;
-					y = tileY + Tile::TILE_ALTO/2;
-				}
-				break;
-			}
-			case OESTE : {
-				if (posX < tileX){
-					x = tileX - Tile::TILE_ANCHO/2;
-					y = tileY;
-				}
-				break;
-			}
-			case NOROESTE : {
-				float pendiente;
-				int yRectaSiguiente;
-				int yRectaReferencia;
-				pendiente= ((float)(posY - tileY))/((float)(posX - tileX));
-				yRectaSiguiente =(int) (tileY + pendiente*((-1)*Tile::TILE_ANCHO/2));
-				yRectaReferencia = tileY + Tile::TILE_ALTO/2;
-				if (yRectaSiguiente < yRectaReferencia){				
-					x = tileX - Tile::TILE_ANCHO/2;
-					y = tileY - Tile::TILE_ALTO/2;
-				}
-				break;
-			}
-		}
-		retorno = mapa -> getTile(x , y);
-
-	//	printf("Obtenido %d %d \n", x , y);
-
-
-		if (retorno != NULL)
-			printf("Obtenido %n %n \n", retorno->getX() , retorno->getY());*/
 		Tile* retorno =NULL;
 		int x;
 		int y;
-		int x0 = Tile::TILE_ANCHO + posX;
-		x0 -= Tile::TILE_ANCHO/2;
-		int y0 = posY;
-		x = y0 + (x0 / 2);
-		y = y0 - (x0 / 2);
+		int x0 = posX;
+		int y0 = posY - Tile::TILE_ALTO/2;
+		x = y0 + ((x0 + Tile::TILE_ANCHO/2) / 2);
+		y = y0 - ((x0 - Tile::TILE_ANCHO/2) / 2);
 		x /= Tile::TILE_ALTO;
 		y /= Tile::TILE_ALTO;
 		retorno = mapa -> getTile(x , y);

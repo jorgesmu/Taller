@@ -60,7 +60,7 @@ int main(int argc, char* args[]) {
 							1 , 1 , 
 							7 , 300, 
 							100, 100 ,
-							25,
+							5,
 							0 , 70 ,
 							NULL , resman ,
 							Imagen::COLOR_KEY);
@@ -151,7 +151,8 @@ int main(int argc, char* args[]) {
 					if(mapa.tileExists(tile_res.x, tile_res.y)) {
 						//mapa.getTile(tile_res.x, tile_res.y)->clean();
 						//mapa.getTile(tile_res.x, tile_res.y)->addEntidad(&cem_test);
-						printf("existe tile\n");
+						printf("Tile Pulsado %d %d\n",tile_res.x , tile_res.y);
+							SDL_Delay( 500 );
 						personaje.mover(mapa.getTile(tile_res.x,tile_res.y));
 					}
 				}

@@ -314,7 +314,7 @@ protected:
 
 	virtual void actualizarImagen(const unsigned int direccion);
 
-	Tile* convertir_PosicionXY_En_Pixeles_A_Tiles(const int posX , const int posY , 
-												const unsigned int direccion , Mapa* mapa);
+	Tile* obtenerTileSiguiente(const int posX , const int posY , 
+								const unsigned int direccion , Mapa* mapa);
 
 };

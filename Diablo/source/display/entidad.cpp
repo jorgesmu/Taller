@@ -421,7 +421,7 @@
 				int posPixelSiguienteX = offsetTentativoX + tileActual -> getX();
 				int posPixelSiguienteY = offsetTentativoY + tileActual -> getY();
 				// Obtengo el tile siguiente
-				Tile* tileSiguiente = this->convertir_PosicionXY_En_Pixeles_A_Tiles(
+				Tile* tileSiguiente = this->obtenerTileSiguiente(
 												posPixelSiguienteX , posPixelSiguienteY , 
 												direccion , mapa);
 				// Si el tileSiguiente es no nulo continua, sino no hace nada
@@ -429,23 +429,19 @@
 					//tileSiguiente distinto a tileActual
 					if(tileSiguiente != tileActual) {
 						// Actualizacion offset
-						if (offsetTileX > 0){
-							this -> offsetTileX = offsetTentativoX - (Tile::TILE_ANCHO/2); 
-						} else{
-							this -> offsetTileX = (Tile::TILE_ANCHO/2) + offsetTentativoX; 
-						}
-						if (offsetTileY > 0){
-							this -> offsetTileY = offsetTentativoY - (Tile::TILE_ALTO/2);
-						} else{
-							this -> offsetTileY = (Tile::TILE_ALTO/2) + offsetTentativoY;
-						}
+						/*
+						
+						this -> offsetTileX = this -> tileActual -> getX() - 
+										(tileSiguiente -> getX() + offsetTentativoX); 
+						this -> offsetTileY = this -> tileActual -> getY() - 
+										(tileSiguiente -> getY() + offsetTentativoY); 
 						// Remocion del Tile
 						this -> tileActual -> deleteEntidad(this);
 						// Colocacion en el tile siguiente
 						tileSiguiente -> addEntidad(this);
 						// Seteo de Entidad en nuevo Tile
 						this -> setTileActual(tileSiguiente);
-						this ->actualizarImagen(direccion);
+						this ->actualizarImagen(direccion);*/
 					// tileSiguiente igual a tileActual
 					} else {
 						//actualizar offset
@@ -513,57 +509,67 @@
 	/*
 		posX y posY en pixeles, es una posicion cualquiera en el mapa
 	*/
-	Tile* Entidad::convertir_PosicionXY_En_Pixeles_A_Tiles(const int posX , const int posY , 
+	Tile* Entidad::obtenerTileSiguiente(const int posX , const int posY , 
 													const unsigned int direccion , Mapa* mapa){
-	/*
-		tilePorImagen = mapa -> getTile(x , y);
-		int xSiguiente = this ->tileActual->getX;
-		int ySiguiente;
+	Tile* retorno = mapa -> getTilePorPixeles(posX , posY);
+	int posImagenX = posX + this -> imagen -> getAncho() - this -> pixel_ref_x;
+	int posImagenY = posY + this -> imagen -> getAlto() - this -> pixel_ref_y;
+	Tile* tilePosicionImagen = mapa -> getTile(posImagenX , posImagenY);
+	if((retorno != NULL) && (tilePosicionImagen != NULL) && 
+		(tilePosicionImagen != retorno)){
+		int xSiguiente = this -> tileActual -> getX();
+		int ySiguiente = this -> tileActual -> getY();
 		switch (direccion){
-				case NORTE :  {
-					(*offsetTentativoY)-=this -> velocidad;
-					break;
-				}
-				case NORESTE : {
-					(*offsetTentativoX)+=(2*this -> velocidad);
-					(*offsetTentativoY)-=this -> velocidad;
-					break;
-				}
-				case ESTE : {
-					(*offsetTentativoX)+=(2*this -> velocidad);
-					break;
-				}
-				case SURESTE : {
-					(*offsetTentativoX)+=(2*this -> velocidad);
-					(*offsetTentativoY)+=this -> velocidad;
-					break;
-				}
-				case SUR : {
-					(*offsetTentativoY)+=this -> velocidad;
-					break;
-				}
-				case SUROESTE : {
-					(*offsetTentativoX)-=(2*this -> velocidad);
-					(*offsetTentativoY)+=this -> velocidad;
-					break;
-				}
-				case OESTE : {
-					(*offsetTentativoX)-=(2*this -> velocidad);
-					break;
-				}
-				case NOROESTE : {
-					(*offsetTentativoX)-=(2*this -> velocidad);
-					(*offsetTentativoY)-=this -> velocidad;
-					break;
-				}
-		}*/
-		return mapa->getTilePorPixeles(posX , posY);
+			case NORTE :  {
+				ySiguiente -= Tile::TILE_ALTO;
+				break;
+			}
+			case NORESTE : {
+				xSiguiente += Tile::TILE_ANCHO/2;
+				ySiguiente -= Tile::TILE_ALTO/2;
+				break;
+			}
+			case ESTE : {
+				xSiguiente += Tile::TILE_ANCHO;
+				break;
+			}
+			case SURESTE : {
+				xSiguiente += Tile::TILE_ANCHO/2;
+				ySiguiente += Tile::TILE_ALTO/2;
+				break;
+			}
+			case SUR : {
+				ySiguiente += Tile::TILE_ALTO;
+				break;
+			}
+			case SUROESTE : {
+				xSiguiente -= Tile::TILE_ANCHO/2;
+				ySiguiente += Tile::TILE_ALTO/2;
+				break;
+			}
+			case OESTE : {
+				xSiguiente -= Tile::TILE_ANCHO;
+				break;
+			}
+			case NOROESTE : {
+				xSiguiente -= Tile::TILE_ANCHO/2;
+				ySiguiente -= Tile::TILE_ALTO/2;
+				break;
+			}
+		}
+		Tile* siguiente = mapa -> getTilePorPixeles(xSiguiente,ySiguiente);
+		printf("%d %d\n",xSiguiente,ySiguiente);
+		if (siguiente != NULL){
+			//retorno = siguiente;
+		}
 	}
+	return retorno;;
+}
 
-	void Entidad::setTileActual(Tile* tile) {
-		this -> tileActual = tile;
-	}
+void Entidad::setTileActual(Tile* tile) {
+	this -> tileActual = tile;
+}
 
-	void Entidad::setTileDestino(Tile* tile){
-		this -> tileDestino = tile;
-	}
+void Entidad::setTileDestino(Tile* tile){
+	this -> tileDestino = tile;
+}

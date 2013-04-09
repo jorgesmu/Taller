@@ -62,8 +62,14 @@ void operator >> (const YAML::Node& node, config_pantalla& config) {
 			it.second() >> valor;
 			//y los asigno
 			if (clave == "ancho"){
+				//actualizo atributos
+				config.completoAtributo();
+				config.completo_Ancho();
 				config.set_ancho(valor);
 			}else if (clave == "alto"){
+				//actualizo atributos
+				config.completoAtributo();
+				config.completo_Alto();
 				config.set_alto(valor);
 			}else {
 				logErrores.escribir("atributo de pantalla erroeneo",clave , valor);
@@ -296,7 +302,7 @@ config_juego parser_nivel(char* path){
 	
 	//verificar errores 
 	verificar_tags_ppales(doc);
-
+	logErrores.verificar_errores(pantalla,logErrores);
 	//cierro log
 	logErrores.cerrarConexion();
 	//cerramos la conexion

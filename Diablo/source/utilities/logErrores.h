@@ -56,13 +56,15 @@ class logErrores {
 		void verificar_errores(config_pantalla& pantalla, logErrores& logErrores){
 			int alto = pantalla.get_alto();
 			int ancho = pantalla.get_ancho();
+			//verifico alto
 			if ( (pantalla.get_completo_alto()) == false ){
 				logErrores.escribir ("No se ingreso el alto de la pantalla, se selecciona valor por defecto");
 				pantalla.set_alto(altoDef);
 			}else if ( alto < 0 ){
-				logErrores.escribir ("El alto de la pantalla ingresado es menor que la unidad, se selecciona valor por defecto" ;
+				logErrores.escribir ("El alto de la pantalla ingresado es menor que la unidad, se selecciona valor por defecto") ;
 				pantalla.set_alto(altoDef);			
 			}
+			//verifico ancho
 			if ( (pantalla.get_completo_ancho()) == false ){
 				logErrores.escribir ("No se ingreso el ancho de la pantalla, se selecciona valor por defecto");
 				pantalla.set_alto(anchoDef);
@@ -72,5 +74,27 @@ class logErrores {
 			}
 
 		}
+		//verfica errores de configuracion
+		void verificar_errores(config_general& config, logErrores& logErrores){
+			int velocidad = config.get_vel_personaje();
+			int margen = config.get_margen_scroll();
+			//verifico velocidad del personaje
+			if ( (config.get_completo_velocidad()) == false ){
+				logErrores.escribir ("No se ingreso la velocidad del personaje en la configuracion, se selecciona valor por defecto");
+				config.set_vel_personaje(VelPerDef);
+			}else if ( velocidad < 0 ){
+				logErrores.escribir ("La velocidad del personaje ingresada es menor que la unidad, se selecciona valor por defecto");
+				config.set_vel_personaje(VelPerDef);		
+			}
+			//verifico margen del scroll
+			if ( (config.get_completo_margen()) == false ){
+				logErrores.escribir ("No se ingreso el margen del scroll en la configuracion, se selecciona valor por defecto");
+				config.set_margen_scroll(scrollDef);
+			}else if ( velocidad < 0 ){
+				logErrores.escribir ("El margen del scroll ingresado es menor que la unidad, se selecciona valor por defecto");
+				config.set_margen_scroll(scrollDef);
+		
+			}
 
+		}
 };

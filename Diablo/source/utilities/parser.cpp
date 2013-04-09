@@ -41,8 +41,10 @@ void operator >> (const YAML::Node& node, config_general& config) {
 			it.second() >> valor;
 			//y los asigno
 			if (clave == "vel_personaje"){
+				config.completo_velocidad();
 				config.set_vel_personaje(valor);
 			}else if (clave == "margen_scroll"){
+				config.completo_Margen();
 				config.set_margen_scroll(valor);
 			}else {
 				logErrores.escribir("atributo de configuracion erroeneo",clave,valor);
@@ -63,12 +65,10 @@ void operator >> (const YAML::Node& node, config_pantalla& config) {
 			//y los asigno
 			if (clave == "ancho"){
 				//actualizo atributos
-				config.completoAtributo();
 				config.completo_Ancho();
 				config.set_ancho(valor);
 			}else if (clave == "alto"){
 				//actualizo atributos
-				config.completoAtributo();
 				config.completo_Alto();
 				config.set_alto(valor);
 			}else {
@@ -303,6 +303,7 @@ config_juego parser_nivel(char* path){
 	//verificar errores 
 	verificar_tags_ppales(doc);
 	logErrores.verificar_errores(pantalla,logErrores);
+	logErrores.verificar_errores(config,logErrores);
 	//cierro log
 	logErrores.cerrarConexion();
 	//cerramos la conexion

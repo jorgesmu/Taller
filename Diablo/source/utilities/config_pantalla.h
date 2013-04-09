@@ -6,7 +6,7 @@ class config_pantalla {
 
 	private:
 		int ancho,alto;
-		bool completo, completoAncho, completoAlto;
+		bool completoAncho, completoAlto;
 	public:
 		//Constructores
 		config_pantalla(int ancho_i, int alto_i);
@@ -15,8 +15,6 @@ class config_pantalla {
 		int get_ancho() { return ancho;}
 
 		int get_alto() { return alto;}
-		
-		bool get_completo() { return completo;}
 
 		bool get_completo_alto() { return completoAlto;}
 		
@@ -30,9 +28,6 @@ class config_pantalla {
 			ancho = nuevaMedida;
 		}
 		//metodos para completar validaciones
-		void completoAtributo(){
-			completo = true;
-		}
 		void completo_Alto(){
 			completoAlto = true;
 		}

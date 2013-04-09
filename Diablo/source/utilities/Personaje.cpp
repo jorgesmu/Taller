@@ -72,6 +72,8 @@ void Personaje::init(const std::string& name,
 	this -> tileDestino = this -> tileActual;
 	//seteo de velocidad
 	this -> velocidad = velocidad;
+	//tiempo siguiente update
+	this -> tiempoProximoUpdate = clock();
 }
 
 /*

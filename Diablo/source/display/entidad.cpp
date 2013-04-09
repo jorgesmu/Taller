@@ -29,6 +29,8 @@
 		this -> imagen = NULL;
 		//velocidad
 		this -> velocidad = Entidad::VELOCIDAD_DEFAULT;
+		//tiempo siguiente update
+		this -> tiempoProximoUpdate = clock();
 	}
 
 	/*
@@ -180,6 +182,8 @@
 		this -> tileDestino = tileActual;
 		//seteo de velocidad
 		this -> velocidad = velocidad;
+		//tiempo siguiente update
+		this -> tiempoProximoUpdate = clock();
 	}
 
 	/*
@@ -223,6 +227,8 @@
 		}
 		//tile destino
 		this -> tileDestino = tileActual;
+		//tiempo siguiente update
+		this -> tiempoProximoUpdate = clock();
 	}
 	
 	/*
@@ -282,11 +288,19 @@
 
 	// Actualiza las cosas internas, si hubiese
 	void Entidad::update(Mapa* mapa) {
-		if (this->tileDestino != NULL) {
-			//actualizacion de posicion
-			this -> actualizarPosicion(mapa);
+		if (this -> tiempoProximoUpdate <= clock()){
+			if (this->tileDestino != NULL) {
+				//actualizacion de posicion
+				this -> actualizarPosicion(mapa);
+			} else {
+				if(this->imagen != NULL) {
+					this -> surf = this -> imagen -> getSurface();
+				}
+			}
+			this ->tiempoProximoUpdate = clock() + Entidad::DELTA_UPDATE;
 		} else {
-			if(this->imagen != NULL) {
+			if(this -> imagen != NULL) {
+				// Actualizacion del surface
 				this -> surf = this -> imagen -> getSurface();
 			}
 		}
@@ -407,8 +421,9 @@
 				int posPixelSiguienteX = offsetTentativoX + tileActual -> getX();
 				int posPixelSiguienteY = offsetTentativoY + tileActual -> getY();
 				// Obtengo el tile siguiente
-				Tile* tileSiguiente = this->convertir_PosicionXY_En_Pixeles_A_Tiles(posPixelSiguienteX , 
-										posPixelSiguienteY , direccion , mapa);
+				Tile* tileSiguiente = this->convertir_PosicionXY_En_Pixeles_A_Tiles(
+												posPixelSiguienteX , posPixelSiguienteY , 
+												direccion , mapa);
 				// Si el tileSiguiente es no nulo continua, sino no hace nada
 				if (tileSiguiente != NULL){
 					//tileSiguiente distinto a tileActual
@@ -500,17 +515,49 @@
 	*/
 	Tile* Entidad::convertir_PosicionXY_En_Pixeles_A_Tiles(const int posX , const int posY , 
 													const unsigned int direccion , Mapa* mapa){
-		Tile* retorno =NULL;
-		int x;
-		int y;
-		int x0 = posX;
-		int y0 = posY - Tile::TILE_ALTO/2;
-		x = y0 + ((x0 + Tile::TILE_ANCHO/2) / 2);
-		y = y0 - ((x0 - Tile::TILE_ANCHO/2) / 2);
-		x /= Tile::TILE_ALTO;
-		y /= Tile::TILE_ALTO;
-		retorno = mapa -> getTile(x , y);
-		return retorno;
+	/*
+		tilePorImagen = mapa -> getTile(x , y);
+		int xSiguiente = this ->tileActual->getX;
+		int ySiguiente;
+		switch (direccion){
+				case NORTE :  {
+					(*offsetTentativoY)-=this -> velocidad;
+					break;
+				}
+				case NORESTE : {
+					(*offsetTentativoX)+=(2*this -> velocidad);
+					(*offsetTentativoY)-=this -> velocidad;
+					break;
+				}
+				case ESTE : {
+					(*offsetTentativoX)+=(2*this -> velocidad);
+					break;
+				}
+				case SURESTE : {
+					(*offsetTentativoX)+=(2*this -> velocidad);
+					(*offsetTentativoY)+=this -> velocidad;
+					break;
+				}
+				case SUR : {
+					(*offsetTentativoY)+=this -> velocidad;
+					break;
+				}
+				case SUROESTE : {
+					(*offsetTentativoX)-=(2*this -> velocidad);
+					(*offsetTentativoY)+=this -> velocidad;
+					break;
+				}
+				case OESTE : {
+					(*offsetTentativoX)-=(2*this -> velocidad);
+					break;
+				}
+				case NOROESTE : {
+					(*offsetTentativoX)-=(2*this -> velocidad);
+					(*offsetTentativoY)-=this -> velocidad;
+					break;
+				}
+		}*/
+		return mapa->getTilePorPixeles(posX , posY);
 	}
 
 	void Entidad::setTileActual(Tile* tile) {

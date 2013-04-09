@@ -32,4 +32,6 @@ class Mapa {
 	void blit(SDL_Surface* dest, Camara& camara);
 	// Libera los recursos
 	void clean();
+	// Devuelve el tile segun su posicion en el mapa dado por el pixel superior
+	Tile* getTilePorPixeles(int pixelX , int pixelY);
 };

@@ -60,7 +60,7 @@ class Entidad {
 		const static unsigned int CENTRO = 8;
 
 		//Velocidad por defecto
-		const static int VELOCIDAD_DEFAULT = 5;
+		const static int VELOCIDAD_DEFAULT = 2;
 
 		//Pixel de referencia por defecto
 		const static int PIXEL_REF_X_DEFAULT = 0;
@@ -69,6 +69,8 @@ class Entidad {
 
 	protected:
 		
+		const static int DELTA_UPDATE = 100;
+
 		std::string name; // Nombre de la entidad
 			
 		Tile* tileActual; // Tile actual
@@ -88,6 +90,8 @@ class Entidad {
 										//de la entidad.
 		unsigned int velocidad; //velocidad de desplazamiento por el mapa 
 					   //[En pixeles por llamado a update]
+
+		clock_t tiempoProximoUpdate;
 
 	public:
 	

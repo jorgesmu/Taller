@@ -51,14 +51,14 @@ int main(int argc, char* args[]) {
 							  resman , Surface::RGB_VERDE);
 	Entidad agua("agua" ,
 							1 , 1 , 
-							10 , 100, 
+							5 , 300, 
 							50, 100 ,
 							0 , 0 , 
 							NULL , resman ,
 							Imagen::COLOR_KEY);
 	Personaje personaje("soldado" ,
 							1 , 1 , 
-							7 , 300, 
+							30 , 10, 
 							100, 100 ,
 							5,
 							0 , 70 ,
@@ -151,8 +151,6 @@ int main(int argc, char* args[]) {
 					if(mapa.tileExists(tile_res.x, tile_res.y)) {
 						//mapa.getTile(tile_res.x, tile_res.y)->clean();
 						//mapa.getTile(tile_res.x, tile_res.y)->addEntidad(&cem_test);
-						printf("Tile Pulsado %d %d\n",tile_res.x , tile_res.y);
-							SDL_Delay( 500 );
 						personaje.mover(mapa.getTile(tile_res.x,tile_res.y));
 					}
 				}

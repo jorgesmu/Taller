@@ -1,7 +1,7 @@
 #include "entidad.h"
 #include "tile.h"
 #include "mapa.h"
-//#include "../utilities/coordenadas.h"
+
 
 	/*
 		Pre:-
@@ -390,8 +390,8 @@
 	void Entidad::actualizarPosicion(Mapa* mapa) {
 		//Calculo de direccion
 		unsigned int direccion = this -> calcularDireccion();
-		printf("Actual %d %d Destino %d %d Direccion %u\n", tileActual->getX() , tileActual->getY() ,
-				tileDestino->getX() , tileDestino->getY() , direccion);
+	/*	printf("Actual %d %d Destino %d %d Direccion %u\n", tileActual->getX() , tileActual->getY() ,
+				tileDestino->getX() , tileDestino->getY() , direccion);*/
 		// Si la direccion es centro se dirige al mismo
 		if (direccion == Entidad::CENTRO) {
 			this -> actualizarImagen(direccion);
@@ -407,17 +407,13 @@
 				int posPixelSiguienteX = offsetTentativoX + tileActual -> getX();
 				int posPixelSiguienteY = offsetTentativoY + tileActual -> getY();
 				// Obtengo el tile siguiente
-				
-				printf("PixelSiguiente %d %d \n",posPixelSiguienteX , posPixelSiguienteY);
-
+				//printf("PixelSiguiente %d %d \n",posPixelSiguienteX , posPixelSiguienteY);
 				Tile* tileSiguiente = this->convertir_PosicionXY_En_Pixeles_A_Tiles(posPixelSiguienteX , 
 											posPixelSiguienteY , direccion , mapa);
-				
-				
 				// Si el tileSiguiente es no nulo continua, sino no hace nada
 				if (tileSiguiente != NULL){
 					//tileSiguiente distinto a tileActual
-					//printf("Siguiente %d %d \n",tileSiguiente->getX() , tileSiguiente->getY());
+					printf("Siguiente %d %d \n",tileSiguiente->getX() , tileSiguiente->getY());
 					/*
 					if(tileSiguiente != tileActual) {
 						// Actualizacion offset
@@ -507,6 +503,7 @@
 	*/
 	Tile* Entidad::convertir_PosicionXY_En_Pixeles_A_Tiles(const int posX , const int posY , 
 													const unsigned int direccion , Mapa* mapa){
+		/*
 		Tile* retorno = NULL;
 		int x = this -> tileActual -> getX();
 		int y = this -> tileActual -> getY();
@@ -527,8 +524,6 @@
 				pendiente= ((float)(posY - tileY))/((float)(posX - tileX));
 				yRectaSiguiente =(int) (tileY + pendiente*(Tile::TILE_ANCHO/2));
 				yRectaReferencia = tileY + Tile::TILE_ALTO/2;
-				printf("Recta Siguiente %d Recta Referencia %d Pediente %f\n",
-					yRectaSiguiente,yRectaReferencia,pendiente);
 				if (yRectaSiguiente < yRectaReferencia){				
 					x = tileX + Tile::TILE_ANCHO/2;
 					y = tileY - Tile::TILE_ALTO/2;
@@ -543,7 +538,17 @@
 				break;
 			}
 			case SURESTE : {
-				
+				float pendiente;
+				int yRectaSiguiente;
+				int yRectaReferencia;
+				pendiente= ((float)(posY - tileY-Tile::TILE_ALTO))/((float)(posX - tileX));
+				yRectaSiguiente =(int) (tileY+Tile::TILE_ALTO + 
+								pendiente*(Tile::TILE_ANCHO/2));
+				yRectaReferencia = tileY + Tile::TILE_ALTO/2;
+				if (yRectaSiguiente > yRectaReferencia){				
+					x = tileX + Tile::TILE_ANCHO/2;
+					y = tileY + Tile::TILE_ALTO/2;
+				}
 				break;
 			}
 			case SUR : {
@@ -557,19 +562,17 @@
 				float pendiente;
 				int yRectaSiguiente;
 				int yRectaReferencia;
-				pendiente= ((float)(posY - tileY))/((float)(posX - tileX));
-				yRectaSiguiente =(int) (tileY + pendiente*((-1)*Tile::TILE_ANCHO/2));
+				pendiente= ((float)(posY - tileY-Tile::TILE_ALTO))/((float)(posX - tileX));
+				yRectaSiguiente =(int) (tileY+Tile::TILE_ALTO + 
+								pendiente*((-1)*Tile::TILE_ANCHO/2));
 				yRectaReferencia = tileY + Tile::TILE_ALTO/2;
-				printf("Recta Siguiente %d Recta Referencia %d Pediente %f\n",
-					yRectaSiguiente,yRectaReferencia,pendiente);
 				if (yRectaSiguiente > yRectaReferencia){				
 					x = tileX - Tile::TILE_ANCHO/2;
-					y = tileY - Tile::TILE_ALTO/2;
+					y = tileY + Tile::TILE_ALTO/2;
 				}
 				break;
 			}
 			case OESTE : {
-				
 				if (posX < tileX){
 					x = tileX - Tile::TILE_ANCHO/2;
 					y = tileY;
@@ -583,8 +586,6 @@
 				pendiente= ((float)(posY - tileY))/((float)(posX - tileX));
 				yRectaSiguiente =(int) (tileY + pendiente*((-1)*Tile::TILE_ANCHO/2));
 				yRectaReferencia = tileY + Tile::TILE_ALTO/2;
-				printf("Recta Siguiente %d Recta Referencia %d Pediente %f\n",
-					yRectaSiguiente,yRectaReferencia,pendiente);
 				if (yRectaSiguiente < yRectaReferencia){				
 					x = tileX - Tile::TILE_ANCHO/2;
 					y = tileY - Tile::TILE_ALTO/2;
@@ -592,8 +593,25 @@
 				break;
 			}
 		}
-		printf("Siguiente hallado x %d y %d\n",x,y);
-		return mapa -> getTile(x , y);
+		retorno = mapa -> getTile(x , y);
+
+	//	printf("Obtenido %d %d \n", x , y);
+
+
+		if (retorno != NULL)
+			printf("Obtenido %n %n \n", retorno->getX() , retorno->getY());*/
+		Tile* retorno =NULL;
+		int x;
+		int y;
+		int x0 = Tile::TILE_ANCHO + posX;
+		x0 -= Tile::TILE_ANCHO/2;
+		int y0 = posY;
+		x = y0 + (x0 / 2);
+		y = y0 - (x0 / 2);
+		x /= Tile::TILE_ALTO;
+		y /= Tile::TILE_ALTO;
+		retorno = mapa -> getTile(x , y);
+		return retorno;
 	}
 
 	void Entidad::setTileActual(Tile* tile) {

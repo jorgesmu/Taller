@@ -11,6 +11,7 @@
 #include "logErrores.h"
 using namespace std;
 
+logErrores logErrores("log.txt");
 //lee e imprime un archivo
 void imprimir_documento(char* path){
 		//se puede mejorar pero es solo una clase de test
@@ -182,7 +183,7 @@ void operator >> (const YAML::Node& node, vector <config_escenario>& escenarios)
 			}else if (clave == "entidadesDef"){
 				parsear_entidades(it.second(),unEscenario);
 			}else{ 
-				cout << "LOG ERROR: atributo de escenario erroeneo: " << clave <<endl; 
+				logErrores.escribir( "LOG ERROR: atributo de escenario erroeneo: " ); 
 			}
 		}
 		//agrego un escenario
@@ -208,10 +209,8 @@ config_juego parser_nivel(char* path){
 	vector <config_escenario> escenarios;
 	config_juego juego;
 	//creo log errores
-	logErrores log("log.txt");
-	log.escribir("esta es mi linea1");
-	log.escribir("esta es mi linea2");
-	log.cerrarConexion();
+	//logErrores log("log.txt");
+
 	//parseo pantalla
 	if(const YAML::Node *pName = doc.FindValue("pantalla")) {
 		cout << "pantalla existe" << endl;
@@ -219,7 +218,7 @@ config_juego parser_nivel(char* path){
 		juego.set_pantalla(pantalla);
 		cout << endl <<"valores:ancho_" << pantalla.get_ancho() << ",alto_" << pantalla.get_alto() << endl; 
 	}else{
-		cout << "LOG ERROR: pantalla no existe" << endl;
+		logErrores.escribir("LOG ERROR: pantalla no existe");
 	}
 	//parseo escenarios
 	if(const YAML::Node *pName = doc.FindValue("escenarios")) {
@@ -227,7 +226,7 @@ config_juego parser_nivel(char* path){
 		doc["escenarios"] >> escenarios;
 		juego.set_escenarios(escenarios);
 	}else{
-		cout << "LOG ERROR: escenarios no existe" << endl;
+		logErrores.escribir("LOG ERROR: escenarios no existe");
 	}
 	//parseo entidades
 	if(const YAML::Node *pName = doc.FindValue("entidades")) {
@@ -235,7 +234,7 @@ config_juego parser_nivel(char* path){
 		juego.set_entidades(entidades);
 		cout << "entidades existe" << endl;
 	}else{
-		cout << "LOG ERROR: entidades no existe" << endl;
+		logErrores.escribir( "LOG ERROR: entidades no existe" );
 	}
 	//parseo configuracion
 	if(const YAML::Node *pName = doc.FindValue("configuracion")) {
@@ -243,8 +242,11 @@ config_juego parser_nivel(char* path){
 		juego.set_configuracion(config);
 		cout << "configuracion existe" << endl;
 	}else{
-		cout << "LOG ERROR: configuracion no existe" << endl;
+		logErrores.escribir("LOG ERROR: configuracion no existe" );
 	}
+	
+	//cierro log
+	logErrores.cerrarConexion();
 	//cerramos la conexion
 	archivo.close();
 
@@ -259,7 +261,9 @@ config_juego parsear(char* path){
 	try{
 		juego = parser_nivel(path);
 	}catch (exception e){
-		cout << endl << endl << "Ocurrio un error con la Yaml";
+		logErrores.escribir( "Ocurrio un error con la Yaml" );
+		//cierro log
+		logErrores.cerrarConexion();
 	}
 
 	return juego;

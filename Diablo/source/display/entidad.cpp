@@ -10,12 +10,12 @@
 	*/
 	void Entidad::inicializarAtributosEnValoresDefault() {
 		//posicion
-		this -> offsetTileX = 0;
-		this -> offsetTileY = 0;
-		//tile actual
-		this -> tileActual = NULL;
+		this -> posX = 0;
+		this -> posX = 0;
 		//tile destino
 		this -> tileDestino = NULL;
+		//tile ancla
+		this -> tileAncla = NULL;
 		//dimensiones
 		this -> highInTiles = 1;
 		this -> widthInTiles = 1;
@@ -31,6 +31,11 @@
 		this -> velocidad = Entidad::VELOCIDAD_DEFAULT;
 		//tiempo siguiente update
 		this -> tiempoProximoUpdate = clock();
+		//seteo posicion
+		this -> posX = 0;
+		this -> posY = 0;
+		//seteo como compartido
+		this -> compartido = true;
 	}
 
 	/*
@@ -170,20 +175,24 @@
 		//pixel de referencia
 		this -> pixel_ref_x = pixel_ref_x ;
 		this -> pixel_ref_y = pixel_ref_y;
-		//posicion en Tiles
-		if (this -> tileActual != NULL) {
-			this -> tileActual -> deleteEntidad(this);
-		}
-		this -> tileActual = tile;
+		//agrego entidad al tile
 		if (tile != NULL) {
-			this -> tileActual -> addEntidad(this);
+			tile -> deleteEntidad(this);
+			tile -> addEntidad(this);
+			//seteo posicion
+			this -> posX = tile -> getX();
+			this -> posY = tile -> getY();
 		}
 		//tile destino
-		this -> tileDestino = tileActual;
+		this -> tileDestino = tile;
+		//tile ancla
+		this -> tileAncla = tile;
 		//seteo de velocidad
 		this -> velocidad = velocidad;
 		//tiempo siguiente update
 		this -> tiempoProximoUpdate = clock();
+		//seteo como compartido
+		this -> compartido = true;
 	}
 
 	/*
@@ -217,18 +226,22 @@
 		//pixel de referencia
 		this -> pixel_ref_x = pixel_ref_x ;
 		this -> pixel_ref_y = pixel_ref_y;
-		//posicion en Tiles
-		if (this -> tileActual != NULL) {
-			this -> tileActual -> deleteEntidad(this);
-		}
-		this -> tileActual = tile;
+		//agrego entidad al tile
 		if (tile != NULL) {
-			this -> tileActual -> addEntidad(this);
+			tile -> deleteEntidad(this);
+			tile -> addEntidad(this);
+			//seteo posicion
+			this -> posX = tile -> getX();
+			this -> posY = tile -> getY();
 		}
 		//tile destino
-		this -> tileDestino = tileActual;
+		this -> tileDestino = tile;
+		//tile ancla
+		this -> tileAncla = tile;
 		//tiempo siguiente update
 		this -> tiempoProximoUpdate = clock();
+		//seteo como compartido
+		this -> compartido = true;
 	}
 	
 	/*
@@ -242,8 +255,8 @@
 			this -> imagen = NULL;
 		}
 		this -> surf = NULL;
-		this -> tileActual = NULL;
 		this -> tileDestino = NULL;
+		this -> tileAncla = NULL;
 	}
 
 	/*
@@ -265,12 +278,6 @@
 		}
 	}
 	
-	/*
-		Retorna Tile Actual
-	*/
-	Tile* Entidad::getTileActual(){
-		return this -> tileActual;
-	}
 				
 	/*
 		retorna el alto en tiles
@@ -333,10 +340,15 @@
 		if ( (this -> imagen != NULL) && (this -> surf != NULL) &&
 			(camara != NULL) ) {
 			if(this -> surf -> getSDL_Surface() != NULL){
-				int posX = tileX - (int)(camara -> getX()) + this -> offsetTileX
-					- this -> pixel_ref_x;
-				int posY = tileY - (int)(camara -> getY()) + this -> offsetTileY
-					- this -> pixel_ref_y;
+				int posX;
+				int posY;
+				if (compartido){
+					posX = tileX - (int)(camara -> getX()) - this -> pixel_ref_x;
+					posY = tileY - (int)(camara -> getY()) - this -> pixel_ref_y;
+				} else {
+					posX = this -> posX - (int)(camara -> getX()) - this -> pixel_ref_x;
+					posY = this -> posY - (int)(camara -> getY()) - this -> pixel_ref_y;
+				}
 				this -> surf -> blit(dest , posX ,posY);		
 			}
 		}
@@ -362,9 +374,9 @@
 		aproximadamente al centro del mismo.
 	*/
 	unsigned int Entidad::calcularDireccion(){
-		if ((tileDestino != NULL) && (tileActual != NULL)) {
-			int deltaX = this -> tileDestino -> getX() - this -> tileActual -> getX();
-			int deltaY = this -> tileDestino -> getY() - this -> tileActual -> getY();
+		if (tileDestino != NULL) {
+			int deltaX = this -> tileDestino -> getX() - posX;
+			int deltaY = this -> tileDestino -> getY() - posY;
 			if (deltaX > 0){
 				if(deltaY < 0){
 					return Entidad::NORESTE;
@@ -404,61 +416,59 @@
 	void Entidad::actualizarPosicion(Mapa* mapa) {
 		//Calculo de direccion
 		unsigned int direccion = this -> calcularDireccion();
-	/*	printf("Actual %d %d Destino %d %d Direccion %u\n", tileActual->getX() , tileActual->getY() ,
-				tileDestino->getX() , tileDestino->getY() , direccion);*/
+		Tile* tileActual = mapa -> getTilePorPixeles(this -> posX , this -> posY);
 		// Si la direccion es centro se dirige al mismo
-		if (direccion == Entidad::CENTRO) {
+		if (tileActual == tileDestino) {
 			this -> actualizarImagen(direccion);
 		//Si es otro Tile se actualizacion posiciones hacia el mismo
 		} else {
-			if (tileActual != NULL) {
-				// Calculo offset tentativo (sin tener en cuenta el pixel de referencia)
-				int offsetTentativoX = 0;
-				int offsetTentativoY = 0;
-				this -> calcularOffsetTentativo(direccion , &offsetTentativoX , 
-															&offsetTentativoY);
-				// Calculo posicion siguiente (tomando en cuenta pixel de referencia y la posicion tile actual)
-				int posPixelSiguienteX = offsetTentativoX + tileActual -> getX();
-				int posPixelSiguienteY = offsetTentativoY + tileActual -> getY();
-				// Obtengo el tile siguiente
-				Tile* tileSiguiente = this->obtenerTileSiguiente(
-												posPixelSiguienteX , posPixelSiguienteY , 
-												direccion , mapa);
-				// Si el tileSiguiente es no nulo continua, sino no hace nada
-				if (tileSiguiente != NULL){
-					//tileSiguiente distinto a tileActual
-					if(tileSiguiente != tileActual) {
-						// Actualizacion offset
-						/*
-						
-						this -> offsetTileX = this -> tileActual -> getX() - 
-										(tileSiguiente -> getX() + offsetTentativoX); 
-						this -> offsetTileY = this -> tileActual -> getY() - 
-										(tileSiguiente -> getY() + offsetTentativoY); 
-						// Remocion del Tile
-						this -> tileActual -> deleteEntidad(this);
-						// Colocacion en el tile siguiente
-						tileSiguiente -> addEntidad(this);
-						// Seteo de Entidad en nuevo Tile
-						this -> setTileActual(tileSiguiente);
-						this ->actualizarImagen(direccion);*/
-					// tileSiguiente igual a tileActual
-					} else {
-						//actualizar offset
-						this -> offsetTileX = offsetTentativoX;
-						this -> offsetTileY = offsetTentativoY;
+			// Calculo posicion siguiente (tomando en cuenta pixel de referencia y la posicion actual)
+			int posPixelSiguienteX = 0;
+			int posPixelSiguienteY = 0;
+			this -> calcularPosicionTentativa(direccion , &posPixelSiguienteX , &posPixelSiguienteY);
+			// Obtengo el tile siguiente
+			Tile* tileSiguiente = mapa -> getTilePorPixeles(posPixelSiguienteX , posPixelSiguienteY);
+			// Si el tileSiguiente es no nulo continua, sino no hace nada
+			printf("Posicion Siguiente %d %d %u\n" , posPixelSiguienteX  , posPixelSiguienteY,direccion);
+			if (tileSiguiente != NULL){
+				// Obtengo el tile del ancla nueva
+				Tile* tileAnclaSiguiente = this->obtenerTileAncla(
+										posPixelSiguienteX , posPixelSiguienteY , 
+										direccion , mapa);
+				
+				this -> posX = posPixelSiguienteX;
+				this -> posY = posPixelSiguienteY; 
+				
+				// Ancla Siguiente distinta a ancla actual
+				if (tileAnclaSiguiente != NULL){
+					if(tileAnclaSiguiente != this -> tileAncla ) {
+						if (tileAncla != NULL) {
+							this -> tileAncla -> deleteEntidad(this);
+						}
+						this -> tileAncla = tileAnclaSiguiente;
+						this -> tileAncla -> addEntidad(this);
+					}
+				} else{
+					Tile* tileActual = mapa -> getTilePorPixeles(this -> posX , this ->posY );
+					if (tileActual != NULL) {
+						if (tileAncla != NULL) {
+							this -> tileAncla -> deleteEntidad(this);
+						}
+						this -> tileAncla = tileActual;
+						this -> tileAncla -> addEntidad(this);
 					}
 				}
 			}
 		}
 	}
+	
 	/* 
 		El offset X Y sin tener en cuenta el pixel de origen
 	*/
-	void Entidad::calcularOffsetTentativo(unsigned int direccion , 
+	void Entidad::calcularPosicionTentativa(unsigned int direccion , 
 									int* offsetTentativoX , int* offsetTentativoY){
-		*offsetTentativoX = this -> offsetTileX;
-		*offsetTentativoY = this -> offsetTileY;
+		*offsetTentativoX = posX;
+		*offsetTentativoY = posY;
 		switch (direccion){
 				case NORTE :  {
 					(*offsetTentativoY)-=this -> velocidad;
@@ -509,65 +519,23 @@
 	/*
 		posX y posY en pixeles, es una posicion cualquiera en el mapa
 	*/
-	Tile* Entidad::obtenerTileSiguiente(const int posX , const int posY , 
+	Tile* Entidad::obtenerTileAncla(const int posX , const int posY , 
 													const unsigned int direccion , Mapa* mapa){
-	Tile* retorno = mapa -> getTilePorPixeles(posX , posY);
-	int posImagenX = posX + this -> imagen -> getAncho() - this -> pixel_ref_x;
+	Tile* retorno =NULL;
+	int posImagenX = posX + this -> imagen -> getAncho()/2 - this -> pixel_ref_x;
 	int posImagenY = posY + this -> imagen -> getAlto() - this -> pixel_ref_y;
-	Tile* tilePosicionImagen = mapa -> getTile(posImagenX , posImagenY);
-	if((retorno != NULL) && (tilePosicionImagen != NULL) && 
-		(tilePosicionImagen != retorno)){
-		int xSiguiente = this -> tileActual -> getX();
-		int ySiguiente = this -> tileActual -> getY();
-		switch (direccion){
-			case NORTE :  {
-				ySiguiente -= Tile::TILE_ALTO;
-				break;
-			}
-			case NORESTE : {
-				xSiguiente += Tile::TILE_ANCHO/2;
-				ySiguiente -= Tile::TILE_ALTO/2;
-				break;
-			}
-			case ESTE : {
-				xSiguiente += Tile::TILE_ANCHO;
-				break;
-			}
-			case SURESTE : {
-				xSiguiente += Tile::TILE_ANCHO/2;
-				ySiguiente += Tile::TILE_ALTO/2;
-				break;
-			}
-			case SUR : {
-				ySiguiente += Tile::TILE_ALTO;
-				break;
-			}
-			case SUROESTE : {
-				xSiguiente -= Tile::TILE_ANCHO/2;
-				ySiguiente += Tile::TILE_ALTO/2;
-				break;
-			}
-			case OESTE : {
-				xSiguiente -= Tile::TILE_ANCHO;
-				break;
-			}
-			case NOROESTE : {
-				xSiguiente -= Tile::TILE_ANCHO/2;
-				ySiguiente -= Tile::TILE_ALTO/2;
-				break;
-			}
-		}
-		Tile* siguiente = mapa -> getTilePorPixeles(xSiguiente,ySiguiente);
-		printf("%d %d\n",xSiguiente,ySiguiente);
-		if (siguiente != NULL){
-			//retorno = siguiente;
-		}
-	}
+	retorno = mapa -> getTilePorPixeles(posImagenX , posImagenY);
+	//printf("%d %d\n",posImagenX,posImagenY);
 	return retorno;;
 }
 
 void Entidad::setTileActual(Tile* tile) {
-	this -> tileActual = tile;
+	if (tile != NULL){
+		this -> posX = tile -> getX();
+		this -> posY = tile -> getY();
+		this -> tileAncla = tile;
+		this -> tileDestino = tile;
+	}
 }
 
 void Entidad::setTileDestino(Tile* tile){

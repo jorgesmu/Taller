@@ -73,11 +73,9 @@ class Entidad {
 
 		std::string name; // Nombre de la entidad
 			
-		Tile* tileActual; // Tile actual
-		
 		Tile* tileDestino; // Tile destino
 
-		int offsetTileX, offsetTileY; // Posicion en el Tile  [en pixeles]
+		Tile* tileAncla; // Tile donde se encuentra el ancla
 
 		Surface* surf; // Puntero a la surface de esta entidad (traida desde el resource manager on load)
 		
@@ -92,6 +90,10 @@ class Entidad {
 					   //[En pixeles por llamado a update]
 
 		clock_t tiempoProximoUpdate;
+
+		int posX,  posY; //posicion en pixeles
+
+		bool compartido; //si es compartido por varios tiles
 
 	public:
 	
@@ -207,12 +209,7 @@ class Entidad {
 		en algun Tile en el que no estaba, y se de de baja en alguno en cual estaba.
 	*/
 	virtual void mover(Tile* tileDestino);
-	
-	/*
-		Retorna el Tile actual
-	*/
-	Tile* getTileActual();
-	
+			
 	/*
 		retorna el alto en tiles
 	*/
@@ -309,12 +306,12 @@ protected:
 
 	void actualizarPosicion(Mapa* mapa);
 
-	void calcularOffsetTentativo(unsigned int direccion , 
+	void calcularPosicionTentativa(unsigned int direccion , 
 									int* offsetTentativoX , int* offsetTentativoY);
 
 	virtual void actualizarImagen(const unsigned int direccion);
 
-	Tile* obtenerTileSiguiente(const int posX , const int posY , 
+	Tile* obtenerTileAncla(const int posX , const int posY , 
 								const unsigned int direccion , Mapa* mapa);
 
 };

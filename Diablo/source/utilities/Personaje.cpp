@@ -66,14 +66,27 @@ void Personaje::init(const std::string& name,
 	//pixel de referencia
 	this -> pixel_ref_x = pixel_ref_x ;
 	this -> pixel_ref_y = pixel_ref_y;
-	//posicion en Tiles
-	this -> tileActual = tile;
 	//tile destino
-	this -> tileDestino = this -> tileActual;
+	this -> tileDestino = tile;
+	//tile ancla
+	this -> tileAncla = tile;
 	//seteo de velocidad
 	this -> velocidad = velocidad;
 	//tiempo siguiente update
 	this -> tiempoProximoUpdate = clock();
+	//agrego entidad al tile
+	if (tile != NULL) {
+		if(this -> tileAncla != NULL){
+			this -> tileAncla -> deleteEntidad(this);
+		}
+		this -> tileAncla = tile;
+		this -> tileAncla -> addEntidad(this);
+		//seteo posicion
+		this -> posX = tile -> getX();
+		this -> posY = tile -> getY();
+	}
+	//seteo como compartido
+	this -> compartido = false;
 }
 
 /*

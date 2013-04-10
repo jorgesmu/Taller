@@ -1,6 +1,7 @@
 #pragma once
 #include "../display/entidad.h"
 #include "../utilities/ImagenPersonaje.h"
+#include "../display/tile.h"
 class Tile;
 class Personaje : public Entidad {
 

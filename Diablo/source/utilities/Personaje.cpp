@@ -70,7 +70,8 @@ void Personaje::init(const std::string& name,
 	this -> tileDestino = tile;
 	//tile ancla
 	this -> tileAncla = tile;
-	//seteo de velocidad
+	//deltaUpdatePosicion
+	this -> deltaUpdatePosicion = Entidad::BASE_DE_TIEMPO/velocidad;
 	this -> velocidad = velocidad;
 	//tiempo siguiente update
 	this -> tiempoProximoUpdate = clock();
@@ -105,12 +106,15 @@ void Personaje::init(const std::string& name,
 void Personaje::mover(Tile* tileDestino) {
 	if (tileDestino != NULL) {
 		this -> tileDestino = tileDestino;
-		/*
-		unsigned int direccion = this -> calcularDireccion();
-		printf("Direccion %d \n", direccion);
-		if (direccion != CENTRO) {
-			
-		} */
+		int deltaX = this -> tileDestino -> getX() - posX;
+		int deltaY = this -> tileDestino -> getY() - posY;
+		//seteo de velocidad
+		int distancia = deltaX*deltaX + deltaY*deltaY;
+		if (distancia <= Entidad::COTA_VELOCIDAD_BAJA) {
+			this -> deltaUpdatePosicion = Entidad::BASE_DE_TIEMPO/this -> velocidad;
+		} else {
+			this -> deltaUpdatePosicion = Entidad::BASE_DE_TIEMPO_RAPIDO/this -> velocidad;
+		}
 	}
 }
 

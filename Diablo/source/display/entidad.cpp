@@ -27,8 +27,9 @@
 		//surf e imagen
 		this -> surf = NULL;
 		this -> imagen = NULL;
-		//velocidad
-		this -> velocidad = Entidad::VELOCIDAD_DEFAULT;
+		//deltaUpdatePosicion
+		this -> deltaUpdatePosicion = Entidad::BASE_DE_TIEMPO/Entidad::VELOCIDAD_DEFAULT;
+		this -> velocidad = VELOCIDAD_DEFAULT;
 		//tiempo siguiente update
 		this -> tiempoProximoUpdate = clock();
 		//seteo posicion
@@ -187,8 +188,9 @@
 		this -> tileDestino = tile;
 		//tile ancla
 		this -> tileAncla = tile;
-		//seteo de velocidad
-		this -> velocidad = velocidad;
+		//deltaUpdatePosicion
+		this -> deltaUpdatePosicion = Entidad::BASE_DE_TIEMPO/velocidad;
+		this -> velocidad = VELOCIDAD_DEFAULT;
 		//tiempo siguiente update
 		this -> tiempoProximoUpdate = clock();
 		//seteo como compartido
@@ -275,6 +277,15 @@
 	void Entidad::mover(Tile* tileDestino) {
 		if (tileDestino != NULL){
 			this -> tileDestino = tileDestino;
+			int deltaX = this -> tileDestino -> getX() - posX;
+			int deltaY = this -> tileDestino -> getY() - posY;
+			//seteo de velocidad
+			int distancia = deltaX*deltaX + deltaY*deltaY;
+			if (distancia <= Entidad::COTA_VELOCIDAD_BAJA) {
+				this -> deltaUpdatePosicion = Entidad::BASE_DE_TIEMPO/this -> velocidad;
+			} else {
+				this -> deltaUpdatePosicion = Entidad::BASE_DE_TIEMPO_RAPIDO/this -> velocidad;
+			}
 		}
 	}
 	
@@ -296,21 +307,16 @@
 	// Actualiza las cosas internas, si hubiese
 	void Entidad::update(Mapa* mapa) {
 		if (this -> tiempoProximoUpdate <= clock()){
-			if (this->tileDestino != NULL) {
+			if (this -> tileDestino != NULL) {
 				//actualizacion de posicion
 				this -> actualizarPosicion(mapa);
 			} else {
-				if(this->imagen != NULL) {
+				if(this -> imagen != NULL) {
 					this -> surf = this -> imagen -> getSurface();
 				}
 			}
-			this ->tiempoProximoUpdate = clock() + Entidad::DELTA_UPDATE;
-		} else {
-			if(this -> imagen != NULL) {
-				// Actualizacion del surface
-				this -> surf = this -> imagen -> getSurface();
-			}
-		}
+			this -> tiempoProximoUpdate = clock() + this -> deltaUpdatePosicion;
+		} 
 	}
 	
 	/*
@@ -373,36 +379,39 @@
 		NOTA: CENTRO implica que la entidad esta en el Tile destino y por lo tanto debe volver 
 		aproximadamente al centro del mismo.
 	*/
-	unsigned int Entidad::calcularDireccion(){
+	unsigned int Entidad::calcularDireccion(Mapa* mapa){
+		const int TOLERANCIA_SUPERIOR = 3;
+		const int TOLERANCIA_INFERIOR = -3;
 		if (tileDestino != NULL) {
 			int deltaX = this -> tileDestino -> getX() - posX;
 			int deltaY = this -> tileDestino -> getY() - posY;
-			if (deltaX > 0){
-				if(deltaY < 0){
+			//calculo de direccion
+			if (deltaX > TOLERANCIA_SUPERIOR){
+				if(deltaY < TOLERANCIA_INFERIOR){
 					return Entidad::NORESTE;
 				} else{
-					if(deltaY == 0){
+					if((deltaY >= TOLERANCIA_INFERIOR) &&(deltaY <= TOLERANCIA_SUPERIOR)){
 						return Entidad::ESTE;
 					} else {
 						return Entidad::SURESTE;
 					}
 				}
 			}else {
-				if (deltaX < 0) {
-					if (deltaY < 0){
+				if (deltaX < TOLERANCIA_INFERIOR) {
+					if (deltaY < TOLERANCIA_INFERIOR){
 						return Entidad::NOROESTE;
 					}else{
-						if (deltaY == 0) {
+						if ((deltaY >= TOLERANCIA_INFERIOR) &&(deltaY <= TOLERANCIA_SUPERIOR)) {
 							return Entidad::OESTE;
 						}else {
 							return Entidad::SUROESTE;
 						}
 					}
 				}else{
-					if (deltaY < 0){
+					if (deltaY < TOLERANCIA_INFERIOR){
 						return Entidad::NORTE;
 					} else{
-						if(deltaY == 0){
+						if((deltaY >= TOLERANCIA_INFERIOR) && (deltaY <= TOLERANCIA_SUPERIOR)){
 							return Entidad::CENTRO;
 						}else{
 							return Entidad::SUR;
@@ -411,17 +420,15 @@
 				}
 			}
 		}
+		return CENTRO;
 	}
 
 	void Entidad::actualizarPosicion(Mapa* mapa) {
 		//Calculo de direccion
-		unsigned int direccion = this -> calcularDireccion();
+		unsigned int direccion = this -> calcularDireccion(mapa);
 		Tile* tileActual = mapa -> getTilePorPixeles(this -> posX , this -> posY);
-		// Si la direccion es centro se dirige al mismo
-		if (tileActual == tileDestino) {
-			this -> actualizarImagen(direccion);
-		//Si es otro Tile se actualizacion posiciones hacia el mismo
-		} else {
+		// Si la direccion llego al tile
+		if (direccion != CENTRO) {
 			// Calculo posicion siguiente (tomando en cuenta pixel de referencia y la posicion actual)
 			int posPixelSiguienteX = 0;
 			int posPixelSiguienteY = 0;
@@ -429,7 +436,6 @@
 			// Obtengo el tile siguiente
 			Tile* tileSiguiente = mapa -> getTilePorPixeles(posPixelSiguienteX , posPixelSiguienteY);
 			// Si el tileSiguiente es no nulo continua, sino no hace nada
-			printf("Posicion Siguiente %d %d %u\n" , posPixelSiguienteX  , posPixelSiguienteY,direccion);
 			if (tileSiguiente != NULL){
 				// Obtengo el tile del ancla nueva
 				Tile* tileAnclaSiguiente = this->obtenerTileAncla(
@@ -438,7 +444,6 @@
 				
 				this -> posX = posPixelSiguienteX;
 				this -> posY = posPixelSiguienteY; 
-				
 				// Ancla Siguiente distinta a ancla actual
 				if (tileAnclaSiguiente != NULL){
 					if(tileAnclaSiguiente != this -> tileAncla ) {
@@ -460,6 +465,7 @@
 				}
 			}
 		}
+		this -> actualizarImagen(direccion);
 	}
 	
 	/* 
@@ -471,39 +477,39 @@
 		*offsetTentativoY = posY;
 		switch (direccion){
 				case NORTE :  {
-					(*offsetTentativoY)-=this -> velocidad;
+					(*offsetTentativoY)-=Entidad::DELTA_AVANCE;
 					break;
 				}
 				case NORESTE : {
-					(*offsetTentativoX)+=(2*this -> velocidad);
-					(*offsetTentativoY)-=this -> velocidad;
+					(*offsetTentativoX)+=(2*Entidad::DELTA_AVANCE);
+					(*offsetTentativoY)-=Entidad::DELTA_AVANCE;
 					break;
 				}
 				case ESTE : {
-					(*offsetTentativoX)+=(2*this -> velocidad);
+					(*offsetTentativoX)+=(2*Entidad::DELTA_AVANCE);
 					break;
 				}
 				case SURESTE : {
-					(*offsetTentativoX)+=(2*this -> velocidad);
-					(*offsetTentativoY)+=this -> velocidad;
+					(*offsetTentativoX)+=(2*Entidad::DELTA_AVANCE);
+					(*offsetTentativoY)+=Entidad::DELTA_AVANCE;
 					break;
 				}
 				case SUR : {
-					(*offsetTentativoY)+=this -> velocidad;
+					(*offsetTentativoY)+=Entidad::DELTA_AVANCE;
 					break;
 				}
 				case SUROESTE : {
-					(*offsetTentativoX)-=(2*this -> velocidad);
-					(*offsetTentativoY)+=this -> velocidad;
+					(*offsetTentativoX)-=(2*Entidad::DELTA_AVANCE);
+					(*offsetTentativoY)+=Entidad::DELTA_AVANCE;
 					break;
 				}
 				case OESTE : {
-					(*offsetTentativoX)-=(2*this -> velocidad);
+					(*offsetTentativoX)-=(2*Entidad::DELTA_AVANCE);
 					break;
 				}
 				case NOROESTE : {
-					(*offsetTentativoX)-=(2*this -> velocidad);
-					(*offsetTentativoY)-=this -> velocidad;
+					(*offsetTentativoX)-=(2*Entidad::DELTA_AVANCE);
+					(*offsetTentativoY)-=Entidad::DELTA_AVANCE;
 					break;
 				}
 		}
@@ -521,20 +527,23 @@
 	*/
 	Tile* Entidad::obtenerTileAncla(const int posX , const int posY , 
 													const unsigned int direccion , Mapa* mapa){
-	Tile* retorno =NULL;
-	int posImagenX = posX + this -> imagen -> getAncho()/2 - this -> pixel_ref_x;
-	int posImagenY = posY + this -> imagen -> getAlto() - this -> pixel_ref_y;
+	Tile* retorno = NULL;
+	int posImagenX = posX + this -> imagen -> getAncho() - this -> pixel_ref_x + 
+						Entidad::MARGEN_ANCLA_X;
+	int posImagenY = posY + this -> imagen -> getAlto() - this -> pixel_ref_y + 
+						Entidad::MARGEN_ANCLA_Y;
 	retorno = mapa -> getTilePorPixeles(posImagenX , posImagenY);
-	//printf("%d %d\n",posImagenX,posImagenY);
 	return retorno;;
 }
 
 void Entidad::setTileActual(Tile* tile) {
 	if (tile != NULL){
-		this -> posX = tile -> getX();
-		this -> posY = tile -> getY();
+		if(this->tileAncla != tile) {
+			this -> posX = tile -> getX();
+			this -> posY = tile -> getY();
+			this -> tileDestino = tile;
+		}
 		this -> tileAncla = tile;
-		this -> tileDestino = tile;
 	}
 }
 

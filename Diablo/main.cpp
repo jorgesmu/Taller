@@ -58,9 +58,9 @@ int main(int argc, char* args[]) {
 							Imagen::COLOR_KEY);
 	Personaje personaje("soldado" ,
 							1 , 1 , 
-							30 , 10, 
+							50 , 5, 
 							100, 100 ,
-							5,
+							20,
 							0 , 70 ,
 							NULL , resman ,
 							Imagen::COLOR_KEY);

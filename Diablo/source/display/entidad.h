@@ -60,17 +60,28 @@ class Entidad {
 		const static unsigned int CENTRO = 8;
 
 		//Velocidad por defecto
-		const static int VELOCIDAD_DEFAULT = 2;
+		const static int VELOCIDAD_DEFAULT = 5;
+
+		const static int DELTA_AVANCE = 2;
+
+		//Base de tiempo para la velocidad
+		const static int BASE_DE_TIEMPO = 1000;
+
+		const static int BASE_DE_TIEMPO_RAPIDO = 300;
+
+		const static int COTA_VELOCIDAD_BAJA = 50000;
 
 		//Pixel de referencia por defecto
 		const static int PIXEL_REF_X_DEFAULT = 0;
 
 		const static int PIXEL_REF_Y_DEFAULT = 0;
 
+		const static int MARGEN_ANCLA_X = 10;
+
+		const static int MARGEN_ANCLA_Y = 10;
+
 	protected:
 		
-		const static int DELTA_UPDATE = 100;
-
 		std::string name; // Nombre de la entidad
 			
 		Tile* tileDestino; // Tile destino
@@ -81,13 +92,13 @@ class Entidad {
 		
 		Imagen* imagen; // Instancia de la clase imagen que contiene los sprites y la lógica de
 						// animación de los sprites en caso que correspondiese
-
 		unsigned int widthInTiles , highInTiles; // Ancho y alto de la base en la grilla [en tiles]
 
 		int pixel_ref_x , pixel_ref_y; // Pixel de referencia dentro del espacio de la imagen
 										//de la entidad.
-		unsigned int velocidad; //velocidad de desplazamiento por el mapa 
-					   //[En pixeles por llamado a update]
+		unsigned int deltaUpdatePosicion; // Distancia en tiempo, entre cada actualizacion
+												//de posicion.
+		unsigned int velocidad;
 
 		clock_t tiempoProximoUpdate;
 
@@ -302,7 +313,7 @@ protected:
 		NOTA: CENTRO implica que la entidad esta en el Tile destino y por lo tanto debe volver 
 		aproximadamente al centro del mismo.
 	*/
-	unsigned int calcularDireccion();
+	unsigned int calcularDireccion(Mapa* mapa);
 
 	void actualizarPosicion(Mapa* mapa);
 

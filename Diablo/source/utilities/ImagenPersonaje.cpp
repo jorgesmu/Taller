@@ -225,15 +225,16 @@ void ImagenPersonaje::setAccionEfectiva(unsigned int accion) {
 */
 void ImagenPersonaje::setAccion(unsigned int accion){
 	if (accion > ImagenPersonaje::MUERTE) {
-		if (accion <= ImagenPersonaje::AVANCE_DIRECCION_ACTUAL) {
+		if (accion <= ImagenPersonaje::ESTATICO_DIRECCION_ACTUAL) {
 			switch (accion) {
-				case ImagenPersonaje::ESTATICO_DIRECCION_ACTUAL : {
-					if (this -> accionActual < ImagenPersonaje::AT_SUR){
-						this -> setAccionEfectiva(this -> accionActual + 16);
-					} else {
-						if (this -> accionActual < ImagenPersonaje::ESTATICO_DIRECCION_ACTUAL){
-							this -> setAccionEfectiva(this -> accionActual + 8);
-						} 
+				case ImagenPersonaje::AVANCE_DIRECCION_ACTUAL : {
+					if (this -> accionActual >= ImagenPersonaje::AT_SUR){
+						if (this -> accionActual < ImagenPersonaje::EST_SUR){
+							this -> setAccionEfectiva(this -> accionActual - 8);
+						} else {
+							if (accionActual < MUERTE)
+								this -> setAccionEfectiva( this -> accionActual-16);
+						}
 					}
 					break;
 				}
@@ -241,21 +242,20 @@ void ImagenPersonaje::setAccion(unsigned int accion){
 					if (this -> accionActual < ImagenPersonaje::AT_SUR){
 						this -> setAccionEfectiva(this -> accionActual + 8);
 					} else {
-						if ((this -> accionActual >= ImagenPersonaje::ESTATICO_DIRECCION_ACTUAL)
+						if ((this -> accionActual >= ImagenPersonaje::EST_SUR)
 							&& (accionActual < ImagenPersonaje::MUERTE)) {
 							this -> setAccionEfectiva(this -> accionActual-8);
 						}
 					}
 					break;
 				}
-				case ImagenPersonaje::AVANCE_DIRECCION_ACTUAL : {
-					if (this -> accionActual >= ImagenPersonaje::AT_SUR){
-						if (this -> accionActual < ImagenPersonaje::ESTATICO_DIRECCION_ACTUAL){
-							this -> setAccionEfectiva(this -> accionActual - 8);
-						} else {
-							if (accionActual < MUERTE)
-								this -> setAccionEfectiva( this -> accionActual-16);
-						}
+				case ImagenPersonaje::ESTATICO_DIRECCION_ACTUAL : {
+					if (this -> accionActual < ImagenPersonaje::AT_SUR){
+						this -> setAccionEfectiva(this -> accionActual + 16);
+					} else {
+						if (this -> accionActual < ImagenPersonaje::EST_SUR){
+							this -> setAccionEfectiva(this -> accionActual + 8);
+						} 
 					}
 					break;
 				}

@@ -8,6 +8,7 @@
 #include "source/utilities/parser.h"
 #include "source/display/entidad.h"
 #include "source/utilities/Personaje.h"
+#include "source/display/entidadFija.h"
 #include "source/display/camara.h"
 #include "source/display/mapa.h"
 #include "source/display/resman.h"
@@ -42,6 +43,7 @@ int main(int argc, char* args[]) {
 	resman.addRes("cemento", "../resources/tile2.bmp", 255);
 	resman.addRes("agua", "../resources/tileAgua.bmp", Imagen::COLOR_KEY);
 	resman.addRes("soldado", "../resources/Soldado.bmp", Imagen::COLOR_KEY);
+	resman.addRes("casa", "../resources/Casa400x400.bmp", Imagen::COLOR_KEY);
 	Entidad tierra_test("tierra", 1 , 1 , 
 							   0 , 0 , 
 							   NULL,
@@ -67,7 +69,7 @@ int main(int argc, char* args[]) {
 							Imagen::COLOR_KEY);
 	Mapa mapa;
 	// Mapa de size random
-	mapa.resize(300, 300);
+	mapa.resize(25, 25);
 	// Llenamos el mapa con entidad tierra
 	
 	for(auto it = mapa.allTiles().begin();it != mapa.allTiles().end(); ++it) {
@@ -83,6 +85,10 @@ int main(int argc, char* args[]) {
 	}
 
 	mapa.getTile(1,1) ->addEntidad(&personaje);
+	EntidadFija casa("casa", 4 , 4 , 
+							 140 , 190 , 
+							 mapa.getTile(0,0) , &mapa ,
+							 resman , Imagen::COLOR_KEY);
 	// Aca muestra como se agregan a mano
 	//mapa.getTile(0, 0).addEntidad(cem_test);
 	//mapa.getTile(0, 1).addEntidad(cem_test);

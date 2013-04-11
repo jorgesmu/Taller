@@ -426,7 +426,6 @@
 	void Entidad::actualizarPosicion(Mapa* mapa) {
 		//Calculo de direccion
 		unsigned int direccion = this -> calcularDireccion(mapa);
-		Tile* tileActual = mapa -> getTilePorPixeles(this -> posX , this -> posY);
 		// Si la direccion llego al tile
 		if (direccion != CENTRO) {
 			// Calculo posicion siguiente (tomando en cuenta pixel de referencia y la posicion actual)
@@ -438,10 +437,9 @@
 			// Si el tileSiguiente es no nulo continua, sino no hace nada
 			if (tileSiguiente != NULL){
 				// Obtengo el tile del ancla nueva
-				Tile* tileAnclaSiguiente = this->obtenerTileAncla(
+				Tile* tileAnclaSiguiente = this -> obtenerTileAncla(
 										posPixelSiguienteX , posPixelSiguienteY , 
 										direccion , mapa);
-				
 				this -> posX = posPixelSiguienteX;
 				this -> posY = posPixelSiguienteY; 
 				// Ancla Siguiente distinta a ancla actual
@@ -454,9 +452,10 @@
 						this -> tileAncla -> addEntidad(this);
 					}
 				} else{
-					Tile* tileActual = mapa -> getTilePorPixeles(this -> posX , this ->posY );
+					Tile* tileActual = mapa -> getTilePorPixeles(this -> posX , 
+																this -> posY);
 					if (tileActual != NULL) {
-						if (tileAncla != NULL) {
+						if (this -> tileAncla != NULL) {
 							this -> tileAncla -> deleteEntidad(this);
 						}
 						this -> tileAncla = tileActual;
@@ -527,25 +526,29 @@
 	*/
 	Tile* Entidad::obtenerTileAncla(const int posX , const int posY , 
 													const unsigned int direccion , Mapa* mapa){
-	Tile* retorno = NULL;
-	int posImagenX = posX + this -> imagen -> getAncho() - this -> pixel_ref_x + 
+		Tile* retorno = NULL;
+		int posImagenX = posX + this -> imagen -> getAncho() - this -> pixel_ref_x + 
 						Entidad::MARGEN_ANCLA_X;
-	int posImagenY = posY + this -> imagen -> getAlto() - this -> pixel_ref_y + 
+		int posImagenY = posY + this -> imagen -> getAlto() - this -> pixel_ref_y + 
 						Entidad::MARGEN_ANCLA_Y;
-	retorno = mapa -> getTilePorPixeles(posImagenX , posImagenY);
-	return retorno;
-}
-
-void Entidad::setTileActual(Tile* tile) {
-	if (tile != NULL){
-		if(this->tileAncla != tile) {
-			this -> posX = tile -> getX();
-			this -> posY = tile -> getY();
-			this -> tileDestino = tile;
+		retorno = mapa -> getTilePorPixeles(posImagenX , posImagenY);
+		if (retorno == NULL){
+			int posImagenX = posX - this -> pixel_ref_x;
+			retorno = mapa -> getTilePorPixeles(posImagenX , posImagenY);
 		}
-		this -> tileAncla = tile;
+		return retorno;
 	}
-}
+
+	void Entidad::setTileActual(Tile* tile) {
+		if (tile != NULL){
+			if(this->tileAncla != tile) {
+				this -> posX = tile -> getX();
+				this -> posY = tile -> getY();
+				this -> tileDestino = tile;
+			}
+			this -> tileAncla = tile;
+		}
+	}
 
 void Entidad::setTileDestino(Tile* tile){
 	this -> tileDestino = tile;

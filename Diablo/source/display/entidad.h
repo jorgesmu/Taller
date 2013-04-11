@@ -263,7 +263,7 @@ class Entidad {
 	virtual void blit(SDL_Surface* dest, Camara* camara , Mapa* mapa,
 					const unsigned int tileX ,	const unsigned int tileY /*Tile* tile*/);
 	
-	void setTileActual(Tile* tile);
+	virtual void setTileActual(Tile* tile);
 
 	void setTileDestino(Tile* tile);
 
@@ -322,7 +322,7 @@ protected:
 
 	virtual void actualizarImagen(const unsigned int direccion);
 
-	Tile* obtenerTileAncla(const int posX , const int posY , 
+	virtual Tile* obtenerTileAncla(const int posX , const int posY , 
 								const unsigned int direccion , Mapa* mapa);
 
 };

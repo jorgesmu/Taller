@@ -87,14 +87,17 @@ void Mapa::assignTileCoords() {
 // Devuelve el tile segun su posicion en el mapa dado por el pixel superior
 Tile* Mapa::getTilePorPixeles(int pixelX , int pixelY) {
 	Tile* retorno = NULL;
-	int x;
-	int y;
+	int x = 0;
+	int y = 0;
 	int x0 = pixelX ;
 	int y0 = pixelY - Tile::TILE_ALTO/2;
 	x = y0 + ((x0 + Tile::TILE_ANCHO/2) / 2);
 	y = y0 - ((x0 - Tile::TILE_ANCHO/2) / 2);
 	x /= Tile::TILE_ALTO;
 	y /= Tile::TILE_ALTO;
-	retorno = this->getTile(x , y);
+	if ((x < this -> w) && (x >= 0) && 
+		(y < this -> h) && (y >= 0)){
+		retorno = this -> getTile(x , y);
+	}
 	return retorno;
 }

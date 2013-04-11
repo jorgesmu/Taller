@@ -533,7 +533,7 @@
 	int posImagenY = posY + this -> imagen -> getAlto() - this -> pixel_ref_y + 
 						Entidad::MARGEN_ANCLA_Y;
 	retorno = mapa -> getTilePorPixeles(posImagenX , posImagenY);
-	return retorno;;
+	return retorno;
 }
 
 void Entidad::setTileActual(Tile* tile) {

@@ -8,6 +8,7 @@
 #include "../display/camara.h"
 #include "../display/resman.h"
 #include "SDL.h"
+#include "entidad.h"
 class Mapa;    // Declaración adelantada de Mapa
 class Tile;    // Declaración adelantada de Tile
 /*	
@@ -44,7 +45,7 @@ class Tile;    // Declaración adelantada de Tile
 	sobre que "Tile" pintara la entidad.
 
 */
-class Entidad {
+class EntidadFija : public Entidad{
 
 	public:
 
@@ -261,7 +262,7 @@ class Entidad {
 
 	*/
 	virtual void blit(SDL_Surface* dest, Camara* camara , Mapa* mapa,
-					const unsigned int tileX ,	const unsigned int tileY /*Tile* tile*/);
+					const unsigned int tileX ,	const unsigned int tileY);
 	
 	void setTileActual(Tile* tile);
 

@@ -33,13 +33,13 @@ TileVec& Mapa::allTiles() {
 
 void Mapa::blit(SDL_Surface* dest, Camara& camara) {
 	// Primero calculamos cuantos tiles nos vamos a tener que mover horizontal y verticalmente
-	const int tile_count_x = (camara.getW() / Tile::TILE_ANCHO) + 2;
-	const int tile_count_y = 2*((camara.getH() / Tile::TILE_ALTO) + 2);
+	const int tile_count_x = (camara.getW() / Tile::TILE_ANCHO) + 3;
+	const int tile_count_y = 2*((camara.getH() / Tile::TILE_ALTO) + 3);
 	// Calculamos el tile de la esquina superior izquierda
 	vec2<int> curr_tile = MouseCoords2Tile(vec2<int>(0, 0), camara);
 	// Lo movemos uno mas para el N y al E
 	curr_tile = tileWalk(curr_tile, GDIR::NE);
-	//curr_tile = tileWalk(curr_tile, GDIR::E);
+	curr_tile = tileWalk(curr_tile, GDIR::N);
 	// Con esta variable controlamos si cuando bajamos de fila vamos hacia el SO o hacia el el SE
 	bool last_turn_SO = true;
 	// Iteramos

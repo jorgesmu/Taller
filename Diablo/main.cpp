@@ -66,7 +66,7 @@ int main(int argc, char* args[]) {
 							Imagen::COLOR_KEY);
 	Mapa mapa;
 	// Mapa de size random
-	mapa.resize(intRand(50, 100), intRand(50, 100));
+	mapa.resize(300, 300);
 	// Llenamos el mapa con entidad tierra
 	
 	for(auto it = mapa.allTiles().begin();it != mapa.allTiles().end(); ++it) {

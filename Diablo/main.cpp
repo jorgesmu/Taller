@@ -37,7 +37,8 @@ int main(int argc, char* args[]) {
 
 	// Mapa
 	ResMan resman;
-	resman.addRes("tierra", "../resources/tile.bmp", 255);
+	resman.init();
+	resman.addRes("tierra", "../resources/tile___ERROR_TEST.bmp", 255);
 	resman.addRes("cemento", "../resources/tile2.bmp", 255);
 	resman.addRes("agua", "../resources/tileAgua.bmp", Imagen::COLOR_KEY);
 	resman.addRes("soldado", "../resources/Soldado.bmp", Imagen::COLOR_KEY);

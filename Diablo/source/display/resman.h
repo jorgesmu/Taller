@@ -1,13 +1,15 @@
 #pragma once
 
 #include "../utilities/surface.h"
+#include "../utilities/imagen_error.h"
 #include <string>
 #include <map>
 #include "SDL.h"
 
 class ResMan {
 	private:
-	std::map<std::string, Surface*> surface_map;
+	std::map<std::string, Surface*> surface_map; // Hash table de surfaces
+	Surface* err_surface; // Surface especial para error
 
 	public:
 	// Ctor

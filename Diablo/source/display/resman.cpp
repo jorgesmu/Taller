@@ -1,11 +1,11 @@
 #include <cassert>
 #include <iostream>
-
+#include <fstream>
 #include "resman.h"
 
 // Ctor
 ResMan::ResMan() {
-	// Nada
+	err_surface = NULL;
 }
 
 // Dtor
@@ -16,10 +16,22 @@ ResMan::~ResMan() {
 	assert(surface_map.size() == 0);
 }
 
-// Carga la surface de error 
 void ResMan::init() {
-	// Tiene que ser llamado despues de SDL_Init()
-	// TO DO, cargar la surface de error aca
+	// Carga la surface de error 
+	err_surface = new Surface;
+	// Creamos el archivo tmp con la imagen de error
+	std::string tmp_path = "err.tmp.bmp";
+	std::fstream tmp_file(tmp_path, std::fstream::out | std::fstream::binary | std::fstream::trunc);
+	tmp_file.write((const char*)err_img_bmp, sizeof(err_img_bmp));
+	tmp_file.close();
+	// Leemos y cargamos
+	bool res = err_surface->load(tmp_path);
+	// Verifica si cargo bien o no
+	if(!res) {
+		std::cerr << "Error loading error surface\n";
+		delete err_surface;
+		err_surface = NULL;
+	}
 }
 
 // Agrega el recurso con nombre name ubicado en el path dado por path
@@ -74,9 +86,7 @@ Surface* ResMan::getRes(const std::string& name) const {
 		return surface_map.find(name)->second;
 	}else{
 		std::cerr << "Error, resource <" << name << "> requested\n";
-		Surface* rubbish;
-		rubbish = NULL;
-		return rubbish; // Deberia devolver la surface de error precargada (TODO)
+		return err_surface; // Devuelve la surface de error precargada
 	}
 }
 
@@ -90,4 +100,9 @@ void ResMan::clean() {
 	}
 	// Borramos todos los elementos ya que los punteros estan liberados
 	surface_map.clear();
+	// Liberamos la err_surface
+	if(err_surface != NULL) {
+		err_surface->destroy();
+		delete err_surface;
+	}
 }

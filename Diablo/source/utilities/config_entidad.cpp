@@ -10,4 +10,12 @@ config_entidad::config_entidad(std::string nombre_i, std::string path_imagen_i, 
 	pixel_ref_y=pixel_ref_y_i;
 	fps=fps_i;
 	delay=delay_i;
+	completoNombre = false;
+	completoPath = false;
+	completoAncho = false;
+	completoAlto = false;
+	completoPixelX = false;
+	completoPixelY = false;
+	completoFps = false;
+	completoDelay = false;
 }

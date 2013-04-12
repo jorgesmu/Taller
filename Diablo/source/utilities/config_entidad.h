@@ -7,7 +7,7 @@ class config_entidad {
 	private:
 		std::string nombre,path_imagen;
 		int ancho_base,alto_base,pixel_ref_x,pixel_ref_y,fps,delay;
-
+		bool completoNombre, completoPath, completoAncho, completoAlto, completoPixelX, completoPixelY, completoFps, completoDelay;
 
 	public:
 		//Constructor
@@ -31,7 +31,23 @@ class config_entidad {
 
 		int get_delay() { return delay;}
 
+		//gets de los flags de control
+		bool get_completo_nombre() { return completoNombre;}
+		
+		bool get_completo_path() { return completoPath;}
+		
+		bool get_completo_alto() { return completoAlto;}
+		
+		bool get_completo_ancho() { return completoAncho;}
+		
+		bool get_completo_pixel_X() { return completoPixelX;}
 
+		bool get_completo_pixel_Y() { return completoPixelY;}
+		
+		bool get_completo_fps() { return completoFps;}
+
+		bool get_completo_delay() { return completoDelay;}
+		
 		//Setters
 		void set_nombre(std::string newValue) { nombre = newValue;}
 
@@ -48,5 +64,31 @@ class config_entidad {
 
 		void set_delay(int newValue) { delay = newValue;}
 		
-
+		//metodos para completar validaciones
+				//metodos para completar validaciones
+		void completo_nombre(){
+			completoNombre = true;
+		}
+		void completo_path(){
+			completoPath = true;
+		}
+		void completo_Alto(){
+			completoAlto = true;
+		}
+		void completo_Ancho(){
+			completoAncho = true;
+		}
+				//metodos para completar validaciones
+		void completo_pixelX(){
+			completoPixelX = true;
+		}
+		void completo_pixelY(){
+			completoPixelY = true;
+		}
+		void completo_fps(){
+			completoFps = true;
+		}
+		void completo_delay(){
+			completoDelay = true;
+		}
 };

@@ -8,8 +8,11 @@
 #include "config_general.h"
 #include "config_escenario.h"
 #include "config_juego.h"
+#include "config_entidad_en_juego.h"
 #include "logErrores.h"
 using namespace std;
+//creo log de errores
+logErrores logErrores("log.txt");
 
 //lee e imprime un archivo
 void imprimir_documento(char* path){
@@ -39,11 +42,13 @@ void operator >> (const YAML::Node& node, config_general& config) {
 			it.second() >> valor;
 			//y los asigno
 			if (clave == "vel_personaje"){
+				config.completo_velocidad();
 				config.set_vel_personaje(valor);
 			}else if (clave == "margen_scroll"){
+				config.completo_Margen();
 				config.set_margen_scroll(valor);
 			}else {
-				cout << "LOG ERROR: atributo de la configuracion erroeneo: " << clave <<endl;
+				logErrores.escribir("atributo de configuracion erroeneo",clave,valor);
 			}
 		}
    }
@@ -60,11 +65,15 @@ void operator >> (const YAML::Node& node, config_pantalla& config) {
 			it.second() >> valor;
 			//y los asigno
 			if (clave == "ancho"){
+				//actualizo atributos
+				config.completo_Ancho();
 				config.set_ancho(valor);
 			}else if (clave == "alto"){
+				//actualizo atributos
+				config.completo_Alto();
 				config.set_alto(valor);
 			}else {
-				cout << "LOG ERROR: atributo de pantalla erroeneo: " << clave <<endl;
+				logErrores.escribir("atributo de pantalla erroeneo",clave , valor);
 			}
 		}
    }
@@ -74,6 +83,7 @@ void operator >> (const YAML::Node& node, vector <config_entidad>& entidades) {
    //aca itero cada entidad	
     for(unsigned i=0;i<node.size();i++) {
 	    config_entidad nuevaEntidad("","",-1,-1,-1,-1,-1,-1);
+		bool creoEntidad = false; //verifica si se ingreso algun parametro valido
 		//aca itero dentro de la entidad
 		for(YAML::Iterator it=node[i].begin();it!=node[i].end();++it) {
 			//leo los atributos de entidad
@@ -81,35 +91,59 @@ void operator >> (const YAML::Node& node, vector <config_entidad>& entidades) {
 			string valor;
 			it.first() >> clave;
 			it.second() >> valor;
+			//actualizo atributos
 			//y los asigno
 			if (clave == "nombre"){
+				creoEntidad = true;
+				nuevaEntidad.completo_nombre();
 				nuevaEntidad.set_nombre(valor); 
 			}else if (clave == "imagen"){
+				creoEntidad = true;
+				nuevaEntidad.completo_path();
 				nuevaEntidad.set_path_imagen(valor);
 			}else if (clave == "ancho_base"){
+				creoEntidad = true;
+				nuevaEntidad.completo_Ancho();
 				nuevaEntidad.set_ancho_base(atoi(valor.c_str()));
 			}else if (clave == "alto_base"){
+				creoEntidad = true;
+				nuevaEntidad.completo_Alto();
 				nuevaEntidad.set_alto_base(atoi(valor.c_str()));
 			}else if (clave == "pixel_ref_x"){
+				creoEntidad = true;
+				nuevaEntidad.completo_pixelX();
 				nuevaEntidad.set_pixel_ref_x(atoi(valor.c_str()));
 			}else if (clave == "pixel_ref_y"){
+				creoEntidad = true;
+				nuevaEntidad.completo_pixelY();
 				nuevaEntidad.set_pixel_ref_y(atoi(valor.c_str()));
 			}else if (clave == "fps"){
+				creoEntidad = true;
+				nuevaEntidad.completo_fps();
 				nuevaEntidad.set_fps(atoi(valor.c_str()));
 			}else if (clave == "delay"){
+				creoEntidad = true;
+				nuevaEntidad.completo_delay();
 				nuevaEntidad.set_delay(atoi(valor.c_str()));
 			}else {
-				cout << "LOG ERROR: atributo de entidad erroeneo: " << clave <<endl;
+				logErrores.escribir("atributo de entidad erroeneo",clave,valor);
 			}
 		}
-		entidades.push_back(nuevaEntidad);
-   }
+		if (creoEntidad){
+			//se ingreso por lo menos un atributo correcto
+			entidades.push_back(nuevaEntidad);
+		} else {
+			//se ingreso una entidad con todos los atributos erroneos
+				logErrores.escribir("Se ingreso una entidad que no contenia ningun atributo valido. Se elimino la misma" );
+		}
+	}
 
 }
 void parsear_protagonistas(const YAML::Node& node, config_escenario& unEscenario){
 	//aca itero por cada protagonista
     for(unsigned i=0;i<node.size();i++) {
 		config_entidad_en_juego unProtagonista("",-1,-1);
+		bool creoEntidad = false; //verifica si se ingreso algun parametro valido
 		//aca itero dentro de un protagonista
 		for(YAML::Iterator it=node[i].begin();it!=node[i].end();++it) {
 			//leo los atributos del protagonista
@@ -119,23 +153,34 @@ void parsear_protagonistas(const YAML::Node& node, config_escenario& unEscenario
 			it.second() >> valor;
 			//y los asigno
 			if (clave == "tipoEntidad"){
+				creoEntidad = true;
 				unProtagonista.set_nombre(valor); 
 			}else if (clave == "x"){
+				creoEntidad = true;
 				unProtagonista.set_pos_x( atoi(valor.c_str()) );
 			}else if (clave == "y"){
+				creoEntidad = true;
 				unProtagonista.set_pos_y( atoi(valor.c_str()) );
 			}else {
-				cout << "LOG ERROR: atributo de entidad erroeneo: " << clave <<endl;
+				logErrores.escribir( "atributo de protagonista erroeneo",clave,valor );
 			}
 		}
-		//agrego un protagonista al escenario
-		unEscenario.agregar_protagonista(unProtagonista);
+
+		if (creoEntidad){
+			//se ingreso por lo menos un atributo correcto
+			//agrego un protagonista al escenario
+			unEscenario.agregar_protagonista(unProtagonista);
+		} else {
+			//se ingreso un protagonista con todos los atributos erroneos
+			logErrores.escribir("Se ingreso un protagonista en el escenario que no contenia ningun atributo valido. Se elimino la misma" );
+		}
    }
 }
 void parsear_entidades(const YAML::Node& node, config_escenario& unEscenario){
 	//aca itero por cada entidad
     for(unsigned i=0;i<node.size();i++) {
 		config_entidad_en_juego unaEntidad("",-1,-1);
+		bool creoEntidad = false; //verifica si se ingreso algun parametro valido
 		//aca itero dentro de una entidad
 		for(YAML::Iterator it=node[i].begin();it!=node[i].end();++it) {
 			//leo los atributos del protagonista
@@ -145,17 +190,26 @@ void parsear_entidades(const YAML::Node& node, config_escenario& unEscenario){
 			it.second() >> valor;
 			//y los asigno
 			if (clave == "entidad"){
+				creoEntidad = true;
 				unaEntidad.set_nombre(valor); 
 			}else if (clave == "x"){
+				creoEntidad = true;
 				unaEntidad.set_pos_x( atoi(valor.c_str()) );
 			}else if (clave == "y"){
+				creoEntidad = true;
 				unaEntidad.set_pos_y( atoi(valor.c_str()) );
 			}else {
-				cout << "LOG ERROR: atributo de entidad erroeneo: " << clave <<endl;
+				logErrores.escribir( "atributo de entidad en escenario erroeneo",clave,valor );
 			}
 		}
-		//agrego una entidad al escenario
-		unEscenario.agregar_entidad(unaEntidad);
+		if (creoEntidad){
+			//se ingreso por lo menos un atributo correcto
+			//agrego una entidad al escenario
+			unEscenario.agregar_entidad(unaEntidad);
+		} else {
+			//se ingreso un protagonista con todos los atributos erroneos
+			logErrores.escribir("Se ingreso una entidad en el escenario que no contenia ningun atributo valido. Se elimino la misma" );
+		}
    }
 }
 void operator >> (const YAML::Node& node, vector <config_escenario>& escenarios) {
@@ -167,9 +221,10 @@ void operator >> (const YAML::Node& node, vector <config_escenario>& escenarios)
 			string clave;
 			string valor;
 			it.first() >> clave;
+
 			//guardo los atributos
 			if ( clave == "nombre" ){
-				it.second() >> valor;
+
 				unEscenario.set_nombre(valor);
 			} else if (clave == "size_x"){
 				it.second() >> valor;
@@ -182,12 +237,24 @@ void operator >> (const YAML::Node& node, vector <config_escenario>& escenarios)
 			}else if (clave == "entidadesDef"){
 				parsear_entidades(it.second(),unEscenario);
 			}else{ 
-				cout << "LOG ERROR: atributo de escenario erroeneo: " << clave <<endl; 
+				it.second() >> valor;
+				logErrores.escribir( "atributo de escenario erroeneo",clave,valor ); 
 			}
 		}
 		//agrego un escenario
 		escenarios.push_back(unEscenario);
     }
+}
+//verifica que no se haya enviado algun nodo ppal incorrecto
+void verificar_tags_ppales(YAML::Node& nodoPpal){
+	for(YAML::Iterator it=nodoPpal.begin();it!=nodoPpal.end();++it) {
+		std::string clave, valor;
+		it.first() >> clave;
+		if ( (clave != "pantalla") && (clave != "configuracion") &&  (clave != "escenarios") && (clave != "entidades") ){
+			logErrores.escribir( "Se ingreso nodo principal erroneo ", clave );
+		}
+	}
+	return;
 }
 config_juego parser_nivel(char* path){
 
@@ -207,44 +274,52 @@ config_juego parser_nivel(char* path){
 	config_general config(-1,-1);
 	vector <config_escenario> escenarios;
 	config_juego juego;
-	//creo log errores
-	logErrores log("log.txt");
-	log.escribir("esta es mi linea1");
-	log.escribir("esta es mi linea2");
-	log.cerrarConexion();
+
+
 	//parseo pantalla
 	if(const YAML::Node *pName = doc.FindValue("pantalla")) {
 		cout << "pantalla existe" << endl;
 		doc["pantalla"] >> pantalla;
-		juego.set_pantalla(pantalla);
-		cout << endl <<"valores:ancho_" << pantalla.get_ancho() << ",alto_" << pantalla.get_alto() << endl; 
 	}else{
-		cout << "LOG ERROR: pantalla no existe" << endl;
+		logErrores.escribir("No existe el valor pantalla");
 	}
 	//parseo escenarios
 	if(const YAML::Node *pName = doc.FindValue("escenarios")) {
 		cout << "escenarios existe" << endl;
 		doc["escenarios"] >> escenarios;
-		juego.set_escenarios(escenarios);
 	}else{
-		cout << "LOG ERROR: escenarios no existe" << endl;
+		logErrores.escribir("No existe el valor escenarios");
 	}
 	//parseo entidades
 	if(const YAML::Node *pName = doc.FindValue("entidades")) {
 		doc["entidades"] >> entidades;
-		juego.set_entidades(entidades);
 		cout << "entidades existe" << endl;
 	}else{
-		cout << "LOG ERROR: entidades no existe" << endl;
+		logErrores.escribir( "No existe el valor entidades." );
 	}
 	//parseo configuracion
 	if(const YAML::Node *pName = doc.FindValue("configuracion")) {
 		doc["configuracion"] >> config;
-		juego.set_configuracion(config);
 		cout << "configuracion existe" << endl;
 	}else{
-		cout << "LOG ERROR: configuracion no existe" << endl;
+		logErrores.escribir("No existe el valor configuracion" );
 	}
+
+	//verificar errores 
+	verificar_tags_ppales(doc);
+	logErrores.verificar_errores(pantalla,logErrores);
+	logErrores.verificar_errores(config,logErrores);
+	logErrores.verificar_errores(entidades,logErrores);
+	logErrores.verificar_errores(escenarios, logErrores, entidades);
+	logErrores.verificar_unicidad_entidades (entidades, logErrores);
+//	logErrores.verificar_correspondencia_escenario(logErrores,entidades, escenarios);
+	//asigno atributos al juego
+ 	juego.set_pantalla(pantalla);
+	juego.set_escenarios(escenarios);
+	juego.set_entidades(entidades);
+	juego.set_configuracion(config);
+	//cierro log
+	logErrores.cerrarConexion();
 	//cerramos la conexion
 	archivo.close();
 
@@ -259,7 +334,9 @@ config_juego parsear(char* path){
 	try{
 		juego = parser_nivel(path);
 	}catch (exception e){
-		cout << endl << endl << "Ocurrio un error con la Yaml";
+		logErrores.escribir( "Ocurrio un error con la Yaml. El formato no corresponde a un archivo YAML" );
+		//cierro log
+		logErrores.cerrarConexion();
 	}
 
 	return juego;

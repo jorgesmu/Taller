@@ -157,12 +157,6 @@ class EntidadFija : public Entidad {
 	virtual void setTileActual(Tile* tile);
 
 protected:	
-	
-	/*
-		Obtiene el ancla adecuada
-	*/
-	virtual void actualizarTileAncla(Tile* tile, Mapa* mapa);
 
-	
-	virtual Tile* obtenerTileAncla(Tile* tile , Mapa* mapa);
+	void EntidadFija::agregarAnclas(Mapa* mapa);
 };

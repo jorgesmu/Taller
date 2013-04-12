@@ -87,7 +87,7 @@ int main(int argc, char* args[]) {
 	mapa.getTile(1,1) ->addEntidad(&personaje);
 	EntidadFija casa("casa", 4 , 4 , 
 							 140 , 190 , 
-							 mapa.getTile(0,0) , &mapa ,
+							 mapa.getTile(10,10) , &mapa ,
 							 resman , Imagen::COLOR_KEY);
 	// Aca muestra como se agregan a mano
 	//mapa.getTile(0, 0).addEntidad(cem_test);

@@ -147,7 +147,7 @@
 			this -> posX = tile -> getX();
 			this -> posY = tile -> getY();
 		}
-		this -> actualizarTileAncla(tile , mapa);
+		this -> agregarAnclas(mapa);
 	}
 	
 	/*
@@ -208,61 +208,36 @@
 		if ( (this -> imagen != NULL) && (this -> surf != NULL) &&
 			(camara != NULL) ) {
 			if(this -> surf -> getSDL_Surface() != NULL){
-				if (tileAncla != NULL) {
-					// Si tileX y tileY son iguales a las posiciones
-					// del ancla se imprime
-					if ((this -> tileAncla -> getX() == tileX) && 
-						(this -> tileAncla -> getY() == tileY)){
-						int posX;
-						int posY;
-						posX = this -> posX - (int)(camara -> getX()) - this -> pixel_ref_x;
-						posY = this -> posY - (int)(camara -> getY()) - this -> pixel_ref_y;
-						this -> surf -> blit(dest , posX , posY);		
-					}
-				}
+				int posX;
+				int posY;
+				posX = this -> posX - (int)(camara -> getX()) - this -> pixel_ref_x;
+				posY = this -> posY - (int)(camara -> getY()) - this -> pixel_ref_y;
+				this -> surf -> blit(dest , posX , posY);		
 			}
 		}
 	}
-
-	/*
-		posX y posY en pixeles, es una posicion cualquiera en el mapa
-	*/
-	void EntidadFija::actualizarTileAncla(Tile* tile , Mapa* mapa){
-		Tile* tileAnclaSiguiente = this -> obtenerTileAncla(tile , mapa);
-		if (tileAnclaSiguiente != NULL){			
-			if(tileAnclaSiguiente != this -> tileAncla ) {
-				if (tileAncla != NULL) {
-					this -> tileAncla -> deleteEntidad(this);
-				}
-				this -> tileAncla = tileAnclaSiguiente;
-				this -> tileAncla -> addEntidad(this);
-			}
-		} else{
-			if (tile != NULL) {
-				if (this -> tileAncla != NULL) {
-					this -> tileAncla -> deleteEntidad(this);
-				}
-				this -> tileAncla = tile;
-				this -> tileAncla -> addEntidad(this);
-			}
-		}
-	}
-
-	void EntidadFija::setTileActual(Tile* tile) {
 		
+	void EntidadFija::agregarAnclas(Mapa* mapa){
+		int contTilesX = 0;
+		int delta = 1;
+		while(contTilesX < (int)(this -> widthInTiles)){
+			bool salida = false;
+			int contTilesY = 0;
+			while((contTilesY < (int)(this -> highInTiles)) && (!salida)){
+				int posAnclaX = this -> posX + (contTilesX - contTilesY) * Tile::TILE_ANCHO/2;
+				int posAnclaY = this -> posY + (contTilesY + contTilesX)*Tile::TILE_ALTO/2;
+				Tile* ancla = mapa -> getTilePorPixeles(posAnclaX , posAnclaY);
+				if (ancla != NULL){
+					ancla -> addEntidad(this);
+					contTilesY += delta;
+				} else {
+					salida = true;
+				}
+			}
+			contTilesX += delta;
+		}
 	}
 
-	/*
-		posX y posY en pixeles, es una posicion cualquiera en el mapa
-	*/
-	Tile* EntidadFija::obtenerTileAncla(Tile* tile , Mapa* mapa){
-		Tile* retorno = NULL;
-		int posImagenX = tile -> getX() + this -> imagen -> getAncho() - this -> pixel_ref_x + 
-						Entidad::MARGEN_ANCLA_X;
-		int posImagenY = tile -> getY() + this -> imagen -> getAlto() - this -> pixel_ref_y + 
-						Entidad::MARGEN_ANCLA_Y;
-		retorno = mapa -> getTilePorPixeles(posImagenX,posImagenY);
-
-		return retorno;
+	void EntidadFija::setTileActual(Tile* tile){
 	}
-
+	

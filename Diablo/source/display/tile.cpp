@@ -1,5 +1,6 @@
 #include "tile.h"
 
+
 Tile::Tile() {
 }
 
@@ -19,6 +20,10 @@ void Tile::deleteEntidad(Entidad* ent){
 	}
 	entidades.swap(new_ent);
 }
+
+//std::vector<Entidad*> Tile::get_entidades(){
+//	return entidades;
+//}
 
 void Tile::blit(SDL_Surface* pantalla, Camara& cam){
 	for(auto it = entidades.begin(); it != entidades.end(); ++it) {

@@ -72,6 +72,7 @@ int main(int argc, char* args[]) {
 		for(auto it2 = entidades_cargadas.begin(); it2 != entidades_cargadas.end(); ++it2){
 			if(it->get_nombre() == (*it2)->get_nombre()){
 				mapa.getTile(it->get_pos_x(), it->get_pos_y())->addEntidad(*it2);
+				(*it2)->setTileActual(mapa.getTile(it->get_pos_x(), it->get_pos_y()), &mapa);
 				entidad_encontrada = true;
 				break;
 			}

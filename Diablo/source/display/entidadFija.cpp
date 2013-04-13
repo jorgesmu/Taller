@@ -89,13 +89,14 @@
 		//pixel de referencia
 		this -> pixel_ref_x = pixel_ref_x ;
 		this -> pixel_ref_y = pixel_ref_y;
+		this -> tileAncla = NULL;
 		// seteo el tile actual		
 		if (tile != NULL) {
 			//seteo posicion
 			this -> posX = tile -> getX();
 			this -> posY = tile -> getY();
+			this -> agregarAnclas(mapa);
 		}
-		this -> agregarAnclas(mapa);
 	}
 
 	/*
@@ -129,13 +130,14 @@
 		//pixel de referencia
 		this -> pixel_ref_x = pixel_ref_x ;
 		this -> pixel_ref_y = pixel_ref_y;
+		this -> tileAncla = NULL;
 		//seteo el tile actual
 		if (tile != NULL) {
 			//seteo posicion
 			this -> posX = tile -> getX();
 			this -> posY = tile -> getY();
+			this -> agregarAnclas(mapa);
 		}
-		this -> agregarAnclas(mapa);
 	}
 	
 	/*
@@ -201,6 +203,10 @@
 	void EntidadFija::agregarAnclas(Mapa* mapa){
 		int contTilesX = 0;
 		int delta = 1;
+		Tile* anclaPrincipal = mapa -> getTilePorPixeles(this -> posX , this -> posY);
+		if (anclaPrincipal != NULL){
+			this -> tileAncla = anclaPrincipal;
+		}
 		while(contTilesX < (int)(this -> widthInTiles)){
 			bool salida = false;
 			int contTilesY = 0;
@@ -216,11 +222,22 @@
 				}
 			}
 			contTilesX += delta;
-		}
+		}			
 	}
 
 	void EntidadFija::setTileActual(Tile* tile){
+		
 	}
+
+	void EntidadFija::setTileActual(Tile* tile , Mapa* mapa){
+		//se puede anclar una sola vez
+		if ( (tile != NULL) && (mapa != NULL) ){
+			this -> posX = tile -> getX();
+			this -> posY = tile -> getY();
+			this -> agregarAnclas(mapa);
+		}
+	}
+	
 	
 	/*
 		Actualiza el surface de la instancia.

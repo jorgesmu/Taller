@@ -24,6 +24,8 @@ class Tile;    // Declaración adelantada de Tile
 */
 class EntidadFija : public Entidad {
 	
+protected:
+
 	public:
 	
 	/*
@@ -151,6 +153,8 @@ class EntidadFija : public Entidad {
 					const unsigned int tileX ,	const unsigned int tileY);
 	
 	virtual void setTileActual(Tile* tile);
+
+	virtual void setTileActual(Tile* tile , Mapa* mapa);
 
 protected:	
 

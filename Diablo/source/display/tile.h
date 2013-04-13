@@ -28,4 +28,6 @@ class Tile {
 	int getX();
 
 	int getY();
+	// Devuelve true si el tile no tiene ninguna entidad
+	bool sinEntidades() const;
 };

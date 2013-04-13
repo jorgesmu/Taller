@@ -18,17 +18,13 @@
 
 int main(int argc, char* args[]) {
 
-	//Prueba parser YAML
-	//parser_test();
-	
-	//parseo un nivel
+	// Parseo el nivel
 	config_juego juego = parsear("../resources/levels/nivel1.yaml");
 	config_pantalla* pantalla = juego.get_pantalla();
 	vector <config_entidad> entidades = juego.get_entidades();
 	config_general configuracion = juego.get_configuracion();
 	vector <config_escenario> escenarios = juego.get_escenarios();
 
-	system("PAUSE");
 	// Ventana de prueba
 	SDL_Surface* screen;
     SDL_Init(SDL_INIT_EVERYTHING);
@@ -36,123 +32,74 @@ int main(int argc, char* args[]) {
 	//SDL_WM_GrabInput(SDL_GRAB_ON);
 	SDL_WarpMouse(800/2, 600/2);
 	// Init the window
-	screen = SDL_SetVideoMode(800, 600, 32, SDL_SWSURFACE);
+	screen = SDL_SetVideoMode(pantalla->get_ancho(), pantalla->get_alto(), 32, SDL_SWSURFACE);
 	// Camara
 	Camara camara;
-	//camara.init(800, 600, 50);
-	camara.init(pantalla->get_ancho(), pantalla->get_alto(), 50);
+	camara.init(pantalla->get_ancho(), pantalla->get_alto(), configuracion.get_margen_scroll());
 
 	// Mapa
 	ResMan resman;
 	resman.init();
 
-	//cargp las entidades en un vector
+	// Cargo las entidades en un vector
 	std::vector<Entidad*> entidades_cargadas;
 	for (auto it = entidades.begin(); it != entidades.end(); ++it){
-		resman.addRes((*it).get_nombre(), (*it).get_path_imagen(), Imagen::COLOR_KEY);
-		Entidad entidad;
-		if((*it).get_fps() == -1){
-			entidad = Entidad ((*it).get_nombre(), (*it).get_ancho_base(), (*it).get_alto_base(), (*it).get_pixel_ref_x(), (*it).get_pixel_ref_y(),
+		resman.addRes(it->get_nombre(), it->get_path_imagen(), Imagen::COLOR_KEY);
+		Entidad* entidad;
+		if(it->get_fps() == -1){
+			entidad = new Entidad (it->get_nombre(), it->get_ancho_base(), it->get_alto_base(), it->get_pixel_ref_x(), it->get_pixel_ref_y(),
 								NULL, resman, Imagen::COLOR_KEY);
 		}else{
-			entidad = Entidad ((*it).get_nombre(), (*it).get_ancho_base(), (*it).get_alto_base(), (*it).get_fps(), (*it).get_delay(),
-								(*it).get_pixel_ref_x(), (*it).get_pixel_ref_y(), NULL, resman, Imagen::COLOR_KEY);		
+			entidad = new Entidad (it->get_nombre(), it->get_ancho_base(), it->get_alto_base(), it->get_fps(), it->get_delay(),
+								it->get_pixel_ref_x(), it->get_pixel_ref_y(), NULL, resman, Imagen::COLOR_KEY);		
 		}
-		entidades_cargadas.push_back(&entidad);
+		entidades_cargadas.push_back(entidad);
 	}
 
-/*	resman.addRes("tierra", "../resources/tile.bmp", 255);
-	resman.addRes("cemento", "../resources/tile2.bmp", 255);
-	resman.addRes("agua", "../resources/tileAgua.bmp", Imagen::COLOR_KEY);
-	resman.addRes("soldado", "../resources/Soldado.bmp", Imagen::COLOR_KEY);
-	resman.addRes("casa", "../resources/Casa400x400.bmp", Imagen::COLOR_KEY);
-	resman.addRes("molino", "../resources/molino_hw_300x320_thw_3x3_offxy_120_100.bmp", Imagen::COLOR_KEY);
-*/
+	// Cargo la entidad por default
+	resman.addRes("tierraDefault", "../resources/tile.bmp");
+	Entidad entidadPisoPorDefecto("tierraDefault", 1 , 1 , 0 , 0 , NULL, resman , Imagen::COLOR_KEY);
 
-/*	Entidad tierra_test("tierra", 1 , 1 , 
-							   0 , 0 , 
-							   NULL,
-							   resman , Surface::RGB_VERDE);
-	Entidad cem_test("cemento", 1 , 1 , 
-							 0 , 0 , 
-							  NULL,
-							  resman , Surface::RGB_VERDE);
-	Entidad agua("agua" ,
-							1 , 1 , 
-							5 , 300, 
-							50, 100 ,
-							0 , 0 , 
-							NULL , resman ,
-							Imagen::COLOR_KEY);
-	Personaje personaje("soldado" ,
-							1 , 1 , 
-							50 , 5, 
-							100, 100 ,
-							20,
-							0 , 70 ,
-							NULL , resman ,
-							Imagen::COLOR_KEY);
-*/
-
+	// Inicializo el mapa
 	Mapa mapa;
-	// Mapa de size random
-	//mapa.resize(25, 25);
 	mapa.resize(escenarios[0].get_tam_x(), escenarios[0].get_tam_x());
+	// Vector de entidades en este mapa
 	vector<config_entidad_en_juego> entidades_en_juego = escenarios[0].get_entidades();
 	
 	// Llenamos el mapa con las entidades
 	for(auto it = entidades_en_juego.begin(); it != entidades_en_juego.end(); ++it){
-		Entidad entidad_elegida;
+		bool entidad_encontrada = false;
 		for(auto it2 = entidades_cargadas.begin(); it2 != entidades_cargadas.end(); ++it2){
-			if((*it).get_nombre() == (*it2)->get_nombre()){
-				mapa.getTile((*it).get_pos_x(), (*it).get_pos_y())->addEntidad(*it2);		
+			if(it->get_nombre() == (*it2)->get_nombre()){
+				mapa.getTile(it->get_pos_x(), it->get_pos_y())->addEntidad(*it2);
+				entidad_encontrada = true;
+				break;
 			}
 		}
+		if(!entidad_encontrada) {
+			std::cerr << "Entidad " << it->get_nombre() << " no fue cargada porque no fue definida\n";
+		}
 	}
-
+	 
+	// Revisamos que no haya quedado ningun tile sin entidades
+	// Si hay alguno le ponemos la entidad por defecto
 	for(auto it = mapa.allTiles().begin();it != mapa.allTiles().end(); ++it) {
-		if((*it).get_entidades().size() == 0) {
+		if(it->sinEntidades()) {
 			it->addEntidad((Entidad*)&entidadPisoPorDefecto);
 		}
 	}
 
-/*	for(auto it = mapa.allTiles().begin();it != mapa.allTiles().end(); ++it) {
-		if(intRand(0,1) == 0) {
-			it->addEntidad(&tierra_test);
-		}else{
-			if(intRand(0,1) == 0) {
-				it->addEntidad(&cem_test);
-			} else {
-				it->addEntidad(&agua);
-			}
-		}
-	}
-*/
-/*	mapa.getTile(1,1) ->addEntidad(&personaje);
-	EntidadFija casa("casa", 4 , 4 , 
-							 140 , 190 , 
-							 mapa.getTile(10,10) , &mapa ,
-							 resman , Imagen::COLOR_KEY);
-	EntidadFija molino("molino", 3 , 3 , //TILES
-								 10 , 1000 , // fps y delay
-								 300 , 320 , // alto y ancho
-								 120 , 100 , // OFFSET
-								 mapa.getTile(0,0) , &mapa, 
-								 resman , Imagen::COLOR_KEY);
+	// Agrega el personaje
+	Personaje personaje(escenarios[0].get_protagonista().get_nombre() , 1 , 1 , 50 , 5, 100, 100 ,	configuracion.get_vel_personaje(),	0 , 70 , NULL , resman , Imagen::COLOR_KEY);
+	mapa.getTile(escenarios[0].get_protagonista().get_pos_x(), escenarios[0].get_protagonista().get_pos_y()) ->addEntidad(&personaje);
 
-	// Aca muestra como se agregan a mano
-	//mapa.getTile(0, 0).addEntidad(cem_test);
-	//mapa.getTile(0, 1).addEntidad(cem_test);
-	//mapa.getTile(1, 0).addEntidad(tierra_test);
-*/
+	// Variables para el game-loop
 	double curr_time = SDL_GetTicks();
     double accum = 0.0;
 	bool quit = false;
 
-	// Para guardar los eventos
+	// Para guardar los eventos  de input
 	SDL_Event event;
-
-	vec2<int> tw_test;
 
 	while(!quit) {
 
@@ -161,40 +108,6 @@ int main(int argc, char* args[]) {
 			// Detectar escape o quit
 			if(event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE || event.type == SDL_QUIT) {
 				quit = true;
-			}
-			// Para probar el tilewalk
-			vec2<int> test_next(-1, -1);
-			if(event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_KP2) {
-				test_next = tileWalk(tw_test, GDIR::S);
-			}
-			if(event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_KP8) {
-				test_next = tileWalk(tw_test, GDIR::N);
-			}
-			if(event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_KP4) {
-				test_next = tileWalk(tw_test, GDIR::E);
-			}
-			if(event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_KP6) {
-				test_next = tileWalk(tw_test, GDIR::O);
-			}
-			if(event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_KP7) {
-				test_next = tileWalk(tw_test, GDIR::NE);
-			}
-			if(event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_KP9) {
-				test_next = tileWalk(tw_test, GDIR::NO);
-			}
-			if(event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_KP1) {
-				test_next = tileWalk(tw_test, GDIR::SE);
-			}
-			if(event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_KP3) {
-				test_next = tileWalk(tw_test, GDIR::SO);
-			}
-			// Hacer el movimiento si es valido
-			if(mapa.tileExists(test_next.x, test_next.y)) {
-				mapa.getTile(tw_test.x, tw_test.y)->clean();
-				mapa.getTile(tw_test.x, tw_test.y)->addEntidad(&tierra_test);
-				mapa.getTile(test_next.x, test_next.y)->clean();
-				mapa.getTile(test_next.x, test_next.y)->addEntidad(&cem_test);
-				tw_test = test_next;
 			}
 			// Detectar mouse motion
 			if(event.type == SDL_MOUSEMOTION) {
@@ -205,10 +118,7 @@ int main(int argc, char* args[]) {
 			if(event.type == SDL_MOUSEBUTTONDOWN) {
 				if(event.button.button == SDL_BUTTON_LEFT) {
 					vec2<int> tile_res = MouseCoords2Tile(vec2<int>(event.button.x, event.button.y), camara);
-					std::cout << event.button.x << ";" << event.button.y <<  " || Tile: " << tile_res.x << ";" << tile_res.y << "\n";
 					if(mapa.tileExists(tile_res.x, tile_res.y)) {
-						//mapa.getTile(tile_res.x, tile_res.y)->clean();
-						//mapa.getTile(tile_res.x, tile_res.y)->addEntidad(&cem_test);
 						personaje.mover(mapa.getTile(tile_res.x,tile_res.y));
 					}
 				}
@@ -228,9 +138,15 @@ int main(int argc, char* args[]) {
 
 		// Aca se hace el timestep, aka avanzar la fisica usando Euler en un delta t fijo
 		while(accum >= CONST_DT) {
-			
+			// Actualiza la camara
 			camara.update();
-
+			// Actualiza las entidades
+			for(auto it = entidades_cargadas.begin(); it != entidades_cargadas.end(); ++it){
+				(*it)->update(&mapa);
+			}
+			// Actualiza el personaje
+			personaje.update(&mapa);
+			// Decrease al accum
 			accum -= CONST_DT;
 		}
 
@@ -241,11 +157,6 @@ int main(int argc, char* args[]) {
 		mapa.blit(screen, camara);
 		// Actualizar la pantalla
 		SDL_Flip(screen);
-		//ACtualizacion entidades
-		agua.update(&mapa);
-		personaje.update(&mapa);
-		casa.update(&mapa);
-		molino.update(&mapa);
 	}
 	
 	mapa.clean();

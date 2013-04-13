@@ -27,12 +27,12 @@ class config_escenario {
 		vector<config_entidad_en_juego> get_protagonitas() { return protagonistas;}
 
 		config_entidad_en_juego get_protagonista() { 
-			if ( protagonistas.size() > 0 ) {
-				protagonistas[0];
+			if (protagonistas.size() > 0) {
+				return protagonistas[0];
+			}else{
+				config_entidad_en_juego protagonistaVacio("",-1,-1);
+				return protagonistaVacio ;
 			}
-			config_entidad_en_juego protagonistaVacio("",-1,-1);
-			
-			return protagonistaVacio ;
 		}
 		//Gets de los flags de control
 		bool get_completo_nombre() { return completoNombre;}

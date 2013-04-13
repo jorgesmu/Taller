@@ -1,45 +1,32 @@
 pantalla:
-  - ancho: 45
-  - alto: 153
+  - ancho: 800
+  - alto: 600
 configuracion:
-  - vel_personaje: 3
+  - vel_personaje: 20
   - margen_scroll: 30
 entidades:
-  - nombre: arbol
-    imagen: path/a/imagen.png
+  - nombre: piso
+    imagen: ../resources/tile2.bmp
   
-  - nombre: castillo
-    imagen: path/a/imagen.png
-    ancho_base: 2
-    alto_base: 2
+  - nombre: casa
+    imagen: ../resources/Casa400x400.bmp
+    ancho_base: 3
+    alto_base: 3
     pixel_ref_x: 30
     pixel_ref_y: 40
 
-  - nombre: orco
-    imagen: path/a/imagen.png
+  - nombre: personaje
+    imagen: ../resources/Soldado.bmp
     fps: 10
-    delay: 5
-
-  - nombre: frodo
-    imagen: path/a/imagen.png
-    fps: 10
-
-  - nombre: tierra
-    imagen: path/a/imagen.png
-
-  - nombre: agua
-    imagen: path/a/imagen.png
 
 escenarios:
   - nombre: bosque_encantado
-    size_x: 100
-    size_y: 100
+    size_x: 20
+    size_y: 20
     entidadesDef:
-      - {x: 10, y: 15, entidad: tierra}
-      - {x: 15, y: 20, entidad: tierra}
-      - {x: 10, y: 15, entidad: agua}
-      - {x: 30, y: 55, entidad: castillo}
+      - {x: 3, y: 5, entidad: piso}
+      - {x: 5, y: 6, entidad: casa}
     protagonista:
-      - tipoEntidad: frodo
-        x: 50
-        y: 50
+      - tipoEntidad: personaje
+        x: 1
+        y: 1

@@ -42,3 +42,7 @@ int Tile::getX(){
 int Tile::getY(){
 	return this -> y;
 }
+
+bool Tile::sinEntidades() const {
+	return entidades.size() == 0;
+}

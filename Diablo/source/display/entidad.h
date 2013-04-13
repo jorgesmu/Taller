@@ -209,6 +209,8 @@ class Entidad {
 					Tile* tile , 
 					ResMan& rm , const int colorKey);
 
+	std::string get_nombre();
+	
 	/*
 		Pre: Los parámetros respetan la siguiente convención:
 

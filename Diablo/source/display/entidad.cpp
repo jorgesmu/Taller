@@ -261,6 +261,10 @@
 		this -> tileAncla = NULL;
 	}
 
+	std::string Entidad::get_nombre(){
+		return name;
+	}
+
 	/*
 		Pre: Los parámetros respetan la siguiente convención:
 

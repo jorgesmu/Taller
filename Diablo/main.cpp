@@ -22,7 +22,12 @@ int main(int argc, char* args[]) {
 	//parser_test();
 	
 	//parseo un nivel
-	parsear("../resources/levels/nivel1.yaml");
+	config_juego juego = parsear("../resources/levels/nivel1.yaml");
+	config_pantalla* pantalla = juego.get_pantalla();
+	vector <config_entidad> entidades = juego.get_entidades();
+	config_general configuracion = juego.get_configuracion();
+	vector <config_escenario> escenarios = juego.get_escenarios();
+
 	system("PAUSE");
 	// Ventana de prueba
 	SDL_Surface* screen;
@@ -34,18 +39,37 @@ int main(int argc, char* args[]) {
 	screen = SDL_SetVideoMode(800, 600, 32, SDL_SWSURFACE);
 	// Camara
 	Camara camara;
-	camara.init(800, 600, 50);
+	//camara.init(800, 600, 50);
+	camara.init(pantalla->get_ancho(), pantalla->get_alto(), 50);
 
 	// Mapa
 	ResMan resman;
 	resman.init();
-	resman.addRes("tierra", "../resources/tile.bmp", 255);
+
+	//cargp las entidades en un vector
+	std::vector<Entidad*> entidades_cargadas;
+	for (auto it = entidades.begin(); it != entidades.end(); ++it){
+		resman.addRes((*it).get_nombre(), (*it).get_path_imagen(), Imagen::COLOR_KEY);
+		Entidad entidad;
+		if((*it).get_fps() == -1){
+			entidad = Entidad ((*it).get_nombre(), (*it).get_ancho_base(), (*it).get_alto_base(), (*it).get_pixel_ref_x(), (*it).get_pixel_ref_y(),
+								NULL, resman, Imagen::COLOR_KEY);
+		}else{
+			entidad = Entidad ((*it).get_nombre(), (*it).get_ancho_base(), (*it).get_alto_base(), (*it).get_fps(), (*it).get_delay(),
+								(*it).get_pixel_ref_x(), (*it).get_pixel_ref_y(), NULL, resman, Imagen::COLOR_KEY);		
+		}
+		entidades_cargadas.push_back(&entidad);
+	}
+
+/*	resman.addRes("tierra", "../resources/tile.bmp", 255);
 	resman.addRes("cemento", "../resources/tile2.bmp", 255);
 	resman.addRes("agua", "../resources/tileAgua.bmp", Imagen::COLOR_KEY);
 	resman.addRes("soldado", "../resources/Soldado.bmp", Imagen::COLOR_KEY);
 	resman.addRes("casa", "../resources/Casa400x400.bmp", Imagen::COLOR_KEY);
 	resman.addRes("molino", "../resources/molino_hw_300x320_thw_3x3_offxy_120_100.bmp", Imagen::COLOR_KEY);
-	Entidad tierra_test("tierra", 1 , 1 , 
+*/
+
+/*	Entidad tierra_test("tierra", 1 , 1 , 
 							   0 , 0 , 
 							   NULL,
 							   resman , Surface::RGB_VERDE);
@@ -68,12 +92,31 @@ int main(int argc, char* args[]) {
 							0 , 70 ,
 							NULL , resman ,
 							Imagen::COLOR_KEY);
+*/
+
 	Mapa mapa;
 	// Mapa de size random
-	mapa.resize(25, 25);
-	// Llenamos el mapa con entidad tierra
+	//mapa.resize(25, 25);
+	mapa.resize(escenarios[0].get_tam_x(), escenarios[0].get_tam_x());
+	vector<config_entidad_en_juego> entidades_en_juego = escenarios[0].get_entidades();
 	
+	// Llenamos el mapa con las entidades
+	for(auto it = entidades_en_juego.begin(); it != entidades_en_juego.end(); ++it){
+		Entidad entidad_elegida;
+		for(auto it2 = entidades_cargadas.begin(); it2 != entidades_cargadas.end(); ++it2){
+			if((*it).get_nombre() == (*it2)->get_nombre()){
+				mapa.getTile((*it).get_pos_x(), (*it).get_pos_y())->addEntidad(*it2);		
+			}
+		}
+	}
+
 	for(auto it = mapa.allTiles().begin();it != mapa.allTiles().end(); ++it) {
+		if((*it).get_entidades().size() == 0) {
+			it->addEntidad((Entidad*)&entidadPisoPorDefecto);
+		}
+	}
+
+/*	for(auto it = mapa.allTiles().begin();it != mapa.allTiles().end(); ++it) {
 		if(intRand(0,1) == 0) {
 			it->addEntidad(&tierra_test);
 		}else{
@@ -84,14 +127,14 @@ int main(int argc, char* args[]) {
 			}
 		}
 	}
-
-	mapa.getTile(1,1) ->addEntidad(&personaje);
+*/
+/*	mapa.getTile(1,1) ->addEntidad(&personaje);
 	EntidadFija casa("casa", 4 , 4 , 
 							 140 , 190 , 
 							 mapa.getTile(10,10) , &mapa ,
 							 resman , Imagen::COLOR_KEY);
 	EntidadFija molino("molino", 3 , 3 , //TILES
-								 10 , 10 , // fps y delay
+								 10 , 1000 , // fps y delay
 								 300 , 320 , // alto y ancho
 								 120 , 100 , // OFFSET
 								 mapa.getTile(0,0) , &mapa, 
@@ -101,7 +144,7 @@ int main(int argc, char* args[]) {
 	//mapa.getTile(0, 0).addEntidad(cem_test);
 	//mapa.getTile(0, 1).addEntidad(cem_test);
 	//mapa.getTile(1, 0).addEntidad(tierra_test);
-
+*/
 	double curr_time = SDL_GetTicks();
     double accum = 0.0;
 	bool quit = false;

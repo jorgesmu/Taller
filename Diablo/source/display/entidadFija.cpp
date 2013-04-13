@@ -89,25 +89,13 @@
 		//pixel de referencia
 		this -> pixel_ref_x = pixel_ref_x ;
 		this -> pixel_ref_y = pixel_ref_y;
-		//agrego entidad al tile
+		// seteo el tile actual		
 		if (tile != NULL) {
-			tile -> deleteEntidad(this);
-			tile -> addEntidad(this);
 			//seteo posicion
 			this -> posX = tile -> getX();
 			this -> posY = tile -> getY();
 		}
-		//tile destino
-		this -> tileDestino = tile;
-		//tile ancla
-		this -> tileAncla = tile;
-		//deltaUpdatePosicion
-		this -> velocidad = VELOCIDAD_DEFAULT;
-		this -> deltaUpdatePosicion = Entidad::BASE_DE_TIEMPO/velocidad;
-		//tiempo siguiente update
-		this -> tiempoProximoUpdate = clock();
-		//seteo como compartido
-		this -> compartido = true;
+		this -> agregarAnclas(mapa);
 	}
 
 	/*
@@ -141,7 +129,7 @@
 		//pixel de referencia
 		this -> pixel_ref_x = pixel_ref_x ;
 		this -> pixel_ref_y = pixel_ref_y;
-		//agrego entidad al tile
+		//seteo el tile actual
 		if (tile != NULL) {
 			//seteo posicion
 			this -> posX = tile -> getX();
@@ -174,11 +162,6 @@
 		
 	}
 		
-	// Se borrar despues
-	void EntidadFija::update(Mapa* mapa) {
-		
-	}
-	
 	// --------------------------------------------------------------------------
 
 	/*
@@ -192,16 +175,10 @@
 
 			tileX , tileY : Tile sobre el 
 
-			NOTA: Cuidado al momento de hacer updates, ya que hay entidades que 
-			ocupan varios Tiles. En sintesis, un update por entidad al momento
-			de pintar toda la pantalla.
-
 		Post: Se ha pintado la entidad en el surface dest según la camara y el mapa.
-		Si la entidad tiene una base rectangular de un sólo Tile se pinta sin mayores 
-		cuidados.
-		En cambio si la entidad tiene una base superior a un tile se realiza un tratamiento
-		especial.
+		Se pinta en la posicion actual de la imagen.
 
+		NOTA: Se supone que se llama luego de acceder al tile donde fue anclada.
 	*/
 	void EntidadFija::blit(SDL_Surface* dest , Camara* camara , Mapa* mapa,
 						const unsigned int tileX ,	const unsigned int tileY){
@@ -216,7 +193,11 @@
 			}
 		}
 	}
-		
+	
+	/*
+		Pre: La instancia ha sido creada.
+		Post: Se han agregado las anclas correspondientes de acuerdo a la base.
+	*/
 	void EntidadFija::agregarAnclas(Mapa* mapa){
 		int contTilesX = 0;
 		int delta = 1;
@@ -241,3 +222,11 @@
 	void EntidadFija::setTileActual(Tile* tile){
 	}
 	
+	/*
+		Actualiza el surface de la instancia.
+	*/
+	void EntidadFija::update(Mapa* mapa) {
+		if (this->imagen != NULL){
+			this -> surf = this -> imagen -> getSurface();
+		}
+	}

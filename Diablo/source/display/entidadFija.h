@@ -15,16 +15,11 @@ class Tile;    // Declaración adelantada de Tile
 
 	3) Puede tener una base dada por uno o más tiles.
 
-	4) Se pinta en la posicion del ancla.
+	4) Se pinta en la posicion de las anclas.
 
-	* Acerca de Update:
-	  -----------------
-		
-	
 	* Acerca de blit:
 	  ---------------
-	Pinta en la posicion del ancla, con alguna clase de evaluacion acerca de si el ancla
-	entra o no en la pantalla dada por la camara.
+	Pinta en la posicion de las anclas.
 
 */
 class EntidadFija : public Entidad {
@@ -112,14 +107,15 @@ class EntidadFija : public Entidad {
 	*/
 	unsigned int getWidthInTiles();
 
-// -------------------------------------------------------------------------------------
+
 
 	/*
-		Va a ser borrada
+		Actualiza el surface de la instancia.
 
 	*/
 	virtual void update(Mapa* mapa);
-	
+
+// -------------------------------------------------------------------------------------
 	/*
 		
 		Va a ser borrada.
@@ -158,5 +154,9 @@ class EntidadFija : public Entidad {
 
 protected:	
 
+	/*
+		Pre: La instancia ha sido creada.
+		Post: Se han agregado las anclas correspondientes de acuerdo a la base.
+	*/
 	void EntidadFija::agregarAnclas(Mapa* mapa);
 };

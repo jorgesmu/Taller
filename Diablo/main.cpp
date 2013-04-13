@@ -39,11 +39,12 @@ int main(int argc, char* args[]) {
 	// Mapa
 	ResMan resman;
 	resman.init();
-	resman.addRes("tierra", "../resources/tile___ERROR_TEST.bmp", 255);
+	resman.addRes("tierra", "../resources/tile.bmp", 255);
 	resman.addRes("cemento", "../resources/tile2.bmp", 255);
 	resman.addRes("agua", "../resources/tileAgua.bmp", Imagen::COLOR_KEY);
 	resman.addRes("soldado", "../resources/Soldado.bmp", Imagen::COLOR_KEY);
 	resman.addRes("casa", "../resources/Casa400x400.bmp", Imagen::COLOR_KEY);
+	resman.addRes("molino", "../resources/molino_hw_300x320_thw_3x3_offxy_120_100.bmp", Imagen::COLOR_KEY);
 	Entidad tierra_test("tierra", 1 , 1 , 
 							   0 , 0 , 
 							   NULL,
@@ -89,6 +90,13 @@ int main(int argc, char* args[]) {
 							 140 , 190 , 
 							 mapa.getTile(10,10) , &mapa ,
 							 resman , Imagen::COLOR_KEY);
+	EntidadFija molino("molino", 3 , 3 , //TILES
+								 10 , 10 , // fps y delay
+								 300 , 320 , // alto y ancho
+								 120 , 100 , // OFFSET
+								 mapa.getTile(0,0) , &mapa, 
+								 resman , Imagen::COLOR_KEY);
+
 	// Aca muestra como se agregan a mano
 	//mapa.getTile(0, 0).addEntidad(cem_test);
 	//mapa.getTile(0, 1).addEntidad(cem_test);
@@ -193,6 +201,8 @@ int main(int argc, char* args[]) {
 		//ACtualizacion entidades
 		agua.update(&mapa);
 		personaje.update(&mapa);
+		casa.update(&mapa);
+		molino.update(&mapa);
 	}
 	
 	mapa.clean();

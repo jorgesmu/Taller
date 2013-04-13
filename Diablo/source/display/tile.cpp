@@ -3,9 +3,15 @@
 Tile::Tile() {
 }
 
+//deprecated
 void Tile::addEntidad(Entidad* ent){
 	entidades.push_back(ent);
 	ent->setTileActual(this);
+}
+
+void Tile::addEntidad(Entidad* ent , Mapa* mapa){
+	entidades.push_back(ent);
+	ent->setTileActual(this , mapa);
 }
 
 void Tile::deleteEntidad(Entidad* ent){

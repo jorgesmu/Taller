@@ -554,6 +554,10 @@
 		}
 	}
 
-void Entidad::setTileDestino(Tile* tile){
-	this -> tileDestino = tile;
-}
+	void Entidad::setTileActual(Tile* tile , Mapa* mapa){
+		this -> setTileActual(tile);
+	}
+
+	void Entidad::setTileDestino(Tile* tile){
+		this -> tileDestino = tile;
+	}

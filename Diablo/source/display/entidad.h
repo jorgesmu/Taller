@@ -265,7 +265,11 @@ class Entidad {
 	virtual void blit(SDL_Surface* dest, Camara* camara , Mapa* mapa,
 					const unsigned int tileX ,	const unsigned int tileY /*Tile* tile*/);
 	
+	//deprecated
 	virtual void setTileActual(Tile* tile);
+	
+	
+	virtual void setTileActual(Tile* tile , Mapa* mapa);
 
 	void setTileDestino(Tile* tile);
 

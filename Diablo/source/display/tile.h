@@ -3,7 +3,7 @@
 #include "entidad.h"
 #include <vector>
 #include "SDL.h"
-
+class Mapa;
 class Tile {
 	private:
 	std::vector<Entidad*> entidades;
@@ -17,7 +17,9 @@ class Tile {
 		
 	// Ctor, no hace nada
 	Tile();
+	// deprecated
 	void addEntidad(Entidad* ent);
+	void addEntidad(Entidad* ent , Mapa* mapa);
 	void deleteEntidad(Entidad* ent);
 	void setBlitCoords(int x, int y);
 	// Blittea todas las entidades en este tile (en el orden que estan en el vector)

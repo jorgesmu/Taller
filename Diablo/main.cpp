@@ -4,7 +4,7 @@
 #include "source/utilities/timer.h"
 #include "source/utilities/surface.h"
 #include "source/utilities/aux_func.h"
-#include "source/utilities/PruebasParser.h"
+//#include "source/utilities/PruebasParser.h"
 #include "source/utilities/parser.h"
 #include "source/display/entidad.h"
 #include "source/utilities/Personaje.h"
@@ -15,6 +15,9 @@
 #include "source/constants/model.h"
 #include "source/utilities/Test.h"
 #include "source/utilities/coordenadas.h"
+
+#include "source/utilities/logErrores.h"
+logErrores err_log("log.txt");
 
 int main(int argc, char* args[]) {
 
@@ -86,7 +89,9 @@ int main(int argc, char* args[]) {
 			}
 		}
 		if(!entidad_encontrada) {
-			std::cerr << "Entidad " << it->get_nombre() << " no fue cargada porque no fue definida\n";
+			std::stringstream ss;
+			ss << "Entidad " << it->get_nombre() << " no fue cargada porque no fue definida\n";
+			err_log.escribir(ss.str());
 		}
 	}
 	 

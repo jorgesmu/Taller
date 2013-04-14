@@ -2,6 +2,8 @@
 #include <cassert>
 
 #include "surface.h"
+#include "../utilities/logErrores.h"
+#include <sstream>
 
 Surface::Surface() {
 	image = NULL;
@@ -52,7 +54,9 @@ bool Surface::load(const std::string& filename) {
 		SDL_SetColorKey(image, SDL_SRCCOLORKEY, ckey);
 		return true;
 	}else{
-		std::cerr << "Error loading " << filename << "\n";
+		std::stringstream ss;
+		ss << "Error loading " << filename << "\n";
+		err_log.escribir(ss.str());
 		return false;
 	}
 }
@@ -70,7 +74,9 @@ bool Surface::load(const std::string& filename , const int colorKey) {
 		SDL_SetColorKey(image, SDL_SRCCOLORKEY , ckey);
 		return true;
 	}else{
-		std::cerr << "Error loading " << filename << "\n";
+		std::stringstream ss;
+		ss << "Error loading " << filename << "\n";
+		err_log.escribir(ss.str());
 		return false;
 	}
 }

@@ -2,6 +2,8 @@
 #include <iostream>
 #include <fstream>
 #include "resman.h"
+#include <sstream>
+#include "../utilities/logErrores.h"
 
 // Ctor
 ResMan::ResMan() {
@@ -28,18 +30,20 @@ void ResMan::init() {
 	bool res = err_surface->load(tmp_path);
 	// Verifica si cargo bien o no
 	if(!res) {
-		std::cerr << "Error loading error surface\n";
+		err_log.escribir("Error loading error surface\n");
 		delete err_surface;
 		err_surface = NULL;
 	}
 }
 
 // Agrega el recurso con nombre name ubicado en el path dado por path
-// Devuelve true o false y loggea a std::cerr en caso de error
+// Devuelve true o false y loggea en caso de error
 bool ResMan::addRes(const std::string& name, const std::string& path) {
 	// Checkea que el resource con ese nombre no exista
 	if(surface_map.find(name) != surface_map.end()) {
-		std::cerr << "Error, resource <" << name << "> already exists\n";
+		std::stringstream ss;
+		ss << "Error, resource <" << name << "> already exists\n";
+		err_log.escribir(ss.str());
 		return false;
 	}
 	// Caso contrario intenta cargarlo
@@ -47,7 +51,9 @@ bool ResMan::addRes(const std::string& name, const std::string& path) {
 	bool load_res = tmp->load(path);
 	// Verifica si cargo bien o no
 	if(!load_res) {
-		std::cerr << "Error loading resource <" << name << ">\n";
+		std::stringstream ss;
+		ss << "Error loading resource <" << name << ">\n";
+		err_log.escribir(ss.str());
 		return false;
 	}else{
 		// Guardamos en caso de exito
@@ -57,12 +63,14 @@ bool ResMan::addRes(const std::string& name, const std::string& path) {
 }
 
 // Agrega el recurso con nombre name ubicado en el path dado por path
-// Devuelve true o false y loggea a std::cerr en caso de error
+// Devuelve true o false y loggea en caso de error
 // Version con color key
 bool ResMan::addRes(const std::string& name, const std::string& path, const int colorKey) {
 	// Checkea que el resource con ese nombre no exista
 	if(surface_map.find(name) != surface_map.end()) {
-		std::cerr << "Error, resource <" << name << "> already exists\n";
+		std::stringstream ss;
+		ss << "Error, resource <" << name << "> already exists\n";
+		err_log.escribir(ss.str());
 		return false;
 	}
 	// Caso contrario intenta cargarlo
@@ -70,7 +78,9 @@ bool ResMan::addRes(const std::string& name, const std::string& path, const int 
 	bool load_res = tmp->load(path, colorKey);
 	// Verifica si cargo bien o no
 	if(!load_res) {
-		std::cerr << "Error loading resource <" << name << ">\n";
+		std::stringstream ss;
+		ss << "Error loading resource <" << name << ">\n";
+		err_log.escribir(ss.str());
 		return false;
 	}else{
 		// Guardamos en caso de exito
@@ -85,7 +95,9 @@ Surface* ResMan::getRes(const std::string& name) const {
 	if(surface_map.find(name) != surface_map.end()) {
 		return surface_map.find(name)->second;
 	}else{
-		std::cerr << "Error, resource <" << name << "> requested\n";
+		std::stringstream ss;
+		ss << "Error, surface <" << name << "> requested\n";
+		err_log.escribir(ss.str());
 		return err_surface; // Devuelve la surface de error precargada
 	}
 }

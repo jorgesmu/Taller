@@ -1,4 +1,6 @@
 #include "coordenadas.h"
+#include "logErrores.h"
+#include <sstream>
 
 vec2<int> tileWalk(const vec2<int>& current, int dir) {
 	switch(dir) {
@@ -19,8 +21,11 @@ vec2<int> tileWalk(const vec2<int>& current, int dir) {
 		case GDIR::NE:
 			return current + vec2<int>(-1, 0);
 		// En caso de error
-		default:
-			std::cerr << "Error, requested tileWalk with invalid direction (" << dir << ")\n";
+		default: {
+			std::stringstream ss;
+			ss << "Error, requested tileWalk with invalid direction (" << dir << ")\n";
+			err_log.escribir(ss.str());
 			return current;
+		}
 	}
 }

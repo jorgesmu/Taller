@@ -25,7 +25,7 @@ escenarios:
     size_y: 20
     entidadesDef:
       - {x: 3, y: 5, entidad: piso}
-      - {x: 0, y: 0, entidad: casa}
+      - {x: 10, y: 10, entidad: casa}
     protagonista:
       - tipoEntidad: personaje
         x: 1

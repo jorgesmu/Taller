@@ -357,3 +357,6 @@ class logErrores {
 			}
 		}*/
 };
+
+// Para declararlo como global (se define en main)
+extern logErrores err_log;

@@ -19,7 +19,7 @@ class ResMan {
 	// Carga la surface de error 
 	void init(); 
 	// Agrega el recurso con nombre name ubicado en el path dado por path
-	// Devuelve true o false y loggea a std::cerr en caso de error
+	// Devuelve true o false y loggea en caso de error
 	// La primera version es sin color key, la segunda con
 	bool addRes(const std::string& name, const std::string& path);
 	bool addRes(const std::string& name, const std::string& path, const int colorKey);

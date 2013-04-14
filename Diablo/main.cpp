@@ -38,6 +38,9 @@ int main(int argc, char* args[]) {
 	camara.init(pantalla->get_ancho(), pantalla->get_alto(), configuracion.get_margen_scroll());
 
 	// Mapa
+	Mapa mapa;
+	mapa.resize(escenarios[0].get_tam_x(), escenarios[0].get_tam_x());
+	// Resman
 	ResMan resman;
 	resman.init();
 
@@ -47,8 +50,8 @@ int main(int argc, char* args[]) {
 		resman.addRes(it->get_nombre(), it->get_path_imagen(), Imagen::COLOR_KEY);
 		Entidad* entidad;
 		if(it->get_fps() == -1){
-			entidad = new Entidad (it->get_nombre(), it->get_ancho_base(), it->get_alto_base(), it->get_pixel_ref_x(), it->get_pixel_ref_y(),
-								NULL, resman, Imagen::COLOR_KEY);
+			entidad = new EntidadFija (it->get_nombre(), it->get_ancho_base(), it->get_alto_base(), it->get_pixel_ref_x(), it->get_pixel_ref_y(),
+								NULL, &mapa, resman, Imagen::COLOR_KEY);
 		}else{
 			entidad = new Entidad (it->get_nombre(), it->get_ancho_base(), it->get_alto_base(), it->get_fps(), it->get_delay(),
 								it->get_pixel_ref_x(), it->get_pixel_ref_y(), NULL, resman, Imagen::COLOR_KEY);		
@@ -60,12 +63,17 @@ int main(int argc, char* args[]) {
 	resman.addRes("tierraDefault", "../resources/tile.bmp");
 	Entidad entidadPisoPorDefecto("tierraDefault", 1 , 1 , 0 , 0 , NULL, resman , Imagen::COLOR_KEY);
 
-	// Inicializo el mapa
-	Mapa mapa;
-	mapa.resize(escenarios[0].get_tam_x(), escenarios[0].get_tam_x());
 	// Vector de entidades en este mapa
 	vector<config_entidad_en_juego> entidades_en_juego = escenarios[0].get_entidades();
 	
+	// Revisamos que no haya quedado ningun tile sin entidades
+	// Si hay alguno le ponemos la entidad por defecto
+	for(auto it = mapa.allTiles().begin();it != mapa.allTiles().end(); ++it) {
+		if(it->sinEntidades()) {
+			it->addEntidad((Entidad*)&entidadPisoPorDefecto);
+		}
+	}
+
 	// Llenamos el mapa con las entidades
 	for(auto it = entidades_en_juego.begin(); it != entidades_en_juego.end(); ++it){
 		bool entidad_encontrada = false;
@@ -82,13 +90,7 @@ int main(int argc, char* args[]) {
 		}
 	}
 	 
-	// Revisamos que no haya quedado ningun tile sin entidades
-	// Si hay alguno le ponemos la entidad por defecto
-	for(auto it = mapa.allTiles().begin();it != mapa.allTiles().end(); ++it) {
-		if(it->sinEntidades()) {
-			it->addEntidad((Entidad*)&entidadPisoPorDefecto);
-		}
-	}
+
 
 	// Agrega el personaje
 	Personaje personaje(escenarios[0].get_protagonista().get_nombre() , 1 , 1 , 50 , 5, 100, 100 ,	configuracion.get_vel_personaje(),	0 , 70 , NULL , resman , Imagen::COLOR_KEY);

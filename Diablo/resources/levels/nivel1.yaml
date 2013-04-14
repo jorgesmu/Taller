@@ -10,10 +10,10 @@ entidades:
   
   - nombre: casa
     imagen: ../resources/Casa400x400.bmp
-    ancho_base: 3
-    alto_base: 3
-    pixel_ref_x: 30
-    pixel_ref_y: 40
+    ancho_base: 4
+    alto_base: 4
+    pixel_ref_x: 150
+    pixel_ref_y: 185
 
   - nombre: personaje
     imagen: ../resources/Soldado.bmp
@@ -25,7 +25,7 @@ escenarios:
     size_y: 20
     entidadesDef:
       - {x: 3, y: 5, entidad: piso}
-      - {x: 5, y: 6, entidad: casa}
+      - {x: 0, y: 0, entidad: casa}
     protagonista:
       - tipoEntidad: personaje
         x: 1

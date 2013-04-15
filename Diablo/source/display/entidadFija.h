@@ -152,8 +152,14 @@ protected:
 	virtual void blit(SDL_Surface* dest, Camara* camara , Mapa* mapa,
 					const unsigned int tileX ,	const unsigned int tileY);
 	
+	//deprecated
 	virtual void setTileActual(Tile* tile);
 
+	/*
+		Pre: La instancia ha sido creada.
+
+		Post: Si la instancia no tiene definida sus anclas, setea la posicion y las anclas.
+	*/
 	virtual void setTileActual(Tile* tile , Mapa* mapa);
 
 protected:	

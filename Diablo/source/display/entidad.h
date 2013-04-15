@@ -330,5 +330,4 @@ protected:
 
 	virtual Tile* obtenerTileAncla(const int posX , const int posY , 
 								const unsigned int direccion , Mapa* mapa);
-
 };

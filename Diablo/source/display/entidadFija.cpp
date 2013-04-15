@@ -187,11 +187,31 @@
 		if ( (this -> imagen != NULL) && (this -> surf != NULL) &&
 			(camara != NULL) ) {
 			if(this -> surf -> getSDL_Surface() != NULL){
-				int posX;
-				int posY;
-				posX = this -> posX - (int)(camara -> getX()) - this -> pixel_ref_x;
-				posY = this -> posY - (int)(camara -> getY()) - this -> pixel_ref_y;
-				this -> surf -> blit(dest , posX , posY);		
+				if( (this -> widthInTiles <= 1) && (this -> highInTiles <= 1)) {
+					int posX;
+					int posY;
+					posX = (int)tileX - (int)(camara -> getX()) - this -> pixel_ref_x;
+					posY = (int)tileY - (int)(camara -> getY()) - this -> pixel_ref_y;
+					this -> surf -> blit(dest , tileX , tileY);	
+				}
+				else {
+					if ( ((tileX == posX) && (tileY == posY)) || (this -> tileAncla == NULL) ){
+						int posX = this -> posX - (int)(camara -> getX()) - this -> pixel_ref_x;
+						int posY = this -> posY - (int)(camara -> getY()) - this -> pixel_ref_y;
+						this -> surf -> blit(dest , posX , posY);
+					} else{
+						int posX;
+						int posY = this -> posY - (int)(camara -> getY()) - this -> pixel_ref_y;
+						int delta = (int)tileX - this -> tileAncla -> getX();
+						SDL_Rect rect;					
+						posX = this -> posX - (int)(camara -> getX()) - this -> pixel_ref_x + delta;
+						rect.x = delta;
+						rect.y = 0;
+						rect.h = this -> imagen -> getAlto();
+						rect.w = Tile::TILE_ANCHO;
+						this -> surf -> blit(dest , posX , posY , rect);
+					}
+				}
 			}
 		}
 	}
@@ -205,33 +225,46 @@
 		int delta = 1;
 		Tile* anclaPrincipal = mapa -> getTilePorPixeles(this -> posX , this -> posY);
 		if (anclaPrincipal != NULL){
+			bool anclaPrincipalHallada = false;
 			this -> tileAncla = anclaPrincipal;
-		}
-		while(contTilesX < (int)(this -> widthInTiles)){
-			bool salida = false;
-			int contTilesY = 0;
-			while((contTilesY < (int)(this -> highInTiles)) && (!salida)){
-				int posAnclaX = this -> posX + (contTilesX - contTilesY) * Tile::TILE_ANCHO/2;
-				int posAnclaY = this -> posY + (contTilesY + contTilesX)*Tile::TILE_ALTO/2;
-				Tile* ancla = mapa -> getTilePorPixeles(posAnclaX , posAnclaY);
-				if (ancla != NULL){
-					ancla -> addEntidad(this);
-					contTilesY += delta;
-				} else {
-					salida = true;
+			while(contTilesX < (int)(this -> widthInTiles)){
+				bool salida = false;
+				int contTilesY = 0;
+				Tile* ancla = NULL;
+				while((contTilesY < (int)(this -> highInTiles)) && (!salida)){
+					int posAnclaX = this -> posX + (contTilesX - contTilesY) * Tile::TILE_ANCHO/2;
+					int posAnclaY = this -> posY + (contTilesY + contTilesX)*Tile::TILE_ALTO/2;
+					Tile* ancla = mapa -> getTilePorPixeles(posAnclaX , posAnclaY);
+					if (ancla != NULL){
+						ancla -> addEntidad(this);
+						contTilesY += delta;
+						if(!anclaPrincipalHallada){
+							this -> tileAncla = ancla;
+						}
+					} else {
+						salida = true;
+					}
 				}
+				anclaPrincipalHallada = true;
+				contTilesX += delta;
 			}
-			contTilesX += delta;
-		}			
+		}
 	}
 
+	//Deprecated
 	void EntidadFija::setTileActual(Tile* tile){
 		
 	}
 
+	
+	/*
+		Pre: La instancia ha sido creada.
+
+		Post: Si la instancia no tiene definida sus anclas, setea la posicion y las anclas.
+	*/
 	void EntidadFija::setTileActual(Tile* tile , Mapa* mapa){
 		//se puede anclar una sola vez
-		if ( (tile != NULL) && (mapa != NULL) ){
+		if ( (tile != NULL) && (mapa != NULL) && (tileAncla == NULL)){
 			this -> posX = tile -> getX();
 			this -> posY = tile -> getY();
 			this -> agregarAnclas(mapa);

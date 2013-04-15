@@ -11,7 +11,7 @@
 	void Entidad::inicializarAtributosEnValoresDefault() {
 		//posicion
 		this -> posX = 0;
-		this -> posX = 0;
+		this -> posY = 0;
 		//tile destino
 		this -> tileDestino = NULL;
 		//tile ancla
@@ -431,39 +431,40 @@
 		//Calculo de direccion
 		unsigned int direccion = this -> calcularDireccion(mapa);
 		// Si la direccion llego al tile
-		if (direccion != CENTRO) {
-			// Calculo posicion siguiente (tomando en cuenta pixel de referencia y la posicion actual)
-			int posPixelSiguienteX = 0;
-			int posPixelSiguienteY = 0;
-			this -> calcularPosicionTentativa(direccion , &posPixelSiguienteX , &posPixelSiguienteY);
-			// Obtengo el tile siguiente
-			Tile* tileSiguiente = mapa -> getTilePorPixeles(posPixelSiguienteX , posPixelSiguienteY);
-			// Si el tileSiguiente es no nulo continua, sino no hace nada
-			if (tileSiguiente != NULL){
-				// Obtengo el tile del ancla nueva
-				Tile* tileAnclaSiguiente = this -> obtenerTileAncla(
-										posPixelSiguienteX , posPixelSiguienteY , 
-										direccion , mapa);
-				this -> posX = posPixelSiguienteX;
-				this -> posY = posPixelSiguienteY; 
-				// Ancla Siguiente distinta a ancla actual
-				if (tileAnclaSiguiente != NULL){
-					if(tileAnclaSiguiente != this -> tileAncla ) {
-						if (tileAncla != NULL) {
-							this -> tileAncla -> deleteEntidad(this);
+		if(this->tileDestino != NULL) {
+			if( (this ->posX != tileDestino->getX()) || (this->posY != tileDestino->getY())){
+				// Calculo posicion siguiente (tomando en cuenta pixel de referencia y la posicion actual)
+				int posPixelSiguienteX = 0;
+				int posPixelSiguienteY = 0;
+				this -> calcularPosicionTentativa(direccion , &posPixelSiguienteX , &posPixelSiguienteY);
+				// Obtengo el tile siguiente
+				Tile* tileSiguiente = mapa -> getTilePorPixeles(posPixelSiguienteX , posPixelSiguienteY);
+				// Si el tileSiguiente es no nulo continua, sino no hace nada
+				if (tileSiguiente != NULL){
+					// Obtengo el tile del ancla nueva
+					Tile* tileAnclaSiguiente = this -> obtenerTileAncla(
+									posPixelSiguienteX , posPixelSiguienteY , 
+									direccion , mapa);
+					this -> posX = posPixelSiguienteX;
+					this -> posY = posPixelSiguienteY; 
+					if (tileAnclaSiguiente != NULL){
+						if(tileAnclaSiguiente != this -> tileAncla ) {
+							if (tileAncla != NULL) {
+								this -> tileAncla -> deleteEntidad(this);
+							}
+							this -> tileAncla = tileAnclaSiguiente;
+							this -> tileAncla -> addEntidad(this);
 						}
-						this -> tileAncla = tileAnclaSiguiente;
-						this -> tileAncla -> addEntidad(this);
-					}
-				} else{
-					Tile* tileActual = mapa -> getTilePorPixeles(this -> posX , 
-																this -> posY);
-					if (tileActual != NULL) {
-						if (this -> tileAncla != NULL) {
-							this -> tileAncla -> deleteEntidad(this);
+					} else{
+						Tile* tileActual = mapa -> getTilePorPixeles(this -> posX , 
+															this -> posY);
+						if (tileActual != NULL) {
+							if (this -> tileAncla != NULL) {
+								this -> tileAncla -> deleteEntidad(this);
+							}
+							this -> tileAncla = tileActual;
+							this -> tileAncla -> addEntidad(this);
 						}
-						this -> tileAncla = tileActual;
-						this -> tileAncla -> addEntidad(this);
 					}
 				}
 			}
@@ -515,6 +516,11 @@
 					(*offsetTentativoY)-=Entidad::DELTA_AVANCE;
 					break;
 				}
+				case CENTRO : {
+					(*offsetTentativoX)+= this -> tileDestino -> getX() - this -> posX;
+					(*offsetTentativoY)+= this -> tileDestino -> getY() - this -> posY;
+					break;
+				}
 		}
 	}
 
@@ -531,10 +537,9 @@
 	Tile* Entidad::obtenerTileAncla(const int posX , const int posY , 
 													const unsigned int direccion , Mapa* mapa){
 		Tile* retorno = NULL;
-		int posImagenX = posX + this -> imagen -> getAncho() - this -> pixel_ref_x + 
-						Entidad::MARGEN_ANCLA_X;
-		int posImagenY = posY + this -> imagen -> getAlto() - this -> pixel_ref_y + 
-						Entidad::MARGEN_ANCLA_Y;
+		int posImagenX = posX;
+		int posImagenY = posY + Tile::TILE_ALTO + Entidad::MARGEN_ANCLA_Y;
+
 		retorno = mapa -> getTilePorPixeles(posImagenX , posImagenY);
 		if (retorno == NULL){
 			int posImagenX = posX - this -> pixel_ref_x;

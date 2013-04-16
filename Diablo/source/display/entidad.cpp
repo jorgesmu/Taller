@@ -539,11 +539,18 @@
 		Tile* retorno = NULL;
 		int posImagenX = posX;
 		int posImagenY = posY + Tile::TILE_ALTO + Entidad::MARGEN_ANCLA_Y;
-
 		retorno = mapa -> getTilePorPixeles(posImagenX , posImagenY);
 		if (retorno == NULL){
-			int posImagenX = posX - this -> pixel_ref_x;
+			posImagenY = posY + Tile::TILE_ALTO;
 			retorno = mapa -> getTilePorPixeles(posImagenX , posImagenY);
+			if (retorno == NULL) {
+				posImagenX = posX - Tile::TILE_ANCHO;
+				posImagenY = posY + Tile::TILE_ALTO/2;
+				if(retorno == NULL) {
+					posImagenX = posX - this -> pixel_ref_x;
+					retorno = mapa -> getTilePorPixeles(posImagenX , posImagenY);
+				}
+			}
 		}
 		return retorno;
 	}

@@ -8,6 +8,11 @@ entidades:
   - nombre: piso
     imagen: ../resources/tile2.bmp
   
+  - nombre: agua
+    imagen: ../resources/tileAgua.bmp
+    fps: 10
+    delay: 700
+
   - nombre: casa
     imagen: ../resources/Casa400x400.bmp
     ancho_base: 4
@@ -15,17 +20,28 @@ entidades:
     pixel_ref_x: 150
     pixel_ref_y: 185
 
+  - nombre: molino
+    imagen: ../resources/molino300x320.bmp
+    ancho_base: 3
+    alto_base: 3
+    pixel_ref_x: 120
+    pixel_ref_y: 100
+    fps: 10
+    delay: 1000
+
   - nombre: personaje
     imagen: ../resources/Soldado.bmp
     fps: 10
 
 escenarios:
   - nombre: bosque_encantado
-    size_x: 20
-    size_y: 20
+    size_x: 100
+    size_y: 100
     entidadesDef:
       - {x: 3, y: 5, entidad: piso}
       - {x: 10, y: 10, entidad: casa}
+      - {x: 20, y: 20, entidad: molino}
+      - {x: 6, y: 6, entidad: agua}
     protagonista:
       - tipoEntidad: personaje
         x: 1

@@ -1,2 +1,1 @@
-esta es mi linea1
-esta es mi linea2
+-ERROR: Ocurrio un error con la Yaml. El formato no corresponde a un archivo YAML.

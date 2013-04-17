@@ -376,10 +376,11 @@ config_juego parser_nivel(char* path){
 	verificar_tags_ppales(doc);
 	err_log.verificar_errores(pantalla,err_log);
 	err_log.verificar_errores(config,err_log);
-	err_log.verificar_errores(entidades,err_log);
+	entidades = err_log.verificar_errores(entidades,err_log);
 	err_log.verificar_errores(escenarios, err_log, entidades);
 	err_log.verificar_unicidad_entidades (entidades, err_log);
 	escenarios = err_log.verificar_correspondencia_escenario(err_log,entidades, escenarios);
+	escenarios = err_log.verificar_limites_entidades(err_log,entidades,escenarios);
 	//asigno atributos al juego
  	juego.set_pantalla(pantalla);
 	juego.set_escenarios(escenarios);

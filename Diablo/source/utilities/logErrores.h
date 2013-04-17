@@ -110,8 +110,8 @@ class logErrores {
 			}
 		}
 		//verfica errores de entidades
-		void verificar_errores(vector <config_entidad>& config, logErrores& logErrores){
-
+		vector<config_entidad> verificar_errores(vector <config_entidad>& config, logErrores& logErrores){
+			vector<config_entidad> entidadesDefinitivas;
 			for ( unsigned int i=0; i < config.size(); i++){		
 				//agarro los valores de la entidad
 				config_entidad unaEntidad = config[i];
@@ -164,22 +164,20 @@ class logErrores {
 					unaEntidad.set_pixel_ref_y(pixelRefYDef);			
 				}
 				if ( unaEntidad.get_completo_fps() == false){
-					logErrores.escribir ("No se ingreso el fps de una entidad "+ nombre +", se selecciona valor por defecto");
-					unaEntidad.set_fps(fpsDef);
+						unaEntidad.set_fps(fpsDef);
 				}else if( fps < 0 ){
 					logErrores.escribir ("El fps de una entidad "+ nombre +" ingresada es menor que la unidad, se selecciona valor por defecto");
 					unaEntidad.set_fps(fpsDef);		
 				}
 				if ( unaEntidad.get_completo_delay() == false){
-					logErrores.escribir ("No se ingreso el delay de una entidad "+ nombre +", se selecciona valor por defecto");
 					unaEntidad.set_delay(delayDef);
 				}else if( delay < 0 ){
 					logErrores.escribir ("El delay de una entidad "+ nombre +" ingresada es menor que la unidad, se selecciona valor por defecto");
 					unaEntidad.set_delay(delayDef);		
 				}
-
+				entidadesDefinitivas.push_back(unaEntidad);
 			}
-
+			return entidadesDefinitivas;
 		}
 		//verfica errores de entidades en juego, con el flag esProtagonista es para imprimir errores segun
 		//sea protagonista o entidad
@@ -408,7 +406,67 @@ class logErrores {
 			}
 			return escenariosDefinitivos;
 		}
+		//devuelve la entidad que tiene el nombre deseado
+		config_entidad buscar_entidad(vector<config_entidad> entidades,string nombre){
+			unsigned int size = entidades.size();
+			bool encontrado = false;
+			unsigned int indice = 0;
+			config_entidad_en_juego resultado();
+			while ( (!encontrado) && (indice<size) ){
+				config_entidad otraEntidad = entidades[indice];
+				if ( otraEntidad.get_nombre() == nombre){
+					encontrado = true;
+				}
+				indice++;
+			}
+			return entidades[indice-1];
+		}
+		//verifica los limites de un escenario
+		void verificar_limites_un_escenario (logErrores& logErrores,vector<config_entidad>& entidades,
+			config_escenario& unEscenario)
+		{
+			vector <config_entidad_en_juego> entidadesEnJuego = unEscenario.get_entidades();
 
+			vector<config_entidad_en_juego> entidadesDefinitivas;
+			for (unsigned int i = 0; i<entidadesEnJuego.size();i++){
+				//busco la entidad correspondiente
+				config_entidad_en_juego unaEntidadEnJuego = entidadesEnJuego[i];
+				config_entidad unaEntidadDeclarada = buscar_entidad(entidades,unaEntidadEnJuego.get_nombre());
+
+				int pos_x = unaEntidadEnJuego.get_pos_x();
+				int pos_y = unaEntidadEnJuego.get_pos_y();
+				int ancho = unaEntidadDeclarada.get_ancho_base(); 
+				int alto = unaEntidadDeclarada.get_alto_base();  
+				int tam_mapa_x = unEscenario.get_tam_x()-1;// se resta 1 ya que va en el rango(0-ancho)
+				int tam_mapa_y = unEscenario.get_tam_y()-1;// se resta 1 ya que va en el rango(0-alto)
+				int ultimo_tile_x = pos_x + ancho - 1; //se le resta uno porque el tile pos_x cuenta como 1
+				int ultimo_tile_y = pos_y + alto - 1;  //se le resta uno porque el tile pos_y cuenta como 1
+
+				//verifico si se va del mapa tipo error sino la agrego a la lista definitiva
+				if( (ultimo_tile_x > tam_mapa_x) || (ultimo_tile_y > tam_mapa_y) ){
+					logErrores.escribir("Hay una entidad "+ unaEntidadDeclarada.get_nombre() +" declarada en el mapa que sale de los limites, se elimina la misma");
+				}else{
+					entidadesDefinitivas.push_back(unaEntidadEnJuego);
+				}
+			}
+			unEscenario.set_entidades(entidadesDefinitivas);
+		}
+
+		//verifica si las entidades no salen del mapa
+		vector<config_escenario> verificar_limites_entidades (logErrores& logErrores,vector<config_entidad>& entidades, vector
+			<config_escenario>& escenarios)
+		{
+			vector<config_escenario> escenariosDefinitivos;
+			for (unsigned int i=0; i < escenarios.size();i++){
+				//para cada escenario verificamos si las entidades y protagonistas en juego corresponden
+				//con alguna entidad declarada
+				config_escenario unEscenario = escenarios[i];
+				vector<config_entidad_en_juego> entidadesEnJuego = unEscenario.get_entidades();
+				verificar_limites_un_escenario(logErrores,entidades,unEscenario);
+				escenariosDefinitivos.push_back(unEscenario);
+			}
+			return escenariosDefinitivos;
+		}
 };
 
 // Para declararlo como global (se define en main)

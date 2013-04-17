@@ -42,7 +42,7 @@ escenarios:
     entidadesDef:
       - {x: 3, y: 5, entidad: piso}
       - {x: 10, y: 10, entidad: casa}
-      - {x: 20, y: 20, entidad: molino}
+      - {x: 2, y: 2, entidad: molino}
       - {x: 6, y: 6, entidad: agua}
     protagonista:
       - tipoEntidad: personaje

@@ -327,7 +327,7 @@ config_juego parser_nivel(char* path){
 	juego.set_entidades(entidades);
 	juego.set_configuracion(config);
 	//cierro log
-	err_log.cerrarConexion();
+	//err_log.cerrarConexion(); // No se cierra mas aca ya que se usa el mismo archivo de log en todo el proyecto
 	//cerramos la conexion
 	archivo.close();
 

@@ -49,24 +49,20 @@ int main(int argc, char* args[]) {
 
 	// Cargo las entidades en un vector
 	std::vector<Entidad*> entidades_cargadas;
-	std::vector<EntidadFija*> entidades_animadas;
 	for (auto it = entidades.begin(); it != entidades.end(); ++it){
 		resman.addRes(it->get_nombre(), it->get_path_imagen(), Imagen::COLOR_KEY);
 		Entidad* entidad;
-		EntidadFija* entidadFija;
 		if((it->get_alto_sprite() > -1) || (it->get_ancho_sprite() > -1)){
-			entidadFija = new EntidadFija (it->get_nombre(), it->get_ancho_base(), it->get_alto_base(), it->get_fps(), it->get_delay(),
+			entidad = new EntidadFija (it->get_nombre(), it->get_ancho_base(), it->get_alto_base(), it->get_fps(), it->get_delay(),
 								it->get_alto_sprite(), it->get_ancho_sprite(), it->get_pixel_ref_x(), it->get_pixel_ref_y(), NULL, &mapa, resman, Imagen::COLOR_KEY);
-			entidades_animadas.push_back(entidadFija);
-		}
-		if(it->get_fps() == -1){
-			entidadFija = new EntidadFija (it->get_nombre(), it->get_ancho_base(), it->get_alto_base(), it->get_pixel_ref_x(), it->get_pixel_ref_y(),
-								NULL, &mapa, resman, Imagen::COLOR_KEY);
 		}else{
-			entidadFija = new EntidadFija (it->get_nombre(), it->get_ancho_base(), it->get_alto_base(), it->get_fps(), it->get_delay(),
+			if(it->get_fps() == -1){
+				entidad = new EntidadFija (it->get_nombre(), it->get_ancho_base(), it->get_alto_base(), it->get_pixel_ref_x(), it->get_pixel_ref_y(),
+								NULL, &mapa, resman, Imagen::COLOR_KEY);
+			}else{
+				entidad = new EntidadFija (it->get_nombre(), it->get_ancho_base(), it->get_alto_base(), it->get_fps(), it->get_delay(),
 								1, 1, it->get_pixel_ref_x(), it->get_pixel_ref_y(), NULL, &mapa, resman, Imagen::COLOR_KEY);
-
-			entidades_animadas.push_back(entidadFija);
+			}
 		}
 		entidades_cargadas.push_back(entidad);
 	}
@@ -163,11 +159,6 @@ int main(int argc, char* args[]) {
 			}
 			// Actualiza el personaje
 			personaje.update(&mapa);
-			for(auto it = entidades_animadas.begin(); it != entidades_animadas.end(); ++it){
-				if((*it)->get_nombre() != "personaje"){
-					(*it)->update(&mapa);
-				}
-			}
 			// Decrease al accum
 			accum -= CONST_DT;
 		}
@@ -184,9 +175,8 @@ int main(int argc, char* args[]) {
 	mapa.clean();
 	resman.clean();
 
-    Test::test();
+    //Test::test();
 
 	SDL_Quit();
-	 
     return 0;    
 }

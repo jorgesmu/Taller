@@ -43,9 +43,39 @@ escenarios:
     size_y: 100
     entidadesDef:
       - {x: 3, y: 5, entidad: piso}
-      - {x: 10, y: 10, entidad: casa}
-      - {x: 3, y: 3, entidad: molino}
+      - {x: 3, y: 6, entidad: piso}
+      - {x: 3, y: 7, entidad: piso}
+      - {x: 3, y: 8, entidad: piso}
+      - {x: 4, y: 5, entidad: piso}
+      - {x: 4, y: 6, entidad: piso}
+      - {x: 4, y: 7, entidad: piso}
+      - {x: 4, y: 8, entidad: piso}
+      - {x: 20, y: 20, entidad: piso}
+      - {x: 20, y: 21, entidad: piso}
+      - {x: 20, y: 22, entidad: piso}
+      - {x: 21, y: 20, entidad: piso}
+      - {x: 21, y: 21, entidad: piso}
+      - {x: 21, y: 22, entidad: casa}
+      - {x: 22, y: 20, entidad: piso}
+      - {x: 22, y: 21, entidad: piso}
       - {x: 6, y: 6, entidad: agua}
+      - {x: 6, y: 7, entidad: agua}
+      - {x: 7, y: 6, entidad: agua}
+      - {x: 7, y: 7, entidad: agua}
+      - {x: 30, y: 10, entidad: agua}
+      - {x: 30, y: 11, entidad: agua}
+      - {x: 30, y: 12, entidad: agua}
+      - {x: 30, y: 13, entidad: agua}
+      - {x: 31, y: 10, entidad: agua}
+      - {x: 31, y: 11, entidad: agua}
+      - {x: 31, y: 12, entidad: agua}
+      - {x: 31, y: 13, entidad: agua}
+      - {x: 10, y: 10, entidad: casa}
+      - {x: 30, y: 15, entidad: casa}
+      - {x: 50, y: 10, entidad: casa}
+      - {x: 3, y: 3, entidad: molino}
+      - {x: 15, y: 15, entidad: molino}
+      - {x: 80, y: 15, entidad: molino}
     protagonista:
       - tipoEntidad: personaje
         x: 1

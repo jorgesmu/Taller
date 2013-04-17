@@ -38,6 +38,8 @@ void Mapa::blit(SDL_Surface* dest, Camara& camara) {
 	// Calculamos el tile de la esquina superior izquierda
 	vec2<int> curr_tile = MouseCoords2Tile(vec2<int>(0, 0), camara);
 	// Lo movemos uno mas para el N y al E
+	curr_tile = tileWalk(curr_tile, GDIR::E);
+	curr_tile = tileWalk(curr_tile, GDIR::E);
 	curr_tile = tileWalk(curr_tile, GDIR::NE);
 	curr_tile = tileWalk(curr_tile, GDIR::N);
 	// Con esta variable controlamos si cuando bajamos de fila vamos hacia el SO o hacia el el SE

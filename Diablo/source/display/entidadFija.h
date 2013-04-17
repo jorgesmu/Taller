@@ -64,6 +64,10 @@ protected:
 			ResMan& rm , const int colorKey);
 
 	
+
+	EntidadFija::EntidadFija(EntidadFija* entidadFija);
+		
+		
 	/*
 		Pre: La instancia ha sido creada.
 		 

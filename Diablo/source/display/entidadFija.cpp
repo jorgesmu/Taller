@@ -140,6 +140,27 @@
 		}
 	}
 	
+
+
+
+	EntidadFija::EntidadFija(EntidadFija* entidadFija){
+		this->imagen = entidadFija->imagen;
+		this->widthInTiles = entidadFija->widthInTiles;
+		this->highInTiles = entidadFija->highInTiles;
+		this->tileDestino = entidadFija->tileDestino;
+		this->tileAncla = entidadFija->tileAncla;
+		this->surf = entidadFija->surf;
+		this->pixel_ref_x = entidadFija->pixel_ref_x;
+		this->pixel_ref_y = entidadFija->pixel_ref_y;
+		this->name = entidadFija->name;
+		this->deltaUpdatePosicion = entidadFija->deltaUpdatePosicion;
+		this->velocidad = entidadFija->velocidad;
+		this->tiempoProximoUpdate = entidadFija->tiempoProximoUpdate;
+		this->posX = entidadFija->posX;
+		this->posY = entidadFija->posY;
+		this->compartido = entidadFija->compartido;
+	}
+
 	/*
 		Pre: La instancia ha sido creada.
 		 
@@ -155,6 +176,7 @@
 		this -> tileAncla = NULL;
 	}
 	
+
 	// --------------------------------------------------------------------------
 
 	/*

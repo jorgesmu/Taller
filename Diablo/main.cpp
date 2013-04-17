@@ -64,10 +64,10 @@ int main(int argc, char* args[]) {
 	}
 
 	// Cargo las entidades en un vector
-	std::vector<Entidad*> entidades_cargadas;
+	std::vector<EntidadFija*> entidades_cargadas;
 	for (auto it = entidades.begin(); it != entidades.end(); ++it){
 		resman.addRes(it->get_nombre(), it->get_path_imagen(), Imagen::COLOR_KEY);
-		Entidad* entidad;
+		EntidadFija* entidad;
 		if(it->get_fps() > 0 && it->get_alto_sprite() > 0 && it->get_ancho_sprite() > 0){
 			entidad = new EntidadFija (it->get_nombre(), it->get_ancho_base(), it->get_alto_base(), it->get_fps(), it->get_delay(),
 								it->get_alto_sprite(), it->get_ancho_sprite(), it->get_pixel_ref_x(), it->get_pixel_ref_y(), NULL, &mapa, resman, Imagen::COLOR_KEY);
@@ -86,8 +86,12 @@ int main(int argc, char* args[]) {
 		bool entidad_encontrada = false;
 		for(auto it2 = entidades_cargadas.begin(); it2 != entidades_cargadas.end(); ++it2){
 			if(it->get_nombre() == (*it2)->get_nombre()){
-				mapa.getTile(it->get_pos_x(), it->get_pos_y())->addEntidad(*it2);
-				(*it2)->setTileActual(mapa.getTile(it->get_pos_x(), it->get_pos_y()), &mapa);
+				EntidadFija* copia;
+				
+				copia = new EntidadFija (*it2);
+
+				mapa.getTile(it->get_pos_x(), it->get_pos_y())->addEntidad(copia);
+				(copia)->setTileActual(mapa.getTile(it->get_pos_x(), it->get_pos_y()), &mapa);
 				entidad_encontrada = true;
 				break;
 			}

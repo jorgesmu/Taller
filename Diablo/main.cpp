@@ -1,5 +1,6 @@
 // SDL Headers
 #include "SDL.h"
+#include <SDL_getenv.h>
 // Our headers
 #include "source/utilities/timer.h"
 #include "source/utilities/surface.h"
@@ -30,12 +31,16 @@ int main(int argc, char* args[]) {
 
 	// Ventana de prueba
 	SDL_Surface* screen;
+	putenv("SDL_VIDEO_CENTERED=1"); // Para centrar la ventana
     SDL_Init(SDL_INIT_EVERYTHING);
-	// Para confinar el mouse a la ventana
-	//SDL_WM_GrabInput(SDL_GRAB_ON);
-	SDL_WarpMouse(800/2, 600/2);
 	// Init the window
-	screen = SDL_SetVideoMode(pantalla->get_ancho(), pantalla->get_alto(), 32, SDL_SWSURFACE);
+	screen = SDL_SetVideoMode(pantalla->get_ancho(), pantalla->get_alto(), 32, SDL_SWSURFACE|SDL_NOFRAME);
+	// Para confinar el mouse a la ventana
+	SDL_WM_GrabInput(SDL_GRAB_ON);
+	// Lo movemos al medio
+	SDL_WarpMouse(pantalla->get_ancho()/2, pantalla->get_alto()/2);
+	SDL_WM_SetCaption("Diablo", NULL);
+
 	// Camara
 	Camara camara;
 	camara.init(pantalla->get_ancho(), pantalla->get_alto(), configuracion.get_margen_scroll());

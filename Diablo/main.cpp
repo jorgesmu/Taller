@@ -49,24 +49,24 @@ int main(int argc, char* args[]) {
 
 	// Cargo las entidades en un vector
 	std::vector<Entidad*> entidades_cargadas;
-	std::vector<Entidad*> entidades_animadas;
+	std::vector<EntidadFija*> entidades_animadas;
 	for (auto it = entidades.begin(); it != entidades.end(); ++it){
 		resman.addRes(it->get_nombre(), it->get_path_imagen(), Imagen::COLOR_KEY);
 		Entidad* entidad;
 		EntidadFija* entidadFija;
-		if(it->get_nombre() == "molino"){
+		if((it->get_alto_sprite() > -1) || (it->get_ancho_sprite() > -1)){
 			entidadFija = new EntidadFija (it->get_nombre(), it->get_ancho_base(), it->get_alto_base(), it->get_fps(), it->get_delay(),
-								300, 320, it->get_pixel_ref_x(), it->get_pixel_ref_y(), NULL, &mapa, resman, Imagen::COLOR_KEY);
+								it->get_alto_sprite(), it->get_ancho_sprite(), it->get_pixel_ref_x(), it->get_pixel_ref_y(), NULL, &mapa, resman, Imagen::COLOR_KEY);
 			entidades_animadas.push_back(entidadFija);
 		}
 		if(it->get_fps() == -1){
-			entidad = new EntidadFija (it->get_nombre(), it->get_ancho_base(), it->get_alto_base(), it->get_pixel_ref_x(), it->get_pixel_ref_y(),
+			entidadFija = new EntidadFija (it->get_nombre(), it->get_ancho_base(), it->get_alto_base(), it->get_pixel_ref_x(), it->get_pixel_ref_y(),
 								NULL, &mapa, resman, Imagen::COLOR_KEY);
 		}else{
-			entidad = new Entidad (it->get_nombre(), it->get_ancho_base(), it->get_alto_base(), it->get_fps(), it->get_delay(),
-								it->get_pixel_ref_x(), it->get_pixel_ref_y(), NULL, resman, Imagen::COLOR_KEY);
+			entidadFija = new EntidadFija (it->get_nombre(), it->get_ancho_base(), it->get_alto_base(), it->get_fps(), it->get_delay(),
+								1, 1, it->get_pixel_ref_x(), it->get_pixel_ref_y(), NULL, &mapa, resman, Imagen::COLOR_KEY);
 
-			entidades_animadas.push_back(entidad);
+			entidades_animadas.push_back(entidadFija);
 		}
 		entidades_cargadas.push_back(entidad);
 	}

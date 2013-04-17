@@ -124,6 +124,14 @@ void operator >> (const YAML::Node& node, vector <config_entidad>& entidades) {
 				creoEntidad = true;
 				nuevaEntidad.completo_delay();
 				nuevaEntidad.set_delay(atoi(valor.c_str()));
+			}else if (clave == "alto_sprite"){
+				creoEntidad = true;
+				nuevaEntidad.completo_alto_sprite();
+				nuevaEntidad.set_alto_sprite(atoi(valor.c_str()));
+			}else if (clave == "ancho_sprite"){
+				creoEntidad = true;
+				nuevaEntidad.completo_ancho_sprite();
+				nuevaEntidad.set_ancho_sprite(atoi(valor.c_str()));
 			}else {
 				err_log.escribir("atributo de entidad erroeneo",clave,valor);
 			}

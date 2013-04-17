@@ -6,8 +6,9 @@ class config_entidad {
 
 	private:
 		std::string nombre,path_imagen;
-		int ancho_base,alto_base,pixel_ref_x,pixel_ref_y,fps,delay;
-		bool completoNombre, completoPath, completoAncho, completoAlto, completoPixelX, completoPixelY, completoFps, completoDelay;
+		int ancho_base,alto_base,pixel_ref_x,pixel_ref_y,fps,delay,alto_sprite,ancho_sprite;
+		bool completoNombre, completoPath, completoAncho, completoAlto, completoPixelX, completoPixelY, completoFps, 
+			completoDelay, completoAltoSprite, completoAnchoSprite;
 
 	public:
 		//Constructor
@@ -31,6 +32,10 @@ class config_entidad {
 
 		int get_delay() { return delay;}
 
+		int get_alto_sprite() { return alto_sprite;}
+
+		int get_ancho_sprite() { return ancho_sprite;}
+		
 		//gets de los flags de control
 		bool get_completo_nombre() { return completoNombre;}
 		
@@ -48,6 +53,10 @@ class config_entidad {
 
 		bool get_completo_delay() { return completoDelay;}
 		
+		bool get_completo_alto_sprite() { return completoAltoSprite;}
+
+		bool get_completo_ancho_sprite() { return completoAnchoSprite;}
+
 		//Setters
 		void set_nombre(std::string newValue) { nombre = newValue;}
 
@@ -64,6 +73,10 @@ class config_entidad {
 
 		void set_delay(int newValue) { delay = newValue;}
 		
+		void set_alto_sprite(int newValue) { alto_sprite = newValue;}
+
+		void set_ancho_sprite(int newValue) { ancho_sprite = newValue;}
+
 		//metodos para completar validaciones
 				//metodos para completar validaciones
 		void completo_nombre(){
@@ -90,5 +103,11 @@ class config_entidad {
 		}
 		void completo_delay(){
 			completoDelay = true;
+		}
+		void completo_alto_sprite(){
+			completoAltoSprite = true;
+		}
+		void completo_ancho_sprite(){
+			completoAnchoSprite = true;
 		}
 };

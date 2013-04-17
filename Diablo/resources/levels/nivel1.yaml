@@ -28,6 +28,8 @@ entidades:
     pixel_ref_y: 100
     fps: 10
     delay: 1000
+    alto_sprite: 300
+    ancho_sprite: 320
 
   - nombre: personaje
     imagen: ../resources/Soldado.bmp

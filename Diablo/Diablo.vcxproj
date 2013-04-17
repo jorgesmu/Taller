@@ -34,6 +34,7 @@
     <ClCompile Include="source\utilities\logErrores.cpp" />
     <ClCompile Include="source\utilities\parser.cpp" />
     <ClCompile Include="source\utilities\Personaje.cpp" />
+    <ClCompile Include="source\utilities\PersonajeAutomatico.cpp" />
     <ClCompile Include="source\utilities\PruebasParser.cpp" />
     <ClCompile Include="source\utilities\surface.cpp" />
     <ClCompile Include="source\utilities\Test.cpp" />
@@ -64,6 +65,7 @@
     <ClInclude Include="source\utilities\logErrores.h" />
     <ClInclude Include="source\utilities\parser.h" />
     <ClInclude Include="source\utilities\Personaje.h" />
+    <ClInclude Include="source\utilities\PersonajeAutomatico.h" />
     <ClInclude Include="source\utilities\PruebasParser.h" />
     <ClInclude Include="source\utilities\surface.h" />
     <ClInclude Include="source\utilities\Test.h" />

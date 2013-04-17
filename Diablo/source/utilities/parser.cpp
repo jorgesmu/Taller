@@ -13,7 +13,11 @@
 using namespace std;
 
 const int errorConstante = -1;
-
+//VARIABLES GLOBALES
+config_pantalla pantalla(-1,-1);
+vector <config_entidad> entidades;
+config_general config(-1,-1);
+vector <config_escenario> escenarios;
 //lee e imprime un archivo
 void imprimir_documento(char* path){
 		//se puede mejorar pero es solo una clase de test
@@ -324,35 +328,24 @@ void verificar_tags_ppales(YAML::Node& nodoPpal){
 }
 config_juego parser_nivel(char* path){
 
-	//imprimo el documento para mirar si lo que imprime yaml esta bien
-	//imprimir_documento(path);
 
-
-	//cout << endl << "Test parsear completo." << endl;
-	cout << "Contenido parseado con Yaml: " << endl;
 	//abro el documento y parseo el nodo
 	std::ifstream archivo(path);
 	YAML::Parser parser(archivo);
 	YAML::Node doc;
 	parser.GetNextDocument(doc);
 	//declaro variables resultado
-	config_pantalla pantalla(-1,-1);
-	vector <config_entidad> entidades;
-	config_general config(-1,-1);
-	vector <config_escenario> escenarios;
 	config_juego juego;
 
 
 	//parseo pantalla
 	if(const YAML::Node *pName = doc.FindValue("pantalla")) {
-		cout << "pantalla existe" << endl;
 		doc["pantalla"] >> pantalla;
 	}else{
 		err_log.escribir("No existe el valor pantalla");
 	}
 	//parseo escenarios
 	if(const YAML::Node *pName = doc.FindValue("escenarios")) {
-		cout << "escenarios existe" << endl;
 		doc["escenarios"] >> escenarios;
 	}else{
 		err_log.escribir("No existe el valor escenarios");
@@ -360,14 +353,12 @@ config_juego parser_nivel(char* path){
 	//parseo entidades
 	if(const YAML::Node *pName = doc.FindValue("entidades")) {
 		doc["entidades"] >> entidades;
-		cout << "entidades existe" << endl;
 	}else{
 		err_log.escribir( "No existe el valor entidades." );
 	}
 	//parseo configuracion
 	if(const YAML::Node *pName = doc.FindValue("configuracion")) {
 		doc["configuracion"] >> config;
-		cout << "configuracion existe" << endl;
 	}else{
 		err_log.escribir("No existe el valor configuracion" );
 	}
@@ -386,8 +377,7 @@ config_juego parser_nivel(char* path){
 	juego.set_escenarios(escenarios);
 	juego.set_entidades(entidades);
 	juego.set_configuracion(config);
-	//cierro log
-	err_log.cerrarConexion();
+
 	//cerramos la conexion
 	archivo.close();
 
@@ -397,16 +387,27 @@ config_juego parser_nivel(char* path){
 config_juego parsear(char* path){
 	//ejemplos basado en: https://code.google.com/p/yaml-cpp/wiki/HowToParseADocument
 	
-	cout << endl << endl << "Comienza Yaml parsing de nivel." << endl;
 	config_juego juego;
 	try{
 		juego = parser_nivel(path);
 	}catch (exception& e){
 		err_log.escribir("YAML exception catched. El archivo de configuracion no es YAML valido." );
 		err_log.escribir(e.what());
-		exit(-1);
-		//cierro log
-		err_log.cerrarConexion();
+		
+		//verifico que si hubo un error y no se que se lleno, los datos sean validos y se inicie el juego igual
+		//verificar errores 
+		err_log.verificar_errores(pantalla,err_log);
+		err_log.verificar_errores(config,err_log);
+		entidades = err_log.verificar_errores(entidades,err_log);
+		err_log.verificar_errores(escenarios, err_log, entidades);
+		err_log.verificar_unicidad_entidades (entidades, err_log);
+		escenarios = err_log.verificar_correspondencia_escenario(err_log,entidades, escenarios);
+		escenarios = err_log.verificar_limites_entidades(err_log,entidades,escenarios);
+		//asigno atributos al juego
+ 		juego.set_pantalla(pantalla);
+		juego.set_escenarios(escenarios);
+		juego.set_entidades(entidades);
+		juego.set_configuracion(config);
 	}
 
 	return juego;

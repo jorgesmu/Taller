@@ -179,7 +179,7 @@ int main(int argc, char* args[]) {
 	
 	mapa.clean();
 	resman.clean();
-
+	err_log.cerrarConexion();
     //Test::test();
 
 	SDL_Quit();

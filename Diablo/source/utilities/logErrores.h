@@ -58,16 +58,16 @@ class logErrores {
 			if ( (pantalla.get_completo_alto()) == false ){
 				logErrores.escribir ("No se ingreso el alto de la pantalla, se selecciona valor por defecto");
 				pantalla.set_alto(altoDef);
-			}else if ( alto < 0 ){
-				logErrores.escribir ("El alto de la pantalla ingresado es menor que la unidad, se selecciona valor por defecto") ;
+			}else if ( alto <= 0 ){
+				logErrores.escribir ("El alto de la pantalla ingresado es menor o igual que la unidad, se selecciona valor por defecto") ;
 				pantalla.set_alto(altoDef);			
 			}
 			//verifico ancho
 			if ( (pantalla.get_completo_ancho()) == false ){
 				logErrores.escribir ("No se ingreso el ancho de la pantalla, se selecciona valor por defecto");
 				pantalla.set_ancho(anchoDef);
-			}else if ( ancho < 0 ){
-				logErrores.escribir ("El ancho de la pantalla ingresado es menor que la unidad, se selecciona valor por defecto");
+			}else if ( ancho <= 0 ){
+				logErrores.escribir ("El ancho de la pantalla ingresado es menor o igual que la unidad, se selecciona valor por defecto");
 				pantalla.set_ancho(anchoDef);			
 			}
 
@@ -95,16 +95,16 @@ class logErrores {
 			if ( (config.get_completo_velocidad()) == false ){
 				logErrores.escribir ("No se ingreso la velocidad del personaje en la configuracion, se selecciona valor por defecto");
 				config.set_vel_personaje(VelPerDef);
-			}else if ( velocidad < 0 ){
-				logErrores.escribir ("La velocidad del personaje ingresada es menor que la unidad, se selecciona valor por defecto");
+			}else if ( velocidad <= 0 ){
+				logErrores.escribir ("La velocidad del personaje ingresada es menor o igual que la unidad, se selecciona valor por defecto");
 				config.set_vel_personaje(VelPerDef);		
 			}
 			//verifico margen del scroll
 			if ( (config.get_completo_margen()) == false ){
 				logErrores.escribir ("No se ingreso el margen del scroll en la configuracion, se selecciona valor por defecto");
 				config.set_margen_scroll(scrollDef);
-			}else if ( velocidad < 0 ){
-				logErrores.escribir ("El margen del scroll ingresado es menor que la unidad, se selecciona valor por defecto");
+			}else if ( velocidad <= 0 ){
+				logErrores.escribir ("El margen del scroll ingresado es menor o igual que la unidad, se selecciona valor por defecto");
 				config.set_margen_scroll(scrollDef);
 		
 			}
@@ -138,15 +138,15 @@ class logErrores {
 				if ( unaEntidad.get_completo_ancho() == false){
 					logErrores.escribir ("No se ingreso el ancho de una entidad "+ nombre +", se selecciona valor por defecto");
 					unaEntidad.set_ancho_base(anchoElementoDef);
-				}else if( anchoElemento < 0 ){
-					logErrores.escribir ("El ancho de una entidad "+ nombre +" ingresada es menor que la unidad, se selecciona valor por defecto");
+				}else if( anchoElemento <= 0 ){
+					logErrores.escribir ("El ancho de una entidad "+ nombre +" ingresada es menor o igual que la unidad, se selecciona valor por defecto");
 					unaEntidad.set_ancho_base(anchoElementoDef);				
 				}
 				if ( unaEntidad.get_completo_alto() == false){
 					logErrores.escribir ("No se ingreso el alto de una entidad "+ nombre +", se selecciona valor por defecto");
 					unaEntidad.set_alto_base(altoElementoDef);
-				}else if( altoElemento < 0 ){
-					logErrores.escribir ("El alto de una entidad "+ nombre +" ingresada es menor que la unidad, se selecciona valor por defecto");
+				}else if( altoElemento <= 0 ){
+					logErrores.escribir ("El alto de una entidad "+ nombre +" ingresada es menor o igual que la unidad, se selecciona valor por defecto");
 					unaEntidad.set_ancho_base(anchoElementoDef);				
 				}
 				if ( unaEntidad.get_completo_pixel_X() == false){

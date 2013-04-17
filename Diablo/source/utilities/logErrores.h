@@ -25,6 +25,9 @@ const unsigned int sizeXDef = 100;
 const unsigned int sizeYDef = 100;
 const unsigned int posXDef = 10;
 const unsigned int posYdef = 17;
+const unsigned int spriteAltoDef = 10;
+const unsigned int spriteAnchoDef = 10;
+
 //hay que mover la implementacion del .h al .cpp, se hace de esta forma ya que el compilador tira error sino!!
 class logErrores {
 	private:
@@ -124,7 +127,9 @@ class logErrores {
 				int fps = unaEntidad.get_fps();
 				string path = unaEntidad.get_path_imagen();
 				int delay = unaEntidad.get_delay();
-			
+				int altoSprite = unaEntidad.get_completo_alto_sprite();
+				int anchoSprite = unaEntidad.get_completo_ancho_sprite();
+
 				//valido cada atributo
 				if ( unaEntidad.get_completo_nombre() == false){
 					logErrores.escribir ("No se ingreso el nombre de una entidad "+ nombre +", se selecciona valor por defecto");
@@ -174,6 +179,18 @@ class logErrores {
 				}else if( delay < 0 ){
 					logErrores.escribir ("El delay de una entidad "+ nombre +" ingresada es menor que la unidad, se selecciona valor por defecto");
 					unaEntidad.set_delay(delayDef);		
+				}
+				if ( unaEntidad.get_completo_alto_sprite() == false){
+					unaEntidad.set_alto_sprite(spriteAltoDef);
+				}else if( altoSprite <= 0 ){
+					logErrores.escribir ("El alto del sprite de una entidad "+ nombre +" ingresada es menor que la unidad, se selecciona valor por defecto");
+					unaEntidad.set_alto_sprite(spriteAltoDef);	
+				}
+				if ( unaEntidad.get_completo_ancho_sprite() == false){
+					unaEntidad.set_ancho_sprite(spriteAnchoDef);
+				}else if( anchoSprite <= 0 ){
+					logErrores.escribir ("El ancho del sprite de una entidad "+ nombre +" ingresada es menor que la unidad, se selecciona valor por defecto");
+					unaEntidad.set_ancho_sprite(spriteAnchoDef);	
 				}
 				entidadesDefinitivas.push_back(unaEntidad);
 			}

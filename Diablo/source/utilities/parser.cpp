@@ -171,7 +171,24 @@ void operator >> (const YAML::Node& node, vector <config_entidad>& entidades) {
 				}else{
 					nuevaEntidad.set_delay(errorConstante);
 				}
-			}else {
+			}else if (clave == "alto_sprite"){
+				creoEntidad = true;
+				nuevaEntidad.completo_alto_sprite();
+				if( err_log.esNumerico(valor) ){
+					nuevaEntidad.set_alto_sprite(atoi(valor.c_str()));
+				}else{
+					nuevaEntidad.set_alto_sprite(errorConstante);
+				}
+
+			}else if (clave == "ancho_sprite"){
+				creoEntidad = true;
+				nuevaEntidad.completo_ancho_sprite();
+				if( err_log.esNumerico(valor) ){
+					nuevaEntidad.set_ancho_sprite(atoi(valor.c_str()));
+				}else{
+					nuevaEntidad.set_ancho_sprite(errorConstante);
+				}
+ 			}else {
 				err_log.escribir("atributo de entidad erroeneo",clave,valor);
 			}
 		}

@@ -60,7 +60,14 @@ class config_escenario {
 			tam_y = newValue;
 			completoTamY = true;
 		}
-		
+		//se agrega por problema con iterador de vectores
+		void set_entidades(vector <config_entidad_en_juego> entidadesEnJuego) { 
+			entidades = entidadesEnJuego;
+		}	
+		//se agrega por problema con iterador de vectores
+		void set_protagonistas(vector <config_entidad_en_juego> protagonistasEnJuego) { 
+			protagonistas = protagonistasEnJuego;
+		}
 		void agregar_entidad(config_entidad_en_juego unaEntidad) { 
 			entidades.push_back(unaEntidad);
 			completoEntidades = true;

@@ -328,34 +328,72 @@ class logErrores {
 			return encontrado;
 		}
 		//verifica si hay correspondencia entre las entidades en juego y las entidades declaradas (sirve para entidades y protagonistas)
-	/*	void verificar_correspondencia_entidades (logErrores& logErrores,vector<config_entidad>& entidades, vector
+		vector<config_entidad_en_juego> verificar_correspondencia_entidades (logErrores& logErrores,vector<config_entidad>& entidades, vector
 			<config_entidad_en_juego>& entidadaesJuego)
 		{
+			vector<config_entidad_en_juego> vectorDefinitivo;
 
 			for (vector<config_entidad_en_juego>::iterator it= entidadaesJuego.begin(); it != entidadaesJuego.end();++it){
 				config_entidad_en_juego unaEntidadJuego = *it;
 				bool existe = verificar_existencia_entidad(unaEntidadJuego.get_nombre(),entidades);
+				//se copia en un nuevo vector ya que el iterador de vector funciona incorrectamente cuando se borra un elemento
 				if (!existe){
-					//si no existe una entidad declarada correspondiente la elimino
-					entidadaesJuego.erase(it);
+					//si no existe una entidad declarada correspondiente no la copio y informo el error 
 					logErrores.escribir("No existe la delaracion una entidad " + unaEntidadJuego.get_nombre() + " que se declaro en el escenario");
+				} else {
+					//si existe lo agrego al vector definitivo
+					vectorDefinitivo.push_back(unaEntidadJuego);
 				}
 			}
+			return vectorDefinitivo;
 		}
-		//verifica si hay correspondencia entre los elemento escenario y las entidades declaradas
-		void verificar_correspondencia_escenario (logErrores& logErrores,vector<config_entidad>& entidades, vector
+		//verifica si hay correspondencia entre las entidades en juego y las entidades declaradas
+		void verificar_correspondencia_entidades_en_escenario (logErrores& logErrores,vector<config_entidad>& entidades,
+			config_escenario& unEscenario)
+		{
+			vector <config_entidad_en_juego> entidadesEnJuego = unEscenario.get_entidades();
+			//verificamos si las entidades en juego corresponden con alguna entidad declarada
+			vector<config_entidad_en_juego> entidadesDefinitivas;
+			entidadesDefinitivas = verificar_correspondencia_entidades(logErrores,entidades,entidadesEnJuego);
+			unEscenario.set_entidades(entidadesDefinitivas);
+		}
+		//verifica si hay correspondencia entre los protagonistas en juego y las entidades declaradas
+		void verificar_correspondencia_protagonistas_en_escenario (logErrores& logErrores,vector<config_entidad>& entidades,
+			config_escenario& unEscenario)
+		{
+			vector <config_entidad_en_juego> protagonistasEnJuego = unEscenario.get_protagonitas();
+			//verificamos si las entidades en juego corresponden con alguna entidad declarada
+			vector<config_entidad_en_juego> protagonitasDefinitivos;
+			protagonitasDefinitivos = verificar_correspondencia_entidades(logErrores,entidades,protagonistasEnJuego);
+			if (protagonitasDefinitivos.size() < 1){
+				//creo protagonista por defecto, no se usa la funcion crearprotagonista ya que agrega uno al vector sirve solo
+				//si no hay protagonistas
+				config_entidad_en_juego unProtagonista(nombreEntidadDef,posXDef,posYdef);
+				protagonitasDefinitivos.push_back(unProtagonista);
+				config_entidad unaEntidadEnJuego (nombreEntidadDef,imagenDef,anchoElementoDef,altoElementoDef,pixelRefXDef,pixelRefYDef,fpsDef,delayDef);
+				entidades.push_back(unaEntidadEnJuego);
+			}
+			unEscenario.set_protagonistas(protagonitasDefinitivos);
+			
+		}
+		//verifica si hay correspondencia entre los elemento escenario y las entidades declaradas y devuelve los escenarios con esta verificacion
+		vector<config_escenario> verificar_correspondencia_escenario (logErrores& logErrores,vector<config_entidad>& entidades, vector
 			<config_escenario>& escenarios)
 		{
+			vector<config_escenario> escenariosDefinitivos;
 			for (unsigned int i=0; i < escenarios.size();i++){
 				//para cada escenario verificamos si las entidades y protagonistas en juego corresponden
 				//con alguna entidad declarada
 				config_escenario unEscenario = escenarios[i];
 				vector<config_entidad_en_juego> entidadesEnJuego = unEscenario.get_entidades();
 				vector<config_entidad_en_juego> protagonistasEnJuego = unEscenario.get_protagonitas();
-				verificar_correspondencia_entidades(logErrores,entidades,entidadesEnJuego);
-				verificar_correspondencia_entidades(logErrores,entidades,protagonistasEnJuego);
+				verificar_correspondencia_entidades_en_escenario(logErrores,entidades,unEscenario);
+				verificar_correspondencia_protagonistas_en_escenario(logErrores,entidades,unEscenario);
+				escenariosDefinitivos.push_back(unEscenario);
 			}
-		}*/
+			return escenariosDefinitivos;
+		}
+
 };
 
 // Para declararlo como global (se define en main)

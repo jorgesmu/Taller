@@ -124,14 +124,6 @@ void operator >> (const YAML::Node& node, vector <config_entidad>& entidades) {
 				creoEntidad = true;
 				nuevaEntidad.completo_delay();
 				nuevaEntidad.set_delay(atoi(valor.c_str()));
-			}else if (clave == "alto_sprite"){
-				creoEntidad = true;
-				nuevaEntidad.completo_alto_sprite();
-				nuevaEntidad.set_alto_sprite(atoi(valor.c_str()));
-			}else if (clave == "ancho_sprite"){
-				creoEntidad = true;
-				nuevaEntidad.completo_ancho_sprite();
-				nuevaEntidad.set_ancho_sprite(atoi(valor.c_str()));
 			}else {
 				err_log.escribir("atributo de entidad erroeneo",clave,valor);
 			}
@@ -320,14 +312,14 @@ config_juego parser_nivel(char* path){
 	err_log.verificar_errores(entidades,err_log);
 	err_log.verificar_errores(escenarios, err_log, entidades);
 	err_log.verificar_unicidad_entidades (entidades, err_log);
-//	err_log.verificar_correspondencia_escenario(err_log,entidades, escenarios);
+	escenarios = err_log.verificar_correspondencia_escenario(err_log,entidades, escenarios);
 	//asigno atributos al juego
  	juego.set_pantalla(pantalla);
 	juego.set_escenarios(escenarios);
 	juego.set_entidades(entidades);
 	juego.set_configuracion(config);
 	//cierro log
-	//err_log.cerrarConexion(); // No se cierra mas aca ya que se usa el mismo archivo de log en todo el proyecto
+	err_log.cerrarConexion();
 	//cerramos la conexion
 	archivo.close();
 

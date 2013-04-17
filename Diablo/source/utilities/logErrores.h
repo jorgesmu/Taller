@@ -72,6 +72,21 @@ class logErrores {
 			}
 
 		}
+		bool esNumerico(string valor){
+			bool res = true;
+			const char* a = valor.c_str();
+			
+			//verifico si es numerico si se puede convertir y si es negativo 
+			if ( atoi(a)<0)
+				return true;
+			for (unsigned int i = 0 ; i<strlen(a);i++){
+				char b= a[i];
+				if(!isdigit(a[i])){
+					res = false;
+				}
+			}
+			return res;
+		}
 		//verfica errores de configuracion
 		void verificar_errores(config_general& config, logErrores& logErrores){
 			int velocidad = config.get_vel_personaje();

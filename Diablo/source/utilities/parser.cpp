@@ -12,6 +12,7 @@
 #include "logErrores.h"
 using namespace std;
 
+const int errorConstante = -1;
 
 //lee e imprime un archivo
 void imprimir_documento(char* path){
@@ -35,17 +36,25 @@ void operator >> (const YAML::Node& node, config_general& config) {
    for(unsigned i=0;i<node.size();i++) {
       	for(YAML::Iterator it=node[i].begin();it!=node[i].end();++it) {
 			//leo los atributos de la configuracion
-			string clave;
-			int valor;
+			string clave,valor;
+		
 			it.first() >> clave;
 			it.second() >> valor;
 			//y los asigno
 			if (clave == "vel_personaje"){
 				config.completo_velocidad();
-				config.set_vel_personaje(valor);
+				if( err_log.esNumerico(valor) ){
+					config.set_vel_personaje(atoi(valor.c_str()));
+				}else{
+					config.set_vel_personaje(errorConstante);
+				}
 			}else if (clave == "margen_scroll"){
 				config.completo_Margen();
-				config.set_margen_scroll(valor);
+				if( err_log.esNumerico(valor) ){
+					config.set_margen_scroll(atoi(valor.c_str()));
+				}else{
+					config.set_vel_personaje(errorConstante);
+				}
 			}else {
 				err_log.escribir("atributo de configuracion erroeneo",clave,valor);
 			}
@@ -59,18 +68,27 @@ void operator >> (const YAML::Node& node, config_pantalla& config) {
       	for(YAML::Iterator it=node[i].begin();it!=node[i].end();++it) {
 			//leo los atributos de pantalla
 			string clave;
-			int valor;
+			string valor;
 			it.first() >> clave;
 			it.second() >> valor;
 			//y los asigno
 			if (clave == "ancho"){
 				//actualizo atributos
 				config.completo_Ancho();
-				config.set_ancho(valor);
+				if( err_log.esNumerico(valor) ){
+					config.set_ancho(atoi(valor.c_str()));
+				}else{
+					config.set_ancho(errorConstante);
+				}
 			}else if (clave == "alto"){
 				//actualizo atributos
 				config.completo_Alto();
-				config.set_alto(valor);
+				if( err_log.esNumerico(valor) ){
+					config.set_alto(atoi(valor.c_str()));
+				}else{
+					config.set_alto(errorConstante);
+				}
+
 			}else {
 				err_log.escribir("atributo de pantalla erroeneo",clave , valor);
 			}
@@ -103,27 +121,52 @@ void operator >> (const YAML::Node& node, vector <config_entidad>& entidades) {
 			}else if (clave == "ancho_base"){
 				creoEntidad = true;
 				nuevaEntidad.completo_Ancho();
-				nuevaEntidad.set_ancho_base(atoi(valor.c_str()));
+				if( err_log.esNumerico(valor) ){
+					nuevaEntidad.set_ancho_base(atoi(valor.c_str()));
+				}else{
+					nuevaEntidad.set_ancho_base(errorConstante);
+				}
 			}else if (clave == "alto_base"){
 				creoEntidad = true;
 				nuevaEntidad.completo_Alto();
-				nuevaEntidad.set_alto_base(atoi(valor.c_str()));
+				if( err_log.esNumerico(valor) ){
+					nuevaEntidad.set_alto_base(atoi(valor.c_str()));
+				}else{
+					nuevaEntidad.set_alto_base(errorConstante);
+				}
 			}else if (clave == "pixel_ref_x"){
 				creoEntidad = true;
-				nuevaEntidad.completo_pixelX();
+				if( err_log.esNumerico(valor) ){
+					nuevaEntidad.set_pixel_ref_x(atoi(valor.c_str()));
+				}else{
+					nuevaEntidad.set_pixel_ref_x(errorConstante);
+				}
 				nuevaEntidad.set_pixel_ref_x(atoi(valor.c_str()));
 			}else if (clave == "pixel_ref_y"){
 				creoEntidad = true;
 				nuevaEntidad.completo_pixelY();
-				nuevaEntidad.set_pixel_ref_y(atoi(valor.c_str()));
+				if( err_log.esNumerico(valor) ){
+					nuevaEntidad.set_pixel_ref_y(atoi(valor.c_str()));
+				}else{
+					nuevaEntidad.set_pixel_ref_y(errorConstante);
+				}
 			}else if (clave == "fps"){
 				creoEntidad = true;
 				nuevaEntidad.completo_fps();
+				if( err_log.esNumerico(valor) ){
+					nuevaEntidad.set_fps(atoi(valor.c_str()));
+				}else{
+					nuevaEntidad.set_fps(errorConstante);
+				}
 				nuevaEntidad.set_fps(atoi(valor.c_str()));
 			}else if (clave == "delay"){
 				creoEntidad = true;
 				nuevaEntidad.completo_delay();
-				nuevaEntidad.set_delay(atoi(valor.c_str()));
+				if( err_log.esNumerico(valor) ){
+					nuevaEntidad.set_delay(atoi(valor.c_str()));;
+				}else{
+					nuevaEntidad.set_delay(errorConstante);
+				}
 			}else {
 				err_log.escribir("atributo de entidad erroeneo",clave,valor);
 			}
@@ -156,10 +199,18 @@ void parsear_protagonistas(const YAML::Node& node, config_escenario& unEscenario
 				unProtagonista.set_nombre(valor); 
 			}else if (clave == "x"){
 				creoEntidad = true;
-				unProtagonista.set_pos_x( atoi(valor.c_str()) );
+				if( err_log.esNumerico(valor) ){
+					unProtagonista.set_pos_x(atoi(valor.c_str()));
+				}else{
+					unProtagonista.set_pos_x(errorConstante);
+				}
 			}else if (clave == "y"){
 				creoEntidad = true;
-				unProtagonista.set_pos_y( atoi(valor.c_str()) );
+				if( err_log.esNumerico(valor) ){
+					unProtagonista.set_pos_y(atoi(valor.c_str()));
+				}else{
+					unProtagonista.set_pos_y(errorConstante);
+				}
 			}else {
 				err_log.escribir( "atributo de protagonista erroeneo",clave,valor );
 			}
@@ -193,10 +244,18 @@ void parsear_entidades(const YAML::Node& node, config_escenario& unEscenario){
 				unaEntidad.set_nombre(valor); 
 			}else if (clave == "x"){
 				creoEntidad = true;
-				unaEntidad.set_pos_x( atoi(valor.c_str()) );
+				if( err_log.esNumerico(valor) ){
+					unaEntidad.set_pos_x( atoi(valor.c_str()) );
+				}else{
+					unaEntidad.set_pos_x(errorConstante);
+				}
 			}else if (clave == "y"){
 				creoEntidad = true;
-				unaEntidad.set_pos_y( atoi(valor.c_str()) );
+				if( err_log.esNumerico(valor) ){
+					unaEntidad.set_pos_y( atoi(valor.c_str()) );
+				}else{
+					unaEntidad.set_pos_y(errorConstante);
+				}
 			}else {
 				err_log.escribir( "atributo de entidad en escenario erroeneo",clave,valor );
 			}
@@ -212,6 +271,7 @@ void parsear_entidades(const YAML::Node& node, config_escenario& unEscenario){
    }
 }
 void operator >> (const YAML::Node& node, vector <config_escenario>& escenarios) {
+	bool control;
     //aca itero para cada escenario	
     for(unsigned i=0;i<node.size();i++) {
 		//aca itero dentro del escenario
@@ -223,14 +283,21 @@ void operator >> (const YAML::Node& node, vector <config_escenario>& escenarios)
 
 			//guardo los atributos
 			if ( clave == "nombre" ){
-
 				unEscenario.set_nombre(valor);
 			} else if (clave == "size_x"){
 				it.second() >> valor;
-				unEscenario.set_tam_x(atoi(valor.c_str()));
+				if( err_log.esNumerico(valor) ){
+					unEscenario.set_tam_x(atoi(valor.c_str()));
+				}else{
+					unEscenario.set_tam_x(errorConstante);
+				}
 			} else if (clave == "size_y"){
 				it.second() >> valor;
-				unEscenario.set_tam_y(atoi(valor.c_str()));
+				if( err_log.esNumerico(valor) ){
+					unEscenario.set_tam_y(atoi(valor.c_str()));
+				}else{
+					unEscenario.set_tam_y(errorConstante);
+				}
 			} else if (clave == "protagonista"){
 				parsear_protagonistas(it.second(),unEscenario);
 			}else if (clave == "entidadesDef"){

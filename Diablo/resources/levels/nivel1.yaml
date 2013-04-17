@@ -11,7 +11,9 @@ entidades:
   - nombre: agua
     imagen: ../resources/tileAgua.bmp
     fps: 10
-    delay: 700
+    delay: 1000
+    alto_sprite: 50
+    ancho_sprite: 100
 
   - nombre: casa
     imagen: ../resources/Casa400x400.bmp
@@ -22,12 +24,12 @@ entidades:
 
   - nombre: molino
     imagen: ../resources/molino300x320.bmp
-    ancho_base: 3
-    alto_base: 3
+    ancho_base: 4
+    alto_base: 4
     pixel_ref_x: 120
     pixel_ref_y: 100
     fps: 10
-    delay: 1000
+    delay: 0
     alto_sprite: 300
     ancho_sprite: 320
 
@@ -42,7 +44,7 @@ escenarios:
     entidadesDef:
       - {x: 3, y: 5, entidad: piso}
       - {x: 10, y: 10, entidad: casa}
-      - {x: 2, y: 2, entidad: molino}
+      - {x: 3, y: 3, entidad: molino}
       - {x: 6, y: 6, entidad: agua}
     protagonista:
       - tipoEntidad: personaje

@@ -52,40 +52,34 @@ int main(int argc, char* args[]) {
 	ResMan resman;
 	resman.init();
 
-	// Cargo las entidades en un vector
-	std::vector<Entidad*> entidades_cargadas;
-	for (auto it = entidades.begin(); it != entidades.end(); ++it){
-		resman.addRes(it->get_nombre(), it->get_path_imagen(), Imagen::COLOR_KEY);
-		Entidad* entidad;
-		if((it->get_alto_sprite() > -1) || (it->get_ancho_sprite() > -1)){
-			entidad = new EntidadFija (it->get_nombre(), it->get_ancho_base(), it->get_alto_base(), it->get_fps(), it->get_delay(),
-								it->get_alto_sprite(), it->get_ancho_sprite(), it->get_pixel_ref_x(), it->get_pixel_ref_y(), NULL, &mapa, resman, Imagen::COLOR_KEY);
-		}else{
-			if(it->get_fps() == -1){
-				entidad = new EntidadFija (it->get_nombre(), it->get_ancho_base(), it->get_alto_base(), it->get_pixel_ref_x(), it->get_pixel_ref_y(),
-								NULL, &mapa, resman, Imagen::COLOR_KEY);
-			}else{
-				entidad = new EntidadFija (it->get_nombre(), it->get_ancho_base(), it->get_alto_base(), it->get_fps(), it->get_delay(),
-								1, 1, it->get_pixel_ref_x(), it->get_pixel_ref_y(), NULL, &mapa, resman, Imagen::COLOR_KEY);
-			}
-		}
-		entidades_cargadas.push_back(entidad);
-	}
-
 	// Cargo la entidad por default
 	resman.addRes("tierraDefault", "../resources/tile.bmp");
 	Entidad entidadPisoPorDefecto("tierraDefault", 1 , 1 , 0 , 0 , NULL, resman , Imagen::COLOR_KEY);
 
-	// Vector de entidades en este mapa
-	vector<config_entidad_en_juego> entidades_en_juego = escenarios[0].get_entidades();
-	
-	// Revisamos que no haya quedado ningun tile sin entidades
-	// Si hay alguno le ponemos la entidad por defecto
+	// Cargamos el tile por defecto
 	for(auto it = mapa.allTiles().begin();it != mapa.allTiles().end(); ++it) {
 		if(it->sinEntidades()) {
 			it->addEntidad((Entidad*)&entidadPisoPorDefecto);
 		}
 	}
+
+	// Cargo las entidades en un vector
+	std::vector<Entidad*> entidades_cargadas;
+	for (auto it = entidades.begin(); it != entidades.end(); ++it){
+		resman.addRes(it->get_nombre(), it->get_path_imagen(), Imagen::COLOR_KEY);
+		Entidad* entidad;
+		if(it->get_fps() > 0 && it->get_alto_sprite() > 0 && it->get_ancho_sprite() > 0){
+			entidad = new EntidadFija (it->get_nombre(), it->get_ancho_base(), it->get_alto_base(), it->get_fps(), it->get_delay(),
+								it->get_alto_sprite(), it->get_ancho_sprite(), it->get_pixel_ref_x(), it->get_pixel_ref_y(), NULL, &mapa, resman, Imagen::COLOR_KEY);
+		}else{
+			entidad = new EntidadFija (it->get_nombre(), it->get_ancho_base(), it->get_alto_base(), it->get_pixel_ref_x(), it->get_pixel_ref_y(),
+								NULL, &mapa, resman, Imagen::COLOR_KEY);
+		}
+		entidades_cargadas.push_back(entidad);
+	}
+
+	// Vector de entidades en este mapa
+	vector<config_entidad_en_juego> entidades_en_juego = escenarios[0].get_entidades();
 
 	// Llenamos el mapa con las entidades
 	for(auto it = entidades_en_juego.begin(); it != entidades_en_juego.end(); ++it){

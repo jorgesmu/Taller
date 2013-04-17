@@ -187,7 +187,8 @@
 		if ( (this -> imagen != NULL) && (this -> surf != NULL) &&
 			(camara != NULL) ) {
 			if(this -> surf -> getSDL_Surface() != NULL){
-				if( (this -> widthInTiles <= 1) && (this -> highInTiles <= 1)) {
+				// Esto no andaba bien, lo "comente" y ahora funciona
+				if( (this -> widthInTiles <= 1) && (this -> highInTiles <= 1) && false) {
 					int posX;
 					int posY;
 					posX = (int)tileX - (int)(camara -> getX()) - this -> pixel_ref_x;

@@ -113,11 +113,10 @@ class logErrores {
 			}
 		}
 		//verfica errores de entidades
-		vector<config_entidad> verificar_errores(vector <config_entidad>& config, logErrores& logErrores){
-			vector<config_entidad> entidadesDefinitivas;
+		void verificar_errores(vector <config_entidad>& config, logErrores& logErrores){
 			for ( unsigned int i=0; i < config.size(); i++){		
 				//agarro los valores de la entidad
-				config_entidad unaEntidad = config[i];
+				config_entidad& unaEntidad = config[i];
 				string imagen = unaEntidad.get_path_imagen();
 				int anchoElemento = unaEntidad.get_ancho_base();
 				int altoElemento = unaEntidad.get_alto_base();
@@ -139,7 +138,6 @@ class logErrores {
 					logErrores.escribir ("No se ingreso el path de una entidad "+ nombre +", se selecciona valor por defecto");
 					unaEntidad.set_path_imagen(imagenDef);
 				}
-				//CHEQUEAR EXISTE PATH
 				if ( unaEntidad.get_completo_ancho() == false){
 					logErrores.escribir ("No se ingreso el ancho de una entidad "+ nombre +", se selecciona valor por defecto");
 					unaEntidad.set_ancho_base(anchoElementoDef);
@@ -192,9 +190,8 @@ class logErrores {
 					logErrores.escribir ("El ancho del sprite de una entidad "+ nombre +" ingresada es menor que la unidad, se selecciona valor por defecto");
 					unaEntidad.set_ancho_sprite(spriteAnchoDef);	
 				}
-				entidadesDefinitivas.push_back(unaEntidad);
 			}
-			return entidadesDefinitivas;
+			return;
 		}
 		//verfica errores de entidades en juego, con el flag esProtagonista es para imprimir errores segun
 		//sea protagonista o entidad
@@ -202,7 +199,7 @@ class logErrores {
 			vector <config_entidad_en_juego> resultado;
 			for (unsigned int i = 0; i < config.size(); i++){
 				//asigno atributos
-				config_entidad_en_juego unaEntidad = config[i];
+				config_entidad_en_juego& unaEntidad = config[i];
 				string nombre = unaEntidad.get_nombre();
 				int pos_x = unaEntidad.get_pos_x();
 				int pos_y = unaEntidad.get_pos_y();
@@ -333,8 +330,8 @@ class logErrores {
 
 			for (vector<config_entidad>::iterator it = entidades.begin();it != entidades.end(); ++it){
 				for (unsigned int i = cont + 1; i < sizeOriginal;i++){
-					config_entidad unaEntidad = *it;
-					config_entidad otraEntidad = entidades[i];
+					config_entidad& unaEntidad = *it;
+					config_entidad& otraEntidad = entidades[i];
 					string unNombre = unaEntidad.get_nombre();
 					string otroNombre = otraEntidad.get_nombre();
 					if( unNombre == otroNombre ){
@@ -345,7 +342,6 @@ class logErrores {
 					}
 				}
 				cont++;
-
 			}
 
 		}
@@ -413,7 +409,7 @@ class logErrores {
 			
 		}
 		//verifica si hay correspondencia entre los elemento escenario y las entidades declaradas y devuelve los escenarios con esta verificacion
-		vector<config_escenario> verificar_correspondencia_escenario (logErrores& logErrores,vector<config_entidad>& entidades, vector
+		void verificar_correspondencia_escenario (logErrores& logErrores,vector<config_entidad>& entidades, vector
 			<config_escenario>& escenarios)
 		{
 			vector<config_escenario> escenariosDefinitivos;
@@ -427,7 +423,9 @@ class logErrores {
 				verificar_correspondencia_protagonistas_en_escenario(logErrores,entidades,unEscenario);
 				escenariosDefinitivos.push_back(unEscenario);
 			}
-			return escenariosDefinitivos;
+
+			escenarios = escenariosDefinitivos;
+			return;
 		}
 		//devuelve la entidad que tiene el nombre deseado
 		config_entidad buscar_entidad(vector<config_entidad> entidades,string nombre){
@@ -448,12 +446,12 @@ class logErrores {
 		void verificar_limites_un_escenario (logErrores& logErrores,vector<config_entidad>& entidades,
 			config_escenario& unEscenario)
 		{
-			vector <config_entidad_en_juego> entidadesEnJuego = unEscenario.get_entidades();
+			vector <config_entidad_en_juego>& entidadesEnJuego = unEscenario.get_entidades();
 
 			vector<config_entidad_en_juego> entidadesDefinitivas;
 			for (unsigned int i = 0; i<entidadesEnJuego.size();i++){
 				//busco la entidad correspondiente
-				config_entidad_en_juego unaEntidadEnJuego = entidadesEnJuego[i];
+				config_entidad_en_juego& unaEntidadEnJuego = entidadesEnJuego[i];
 				config_entidad unaEntidadDeclarada = buscar_entidad(entidades,unaEntidadEnJuego.get_nombre());
 
 				int pos_x = unaEntidadEnJuego.get_pos_x();
@@ -476,19 +474,16 @@ class logErrores {
 		}
 
 		//verifica si las entidades no salen del mapa
-		vector<config_escenario> verificar_limites_entidades (logErrores& logErrores,vector<config_entidad>& entidades, vector
+		void verificar_limites_entidades (logErrores& logErrores,vector<config_entidad>& entidades, vector
 			<config_escenario>& escenarios)
 		{
-			vector<config_escenario> escenariosDefinitivos;
 			for (unsigned int i=0; i < escenarios.size();i++){
 				//para cada escenario verificamos si las entidades y protagonistas en juego corresponden
 				//con alguna entidad declarada
-				config_escenario unEscenario = escenarios[i];
-				vector<config_entidad_en_juego> entidadesEnJuego = unEscenario.get_entidades();
+				config_escenario& unEscenario = escenarios[i];
 				verificar_limites_un_escenario(logErrores,entidades,unEscenario);
-				escenariosDefinitivos.push_back(unEscenario);
 			}
-			return escenariosDefinitivos;
+			return;
 		}
 };
 

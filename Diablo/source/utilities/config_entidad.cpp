@@ -18,4 +18,7 @@ config_entidad::config_entidad(std::string nombre_i, std::string path_imagen_i, 
 	completoPixelY = false;
 	completoFps = false;
 	completoDelay = false;
+	completoAltoSprite = false;
+	completoAnchoSprite = false;
+
 }

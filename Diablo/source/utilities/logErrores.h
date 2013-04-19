@@ -8,8 +8,8 @@
 #include "config_escenario.h"
 using namespace std;
 //se declaran los valores por defecto
-const unsigned int anchoDef = 100;
-const unsigned int altoDef = 100;
+const unsigned int anchoDef = 800;
+const unsigned int altoDef = 600;
 const unsigned int VelPerDef = 100; //velodidad personaje
 const unsigned int scrollDef = 30;
 const string imagenDef = "Path";
@@ -198,7 +198,8 @@ class logErrores {
 		}
 		//verfica errores de entidades en juego, con el flag esProtagonista es para imprimir errores segun
 		//sea protagonista o entidad
-		void verificar_errores_entidad_en_juego(vector <config_entidad_en_juego>& config, bool esProtagonista, string nombreEscenario, logErrores& logErrores){
+		vector <config_entidad_en_juego> verificar_errores_entidad_en_juego(vector <config_entidad_en_juego>& config, bool esProtagonista, string nombreEscenario, logErrores& logErrores){
+			vector <config_entidad_en_juego> resultado;
 			for (unsigned int i = 0; i < config.size(); i++){
 				//asigno atributos
 				config_entidad_en_juego unaEntidad = config[i];
@@ -242,7 +243,7 @@ class logErrores {
 
 					}
 					unaEntidad.set_pos_y(posYdef);
-				} else if( pos_x < 0 ) {
+				} else if( pos_y < 0 ) {
 					if (esProtagonista){
 						logErrores.escribir ("La posicion y de un protagonista " + nombre + " en el escenario " + nombreEscenario + "ingresada es menor que la unidad, se selecciona valor por defecto");
 					}else{
@@ -250,7 +251,9 @@ class logErrores {
 					}
 					unaEntidad.set_pos_y(posYdef);
 				}
+				resultado.push_back(unaEntidad);
 			}
+			return resultado;
 		}
 		void crear_protagonista_defecto(config_escenario& escenario, vector<config_entidad> entidades){
 			config_entidad_en_juego unProtagonista(nombreEntidadDef,posXDef,posYdef);
@@ -269,7 +272,7 @@ class logErrores {
 		void verificar_errores(vector <config_escenario>& config, logErrores& logErrores,vector<config_entidad>& entidades){
 			for (unsigned int i=0; i < config.size(); i++){
 				//guardo atributos
-				config_escenario unEscenario = config[i];
+				config_escenario& unEscenario = config[i];
 				string nombre = unEscenario.get_nombre();
 				int size_x = unEscenario.get_tam_x();
 				int size_y = unEscenario.get_tam_y();
@@ -294,23 +297,26 @@ class logErrores {
 				}else if ( size_y < 0 ){
 					logErrores.escribir ("El size y ingresado en un escenario " + nombre + " es menor que la unidad, se selecciona valor por defecto");
 					unEscenario.set_tam_y(anchoDef);
-		
 				}
-				//verifico los protagonistas del scroll
+				//verifico los protagonistad
 				if ( ( unEscenario.get_completo_protagonista() ) == false ){
 					logErrores.escribir ("No se ingreso ningun protagonista en un escenario" + nombre + ", se selecciona uno por defecto");
 					crear_protagonista_defecto(unEscenario,entidades);
 					crear_entidad_defecto(entidades);
 				}else if ( unEscenario.get_protagonitas().size() > 1){
 					logErrores.escribir ("Se ingreso mas de un protagonista en un escenario" + nombre + ", se selecciona uno por defecto");				
-					verificar_errores_entidad_en_juego( unEscenario.get_protagonitas(), true, nombre, logErrores );
+					vector<config_entidad_en_juego> protagonistas_en_juego = verificar_errores_entidad_en_juego( unEscenario.get_protagonitas(), true, nombre, logErrores );
+					unEscenario.set_protagonistas(protagonistas_en_juego);
 				}else{
 					//se ingreso un unico protagonsita	
-					verificar_errores_entidad_en_juego( unEscenario.get_protagonitas(), true, nombre, logErrores );
+					vector<config_entidad_en_juego> protagonistas_en_juego = verificar_errores_entidad_en_juego( unEscenario.get_protagonitas(), true, nombre, logErrores );
+					unEscenario.set_protagonistas(protagonistas_en_juego);
 				}
 
+
 				//verifico las entidades
-				verificar_errores_entidad_en_juego( unEscenario.get_entidades(), false, nombre, logErrores );				
+				vector<config_entidad_en_juego> entidades_en_juego = verificar_errores_entidad_en_juego( unEscenario.get_entidades(), false, nombre, logErrores );
+				unEscenario.set_entidades(entidades_en_juego);
 			}
 			if (config.size() == 0){
 				//no hay escenario seteo todo por defecto

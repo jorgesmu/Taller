@@ -27,7 +27,7 @@ const unsigned int posXDef = 10;
 const unsigned int posYdef = 17;
 const unsigned int spriteAltoDef = 10;
 const unsigned int spriteAnchoDef = 10;
-
+const bool esCaminableDef = true;
 //hay que mover la implementacion del .h al .cpp, se hace de esta forma ya que el compilador tira error sino!!
 class logErrores {
 	private:
@@ -189,6 +189,9 @@ class logErrores {
 				}else if( anchoSprite <= 0 ){
 					logErrores.escribir ("El ancho del sprite de una entidad "+ nombre +" ingresada es menor que la unidad, se selecciona valor por defecto");
 					unaEntidad.set_ancho_sprite(spriteAnchoDef);	
+				}
+				if ( unaEntidad.get_completo_caminable() == false){
+					unaEntidad.set_caminable(esCaminableDef);
 				}
 			}
 			return;

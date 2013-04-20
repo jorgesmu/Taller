@@ -11,7 +11,6 @@
 #include "config_entidad_en_juego.h"
 #include "logErrores.h"
 using namespace std;
-
 const int errorConstante = -1;
 //VARIABLES GLOBALES
 config_pantalla pantalla(-1,-1);
@@ -99,6 +98,16 @@ void operator >> (const YAML::Node& node, config_pantalla& config) {
 		}
    }
 
+}
+bool ConvertirABool(string valor){
+	//se transforma el valor a boolean
+	bool res;
+	if (valor == "true"){
+		res = true;
+	}else if(valor == "false"){
+		res = false;;		
+	}
+	return res;
 }
 void operator >> (const YAML::Node& node, vector <config_entidad>& entidades) {
    //aca itero cada entidad	
@@ -188,7 +197,16 @@ void operator >> (const YAML::Node& node, vector <config_entidad>& entidades) {
 				}else{
 					nuevaEntidad.set_ancho_sprite(errorConstante);
 				}
- 			}else {
+ 			}else if (clave == "caminable"){
+				if ( (valor == "true") || (valor == "false" )){
+					bool caminable_Value = ConvertirABool(valor);
+					creoEntidad = true;
+					nuevaEntidad.completo_caminable();
+					nuevaEntidad.set_caminable(caminable_Value);
+				}else{
+					err_log.escribir("Atributo caminable de " + nuevaEntidad.get_nombre() + " erroneo");
+				}
+			}else {
 				err_log.escribir("atributo de entidad erroeneo",clave,valor);
 			}
 		}
@@ -292,7 +310,6 @@ void parsear_entidades(const YAML::Node& node, config_escenario& unEscenario){
    }
 }
 void operator >> (const YAML::Node& node, vector <config_escenario>& escenarios) {
-	bool control;
     //aca itero para cada escenario	
     for(unsigned i=0;i<node.size();i++) {
 		//aca itero dentro del escenario

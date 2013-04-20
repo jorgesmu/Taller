@@ -10,6 +10,7 @@ class config_entidad {
 		bool completoNombre, completoPath, completoAncho, completoAlto, completoPixelX, completoPixelY, completoFps, 
 			completoDelay, completoAltoSprite, completoAnchoSprite;
 
+		bool caminable, completoCaminable;
 	public:
 		//Constructor
 		//i: inicial
@@ -35,7 +36,8 @@ class config_entidad {
 		int get_alto_sprite() { return alto_sprite;}
 
 		int get_ancho_sprite() { return ancho_sprite;}
-		
+
+		bool get_caminable() { return caminable;}
 		//gets de los flags de control
 		bool get_completo_nombre() { return completoNombre;}
 		
@@ -57,6 +59,8 @@ class config_entidad {
 
 		bool get_completo_ancho_sprite() { return completoAnchoSprite;}
 
+		bool get_completo_caminable() { return completoCaminable;}
+
 		//Setters
 		void set_nombre(std::string newValue) { nombre = newValue;}
 
@@ -77,6 +81,7 @@ class config_entidad {
 
 		void set_ancho_sprite(int newValue) { ancho_sprite = newValue;}
 
+		void set_caminable(bool newValue) { caminable = newValue;}
 		//metodos para completar validaciones
 				//metodos para completar validaciones
 		void completo_nombre(){
@@ -109,5 +114,8 @@ class config_entidad {
 		}
 		void completo_ancho_sprite(){
 			completoAnchoSprite = true;
+		}
+		void completo_caminable(){
+			completoCaminable = true;
 		}
 };

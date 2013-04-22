@@ -1,37 +1,47 @@
 #include "cliente.h"
 #include <stdio.h>
+#include <iostream>
+#include <string>
 
 #pragma comment(lib, "Ws2_32.lib")
 
 #define DEFAULT_PORT "27018"
 #define DEFAULT_BUFLEN 512
 	
-
+using namespace std;
 
 int main() {
-	int status=0;
 	Cliente cliente;	
-	status+=cliente.obtenerDireccion("127.0.0.1",DEFAULT_PORT);
-	status+=cliente.crearSocket();	
-	status+=cliente.conectar();
-	if (status!=0) printf("Hubo un error en el proceso");
-	char* texto="texto de prueba";
-	cliente.enviar(texto,strlen(texto));
+	cliente.obtenerDireccion("127.0.0.1",DEFAULT_PORT);
+	cliente.crearSocket();	
+	cliente.conectar();
+
+	//modoEnvio();
+	/*
+	string texto;
+	cin >> texto;
+	while (true) {
+		if (texto.compare("exit")==0) break;
+		char *copy = new char[texto.size()+1] ;
+		strcpy(copy, texto.c_str());
+		cliente.enviar(copy,strlen(copy));
+		cin >> texto;
+	} */
+
+	//modoRecepcion();
+	int resultado=0;
 	char buffer[DEFAULT_BUFLEN];
-	//Recibo hasta el fin de la conexion
-	do {
-		status=cliente.recibir(buffer,strlen(buffer));
-		if (status > 0) {
-			printf("Bytes recibidos: %d\n", status);
+	while (true) {
+		printf("El resultado es: %i",resultado);
+		resultado = cliente.recibir(buffer,strlen(buffer));
+		printf("El resultado es: %i",resultado);
+		if (resultado > 0) {	
+			 printf("%.*s\n", resultado, buffer);
 		}
-		else if (status == 0) {
-			printf("Conexion cerrada\n");
-		}
-		else {
-			printf("Recepcion de datos erronea: %d\n", WSAGetLastError());
-		}
-	} while (status>0);
-	
-	getchar();
+		if (resultado==0) break;
+		if (resultado<0) printf("Error recepcion de datos: %d\n",WSAGetLastError());
+	}
+
+	cliente.desconectar();
 	return 0;
 }

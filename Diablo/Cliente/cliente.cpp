@@ -79,9 +79,9 @@ int Cliente::enviar(char* data,int len) {
 		return 1;
 	}
 
-	printf("Bytes enviados: %ld\n",resultado);
-	printf("Mensaje enviado: %s \n",data);
-
+	//printf("Bytes enviados: %ld\n",resultado);
+	//printf("Mensaje enviado: %s \n",data);
+	/*
 	//Dejo de enviar
 	resultado=shutdown(ConnectSocket,SD_SEND);
 	if (resultado==SOCKET_ERROR) {
@@ -92,6 +92,7 @@ int Cliente::enviar(char* data,int len) {
 	}
 
 	printf("Proceso de envio finalizado correctamente \n");
+	*/
 	return 0;
 }
 
@@ -103,6 +104,13 @@ int Cliente::recibir(char* buffer,int len) {
 
 //Termina la conexion con el host
 int Cliente::desconectar() {
+	int resultado=shutdown(ConnectSocket,SD_SEND);
+	if (resultado==SOCKET_ERROR) {
+		printf("Termino de envio fallido: %d\n",WSAGetLastError());
+		closesocket(ConnectSocket);
+		WSACleanup();
+		return 1;
+	}
 	closesocket(ConnectSocket);
 	WSACleanup();
 	printf("Conexion finalizada \n");

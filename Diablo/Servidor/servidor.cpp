@@ -98,10 +98,10 @@ int Servidor::recibir(char* buffer,int len)  {
 	if (resultado<0) {
 		printf("Error al recibir datos del cliente\n");
 	} else if (resultado>0) {
-		printf("Bytes recibidos: %d\n", resultado);
-		printf("El mensaje recibido es: %s\n",buffer);
+		//printf("Bytes recibidos: %d\n", resultado);
+		//printf("El mensaje recibido es: %s\n",buffer);
 	} else {
-		printf("Conexion cerrada\n");
+		//printf("Conexion cerrada\n");
 	}
 	return resultado;
 }

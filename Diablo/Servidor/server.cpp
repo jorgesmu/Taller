@@ -1,36 +1,57 @@
 #include "servidor.h"
 #include <stdio.h>
+#include <iostream>
+#include <string>
 
 #define DEFAULT_PORT "27018"
-#define DEFAULT_BUFLEN 512
+#define DEFAULT_BUFLEN 10
+
+using namespace std;
+
+Servidor servidor;
+
+void modoRecepcion() {
+	int resultado;
+	char buffer[DEFAULT_BUFLEN];
+	while (true) {
+		resultado = servidor.recibir(buffer,strlen(buffer));
+		if (resultado > 0) {	
+			 printf("%.*s\n", resultado, buffer);
+		}
+		if (resultado==0) break;
+	}
+}
 
 int main() {
 	Servidor servidor;
-	int resultado;
 	servidor.generarDireccion(NULL,DEFAULT_PORT);
 	servidor.crearSocket();
 	servidor.escuchar();
 	servidor.aceptarConexion();
-	
-	//Envio/Recepcion de datos
-	char buffer[DEFAULT_BUFLEN];
-	int resulEnvio;
 
-	// Recibir hasta que el cliente cierre la conexion
-	do {
+	//modoRecepcion();
+	/*
+	int resultado;
+	char buffer[DEFAULT_BUFLEN];
+	while (true) {
 		resultado = servidor.recibir(buffer,strlen(buffer));
-		if (resultado > 0) {			
-			//Devuelve el buffer al cliente
-			resulEnvio=servidor.enviar(buffer,resultado);
-			if (resulEnvio==1) servidor.cerrarSocket();
-		} else if (resultado < 0) {
-			servidor.cerrarSocket();
-			return 1;
+		if (resultado > 0) {	
+			 printf("%.*s\n", resultado, buffer);
 		}
-	} while (resultado > 0);
+		if (resultado==0) break;
+	}*/
+
+	//modoEnvio();
+	string texto;
+	cin >> texto;
+	while (true) {
+		if (texto.compare("exit")==0) break;
+		char *copy = new char[texto.size()+1] ;
+		strcpy(copy, texto.c_str());
+		servidor.enviar(copy,strlen(copy));
+		cin >> texto;
+	}
 
 	servidor.cerrarSocket();
-
-	getchar();
 	return 0;
 }

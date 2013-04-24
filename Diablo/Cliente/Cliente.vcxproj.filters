@@ -18,12 +18,12 @@
     <ClCompile Include="client.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="cliente.cpp">
+    <ClCompile Include="clientsocket.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="cliente.h">
+    <ClInclude Include="clientsocket.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

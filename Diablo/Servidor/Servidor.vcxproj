@@ -12,10 +12,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="server.cpp" />
-    <ClCompile Include="servidor.cpp" />
+    <ClCompile Include="serversocket.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="servidor.h" />
+    <ClInclude Include="serversocket.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{058A2645-D647-4A4F-BAAA-66A91E746E00}</ProjectGuid>

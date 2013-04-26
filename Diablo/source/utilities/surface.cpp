@@ -123,3 +123,8 @@ SDL_Surface* Surface::getSDL_Surface() {
 	return this -> image;
 }
 
+void Surface::setSurface(SDL_Surface* nuevaSurface) {
+	SDL_FreeSurface(this->image);
+	this->image=nuevaSurface;
+}
+

@@ -38,6 +38,7 @@
     <ClCompile Include="source\utilities\PruebasParser.cpp" />
     <ClCompile Include="source\utilities\surface.cpp" />
     <ClCompile Include="source\utilities\Test.cpp" />
+    <ClCompile Include="source\utilities\texto.cpp" />
     <ClCompile Include="source\utilities\timer.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -69,6 +70,7 @@
     <ClInclude Include="source\utilities\PruebasParser.h" />
     <ClInclude Include="source\utilities\surface.h" />
     <ClInclude Include="source\utilities\Test.h" />
+    <ClInclude Include="source\utilities\texto.h" />
     <ClInclude Include="source\utilities\timer.h" />
     <ClInclude Include="source\utilities\vec2.h" />
   </ItemGroup>
@@ -118,7 +120,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>SDL.lib;SDLmain.lib;libyaml-cppmdd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SDL.lib;SDLmain.lib;libyaml-cppmdd.lib;SDL_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>

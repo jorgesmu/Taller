@@ -43,6 +43,8 @@ class Surface {
 	void blit(SDL_Surface* destination, int x, int y, SDL_Rect& clip);
 	// Retorna el Surface contenido.
 	SDL_Surface* getSDL_Surface();
+	//Asocia la Surface con una nueva SDL_Surface
+	void setSurface(SDL_Surface* nuevaSurface);
 	/*
 		Nota: 
 			Como obtener video info:

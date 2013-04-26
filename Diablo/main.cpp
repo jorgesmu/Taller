@@ -16,6 +16,7 @@
 #include "source/constants/model.h"
 #include "source/utilities/Test.h"
 #include "source/utilities/coordenadas.h"
+#include "source/utilities/texto.h"
 
 #include "source/utilities/logErrores.h"
 logErrores err_log("log.txt");
@@ -181,5 +182,5 @@ int main(int argc, char* args[]) {
     //Test::test();
 
 	SDL_Quit();
-    return 0;    
+    return 0; 
 }

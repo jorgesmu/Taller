@@ -1,4 +1,8 @@
 #include "clientsocket.h"
+
+#include <Windows.h>
+#include <process.h>
+
 #include <iostream>
 #include <string>
 
@@ -16,11 +20,13 @@ int main() {
 	if(!sock.connect("127.0.0.1", 8080))
 		return 1;
 	
-	//if(!sock.send("hola\n")) return 1;
-
-	std::string stuff;
-	while(sock.receive(stuff)) {
-		std::cout << stuff << "\n";
+	// Creamos el thread de listen
+	HANDLE hth1 = (HANDLE)_beginthreadex(NULL, 0, ClientSocket::listenEntry, (void*)&sock, 0, NULL);
+	// Hacemos el input en el main thread
+	std::string line;
+	while(std::getline(std::cin, line)) {
+		if(!sock.send(line)) 
+			break;
 	}
 
 	sock.close();

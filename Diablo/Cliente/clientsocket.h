@@ -34,4 +34,8 @@ class ClientSocket {
 	bool send(const std::string& msg);
 	// Cierra el socket
 	void close();
+	// Funcion de entry para el socket en modo receive
+	static unsigned int __stdcall listenEntry(void* pthis);
+	// Funcion de listen 
+	void listenDo();
 };

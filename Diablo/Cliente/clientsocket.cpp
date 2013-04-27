@@ -98,3 +98,16 @@ void ClientSocket::close() {
 		std::cout << "Cierre de conexion exitosa\n";
 	}
 }
+
+unsigned int __stdcall ClientSocket::listenEntry(void* pthis) {
+	ClientSocket* pt = (ClientSocket*)pthis;
+	pt->listenDo();
+	return 0;
+}
+
+void ClientSocket::listenDo() {
+	std::string stuff;
+	while(this->receive(stuff)) {
+		std::cout << stuff;
+	}
+}

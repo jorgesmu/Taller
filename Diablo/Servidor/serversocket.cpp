@@ -3,6 +3,9 @@
 #include <sstream>
 #include <cassert>
 
+#include <Windows.h>
+#include <process.h>
+
 bool ServerSocket::WSinit = false;
 size_t ServerSocket::ref_count = 0;
 
@@ -68,7 +71,7 @@ bool ServerSocket::listen(int port) {
 }
 
 // Acepta una conexion entrante
-bool ServerSocket::accept(std::string& str_id) {
+bool ServerSocket::accept() {
 	// Estructura para guardar info de la conexion entrante
 	sockaddr_in tmp_st;
 	int tmp_st_size = sizeof(tmp_st);
@@ -76,13 +79,14 @@ bool ServerSocket::accept(std::string& str_id) {
 	SOCKET tmp_sck = ::accept(ListenSocket, (sockaddr*)&tmp_st, &tmp_st_size);
 	if(tmp_sck == INVALID_SOCKET) {
 		std::cerr << "Error during accept(): " << WSAGetLastError() << "\n";
-		str_id = "";
 		return false;
 	}else{
 		// Ingresamos la conexion en la tabla
 		addClient(tmp_st, tmp_sck);
 		// "Devolvemos" el id para la conexion que se acaba de aceptar
-		str_id = buildId(tmp_st);
+		clients_queue.push(buildId(tmp_st));
+		// Spawneamos el thread
+		_beginthreadex(NULL, 0, ServerSocket::acceptLastEntry, (void*)this, 0, NULL);
 		return true;
 	}
 }
@@ -108,6 +112,7 @@ SOCKET ServerSocket::getClient(const std::string& id) {
 		return SOCKET_ERROR;
 	}else{
 		size_t pos = clients_map[id];
+		std::cout << "Requested client <" << id << "> @ " << pos << "\n";
 		// Checkeo
 		assert(pos >= 0 && pos < clients_vector.size());
 		return clients_vector[pos];
@@ -125,6 +130,7 @@ bool ServerSocket::send(const std::string& cid, const std::string& msg) {
 	int res = ::send(sock, msg.c_str(), msg.size(), 0);
 	if(res == SOCKET_ERROR) {
 		std::cerr << "Error enviando mensaje: " << WSAGetLastError() << "\n";
+		removeClient(cid);
 		return false;
 	}else{
 		std::cout << "Se enviaron " << res << " bytes\n";
@@ -132,9 +138,24 @@ bool ServerSocket::send(const std::string& cid, const std::string& msg) {
 	}
 }
 
+bool ServerSocket::sendAll(const std::string& msg) {
+	bool res = true;
+	for(auto it = clients_map.begin(); it != clients_map.end(); it++) {
+		res = res && this->send(it->first, msg);
+	}
+	return res;
+}
+
 // Funcion de receive
-bool ServerSocket::receive(std::string& buff) {
-	int res = ::recv(ListenSocket, recvbuf, DEFAULT_BUFLEN, 0);
+bool ServerSocket::receive(const std::string& cid, std::string& buff) {
+
+	SOCKET sock = getClient(cid);
+	if(sock == SOCKET_ERROR) {
+		std::cerr << "Cliente invalid pasado a receive(): " << cid << "\n";
+		return false;
+	}
+
+	int res = ::recv(sock, recvbuf, DEFAULT_BUFLEN, 0);
 	if(res > 0) {
 		std::cout << "Received " << res << " bytes\n";
 		buff.clear();
@@ -142,22 +163,23 @@ bool ServerSocket::receive(std::string& buff) {
 		return true;
 	}else if(res == 0) {
 		std::cout << "Connection closed\n";
+		removeClient(cid);
 		return false;
 	}else{
 		std::cout << "Receive error: " << WSAGetLastError() << "\n";
+		removeClient(cid);
 		return false;
 	}
 }
 
 // Funciones para eliminar un cliente (desconectarlo)
 bool ServerSocket::removeClient(const std::string& str_id) {
-	size_t pos;
 	if(clients_map.find(str_id) == clients_map.end()) {
 		std::cerr << "removeClient(): " << str_id << " not found\n";
 		return false;
 	}else{
 		// Borramos
-		pos = clients_map[str_id];
+		size_t pos = clients_map[str_id];
 		int res = closesocket(clients_vector[pos]);
 		if(res == SOCKET_ERROR) {
 			std::cerr << "Cierre de conexion en removeClient() fallido para " << str_id << ": " << WSAGetLastError() << "\n";
@@ -188,4 +210,36 @@ std::string ServerSocket::buildId(const sockaddr_in& sckaddr) {
 	std::stringstream conn_id;
 	conn_id << inet_ntoa(sckaddr.sin_addr) << ":" << sckaddr.sin_port;
 	return conn_id.str();
+}
+
+unsigned int __stdcall ServerSocket::acceptLastEntry(void* pthis) {
+	ServerSocket* pt = (ServerSocket*)pthis;
+	pt->acceptLastDo();
+	return 0;
+}
+
+void ServerSocket::acceptLastDo() {
+	if(clients_queue.empty()) {
+		std::cerr << "Empty queue on acceptLastDo()\n";
+		return;
+	}else{
+		std::string cid = clients_queue.front();
+		clients_queue.pop();
+		std::stringstream ss;
+		ss << "<" << cid << "> connected\n";
+		std::cout << ss.str();
+		this->sendAll(ss.str());
+		std::string buff;
+		while(this->receive(cid, buff)) {
+			std::stringstream ss;
+			ss << "<" << cid << "> " << buff << "\n";
+			std::cout << ss.str();
+			this->sendAll(ss.str());
+		}
+		ss.str("");
+		ss << "<" << cid << "> disconnected\n";
+		std::cout << ss.str();
+		//this->sendAll(ss.str());
+		return;
+	}
 }

@@ -1,4 +1,8 @@
 #include "serversocket.h"
+
+#include <Windows.h>
+#include <process.h>
+
 #include <iostream>
 #include <string>
 
@@ -13,13 +17,10 @@ int main() {
 	if(!sock.listen(8080))
 		return 1;
 
-	// Aceptar 1 conexion
-	std::string cid;
-	if(!sock.accept(cid))
-		return 1;
-
-	// Mandar algo
-	sock.send(cid, "hola");
+	// Aceptar conexiones indefinidamente
+	while(sock.accept()) {
+		//
+	}
 
 	// Close
 	sock.close();

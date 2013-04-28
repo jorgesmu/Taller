@@ -72,7 +72,7 @@ void PersonajeAutomatico::init(const std::string& name,
 	//tile ancla
 	this -> tileAncla = tile;
 	//deltaUpdatePosicion
-	this -> deltaUpdatePosicion = Entidad::BASE_DE_TIEMPO/velocidad;
+	this -> deltaUpdatePosicion = Personaje::BASE_DE_TIEMPO/velocidad;
 	this -> velocidad = velocidad;
 	//tiempo siguiente update
 	this -> tiempoProximoUpdate = clock();

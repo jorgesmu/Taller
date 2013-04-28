@@ -23,8 +23,6 @@ class Tile;    // Declaración adelantada de Tile
 
 */
 class EntidadFija : public Entidad {
-	
-protected:
 
 	public:
 	
@@ -65,7 +63,7 @@ protected:
 
 	
 
-	EntidadFija::EntidadFija(EntidadFija* entidadFija);
+	EntidadFija(EntidadFija* entidadFija);
 		
 		
 	/*
@@ -112,24 +110,12 @@ protected:
 		retorna el ancho en tiles
 	*/
 	unsigned int getWidthInTiles();
-
-
-
+	
 	/*
 		Actualiza el surface de la instancia.
 
 	*/
 	virtual void update(Mapa* mapa);
-
-// -------------------------------------------------------------------------------------
-	/*
-		
-		Va a ser borrada.
-
-	*/
-	virtual void mover(Tile* tileDestino);
-
-// -------------------------------------------------------------------------------------
 
 	/*
 		Pre: Los parámetros cumplen las siguiente condiciones:
@@ -166,11 +152,24 @@ protected:
 	*/
 	virtual void setTileActual(Tile* tile , Mapa* mapa);
 
+	/*
+		Pre: La instancia ha sido creada.
+		Post: Se retorna verdadero si se puede ocupar el tile ocupado 
+		por dicha instancia.
+	*/
+	virtual bool isCaminable(Tile* tile , Mapa* mapa);
+
+	/*
+		Pre: La instancia ha sido creada.
+		Post: Se retorna el tile donde se encuentra la instancia.
+	*/
+	virtual Tile* getPosicion(Mapa* mapa);
+
 protected:	
 
 	/*
 		Pre: La instancia ha sido creada.
 		Post: Se han agregado las anclas correspondientes de acuerdo a la base.
 	*/
-	void EntidadFija::agregarAnclas(Mapa* mapa);
+	void agregarAnclas(Mapa* mapa);
 };

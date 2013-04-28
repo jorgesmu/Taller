@@ -140,22 +140,15 @@
 		}
 	}
 	
-
-
-
 	EntidadFija::EntidadFija(EntidadFija* entidadFija){
 		this->imagen = entidadFija->imagen;
 		this->widthInTiles = entidadFija->widthInTiles;
 		this->highInTiles = entidadFija->highInTiles;
-		this->tileDestino = entidadFija->tileDestino;
 		this->tileAncla = entidadFija->tileAncla;
 		this->surf = entidadFija->surf;
 		this->pixel_ref_x = entidadFija->pixel_ref_x;
 		this->pixel_ref_y = entidadFija->pixel_ref_y;
 		this->name = entidadFija->name;
-		this->deltaUpdatePosicion = entidadFija->deltaUpdatePosicion;
-		this->velocidad = entidadFija->velocidad;
-		this->tiempoProximoUpdate = entidadFija->tiempoProximoUpdate;
 		this->posX = entidadFija->posX;
 		this->posY = entidadFija->posY;
 		this->compartido = entidadFija->compartido;
@@ -172,22 +165,9 @@
 			this -> imagen = NULL;
 		}
 		this -> surf = NULL;
-		this -> tileDestino = NULL;
 		this -> tileAncla = NULL;
 	}
-	
-
-	// --------------------------------------------------------------------------
-
-	/*
-		Se borrara despues
-	*/
-	void EntidadFija::mover(Tile* tileDestino) {
 		
-	}
-		
-	// --------------------------------------------------------------------------
-
 	/*
 		Pre: Los parámetros cumplen las siguiente condiciones:
 
@@ -302,4 +282,25 @@
 		if (this->imagen != NULL){
 			this -> surf = this -> imagen -> getSurface();
 		}
+	}
+
+	/*
+		Pre: La instancia ha sido creada.
+		Post: Se retorna verdadero si se puede ocupar el tile ocupado 
+		por dicha instancia.
+	*/
+	bool EntidadFija::isCaminable(Tile* tile , Mapa* mapa){
+		return false;
+	}
+
+	/*
+		Pre: La instancia ha sido creada.
+		Post: Se retorna el tile donde se encuentra la instancia.
+	*/
+	Tile* EntidadFija::getPosicion(Mapa* mapa){
+		Tile* retorno=NULL;
+		if (mapa != NULL) {
+			retorno=mapa -> getTilePorPixeles(this -> posX , this -> posY);
+		}
+		return retorno;
 	}

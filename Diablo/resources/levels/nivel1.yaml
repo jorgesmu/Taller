@@ -64,8 +64,8 @@ entidades:
 
 escenarios:
   - nombre: bosque_encantado
-    size_x: 1000
-    size_y: 1000
+    size_x: 100
+    size_y: 100
     entidadesDef:
       - {x: 3, y: 5, entidad: piso}
       - {x: 3, y: 6, entidad: piso}

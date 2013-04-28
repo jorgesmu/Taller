@@ -2,52 +2,10 @@
 
 /*
 	Pre:-
-
-	Post: Inicializa los atributos con los valores por defecto.
-*/
-void Personaje::inicializarAtributosEnValoresDefault() {
-	//posicion
-	this -> posX = 0;
-	this -> posY = 0;
-	//tile destino
-	this -> tileDestino = NULL;
-	//tile ancla
-	this -> tileAncla = NULL;
-	//dimensiones
-	this -> highInTiles = 1;
-	this -> widthInTiles = 1;
-	//pixel de referencia
-	this -> pixel_ref_x = Entidad::PIXEL_REF_X_DEFAULT;
-	this -> pixel_ref_y = Entidad::PIXEL_REF_Y_DEFAULT;
-	//nombre
-	this -> name = "";
-	//surf e imagen
-	this -> surf = NULL;
-	this -> imagen = NULL;
-	//deltaUpdatePosicion
-	this -> deltaUpdatePosicion = Personaje::BASE_DE_TIEMPO/Personaje::VELOCIDAD_DEFAULT;
-	this -> velocidad = VELOCIDAD_DEFAULT;
-	//tiempo siguiente update
-	this -> tiempoProximoUpdate = clock();
-	//seteo posicion
-	this -> posX = 0;
-	this -> posY = 0;
-	//seteo como compartido
-	this -> compartido = true;
-	//seteo flag de actualizando posicion
-	this -> actualizandoPosicion = false;
-}
-
-/*
-	Pre:-
 		 
 	Post: Se ha creado la instancia con los valores por defecto.
 */
-Personaje::Personaje(){
-	// seteo del puntero a imagen
-	this -> imagen = NULL;
-	// Se setean los atributos a sus valores por defecto.
-	this -> inicializarAtributosEnValoresDefault();
+Personaje::Personaje():Entidad(){
 }
 
 /*
@@ -113,7 +71,7 @@ void Personaje::init(const std::string& name,
 	//tile ancla
 	this -> tileAncla = tile;
 	//deltaUpdatePosicion
-	this -> deltaUpdatePosicion = Personaje::BASE_DE_TIEMPO/velocidad;
+	this -> deltaUpdatePosicion = Entidad::BASE_DE_TIEMPO/velocidad;
 	this -> velocidad = velocidad;
 	//tiempo siguiente update
 	this -> tiempoProximoUpdate = clock();
@@ -130,239 +88,6 @@ void Personaje::init(const std::string& name,
 	}
 	//seteo como compartido
 	this -> compartido = false;
-	//seteo flag de actualizando posicion
-	this -> actualizandoPosicion = false;
-}
-
-/*
-	Pre: 
-
-	Post: Se retorna la dirección a la que se debe mover la entidad de acuerdo a la
-	siguiente codificacion:
-		SUR = 0;
-		SURESTE = 1;
-		ESTE = 2;
-		NORESTE = 3; 
-		NORTE = 4;
-		NOROESTE = 5;
-		OESTE = 6;
-		SUROESTE = 7;	
-		CENTRO = 8;
-			
-	NOTA: CENTRO implica que la entidad esta en el Tile destino y por lo tanto debe volver 
-	aproximadamente al centro del mismo.
-*/
-unsigned int Personaje::calcularDireccion(Mapa* mapa){
-	const int TOLERANCIA_SUPERIOR = 3;
-	const int TOLERANCIA_INFERIOR = -3;
-	if (tileDestino != NULL) {
-		int deltaX = this -> tileDestino -> getX() - posX;
-		int deltaY = this -> tileDestino -> getY() - posY;
-		//calculo de direccion
-		if (deltaX > TOLERANCIA_SUPERIOR){
-			if(deltaY < TOLERANCIA_INFERIOR){
-				return Personaje::NORESTE;
-			} else{
-				if((deltaY >= TOLERANCIA_INFERIOR) &&(deltaY <= TOLERANCIA_SUPERIOR)){
-					return Personaje::ESTE;
-				} else {
-					return Personaje::SURESTE;
-				}
-			}
-		}else {
-			if (deltaX < TOLERANCIA_INFERIOR) {
-				if (deltaY < TOLERANCIA_INFERIOR){
-					return Personaje::NOROESTE;
-				}else{
-					if ((deltaY >= TOLERANCIA_INFERIOR) &&(deltaY <= TOLERANCIA_SUPERIOR)) {
-						return Personaje::OESTE;
-					}else {
-						return Personaje::SUROESTE;
-					}
-				}
-			}else{
-				if (deltaY < TOLERANCIA_INFERIOR){
-					return Personaje::NORTE;
-				} else{
-					if((deltaY >= TOLERANCIA_INFERIOR) && (deltaY <= TOLERANCIA_SUPERIOR)){
-						return Personaje::CENTRO;
-					}else{
-						return Personaje::SUR;
-					}
-				}
-			}
-		}
-	}
-	return CENTRO;
-}
-
-void Personaje::actualizarPosicion(Mapa* mapa) {
-	//Pongo en verdadero el flag de actualizar posicion
-	this -> actualizandoPosicion = true;		
-	//Calculo de direccion
-	unsigned int direccion = this -> calcularDireccion(mapa);
-	// Si la direccion llego al tile
-	if(this -> tileDestino != NULL) {
-		if( (this -> posX != tileDestino -> getX()) || (this -> posY != tileDestino -> getY())){
-			// Calculo posicion siguiente (tomando en cuenta pixel de referencia y la posicion actual)
-			int posPixelSiguienteX = 0;
-			int posPixelSiguienteY = 0;
-			this -> calcularPosicionTentativa(direccion , &posPixelSiguienteX , &posPixelSiguienteY);
-			// Obtengo el tile siguiente
-			Tile* tileSiguiente = mapa -> getTilePorPixeles(posPixelSiguienteX , posPixelSiguienteY);
-			// Si el tileSiguiente es no nulo continua, sino no hace nada
-			if (tileSiguiente != NULL){
-				// Obtengo el tile del ancla nueva
-				Tile* tileAnclaSiguiente = this -> obtenerTileAncla(
-								posPixelSiguienteX , posPixelSiguienteY , 
-								direccion , mapa);
-				if (tileAnclaSiguiente != NULL) {
-					Tile* tileActual = mapa -> getTilePorPixeles(this -> posX , this -> posY);
-					// seteo de la posicion siguiente
-					this -> posX = posPixelSiguienteX;
-					this -> posY = posPixelSiguienteY;
-					// agrego la entidad al ancla siguiente
-					if (tileAnclaSiguiente != this -> tileAncla ) {
-						if (tileAncla != NULL) {
-							this -> tileAncla -> deleteEntidad(this);
-						}
-						this -> tileAncla = tileAnclaSiguiente;
-						this -> tileAncla -> addEntidad(this);	
-					} 
-					// agregado de entidad al tile nuevo
-					if (tileSiguiente != tileActual) {	
-						if (tileActual != NULL) {
-							if (this -> tileAncla != tileActual){
-								tileActual -> deleteEntidad(this);
-							} 
-							if (this -> tileAncla != tileSiguiente){
-								tileSiguiente -> addEntidad(this);
-							}
-						} else {
-							if (this -> tileAncla != tileSiguiente){
-								tileSiguiente -> addEntidad(this);
-							}
-						}								
-					}
-				} else{
-					Tile* tileActual = mapa -> getTilePorPixeles(this -> posX , this -> posY);
-					// seteo de la posicion siguiente
-					this -> posX = posPixelSiguienteX;
-					this -> posY = posPixelSiguienteY;
-					// agrego la entidad al ancla siguiente
-					if (tileAncla != NULL) {
-						this -> tileAncla -> deleteEntidad(this);
-					}
-					// seteo como tileAncla el tileSiguiente
-					this -> tileAncla = tileSiguiente;
-					this -> tileAncla -> addEntidad(this);
-					// agregado de entidad al tile nuevo
-					if (tileSiguiente != tileActual) {	
-						if (tileActual != NULL) {
-							tileActual -> deleteEntidad(this);
-						} 								
-					}
-				}
-			}
-		}
-	}
-	this -> actualizandoPosicion = false;
-	this -> actualizarImagen(direccion);
-}
-	
-/* 
-	El offset X Y sin tener en cuenta el pixel de origen
-*/
-void Personaje::calcularPosicionTentativa(unsigned int direccion , 
-								int* offsetTentativoX , int* offsetTentativoY){
-	*offsetTentativoX = posX;
-	*offsetTentativoY = posY;
-	switch (direccion){
-			case NORTE :  {
-				(*offsetTentativoY)-=Personaje::DELTA_AVANCE;
-				break;
-			}
-			case NORESTE : {
-				(*offsetTentativoX)+=(2*Personaje::DELTA_AVANCE);
-				(*offsetTentativoY)-=Personaje::DELTA_AVANCE;
-				break;
-			}
-			case ESTE : {
-				(*offsetTentativoX)+=(2*Personaje::DELTA_AVANCE);
-				break;
-			}
-			case SURESTE : {
-				(*offsetTentativoX)+=(2*Personaje::DELTA_AVANCE);
-				(*offsetTentativoY)+=Personaje::DELTA_AVANCE;
-				break;
-			}
-			case SUR : {
-				(*offsetTentativoY)+=Personaje::DELTA_AVANCE;
-				break;
-			}
-			case SUROESTE : {
-				(*offsetTentativoX)-=(2*Personaje::DELTA_AVANCE);
-				(*offsetTentativoY)+=Personaje::DELTA_AVANCE;
-				break;
-			}
-			case OESTE : {
-				(*offsetTentativoX)-=(2*Personaje::DELTA_AVANCE);
-				break;
-			}
-			case NOROESTE : {
-				(*offsetTentativoX)-=(2*Personaje::DELTA_AVANCE);
-				(*offsetTentativoY)-=Personaje::DELTA_AVANCE;
-				break;
-			}
-			case CENTRO : {
-				(*offsetTentativoX)+= this -> tileDestino -> getX() - this -> posX;
-				(*offsetTentativoY)+= this -> tileDestino -> getY() - this -> posY;
-				break;
-			}
-	}
-}
-	
-/*
-	posX y posY en pixeles, es una posicion cualquiera en el mapa
-*/
-Tile* Personaje::obtenerTileAncla(const int posX , const int posY , 
-												const unsigned int direccion , Mapa* mapa){
-	Tile* retorno = NULL;
-	int posImagenX = posX;
-	int posImagenY = posY + Tile::TILE_ALTO + Personaje::MARGEN_ANCLA_Y;
-	retorno = mapa -> getTilePorPixeles(posImagenX , posImagenY);
-	if (retorno == NULL){
-		posImagenY = posY + Tile::TILE_ALTO;
-		retorno = mapa -> getTilePorPixeles(posImagenX , posImagenY);
-		if (retorno == NULL) {
-			posImagenX = posX - Tile::TILE_ANCHO;
-			posImagenY = posY + Tile::TILE_ALTO/2;
-			if(retorno == NULL) {
-				posImagenX = posX - this -> pixel_ref_x;
-				retorno = mapa -> getTilePorPixeles(posImagenX , posImagenY);
-			}
-		}
-	}
-	return retorno;
-}
-
-void Personaje::setTileActual(Tile* tile) {
-	if ( (tile != NULL) && (!this->actualizandoPosicion)){
-		if(this -> tileAncla != tile) {
-			this -> posX = tile -> getX();
-			this -> posY = tile -> getY();
-			this -> tileDestino = tile;
-		}
-		this -> tileAncla = tile;
-	}
-}
-
-void Personaje::setTileActual(Tile* tile , Mapa* mapa){
-	setTileActual(tile);
-}
-
-void Personaje::setTileDestino(Tile* tile){
-	this -> tileDestino = tile;
 }
 
 /*
@@ -385,10 +110,10 @@ void Personaje::mover(Tile* tileDestino) {
 		int deltaY = this -> tileDestino -> getY() - posY;
 		//seteo de velocidad
 		int distancia = deltaX*deltaX + deltaY*deltaY;
-		if (distancia <= Personaje::COTA_VELOCIDAD_BAJA) {
-			this -> deltaUpdatePosicion = Personaje::BASE_DE_TIEMPO/this -> velocidad;
+		if (distancia <= Entidad::COTA_VELOCIDAD_BAJA) {
+			this -> deltaUpdatePosicion = Entidad::BASE_DE_TIEMPO/this -> velocidad;
 		} else {
-			this -> deltaUpdatePosicion = Personaje::BASE_DE_TIEMPO_RAPIDO/this -> velocidad;
+			this -> deltaUpdatePosicion = Entidad::BASE_DE_TIEMPO_RAPIDO/this -> velocidad;
 		}
 	}
 }
@@ -404,48 +129,4 @@ void Personaje::actualizarImagen(const unsigned int direccion){
 		// Actualizacion del surface
 		this -> surf = this -> imagen -> getSurface();
 	}
-}
-
-/*
-	Pre: La instancia ha sido creada.
-	Post: Se retorna verdadero si se puede ocupar el tile ocupado 
-	por dicha instancia.
-*/
-bool Personaje::isCaminable(Tile* tile , Mapa* mapa){
-	bool retorno = true;
-	// Solo en la posicion es no caminable
-	if (tile != NULL){
-		Tile* tileActual = mapa -> getTilePorPixeles(this -> posX , this -> posY);
-		if (tileActual == tile) {
-			retorno = false;
-		}
-	}
-	return retorno;
-}
-
-/*
-	Pre: La instancia ha sido creada.
-	Post: Se retorna el tile donde se encuentra la instancia.
-*/
-Tile* Personaje::getPosicion(Mapa* mapa){
-	Tile* retorno=NULL;
-	if (mapa != NULL) {
-		retorno=mapa -> getTilePorPixeles(this -> posX , this -> posY);
-	}
-	return retorno;
-}
-
-// Actualiza las cosas internas, si hubiese
-void Personaje::update(Mapa* mapa) {
-	if (this -> tiempoProximoUpdate <= clock()){
-		if (this -> tileDestino != NULL) {
-			//actualizacion de posicion
-			this -> actualizarPosicion(mapa);
-		} else {
-			if(this -> imagen != NULL) {
-				this -> surf = this -> imagen -> getSurface();
-			}
-		}
-		this -> tiempoProximoUpdate = clock() + this -> deltaUpdatePosicion;
-	} 
 }

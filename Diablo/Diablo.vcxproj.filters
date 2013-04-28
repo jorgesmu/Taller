@@ -102,9 +102,6 @@
     <ClCompile Include="source\utilities\texto.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\display\EntidadFijaCaminable.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\utilities\timer.h">
@@ -198,9 +195,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="source\utilities\texto.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="source\display\EntidadFijaCaminable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -19,6 +19,7 @@ ServerSocket::~ServerSocket() {
 	// Clean if this is the last socket
 	if(ref_count == 0) {
 		WSACleanup();
+		WSinit = false;
 	}
 }
 
@@ -45,6 +46,8 @@ bool ServerSocket::init() {
 		std::cout << "Socket creado\n";
 		return true;
 	}
+	// Creamos la critical section
+	InitializeCriticalSection(&critSect);
 }
 
 // Funcion de conexion (solo para clientes)
@@ -93,6 +96,7 @@ bool ServerSocket::accept() {
 
 // Agrega un cliente a la tabla
 void ServerSocket::addClient(const sockaddr_in& tmp_st, const SOCKET& sock) {
+	//EnterCriticalSection(&critSect);
 	// Ingresamos el socket en la lista
 	clients_vector.push_back(sock);
 	// Ingresamos el cliente por IP:Port en la tabla
@@ -104,19 +108,24 @@ void ServerSocket::addClient(const sockaddr_in& tmp_st, const SOCKET& sock) {
 	}else{
 		std::cerr << "Warning.. duplicate connection from " << conn_id << "\n";
 	}
+	//LeaveCriticalSection(&critSect);
 }
 
 SOCKET ServerSocket::getClient(const std::string& id) {
+	SOCKET ret;
+	//EnterCriticalSection(&critSect);
 	if(clients_map.find(id) == clients_map.end()) {
 		std::cerr << "Error en getClient(): " << id << " requested not found\n";
-		return SOCKET_ERROR;
+		ret = SOCKET_ERROR;
 	}else{
 		size_t pos = clients_map[id];
 		std::cout << "Requested client <" << id << "> @ " << pos << "\n";
 		// Checkeo
 		assert(pos >= 0 && pos < clients_vector.size());
-		return clients_vector[pos];
+		ret = clients_vector[pos];
 	}
+	//LeaveCriticalSection(&critSect);
+	return ret;
 }
 
 // Funcion de send
@@ -139,10 +148,12 @@ bool ServerSocket::send(const std::string& cid, const std::string& msg) {
 }
 
 bool ServerSocket::sendAll(const std::string& msg) {
+	//EnterCriticalSection(&critSect);
 	bool res = true;
 	for(auto it = clients_map.begin(); it != clients_map.end(); it++) {
 		res = res && this->send(it->first, msg);
 	}
+	//LeaveCriticalSection(&critSect);
 	return res;
 }
 
@@ -174,9 +185,11 @@ bool ServerSocket::receive(const std::string& cid, std::string& buff) {
 
 // Funciones para eliminar un cliente (desconectarlo)
 bool ServerSocket::removeClient(const std::string& str_id) {
+	bool ret;
+	//EnterCriticalSection(&critSect);
 	if(clients_map.find(str_id) == clients_map.end()) {
 		std::cerr << "removeClient(): " << str_id << " not found\n";
-		return false;
+		ret = false;
 	}else{
 		// Borramos
 		size_t pos = clients_map[str_id];
@@ -189,8 +202,10 @@ bool ServerSocket::removeClient(const std::string& str_id) {
 		// Borramos de ambas estructuras 
 		clients_vector.erase(clients_vector.begin()+pos);
 		clients_map.erase(str_id);
-		return true;
+		ret = true;
 	}
+	//LeaveCriticalSection(&critSect);
+	return ret;
 }
 
 // Cierra el socket principal
@@ -239,7 +254,7 @@ void ServerSocket::acceptLastDo() {
 		ss.str("");
 		ss << "<" << cid << "> disconnected\n";
 		std::cout << ss.str();
-		//this->sendAll(ss.str());
+		this->sendAll(ss.str());
 		return;
 	}
 }

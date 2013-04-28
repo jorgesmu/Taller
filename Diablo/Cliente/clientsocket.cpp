@@ -14,6 +14,7 @@ ClientSocket::~ClientSocket() {
 	// Clean if this is the last socket
 	if(ref_count == 0) {
 		WSACleanup();
+		WSinit = false;
 	}
 }
 

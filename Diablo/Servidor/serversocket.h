@@ -22,6 +22,8 @@ class ServerSocket {
 	// Variables para manejo del socket
 	SOCKET ListenSocket;
 	char recvbuf[DEFAULT_BUFLEN];
+	// Mutex para el acceso a la data de clientes
+	CRITICAL_SECTION critSect;
 	// Vector de sockets conectados
 	std::vector<SOCKET> clients_vector;
 	// Queue de clientes aceptados pero que no estan siendo escuchados

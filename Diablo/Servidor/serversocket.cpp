@@ -44,10 +44,10 @@ bool ServerSocket::init() {
         return false;
     }else{
 		std::cout << "Socket creado\n";
-		return true;
 	}
-	// Creamos la critical section
+	// Inicializamos la critical section
 	InitializeCriticalSection(&critSect);
+	return true;
 }
 
 // Funcion de conexion (solo para clientes)
@@ -96,35 +96,30 @@ bool ServerSocket::accept() {
 
 // Agrega un cliente a la tabla
 void ServerSocket::addClient(const sockaddr_in& tmp_st, const SOCKET& sock) {
-	//EnterCriticalSection(&critSect);
-	// Ingresamos el socket en la lista
-	clients_vector.push_back(sock);
+	EnterCriticalSection(&critSect);
 	// Ingresamos el cliente por IP:Port en la tabla
 	const std::string conn_id = buildId(tmp_st);
 	// Un checkeo de que no exista ya esa conexion.. no deberia ocurrir nunca igual
 	if(clients_map.find(conn_id) == clients_map.end()) {
-		clients_map[conn_id] = clients_vector.size()-1;
+		clients_map[conn_id] = sock;
 		std::cout << "Accepted connection from " << conn_id  << "\n";
 	}else{
 		std::cerr << "Warning.. duplicate connection from " << conn_id << "\n";
 	}
-	//LeaveCriticalSection(&critSect);
+	LeaveCriticalSection(&critSect);
 }
 
 SOCKET ServerSocket::getClient(const std::string& id) {
 	SOCKET ret;
-	//EnterCriticalSection(&critSect);
+	EnterCriticalSection(&critSect);
 	if(clients_map.find(id) == clients_map.end()) {
 		std::cerr << "Error en getClient(): " << id << " requested not found\n";
 		ret = SOCKET_ERROR;
 	}else{
-		size_t pos = clients_map[id];
-		std::cout << "Requested client <" << id << "> @ " << pos << "\n";
-		// Checkeo
-		assert(pos >= 0 && pos < clients_vector.size());
-		ret = clients_vector[pos];
+		ret = clients_map[id];
+		std::cout << "Requested client <" << id << "\n";
 	}
-	//LeaveCriticalSection(&critSect);
+	LeaveCriticalSection(&critSect);
 	return ret;
 }
 
@@ -139,7 +134,6 @@ bool ServerSocket::send(const std::string& cid, const std::string& msg) {
 	int res = ::send(sock, msg.c_str(), msg.size(), 0);
 	if(res == SOCKET_ERROR) {
 		std::cerr << "Error enviando mensaje: " << WSAGetLastError() << "\n";
-		removeClient(cid);
 		return false;
 	}else{
 		std::cout << "Se enviaron " << res << " bytes\n";
@@ -148,12 +142,12 @@ bool ServerSocket::send(const std::string& cid, const std::string& msg) {
 }
 
 bool ServerSocket::sendAll(const std::string& msg) {
-	//EnterCriticalSection(&critSect);
+	EnterCriticalSection(&critSect);
 	bool res = true;
 	for(auto it = clients_map.begin(); it != clients_map.end(); it++) {
 		res = res && this->send(it->first, msg);
 	}
-	//LeaveCriticalSection(&critSect);
+	LeaveCriticalSection(&critSect);
 	return res;
 }
 
@@ -174,11 +168,9 @@ bool ServerSocket::receive(const std::string& cid, std::string& buff) {
 		return true;
 	}else if(res == 0) {
 		std::cout << "Connection closed\n";
-		removeClient(cid);
 		return false;
 	}else{
 		std::cout << "Receive error: " << WSAGetLastError() << "\n";
-		removeClient(cid);
 		return false;
 	}
 }
@@ -186,25 +178,23 @@ bool ServerSocket::receive(const std::string& cid, std::string& buff) {
 // Funciones para eliminar un cliente (desconectarlo)
 bool ServerSocket::removeClient(const std::string& str_id) {
 	bool ret;
-	//EnterCriticalSection(&critSect);
+	EnterCriticalSection(&critSect);
 	if(clients_map.find(str_id) == clients_map.end()) {
 		std::cerr << "removeClient(): " << str_id << " not found\n";
 		ret = false;
 	}else{
 		// Borramos
-		size_t pos = clients_map[str_id];
-		int res = closesocket(clients_vector[pos]);
+		int res = closesocket(clients_map[str_id]);
 		if(res == SOCKET_ERROR) {
 			std::cerr << "Cierre de conexion en removeClient() fallido para " << str_id << ": " << WSAGetLastError() << "\n";
 		}else{
 			std::cout << "Cierre de conexion exitosa para " << str_id << "\n";
 		}
-		// Borramos de ambas estructuras 
-		clients_vector.erase(clients_vector.begin()+pos);
+		// Borramos
 		clients_map.erase(str_id);
 		ret = true;
 	}
-	//LeaveCriticalSection(&critSect);
+	LeaveCriticalSection(&critSect);
 	return ret;
 }
 
@@ -251,6 +241,7 @@ void ServerSocket::acceptLastDo() {
 			std::cout << ss.str();
 			this->sendAll(ss.str());
 		}
+		removeClient(cid);
 		ss.str("");
 		ss << "<" << cid << "> disconnected\n";
 		std::cout << ss.str();

@@ -18,6 +18,7 @@ class ClientSocket {
 	// Variables para manejo del socket
 	SOCKET ConnectSocket;
 	char recvbuf[DEFAULT_BUFLEN];
+	bool open;
 
 	public:
 	// Constructor
@@ -32,6 +33,8 @@ class ClientSocket {
 	bool receive(std::string& buff);
 	// Funcion de send
 	bool send(const std::string& msg);
+	// Nos dice si el socket esta abierto o no
+	bool isOpen() const;
 	// Cierra el socket
 	void close();
 	// Funcion de entry para el socket en modo receive

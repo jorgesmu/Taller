@@ -25,7 +25,7 @@ int main() {
 	// Hacemos el input en el main thread
 	std::string line;
 	while(std::getline(std::cin, line)) {
-		if(!sock.send(line)) 
+		if(!sock.isOpen() || !sock.send(line)) 
 			break;
 	}
 

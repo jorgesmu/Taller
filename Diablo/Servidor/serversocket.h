@@ -24,12 +24,10 @@ class ServerSocket {
 	char recvbuf[DEFAULT_BUFLEN];
 	// Mutex para el acceso a la data de clientes
 	CRITICAL_SECTION critSect;
-	// Vector de sockets conectados
-	std::vector<SOCKET> clients_vector;
 	// Queue de clientes aceptados pero que no estan siendo escuchados
 	std::queue<std::string> clients_queue;
 	// Tabla de clients
-	std::map<std::string, size_t> clients_map;
+	std::map<std::string, SOCKET> clients_map;
 	// Funcion que agrega un cliente en la tabla
 	void addClient(const sockaddr_in& tmp_st, const SOCKET& sock);
 	// Construye un ID basado en la informacion de sockaddr_in

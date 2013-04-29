@@ -7,6 +7,8 @@ size_t ClientSocket::ref_count = 0;
 ClientSocket::ClientSocket() {
 	// Increase ref count
 	ref_count++;
+	// Init status
+	open = false;
 }
 
 ClientSocket::~ClientSocket() {
@@ -53,9 +55,11 @@ bool ClientSocket::connect(const std::string& dir, int port) {
 	// Creamos la conexion
 	if(::connect(ConnectSocket, (SOCKADDR*)&clientService, sizeof(clientService)) == SOCKET_ERROR) {
 		std::cerr << "Error conectando a " << dir << ":" << port << ": " << WSAGetLastError() << "\n";
+		this->close();
 		return false;
 	}else{
 		std::cout << "Conectado a " << dir << ":" << port << "\n";
+		open = true;
 		return true;
 	}
 
@@ -66,6 +70,7 @@ bool ClientSocket::send(const std::string& msg) {
 	int res = ::send(ConnectSocket, msg.c_str(), msg.size(), 0);
 	if(res == SOCKET_ERROR) {
 		std::cerr << "Error enviando mensaje: " << WSAGetLastError() << "\n";
+		this->close();
 		return false;
 	}else{
 		std::cout << "Se enviaron " << res << " bytes\n";
@@ -83,20 +88,25 @@ bool ClientSocket::receive(std::string& buff) {
 		return true;
 	}else if(res == 0) {
 		std::cout << "Connection closed\n";
+		this->close();
 		return false;
 	}else{
 		std::cout << "Receive error: " << WSAGetLastError() << "\n";
+		this->close();
 		return false;
 	}
 }
 
 // Cierra el socket
 void ClientSocket::close() {
-	int res = closesocket(ConnectSocket);
-	if(res == SOCKET_ERROR) {
-		std::cerr << "Cierre de conexion fallido: " << WSAGetLastError() << "\n";
-	}else{
-		std::cout << "Cierre de conexion exitosa\n";
+	if(isOpen()) {
+		int res = closesocket(ConnectSocket);
+		if(res == SOCKET_ERROR) {
+			std::cerr << "Cierre de conexion fallido: " << WSAGetLastError() << "\n";
+		}else{
+			std::cout << "Cierre de conexion exitosa\n";
+		}
+		open = false;
 	}
 }
 
@@ -111,4 +121,8 @@ void ClientSocket::listenDo() {
 	while(this->receive(stuff)) {
 		std::cout << stuff;
 	}
+}
+
+bool ClientSocket::isOpen() const {
+	return this->open;
 }

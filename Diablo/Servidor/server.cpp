@@ -7,6 +7,9 @@
 #include <string>
 
 #include "wcomm.h"
+#include "serversocket.h"
+
+using namespace std;
 
 int chat() {
 	
@@ -31,7 +34,7 @@ int chat() {
 
 int main() {
 	//chat();
-
+/*
 	WComm w;
 	// Start Server Daemon
 	w.startServer(27016);
@@ -65,6 +68,41 @@ int main() {
 		// Disconnect client
 		w.closeConnection();
 	}
-	getchar();
+	*/
+	ServerSocket s;
+	// Start Server Daemon
+	s.init();
+	s.listen(27016);
+	printf("Server Started........\n");
+
+    while (TRUE) {
+        
+		// Wait until a client connects
+		s.accept();
+		printf("Client Connected......\n");
+
+		// Work with client
+		while(TRUE)
+		{
+			string rec;
+			s.receive("1",rec);
+			s.send("1","OK");
+
+			if(strcmp(rec.c_str(),"FileSend")==0)
+			{
+				char fname[32] ="";
+				s.fileReceive(fname);
+				printf("File Received.........\n");
+			}
+
+			
+			if(strcmp(rec.c_str(),"EndConnection")==0)break;
+			printf("Connection Ended......\n");
+
+		}
+		
+		// Disconnect client
+		s.close();
+	}
 	return 0;
 }

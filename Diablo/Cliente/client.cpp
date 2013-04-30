@@ -7,6 +7,7 @@
 #include <string>
 
 #include "wcomm.h"
+#include "clientsocket.h"
 
 #pragma comment(lib, "Ws2_32.lib")
 	
@@ -37,6 +38,7 @@ int chat() {
 int main() {
 	//chat();
 
+	
 	WComm w;
 	char rec[32] = "";
 	// Connect To Server
@@ -52,5 +54,25 @@ int main() {
 	w.sendData("EndConnection");w.recvData(rec,32);
 	printf("Connection ended......\n");
 	getchar();
+	
+	/*
+	ClientSocket s;
+	string rec;
+	// Connect To Server
+	s.connect("127.0.0.1",27016);
+	printf("Connected to server...\n");
+
+	// Sending File
+	s.send("FileSend");
+	s.receive(rec);
+	s.sendFile("Files/test.JPG");
+	printf("File Sent.............\n");
+
+	// Send Close Connection Signal
+	s.send("EndConnection");
+	s.receive(rec);
+	printf("Connection ended......\n")
+	getchar();
+	*/
 	return 0;
 }

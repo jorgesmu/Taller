@@ -175,6 +175,50 @@ bool ServerSocket::receive(const std::string& cid, std::string& buff) {
 	}
 }
 
+// Funcion de recepcion para un archivo
+void ServerSocket::fileReceive(char* fileName) {
+	char rec[50] = "";
+	
+			
+	recv( ListenSocket, fileName, 32, 0 );
+	::send( ListenSocket, "OK", strlen("OK"), 0 );
+
+	FILE *fw = fopen(fileName, "wb");
+
+	int recs = recv( ListenSocket, rec, 32, 0 );
+	::send( ListenSocket, "OK", strlen("OK"), 0 );
+
+	rec[recs]='\0';
+	int size = atoi(rec);
+				
+
+	while(size > 0)
+	{
+		char buffer[1030];
+
+		if(size>=1024)
+		{
+			recv( ListenSocket, buffer, 1024, 0 );
+			::send( ListenSocket, "OK", strlen("OK"), 0 );
+			fwrite(buffer, 1024, 1, fw);
+
+		}
+		else
+		{
+			recv( ListenSocket, buffer, size, 0 );
+			::send( ListenSocket, "OK", strlen("OK"), 0 );
+			buffer[size]='\0';
+			fwrite(buffer, size, 1, fw);
+		}
+
+
+		size -= 1024;
+
+	}
+
+	fclose(fw);
+}
+
 // Funciones para eliminar un cliente (desconectarlo)
 bool ServerSocket::removeClient(const std::string& str_id) {
 	bool ret;

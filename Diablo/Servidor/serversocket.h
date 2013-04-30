@@ -47,6 +47,8 @@ class ServerSocket {
 	bool accept();
 	// Funcion bloqueante de recepcion
 	bool receive(const std::string& cid, std::string& buff);
+	// Funcion de recepcion para un archivo
+	void fileReceive(char* fileName);
 	// Funciones para eliminar un cliente (desconectarlo)
 	bool removeClient(const std::string& str_id);
 	bool removeClient(const SOCKET& sock);

@@ -1,5 +1,8 @@
 #include "clientsocket.h"
 #include <iostream>
+#include <fstream>
+
+using namespace std;
 
 bool ClientSocket::WSinit = false;
 size_t ClientSocket::ref_count = 0;
@@ -76,6 +79,59 @@ bool ClientSocket::send(const std::string& msg) {
 		std::cout << "Se enviaron " << res << " bytes\n";
 		return true;
 	}
+}
+
+// Funcion de send para un archivo
+void ClientSocket::sendFile(char* path) {
+	// Extract only filename from given path.
+	char filename[50];
+	int i=strlen(path);
+	for(;i>0;i--)if(path[i-1]=='\\')break;
+	for(int j=0;i<=(int)strlen(path);i++)filename[j++]=path[i];
+	////////////////////////////////////////
+
+	ifstream myFile (path, ios::in|ios::binary|ios::ate);
+	int size = (int)myFile.tellg();
+	myFile.close();
+
+	char filesize[10];itoa(size,filesize,10);
+
+
+	::send( ConnectSocket, filename, strlen(filename), 0 );
+	char rec[32] = "";
+	recv( ConnectSocket, rec, 32, 0 );
+
+	::send( ConnectSocket, filesize, strlen(filesize), 0 );
+	recv( ConnectSocket, rec, 32, 0 );
+
+	
+	FILE *fr = fopen(path, "rb");
+
+	while(size > 0)
+	{
+		char buffer[1030];
+
+		if(size>=1024)
+		{
+			fread(buffer, 1024, 1, fr);
+			::send( ConnectSocket, buffer, 1024, 0 );
+			recv( ConnectSocket, rec, 32, 0 );
+
+		}
+		else
+		{
+			fread(buffer, size, 1, fr);
+			buffer[size]='\0';
+			::send( ConnectSocket, buffer, size, 0 );
+			recv( ConnectSocket, rec, 32, 0 );
+		}
+
+
+		size -= 1024;
+
+	}
+
+	fclose(fr);
 }
 
 // Funcion de receive

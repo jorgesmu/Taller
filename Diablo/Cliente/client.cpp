@@ -6,12 +6,13 @@
 #include <iostream>
 #include <string>
 
+#include "wcomm.h"
+
 #pragma comment(lib, "Ws2_32.lib")
 	
 using namespace std;
 
-int main() {
-
+int chat() {
 	ClientSocket sock;
 	
 	if(!sock.init()) 
@@ -30,5 +31,26 @@ int main() {
 	}
 
 	sock.close();
+	return 0;
+}
+
+int main() {
+	//chat();
+
+	WComm w;
+	char rec[32] = "";
+	// Connect To Server
+	w.connectServer("127.0.0.1",27016);
+	printf("Connected to server...\n");
+
+	// Sending File
+	w.sendData("FileSend");	w.recvData(rec,32);
+	w.fileSend("Files/test.JPG");
+	printf("File Sent.............\n");
+
+	// Send Close Connection Signal
+	w.sendData("EndConnection");w.recvData(rec,32);
+	printf("Connection ended......\n");
+	getchar();
 	return 0;
 }

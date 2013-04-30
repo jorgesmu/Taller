@@ -21,9 +21,15 @@
     <ClCompile Include="clientsocket.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="wcomm.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="clientsocket.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="wcomm.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

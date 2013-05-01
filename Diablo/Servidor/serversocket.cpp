@@ -327,3 +327,15 @@ bool ServerSocket::sendFiles(const std::string& cid, const std::vector<std::stri
 
 	return true;
 }
+
+std::string ServerSocket::getCIDbyNick(const std::string& nick) {
+	EnterCriticalSection(&critSect);
+	for(auto it = clients_map.begin();it != clients_map.end();it++) {
+		if(it->second.nick == nick) {
+			LeaveCriticalSection(&critSect);
+			return it->first;
+		}
+	}
+	LeaveCriticalSection(&critSect);
+	return "";
+}

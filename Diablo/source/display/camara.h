@@ -2,7 +2,7 @@
 
 #include "SDL.h"
 
-const float DRAG_SPEED = 4.0f;
+const float DRAG_SPEED = 0.5f;
 
 class Camara {
 

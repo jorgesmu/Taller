@@ -24,7 +24,7 @@ logErrores err_log("log.txt");
 int main(int argc, char* args[]) {
 
 	// Parseo el nivel
-	config_juego juego = parsear("../resources/levels/nivel1.yaml");
+	config_juego juego = parsear("../resources/nivel1.yaml");
 	config_pantalla* pantalla = juego.get_pantalla();
 	vector <config_entidad> entidades = juego.get_entidades();
 	config_general configuracion = juego.get_configuracion();

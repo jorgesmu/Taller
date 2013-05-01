@@ -46,6 +46,8 @@ class ServerSocket {
 	static std::string buildId(const sockaddr_in& sckaddr);
 	// Retorna un Client dado un ID o SOCKET_ERROR en caso de error
 	Client& getClient(const std::string& id);
+	// Devuelve un cid dado un nick o "" en caso de error
+	std::string getCIDbyNick(const std::string& nick);
 	public:
 	// Constructor
 	ServerSocket();

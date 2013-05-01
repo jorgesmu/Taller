@@ -1,3 +1,5 @@
+#include "SDL.h"
+
 #include "clientsocket.h"
 
 #include <Windows.h>
@@ -6,14 +8,19 @@
 #include <iostream>
 #include <string>
 
-#include "wcomm.h"
-#include "clientsocket.h"
+#include "../source/net/bitstream.h"
+#include "../source/net/defines.h"
 
 #pragma comment(lib, "Ws2_32.lib")
-	
-using namespace std;
 
-int chat() {
+int main(int argc, char* argv[]) {
+
+	// Verificamos que se pase el nick
+	if(argc == 1) {
+		std::cout << "Falta especificar nick:\ncliente.exe <nick>\n";
+		return 0;
+	}
+
 	ClientSocket sock;
 	
 	if(!sock.init()) 
@@ -24,55 +31,17 @@ int chat() {
 	
 	// Creamos el thread de listen
 	HANDLE hth1 = (HANDLE)_beginthreadex(NULL, 0, ClientSocket::listenEntry, (void*)&sock, 0, NULL);
+	// Mandamos el nick
+	BitStream bs;
+	bs << PROTO::NICK << std::string(argv[1]);
+	sock.send(bs.str());
 	// Hacemos el input en el main thread
 	std::string line;
-	while(std::getline(std::cin, line)) {
-		if(!sock.isOpen() || !sock.send(line)) 
+	while(sock.isOpen() && std::getline(std::cin, line)) {
+		if(!sock.send(line)) 
 			break;
 	}
 
 	sock.close();
-	return 0;
-}
-
-int main() {
-	//chat();
-
-	
-	WComm w;
-	char rec[32] = "";
-	// Connect To Server
-	w.connectServer("127.0.0.1",27016);
-	printf("Connected to server...\n");
-
-	// Sending File
-	w.sendData("FileSend");	w.recvData(rec,32);
-	w.fileSend("Files/test.JPG");
-	printf("File Sent.............\n");
-
-	// Send Close Connection Signal
-	w.sendData("EndConnection");w.recvData(rec,32);
-	printf("Connection ended......\n");
-	getchar();
-	
-	/*
-	ClientSocket s;
-	string rec;
-	// Connect To Server
-	s.connect("127.0.0.1",27016);
-	printf("Connected to server...\n");
-
-	// Sending File
-	s.send("FileSend");
-	s.receive(rec);
-	s.sendFile("Files/test.JPG");
-	printf("File Sent.............\n");
-
-	// Send Close Connection Signal
-	s.send("EndConnection");
-	s.receive(rec);
-	printf("Connection ended......\n")
-	getchar();
-	*/
 	return 0;
 }

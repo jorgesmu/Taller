@@ -1,10 +1,14 @@
 #pragma once
+
 #pragma comment(lib, "Ws2_32.lib")
 
 #include <string>
 
 #include <winsock2.h>
 #include <ws2tcpip.h>
+
+#include "../source/net/bitstream.h"
+#include "../source/net/defines.h"
 
 // Tamaño del buffer de envio/recepcion
 const size_t DEFAULT_BUFLEN = 1024;
@@ -33,8 +37,6 @@ class ClientSocket {
 	bool receive(std::string& buff);
 	// Funcion de send
 	bool send(const std::string& msg);
-	// Funcion de send para un archivo
-	void sendFile(char* path);
 	// Nos dice si el socket esta abierto o no
 	bool isOpen() const;
 	// Cierra el socket

@@ -21,7 +21,7 @@
     <ClCompile Include="serversocket.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="wcomm.cpp">
+    <ClCompile Include="..\source\net\bitstream.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -29,7 +29,10 @@
     <ClInclude Include="serversocket.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="wcomm.h">
+    <ClInclude Include="..\source\net\bitstream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\net\defines.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

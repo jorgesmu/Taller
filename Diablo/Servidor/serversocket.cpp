@@ -101,7 +101,7 @@ void ServerSocket::addClient(const sockaddr_in& tmp_st, const SOCKET& sock) {
 	const std::string conn_id = buildId(tmp_st);
 	// Un checkeo de que no exista ya esa conexion.. no deberia ocurrir nunca igual
 	if(clients_map.find(conn_id) == clients_map.end()) {
-		clients_map[conn_id] = sock;
+		clients_map[conn_id].sock = sock;
 		std::cout << "Accepted connection from " << conn_id  << "\n";
 	}else{
 		std::cerr << "Warning.. duplicate connection from " << conn_id << "\n";
@@ -109,23 +109,26 @@ void ServerSocket::addClient(const sockaddr_in& tmp_st, const SOCKET& sock) {
 	LeaveCriticalSection(&critSect);
 }
 
-SOCKET ServerSocket::getClient(const std::string& id) {
-	SOCKET ret;
+Client& ServerSocket::getClient(const std::string& id) {
 	EnterCriticalSection(&critSect);
 	if(clients_map.find(id) == clients_map.end()) {
 		std::cerr << "Error en getClient(): " << id << " requested not found\n";
-		ret = SOCKET_ERROR;
+		// Fake error-reporting client
+		Client ret = clients_map["0"];
+		ret.sock = SOCKET_ERROR;
+		ret.nick = "INVALID-CLIENT";
+		LeaveCriticalSection(&critSect);
+		return ret;
 	}else{
-		ret = clients_map[id];
-		std::cout << "Requested client <" << id << "\n";
+		LeaveCriticalSection(&critSect);
+		return clients_map[id];
+		//std::cout << "Requested client <" << id << ">\n";
 	}
-	LeaveCriticalSection(&critSect);
-	return ret;
 }
 
 // Funcion de send
 bool ServerSocket::send(const std::string& cid, const std::string& msg) {
-	SOCKET sock = getClient(cid);
+	SOCKET sock = getClient(cid).sock;
 	if(sock == SOCKET_ERROR) {
 		std::cerr << "Cliente invalid pasado a send(): " << cid << "\n";
 		return false;
@@ -136,7 +139,7 @@ bool ServerSocket::send(const std::string& cid, const std::string& msg) {
 		std::cerr << "Error enviando mensaje: " << WSAGetLastError() << "\n";
 		return false;
 	}else{
-		std::cout << "Se enviaron " << res << " bytes\n";
+		//std::cout << "Se enviaron " << res << " bytes\n";
 		return true;
 	}
 }
@@ -154,7 +157,7 @@ bool ServerSocket::sendAll(const std::string& msg) {
 // Funcion de receive
 bool ServerSocket::receive(const std::string& cid, std::string& buff) {
 
-	SOCKET sock = getClient(cid);
+	SOCKET sock = getClient(cid).sock;
 	if(sock == SOCKET_ERROR) {
 		std::cerr << "Cliente invalid pasado a receive(): " << cid << "\n";
 		return false;
@@ -175,50 +178,6 @@ bool ServerSocket::receive(const std::string& cid, std::string& buff) {
 	}
 }
 
-// Funcion de recepcion para un archivo
-void ServerSocket::fileReceive(char* fileName) {
-	char rec[50] = "";
-	
-			
-	recv( ListenSocket, fileName, 32, 0 );
-	::send( ListenSocket, "OK", strlen("OK"), 0 );
-
-	FILE *fw = fopen(fileName, "wb");
-
-	int recs = recv( ListenSocket, rec, 32, 0 );
-	::send( ListenSocket, "OK", strlen("OK"), 0 );
-
-	rec[recs]='\0';
-	int size = atoi(rec);
-				
-
-	while(size > 0)
-	{
-		char buffer[1030];
-
-		if(size>=1024)
-		{
-			recv( ListenSocket, buffer, 1024, 0 );
-			::send( ListenSocket, "OK", strlen("OK"), 0 );
-			fwrite(buffer, 1024, 1, fw);
-
-		}
-		else
-		{
-			recv( ListenSocket, buffer, size, 0 );
-			::send( ListenSocket, "OK", strlen("OK"), 0 );
-			buffer[size]='\0';
-			fwrite(buffer, size, 1, fw);
-		}
-
-
-		size -= 1024;
-
-	}
-
-	fclose(fw);
-}
-
 // Funciones para eliminar un cliente (desconectarlo)
 bool ServerSocket::removeClient(const std::string& str_id) {
 	bool ret;
@@ -228,7 +187,7 @@ bool ServerSocket::removeClient(const std::string& str_id) {
 		ret = false;
 	}else{
 		// Borramos
-		int res = closesocket(clients_map[str_id]);
+		int res = closesocket(clients_map[str_id].sock);
 		if(res == SOCKET_ERROR) {
 			std::cerr << "Cierre de conexion en removeClient() fallido para " << str_id << ": " << WSAGetLastError() << "\n";
 		}else{
@@ -268,28 +227,103 @@ unsigned int __stdcall ServerSocket::acceptLastEntry(void* pthis) {
 }
 
 void ServerSocket::acceptLastDo() {
+	std::cout << "ABRACADABRA\n";
+	EnterCriticalSection(&critSect);
 	if(clients_queue.empty()) {
 		std::cerr << "Empty queue on acceptLastDo()\n";
+		LeaveCriticalSection(&critSect);
 		return;
 	}else{
 		std::string cid = clients_queue.front();
 		clients_queue.pop();
+		LeaveCriticalSection(&critSect);
 		std::stringstream ss;
 		ss << "<" << cid << "> connected\n";
 		std::cout << ss.str();
-		this->sendAll(ss.str());
+		// In this buffer we hold any incoming data
 		std::string buff;
+
+		// First we read a nick for the connected client
+		this->receive(cid, buff);
+		BitStream tmp_bs(buff.c_str(), buff.size());
+		unsigned char bt;
+		std::string new_nick;
+		tmp_bs >> bt;
+		tmp_bs >> new_nick;
+		// Validamos
+		if(bt != PROTO::NICK || new_nick.size() == 0) {
+			BitStream reply;
+			reply << PROTO::TEXTMSG << "Transaction error, valid nickname expected";
+			this->send(cid, reply.str());
+			removeClient(cid);
+			return;
+		}
+		// Verificamos que el nick no esté en uso ya
+		for(auto it = clients_map.begin();it != clients_map.end();it++) {
+			std::cout << "NICK: " << it->second.nick << "\n";
+			if(it->second.nick == new_nick) {
+				BitStream reply;
+				reply << PROTO::TEXTMSG << "Nickname already in use";
+				this->send(cid, reply.str());
+				removeClient(cid);
+				std::cout << "LBRHFIHRA\n";
+
+				return;
+			}
+		}
+		// Asignamos si todo marcho como esperabamos
+		getClient(cid).nick = new_nick;
+		std::cout << new_nick << " - connected from " << cid << "\n";
+
+
+
+		// Receive loop
 		while(this->receive(cid, buff)) {
+
+			// This is for debugging purposes
 			std::stringstream ss;
 			ss << "<" << cid << "> " << buff << "\n";
 			std::cout << ss.str();
-			this->sendAll(ss.str());
+
+			// Build the bitstream
+			BitStream bs(buff.c_str(), buff.size());
+			// Branch based on packet type
+			unsigned char pt;
+			bs >> pt;
+
+			if(pt == PROTO::CHAT) {
+				bs.clear();
+				ss.str("");
+				ss << "<" << getClient(cid).nick << "> " << buff.substr(1, buff.size());
+				bs << PROTO::TEXTMSG << ss.str();
+				this->sendAll(bs.str());
+			}else{
+				bs.clear();
+				bs << PROTO::TEXTMSG << "Unknown packet type";
+				this->send(cid, bs.str());
+			}
 		}
-		removeClient(cid);
+
+		// Cuando hay una desconexion loggeamos e informamos al resto
 		ss.str("");
-		ss << "<" << cid << "> disconnected\n";
-		std::cout << ss.str();
-		this->sendAll(ss.str());
+		ss << getClient(cid).nick << " - disconnected\n";
+		BitStream bs;
+		bs << PROTO::TEXTMSG << ss.str();
+		removeClient(cid);
+		this->sendAll(bs.str());
+		
+
 		return;
 	}
+}
+
+bool ServerSocket::sendFiles(const std::string& cid, const std::vector<std::string>& files) {
+	BitStream bs;
+	bs << PROTO::FILE_SEND << files.size();
+	if(!this->send(cid, bs.str()))
+		return false;
+
+	// ToDo
+
+	return true;
 }

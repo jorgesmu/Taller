@@ -9,9 +9,21 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>
 
+#include "../source/net/bitstream.h"
+#include "../source/net/defines.h"
+
 // Tamaño del buffer de envio/recepcion
 const size_t DEFAULT_BUFLEN = 1024;
 typedef std::string addr;
+
+// Estructura POD con los datos que queremos guardar de cada conexion
+struct Client {
+	// Default ctor
+	Client() : sock(NULL), nick("uninit-nick") { }
+	// Members
+	SOCKET sock; // Socket de conexion
+	std::string nick; // Nick del usuario
+};
 
 class ServerSocket {
 	private:
@@ -27,13 +39,13 @@ class ServerSocket {
 	// Queue de clientes aceptados pero que no estan siendo escuchados
 	std::queue<std::string> clients_queue;
 	// Tabla de clients
-	std::map<std::string, SOCKET> clients_map;
+	std::map<std::string, Client> clients_map;
 	// Funcion que agrega un cliente en la tabla
 	void addClient(const sockaddr_in& tmp_st, const SOCKET& sock);
 	// Construye un ID basado en la informacion de sockaddr_in
 	static std::string buildId(const sockaddr_in& sckaddr);
-	// Retorna un SOCKET dado un ID o SOCKET_ERROR en caso de error
-	SOCKET getClient(const std::string& id);
+	// Retorna un Client dado un ID o SOCKET_ERROR en caso de error
+	Client& getClient(const std::string& id);
 	public:
 	// Constructor
 	ServerSocket();
@@ -47,8 +59,8 @@ class ServerSocket {
 	bool accept();
 	// Funcion bloqueante de recepcion
 	bool receive(const std::string& cid, std::string& buff);
-	// Funcion de recepcion para un archivo
-	void fileReceive(char* fileName);
+	// Funcion de envio de archivos - id de conexion + lista de archivos
+	bool sendFiles(const std::string& cid, const std::vector<std::string>& files);
 	// Funciones para eliminar un cliente (desconectarlo)
 	bool removeClient(const std::string& str_id);
 	bool removeClient(const SOCKET& sock);

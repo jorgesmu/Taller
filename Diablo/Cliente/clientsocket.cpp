@@ -1,3 +1,5 @@
+#include "../source/net/bitstream.h"
+#include "../source/net/defines.h"
 #include "clientsocket.h"
 #include <iostream>
 #include <fstream>
@@ -32,7 +34,7 @@ bool ClientSocket::init() {
 			std::cerr << "Inicializacion Winsock fallida: " << res << "\n";
 			return false;
 		}else{
-			std::cout << "Winsock inicializado\n";
+			//std::cout << "Winsock inicializado\n";
 			WSinit = true;
 		}
 	}
@@ -43,7 +45,7 @@ bool ClientSocket::init() {
         std::cerr << "Error at socket():" <<  WSAGetLastError() << "\n";
         return false;
     }else{
-		std::cout << "Socket creado\n";
+		//std::cout << "Socket creado\n";
 		return true;
 	}
 }
@@ -76,69 +78,16 @@ bool ClientSocket::send(const std::string& msg) {
 		this->close();
 		return false;
 	}else{
-		std::cout << "Se enviaron " << res << " bytes\n";
+		//std::cout << "Se enviaron " << res << " bytes\n";
 		return true;
 	}
-}
-
-// Funcion de send para un archivo
-void ClientSocket::sendFile(char* path) {
-	// Extract only filename from given path.
-	char filename[50];
-	int i=strlen(path);
-	for(;i>0;i--)if(path[i-1]=='\\')break;
-	for(int j=0;i<=(int)strlen(path);i++)filename[j++]=path[i];
-	////////////////////////////////////////
-
-	ifstream myFile (path, ios::in|ios::binary|ios::ate);
-	int size = (int)myFile.tellg();
-	myFile.close();
-
-	char filesize[10];itoa(size,filesize,10);
-
-
-	::send( ConnectSocket, filename, strlen(filename), 0 );
-	char rec[32] = "";
-	recv( ConnectSocket, rec, 32, 0 );
-
-	::send( ConnectSocket, filesize, strlen(filesize), 0 );
-	recv( ConnectSocket, rec, 32, 0 );
-
-	
-	FILE *fr = fopen(path, "rb");
-
-	while(size > 0)
-	{
-		char buffer[1030];
-
-		if(size>=1024)
-		{
-			fread(buffer, 1024, 1, fr);
-			::send( ConnectSocket, buffer, 1024, 0 );
-			recv( ConnectSocket, rec, 32, 0 );
-
-		}
-		else
-		{
-			fread(buffer, size, 1, fr);
-			buffer[size]='\0';
-			::send( ConnectSocket, buffer, size, 0 );
-			recv( ConnectSocket, rec, 32, 0 );
-		}
-
-
-		size -= 1024;
-
-	}
-
-	fclose(fr);
 }
 
 // Funcion de receive
 bool ClientSocket::receive(std::string& buff) {
 	int res = ::recv(ConnectSocket, recvbuf, DEFAULT_BUFLEN, 0);
 	if(res > 0) {
-		std::cout << "Received " << res << " bytes\n";
+		//std::cout << "Received " << res << " bytes\n";
 		buff.clear();
 		buff.assign(recvbuf, res);
 		return true;
@@ -173,9 +122,26 @@ unsigned int __stdcall ClientSocket::listenEntry(void* pthis) {
 }
 
 void ClientSocket::listenDo() {
-	std::string stuff;
-	while(this->receive(stuff)) {
-		std::cout << stuff;
+	std::string buff;
+	while(this->receive(buff)) {
+
+			// This is for debugging purposes
+			//std::cout << buff << "\n";
+
+			// Build the bitstream
+			BitStream bs(buff.c_str(), buff.size());
+			// Branch based on packet type
+			unsigned char pt;
+			bs >> pt;
+
+			if(pt == PROTO::TEXTMSG) {
+				std::string msg;
+				bs >> msg;
+				std::cout << "Server says: " << msg << "\n";
+			}else{
+				std::cout << "Unknown packet type " << int(pt) << " received\n";
+			}
+
 	}
 }
 

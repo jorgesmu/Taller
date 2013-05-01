@@ -12,12 +12,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\source\net\bitstream.cpp" />
+    <ClCompile Include="..\source\utilities\aux_func.cpp" />
     <ClCompile Include="server.cpp" />
     <ClCompile Include="serversocket.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\net\bitstream.h" />
     <ClInclude Include="..\source\net\defines.h" />
+    <ClInclude Include="..\source\utilities\aux_func.h" />
     <ClInclude Include="serversocket.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

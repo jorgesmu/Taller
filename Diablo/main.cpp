@@ -54,7 +54,7 @@ int main(int argc, char* args[]) {
 	resman.init();
 
 	// Cargo la entidad por default
-	resman.addRes("tierraDefault", "../resources/tile.bmp");
+	resman.addRes("tierraDefault", "../resources/tile.png");
 	Entidad entidadPisoPorDefecto("tierraDefault", 1 , 1 , 0 , 0 , NULL, resman , Imagen::COLOR_KEY);
 
 	// Cargamos el tile por defecto

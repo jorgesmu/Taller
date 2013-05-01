@@ -1,5 +1,6 @@
 #include "aux_func.h"
 #include <fstream>
+#include <windows.h>
 
 SDL_Rect makeRect(int x, int y) {
 	SDL_Rect r;
@@ -26,11 +27,25 @@ float fRand(float v1, float v2) {
 }
 
 size_t fileSize(const std::string& file) {
-	std::ifstream f(file, std::ios_base::app | std::ios_base::binary | std::ios_base::in);
-	if(f.bad())
+    std::ifstream in(file, std::ifstream::in | std::ifstream::binary);
+	if(in.bad())
 		return 0;
+    in.seekg(0, std::ifstream::end);
+    return in.tellg(); 
+}
 
-	size_t r = f.tellg();
-	f.close();
-	return r;
+void listFilesinDir(std::string dir, std::vector<std::string>& ret) {
+	HANDLE hFind;
+	WIN32_FIND_DATA data;
+
+	dir.append("\\*.*");
+
+	hFind = FindFirstFile(dir.c_str(), &data);
+	if(hFind != INVALID_HANDLE_VALUE) {
+		do {
+			if(strlen(data.cFileName) > 3)
+				ret.push_back(data.cFileName);
+		} while (FindNextFile(hFind, &data));
+		FindClose(hFind);
+	}
 }

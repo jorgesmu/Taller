@@ -10,11 +10,22 @@
 
 #include "../source/net/bitstream.h"
 #include "../source/net/defines.h"
+#include "../source/utilities/aux_func.h"
 
 #pragma comment(lib, "Ws2_32.lib")
 
 int main(int argc, char* args[]) {
 	
+	std::cout << fileSize("servidor.exe") << "\n";
+	std::vector<std::string> files;
+	listFilesinDir("..\\resources", files);
+	for(auto it = files.begin();it != files.end();it++) {
+		std::cout << *it << " ";
+	}
+	std::cout << "\n";
+
+	return 0;
+
 	ServerSocket sock;
 	// Init
 	if(!sock.init())

@@ -6,38 +6,38 @@ configuracion:
   - margen_scroll: 30
 entidades:
   - nombre: piso
-    imagen: ../resources/tile2.bmp
+    imagen: ../resources/tile2.png
   
   - nombre: agua
-    imagen: ../resources/tileAgua.bmp
+    imagen: ../resources/tileAgua.png
     fps: 10
     delay: 1000
     alto_sprite: 50
     ancho_sprite: 100
 
   - nombre: casa
-    imagen: ../resources/Casa400x400.bmp
+    imagen: ../resources/Casa400x400.png
     ancho_base: 4
     alto_base: 4
     pixel_ref_x: 150
     pixel_ref_y: 185
 
   - nombre: pino
-    imagen: ../resources/pino.bmp
+    imagen: ../resources/pino.png
     ancho_base: 2
     alto_base: 2
     pixel_ref_x: 120
     pixel_ref_y: 130
 
   - nombre: arbol
-    imagen: ../resources/arbol1.bmp
+    imagen: ../resources/arbol1.png
     ancho_base: 2
     alto_base: 2
     pixel_ref_x: 120
     pixel_ref_y: 80
 
   - nombre: molino
-    imagen: ../resources/molino300x320.bmp
+    imagen: ../resources/molino300x320.png
     ancho_base: 4
     alto_base: 4
     pixel_ref_x: 120
@@ -48,7 +48,7 @@ entidades:
     ancho_sprite: 320
 
   - nombre: molino2
-    imagen: ../resources/molino300x320.bmp
+    imagen: ../resources/molino300x320.png
     ancho_base: 4
     alto_base: 4
     pixel_ref_x: 120
@@ -59,7 +59,7 @@ entidades:
     ancho_sprite: 320
 
   - nombre: personaje
-    imagen: ../resources/Soldado.bmp
+    imagen: ../resources/Soldado.png
     fps: 10
 
 escenarios:

@@ -43,7 +43,7 @@ Surface::~Surface() {
 
 bool Surface::load(const std::string& filename) {
 	// Load the image in the surface
-	SDL_Surface *temp_surf = SDL_LoadBMP(filename.c_str());
+	SDL_Surface *temp_surf = IMG_Load(filename.c_str());
 	// Check for errors
 	if(temp_surf != NULL) {
 		// Optimized format
@@ -55,27 +55,27 @@ bool Surface::load(const std::string& filename) {
 		return true;
 	}else{
 		std::stringstream ss;
-		ss << "Error loading " << filename << "\n";
+		ss << "Error loading " << filename << ": " << IMG_GetError() << "\n";
 		err_log.escribir(ss.str());
 		return false;
 	}
 }
 
-bool Surface::load(const std::string& filename , const int colorKey) {
+bool Surface::load(const std::string& filename, const int colorKey) {
 	// Load the image in the surface
-	SDL_Surface *temp_surf = SDL_LoadBMP(filename.c_str());
+	SDL_Surface *temp_surf = IMG_Load(filename.c_str());
 	// Check for errors
 	if(temp_surf != NULL) {
 		// Optimized format
 		image = SDL_DisplayFormat(temp_surf);
 		SDL_FreeSurface(temp_surf);
 		// Apply color key
-		Uint32 ckey = SDL_MapRGB(image -> format , 0 , colorKey , 0);
+		Uint32 ckey = SDL_MapRGB(image -> format , 0, colorKey, 0);
 		SDL_SetColorKey(image, SDL_SRCCOLORKEY , ckey);
 		return true;
 	}else{
 		std::stringstream ss;
-		ss << "Error loading " << filename << "\n";
+		ss << "Error loading " << filename << ": " << IMG_GetError() << "\n";
 		err_log.escribir(ss.str());
 		return false;
 	}

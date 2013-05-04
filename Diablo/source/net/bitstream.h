@@ -5,14 +5,15 @@
 
 class BitStream {
     public:
-        std::vector<unsigned char> buffer;
+        std::vector<char> buffer;
         Uint16 cpos;
         void clear();
         //cons
         BitStream();
         ~BitStream();
-        BitStream(const char* load, const int size);
-        const unsigned char* data(); // returns pointer to first elem in vector
+        BitStream(const char* load, size_t size);
+		void load(const char* load, size_t size) ;
+        const char* data(); // returns pointer to first elem in vector
 		std::string str(); // Returns data in std::string
         size_t size() const;
         // overloads

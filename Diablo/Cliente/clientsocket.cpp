@@ -83,13 +83,27 @@ bool ClientSocket::send(const std::string& msg) {
 	}
 }
 
+bool ClientSocket::send(const char* msg, size_t size) {
+	int res = ::send(ConnectSocket, msg, size, 0);
+	if(res == SOCKET_ERROR) {
+		std::cerr << "Error enviando mensaje: " << WSAGetLastError() << "\n";
+		this->close();
+		return false;
+	}else{
+		//std::cout << "Se enviaron " << res << " bytes\n";
+		return true;
+	}
+}
+
 // Funcion de receive
 bool ClientSocket::receive(std::string& buff) {
 	int res = ::recv(ConnectSocket, recvbuf, DEFAULT_BUFLEN, 0);
 	if(res > 0) {
-		//std::cout << "Received " << res << " bytes\n";
 		buff.clear();
 		buff.assign(recvbuf, res);
+		//std::cout << "Received " << res << " bytes: ";
+		//std::cout.write(buff.c_str(), buff.size());
+		//std::cout << "\n";
 		return true;
 	}else if(res == 0) {
 		std::cout << "Connection closed\n";
@@ -126,7 +140,7 @@ void ClientSocket::listenDo() {
 	while(this->receive(buff)) {
 
 			// This is for debugging purposes
-			//std::cout << buff << "\n";
+			//std::cout << "(" << buff.size() << ")" << buff << "\n";
 
 			// Build the bitstream
 			BitStream bs(buff.c_str(), buff.size());
@@ -138,6 +152,58 @@ void ClientSocket::listenDo() {
 				std::string msg;
 				bs >> msg;
 				std::cout << "Server says: " << msg << "\n";
+			}else if(pt == PROTO::FILE_SEND_COUNT) {
+				// Leemos la cantidad de archivos
+				Uint16 fcount;
+				bs >> fcount;
+				std::cout << "Receiving " << fcount << " files\n";
+				
+				// Loop de archivos
+				for(int i = 0;i < fcount;i++) {
+					// Esperamos el header ahora
+					this->receive(buff);
+					bs.load(buff.c_str(), buff.size());
+					bs >> pt;
+					if(pt != PROTO::FILE_HEADER) {
+						std::cerr << "Unexpected packet, expected FILE_HEADER\n";
+						this->close();
+						return;
+					}
+					std::string local_file;
+					bs >> local_file;
+					std::cout << "Receiving " << local_file << "...\n";
+					std::ofstream f(std::string("..\\resources\\")+local_file, std::ios_base::binary|std::ios_base::trunc);
+					if(f.bad()) {
+						std::cerr << "Error opening " << local_file << "\n";
+						this->close();
+						return;
+					}
+					// Loopeamos hasta recibir todo el archivo
+					while(this->receive(buff)) {
+						//std::cout << buff << "\n";
+						//std::cout << "--------------------------------------------\n";
+						//dstd::cout << "--------------------------------------------\n";
+						std::string tmp_chunk;
+						bs.load(buff.c_str(), buff.size());
+						bs >> pt;
+						if(pt == PROTO::FILE_PART) {
+							bs >> tmp_chunk;
+							f.write(tmp_chunk.c_str(), tmp_chunk.size());
+							std::cout << "Writing chunk..\n";
+						}else if(pt == PROTO::FILE_DONE) {
+							f.close();
+							std::cout << "File done!\n";
+							break;
+						}else{
+							//f.write(bs.data(), bs.size());
+							f.close();
+							std::cerr << "Unexpected packet type during file transfer (" << int(pt) << "), aborting\n";
+							this->close();
+							return;
+						}
+					}
+				}
+				std::cout << "All files received\n";
 			}else{
 				std::cout << "Unknown packet type " << int(pt) << " received\n";
 			}

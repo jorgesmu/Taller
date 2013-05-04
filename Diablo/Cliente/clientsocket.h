@@ -11,7 +11,8 @@
 #include "../source/net/defines.h"
 
 // Tamaño del buffer de envio/recepcion
-const size_t DEFAULT_BUFLEN = 1024;
+const size_t DEFAULT_BUFLEN = 2048;
+const size_t CHUNK_SIZE = 1024;
 
 class ClientSocket {
 	private:
@@ -37,6 +38,7 @@ class ClientSocket {
 	bool receive(std::string& buff);
 	// Funcion de send
 	bool send(const std::string& msg);
+	bool send(const char* msg, size_t len);
 	// Nos dice si el socket esta abierto o no
 	bool isOpen() const;
 	// Cierra el socket

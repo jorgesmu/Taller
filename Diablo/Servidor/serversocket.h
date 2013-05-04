@@ -13,8 +13,10 @@
 #include "../source/net/defines.h"
 
 // Tamaño del buffer de envio/recepcion
-const size_t DEFAULT_BUFLEN = 1024;
+const size_t DEFAULT_BUFLEN = 2048;
+const size_t CHUNK_SIZE = 1024;
 typedef std::string addr;
+const std::string res_dir = "..\\server_resources";
 
 // Estructura POD con los datos que queremos guardar de cada conexion
 struct Client {
@@ -62,12 +64,13 @@ class ServerSocket {
 	// Funcion bloqueante de recepcion
 	bool receive(const std::string& cid, std::string& buff);
 	// Funcion de envio de archivos - id de conexion + lista de archivos
-	bool sendFiles(const std::string& cid, const std::vector<std::string>& files);
+	bool sendFilesInDir(const std::string& cid, const std::string& dir);
 	// Funciones para eliminar un cliente (desconectarlo)
 	bool removeClient(const std::string& str_id);
 	bool removeClient(const SOCKET& sock);
 	// Funcion de send - toma como parametro el ID de la conexion a mandar y el mensaje
 	bool send(const std::string& cid, const std::string& msg);
+	bool send(const std::string& cid, const char* msg, size_t size);
 	// Funcion para enviar a todos los clientes
 	bool sendAll(const std::string& msg);
 	// Cierra el socket y todas sus conexiones

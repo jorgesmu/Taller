@@ -1,4 +1,7 @@
 #include "serversocket.h"
+
+#include "../source/utilities/aux_func.h"
+
 #include <iostream>
 #include <sstream>
 #include <cassert>
@@ -114,7 +117,7 @@ Client& ServerSocket::getClient(const std::string& id) {
 	if(clients_map.find(id) == clients_map.end()) {
 		std::cerr << "Error en getClient(): " << id << " requested not found\n";
 		// Fake error-reporting client
-		Client ret = clients_map["0"];
+		Client& ret = clients_map["0"];
 		ret.sock = SOCKET_ERROR;
 		ret.nick = "INVALID-CLIENT";
 		LeaveCriticalSection(&critSect);
@@ -135,6 +138,23 @@ bool ServerSocket::send(const std::string& cid, const std::string& msg) {
 	}
 
 	int res = ::send(sock, msg.c_str(), msg.size(), 0);
+	if(res == SOCKET_ERROR) {
+		std::cerr << "Error enviando mensaje: " << WSAGetLastError() << "\n";
+		return false;
+	}else{
+		//std::cout << "Se enviaron " << res << " bytes\n";
+		return true;
+	}
+}
+
+bool ServerSocket::send(const std::string& cid, const char* msg, size_t size) {
+	SOCKET sock = getClient(cid).sock;
+	if(sock == SOCKET_ERROR) {
+		std::cerr << "Cliente invalid pasado a send(): " << cid << "\n";
+		return false;
+	}
+
+	int res = ::send(sock, msg, size, 0);
 	if(res == SOCKET_ERROR) {
 		std::cerr << "Error enviando mensaje: " << WSAGetLastError() << "\n";
 		return false;
@@ -165,7 +185,7 @@ bool ServerSocket::receive(const std::string& cid, std::string& buff) {
 
 	int res = ::recv(sock, recvbuf, DEFAULT_BUFLEN, 0);
 	if(res > 0) {
-		std::cout << "Received " << res << " bytes\n";
+		//std::cout << "Received " << res << " bytes\n";
 		buff.clear();
 		buff.assign(recvbuf, res);
 		return true;
@@ -227,7 +247,6 @@ unsigned int __stdcall ServerSocket::acceptLastEntry(void* pthis) {
 }
 
 void ServerSocket::acceptLastDo() {
-	std::cout << "ABRACADABRA\n";
 	EnterCriticalSection(&critSect);
 	if(clients_queue.empty()) {
 		std::cerr << "Empty queue on acceptLastDo()\n";
@@ -260,14 +279,12 @@ void ServerSocket::acceptLastDo() {
 		}
 		// Verificamos que el nick no esté en uso ya
 		for(auto it = clients_map.begin();it != clients_map.end();it++) {
-			std::cout << "NICK: " << it->second.nick << "\n";
+			//std::cout << "NICK: " << it->second.nick << "\n";
 			if(it->second.nick == new_nick) {
 				BitStream reply;
 				reply << PROTO::TEXTMSG << "Nickname already in use";
 				this->send(cid, reply.str());
 				removeClient(cid);
-				std::cout << "LBRHFIHRA\n";
-
 				return;
 			}
 		}
@@ -275,7 +292,12 @@ void ServerSocket::acceptLastDo() {
 		getClient(cid).nick = new_nick;
 		std::cout << new_nick << " - connected from " << cid << "\n";
 
-
+		// Hacemos el envio inicial de todos los archivos
+		if(!sendFilesInDir(cid, res_dir)) {
+			std::cout << "Error enviando archivos a " << cid << " - " << getClient(cid).nick << "\n";
+			removeClient(cid);
+			return;
+		}
 
 		// Receive loop
 		while(this->receive(cid, buff)) {
@@ -317,13 +339,55 @@ void ServerSocket::acceptLastDo() {
 	}
 }
 
-bool ServerSocket::sendFiles(const std::string& cid, const std::vector<std::string>& files) {
+bool ServerSocket::sendFilesInDir(const std::string& cid, const std::string& dir) {
+
+	// Cargamos los archivos
+	std::vector<std::string> files;
+	listFilesinDir(dir, files);
+
+	// Primero mandamos la cantidad de archivos
 	BitStream bs;
-	bs << PROTO::FILE_SEND << files.size();
+	Uint16 fcount = files.size();
+	bs << PROTO::FILE_SEND_COUNT << fcount;
 	if(!this->send(cid, bs.str()))
 		return false;
 
-	// ToDo
+	// Recorremos todos los archivos
+	for(auto it = files.begin();it != files.end();it++) {
+		std::string local_file = dir + "\\" + *it;
+		// Mandamos el nombre del archivo
+		bs.clear();
+		bs << PROTO::FILE_HEADER << *it;
+		if(!this->send(cid, bs.str())) return false;
+
+		// Mandamos los chunks
+		size_t fs = fileSize(local_file);
+		std::ifstream f(local_file, std::ios_base::binary);
+
+		char tmp_buf[CHUNK_SIZE];
+		size_t csize;
+		while(fs > 0) {
+			bs.clear();
+			bs << PROTO::FILE_PART;
+			if(fs > CHUNK_SIZE) {
+				csize = CHUNK_SIZE;
+				f.read(tmp_buf, CHUNK_SIZE);
+			}else{
+				csize = fs;
+				f.read(tmp_buf, fs);
+			}
+			std::string tmp_str(tmp_buf, csize);
+			bs << tmp_str;
+			fs -= csize;
+			if(!this->send(cid, bs.str())) return false;
+			//Sleep(10);
+			//std::cout << "Chunk sent, size: " << csize << "\n";
+		}
+		bs.clear();
+		bs << PROTO::FILE_DONE;
+		if(!this->send(cid, bs.str())) return false;
+		f.close();
+	}
 
 	return true;
 }

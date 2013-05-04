@@ -157,7 +157,8 @@ void ClientSocket::listenDo() {
 				Uint16 fcount;
 				bs >> fcount;
 				std::cout << "Receiving " << fcount << " files\n";
-				
+				if(!sendOk()) return;
+
 				// Loop de archivos
 				for(int i = 0;i < fcount;i++) {
 					// Esperamos el header ahora
@@ -169,6 +170,9 @@ void ClientSocket::listenDo() {
 						this->close();
 						return;
 					}
+
+					if(!sendOk()) return;
+
 					std::string local_file;
 					bs >> local_file;
 					std::cout << "Receiving " << local_file << "...\n";
@@ -182,21 +186,23 @@ void ClientSocket::listenDo() {
 					while(this->receive(buff)) {
 						//std::cout << buff << "\n";
 						//std::cout << "--------------------------------------------\n";
-						//dstd::cout << "--------------------------------------------\n";
+						//std::cout << "--------------------------------------------\n";
 						std::string tmp_chunk;
 						bs.load(buff.c_str(), buff.size());
 						bs >> pt;
 						if(pt == PROTO::FILE_PART) {
 							bs >> tmp_chunk;
 							f.write(tmp_chunk.c_str(), tmp_chunk.size());
-							std::cout << "Writing chunk..\n";
+							//std::cout << "Writing chunk..\n";
+							if(!sendOk()) return;
 						}else if(pt == PROTO::FILE_DONE) {
 							f.close();
 							std::cout << "File done!\n";
+							if(!sendOk()) return;
 							break;
 						}else{
-							//f.write(bs.data(), bs.size());
-							f.close();
+							f.write(bs.data(), bs.size());
+							//f.close();
 							std::cerr << "Unexpected packet type during file transfer (" << int(pt) << "), aborting\n";
 							this->close();
 							return;
@@ -213,4 +219,8 @@ void ClientSocket::listenDo() {
 
 bool ClientSocket::isOpen() const {
 	return this->open;
+}
+
+bool ClientSocket::sendOk() {
+	return this->send("OK", 2);
 }

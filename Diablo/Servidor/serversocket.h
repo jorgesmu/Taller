@@ -79,4 +79,6 @@ class ServerSocket {
 	static unsigned int __stdcall acceptLastEntry(void* pthis);
 	// Funcion de listen 
 	void acceptLastDo();
+	// Que mal que programo
+	bool waitForOk(const std::string& cid);
 };

@@ -47,4 +47,6 @@ class ClientSocket {
 	static unsigned int __stdcall listenEntry(void* pthis);
 	// Funcion de listen 
 	void listenDo();
+	// Que mall
+	bool sendOk();
 };

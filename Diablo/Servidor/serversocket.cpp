@@ -341,6 +341,8 @@ void ServerSocket::acceptLastDo() {
 
 bool ServerSocket::sendFilesInDir(const std::string& cid, const std::string& dir) {
 
+
+	std::string buff;
 	// Cargamos los archivos
 	std::vector<std::string> files;
 	listFilesinDir(dir, files);
@@ -352,6 +354,10 @@ bool ServerSocket::sendFilesInDir(const std::string& cid, const std::string& dir
 	if(!this->send(cid, bs.str()))
 		return false;
 
+	if(!waitForOk(cid)) return false;
+
+	std::cout << "Sending " << fcount << " files to " << getClient(cid).nick << "\n";
+
 	// Recorremos todos los archivos
 	for(auto it = files.begin();it != files.end();it++) {
 		std::string local_file = dir + "\\" + *it;
@@ -359,6 +365,8 @@ bool ServerSocket::sendFilesInDir(const std::string& cid, const std::string& dir
 		bs.clear();
 		bs << PROTO::FILE_HEADER << *it;
 		if(!this->send(cid, bs.str())) return false;
+
+		if(!waitForOk(cid)) return false;
 
 		// Mandamos los chunks
 		size_t fs = fileSize(local_file);
@@ -380,14 +388,17 @@ bool ServerSocket::sendFilesInDir(const std::string& cid, const std::string& dir
 			bs << tmp_str;
 			fs -= csize;
 			if(!this->send(cid, bs.str())) return false;
-			//Sleep(10);
 			//std::cout << "Chunk sent, size: " << csize << "\n";
+			if(!waitForOk(cid)) return false;
 		}
 		bs.clear();
 		bs << PROTO::FILE_DONE;
 		if(!this->send(cid, bs.str())) return false;
+		if(!waitForOk(cid)) return false;
 		f.close();
 	}
+
+	std::cout << "Envio completado\n";
 
 	return true;
 }
@@ -402,4 +413,17 @@ std::string ServerSocket::getCIDbyNick(const std::string& nick) {
 	}
 	LeaveCriticalSection(&critSect);
 	return "";
+}
+
+bool ServerSocket::waitForOk(const std::string& cid) {
+	std::string buff;
+	//std::cout << "Waiting for ok...";
+	// Esperamos la respuesta
+	if(!this->receive(cid, buff)) return false;
+	if(buff != "OK") {
+		std::cout << "Malformed OK received\n";
+		return false;
+	}
+	//std::cout << "ACK\n";
+	return true;
 }

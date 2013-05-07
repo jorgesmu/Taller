@@ -21,3 +21,13 @@ size_t fileSize(const std::string& file);
 
 // Devuelve un vector con todos los archivos en el directorio (en el argumento ret)
 void listFilesinDir(std::string dir, std::vector<std::string>& ret);
+
+// Constantes de colores generales
+namespace COLOR {
+	const SDL_Color RED = { 242, 0, 0 };
+	const SDL_Color BLUE = { 84, 84, 255 };
+	const SDL_Color GREEN = { 0, 234, 0};
+	const SDL_Color YELLOW = { 128,128,0 };
+	const SDL_Color WHITE = {255,255,255};
+	const SDL_Color GRAY = {180,180,180};
+}

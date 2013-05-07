@@ -99,10 +99,10 @@
     <ClCompile Include="source\utilities\PersonajeAutomatico.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\utilities\texto.cpp">
+    <ClCompile Include="source\display\EntidadFijaCaminable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\display\EntidadFijaCaminable.cpp">
+    <ClCompile Include="source\display\font.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -197,10 +197,10 @@
     <ClInclude Include="source\utilities\PersonajeAutomatico.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="source\utilities\texto.h">
+    <ClInclude Include="source\display\EntidadFijaCaminable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="source\display\EntidadFijaCaminable.h">
+    <ClInclude Include="source\display\font.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

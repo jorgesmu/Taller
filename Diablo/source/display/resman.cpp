@@ -1,13 +1,16 @@
 #include <cassert>
 #include <iostream>
 #include <fstream>
-#include "resman.h"
 #include <sstream>
+
+#include "resman.h"
 #include "../utilities/logErrores.h"
 
 // Ctor
 ResMan::ResMan() {
 	err_surface = NULL;
+	for(auto it = fonts.begin();it != fonts.end();it++)
+		*it = NULL;
 }
 
 // Dtor
@@ -18,7 +21,7 @@ ResMan::~ResMan() {
 	assert(surface_map.size() == 0);
 }
 
-void ResMan::init() {
+bool ResMan::init() {
 	// Carga la surface de error 
 	err_surface = new Surface;
 	// Creamos el archivo tmp con la imagen de error
@@ -34,6 +37,16 @@ void ResMan::init() {
 		delete err_surface;
 		err_surface = NULL;
 	}
+	// Cargamos los fonts
+	fonts[0] = new Font;
+	if(!fonts[0]->init("..\\resources\\font.ttf", Font::SIZE_SMALL)) return false;
+
+	fonts[1] = new Font;
+	if(!fonts[1]->init("..\\resources\\font.ttf", Font::SIZE_NORMAL)) return false;
+	
+	fonts[2] = new Font;
+	if(!fonts[2]->init("..\\resources\\font.ttf", Font::SIZE_BIG)) return false;
+
 }
 
 // Agrega el recurso con nombre name ubicado en el path dado por path
@@ -104,6 +117,7 @@ Surface* ResMan::getRes(const std::string& name) const {
 
 // Libera todas las surfaces - se tiene que llamar antes de salir
 void ResMan::clean() {
+	// Libera los surfaces de imagenes primero
 	for(auto it = surface_map.begin(); it != surface_map.end(); ++it) {
 		// Liberamos la memoria asociada 
 		it->second->destroy();
@@ -117,4 +131,30 @@ void ResMan::clean() {
 		err_surface->destroy();
 		delete err_surface;
 	}
+	// Liberamos los fonts
+	for(auto it = fonts.begin();it != fonts.end();it++) {
+		(*it)->clean();
+		delete *it;
+	}
+
+}
+
+Font* ResMan::getFont(int size) const {
+	// Determinamos el tamaño del font
+	Font* ret = NULL;
+	switch(size) {
+		case Font::SIZE_SMALL:
+			ret = fonts[0];
+			break;
+		case Font::SIZE_NORMAL:
+			ret = fonts[1];
+			break;
+		case Font::SIZE_BIG:
+			ret = fonts[2];
+			break;
+		default:
+			std::cerr << "Invalid font-size @ ResMan::getFont()\n";
+			break;
+	}
+	return ret;
 }

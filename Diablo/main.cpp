@@ -16,26 +16,26 @@
 #include "source/constants/model.h"
 #include "source/utilities/Test.h"
 #include "source/utilities/coordenadas.h"
-#include "source/utilities/texto.h"
 
 #include "source/utilities/logErrores.h"
 logErrores err_log("log.txt");
 
 int main(int argc, char* args[]) {
-
 	// Parseo el nivel
 	config_juego juego = parsear("../resources/nivel1.yaml");
 	config_pantalla* pantalla = juego.get_pantalla();
 	vector <config_entidad> entidades = juego.get_entidades();
 	config_general configuracion = juego.get_configuracion();
 	vector <config_escenario> escenarios = juego.get_escenarios();
-
+			
 	// Ventana de prueba
 	SDL_Surface* screen;
 	putenv("SDL_VIDEO_CENTERED=1"); // Para centrar la ventana
-    SDL_Init(SDL_INIT_EVERYTHING);
+	if(SDL_Init(SDL_INIT_EVERYTHING) == -1) { std::cerr << "Error @ SDL_Init(): " << SDL_GetError() << "\n"; return -1; }
 	// Init the window
 	screen = SDL_SetVideoMode(pantalla->get_ancho(), pantalla->get_alto(), 32, SDL_SWSURFACE|SDL_NOFRAME);
+	// Init a SDL_TTF
+	if(TTF_Init() == -1) { std::cerr << "Error @ TTF_Init(): " << TTF_GetError() << "\n"; return -1; }
 	// Para confinar el mouse a la ventana
 	SDL_WM_GrabInput(SDL_GRAB_ON);
 	// Lo movemos al medio
@@ -51,7 +51,7 @@ int main(int argc, char* args[]) {
 	mapa.resize(escenarios[0].get_tam_x(), escenarios[0].get_tam_x());
 	// Resman
 	ResMan resman;
-	resman.init();
+	if(!resman.init()) return -2;
 
 	// Cargo la entidad por default
 	resman.addRes("tierraDefault", "../resources/tile.png");
@@ -172,6 +172,8 @@ int main(int argc, char* args[]) {
 		SDL_FillRect(screen, NULL, 0);
 		// Draw el mapa
 		mapa.blit(screen, camara);
+		resman.getFont()->buffBlit(screen, 20, 10, "STRING DE PRUEBA", COLOR::WHITE);
+		resman.getFont(Font::SIZE_BIG)->buffBlit(screen, 20, 20, "STRING DE PRUEBA 2", COLOR::WHITE);
 		// Actualizar la pantalla
 		SDL_Flip(screen);
 	}
@@ -180,7 +182,7 @@ int main(int argc, char* args[]) {
 	resman.clean();
 	err_log.cerrarConexion();
     //Test::test();
-
+	TTF_Quit();
 	SDL_Quit();
     return 0; 
 }

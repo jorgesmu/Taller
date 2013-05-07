@@ -42,6 +42,11 @@ Surface::~Surface() {
 }
 
 bool Surface::load(const std::string& filename) {
+	// Por si las moscas
+	if (this -> image != NULL) {
+		SDL_FreeSurface(image);
+		this -> image = NULL;
+	}
 	// Load the image in the surface
 	SDL_Surface *temp_surf = IMG_Load(filename.c_str());
 	// Check for errors

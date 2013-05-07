@@ -17,6 +17,7 @@
     <ClCompile Include="source\display\entidad2.cpp" />
     <ClCompile Include="source\display\entidadFija.cpp" />
     <ClCompile Include="source\display\EntidadFijaCaminable.cpp" />
+    <ClCompile Include="source\display\font.cpp" />
     <ClCompile Include="source\display\mapa.cpp" />
     <ClCompile Include="source\display\resman.cpp" />
     <ClCompile Include="source\display\tile.cpp" />
@@ -39,7 +40,6 @@
     <ClCompile Include="source\utilities\PruebasParser.cpp" />
     <ClCompile Include="source\utilities\surface.cpp" />
     <ClCompile Include="source\utilities\Test.cpp" />
-    <ClCompile Include="source\utilities\texto.cpp" />
     <ClCompile Include="source\utilities\timer.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -49,6 +49,7 @@
     <ClInclude Include="source\display\entidad2.h" />
     <ClInclude Include="source\display\entidadFija.h" />
     <ClInclude Include="source\display\EntidadFijaCaminable.h" />
+    <ClInclude Include="source\display\font.h" />
     <ClInclude Include="source\display\mapa.h" />
     <ClInclude Include="source\display\resman.h" />
     <ClInclude Include="source\display\tile.h" />
@@ -72,7 +73,6 @@
     <ClInclude Include="source\utilities\PruebasParser.h" />
     <ClInclude Include="source\utilities\surface.h" />
     <ClInclude Include="source\utilities\Test.h" />
-    <ClInclude Include="source\utilities\texto.h" />
     <ClInclude Include="source\utilities\timer.h" />
     <ClInclude Include="source\utilities\vec2.h" />
   </ItemGroup>

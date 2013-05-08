@@ -22,6 +22,7 @@
     <ClCompile Include="source\display\resman.cpp" />
     <ClCompile Include="source\display\tile.cpp" />
     <ClCompile Include="source\utilities\aux_func.cpp" />
+    <ClCompile Include="source\utilities\chatwindow.cpp" />
     <ClCompile Include="source\utilities\config_entidad.cpp" />
     <ClCompile Include="source\utilities\config_entidad_en_juego.cpp" />
     <ClCompile Include="source\utilities\config_escenario.cpp" />
@@ -38,6 +39,7 @@
     <ClCompile Include="source\utilities\Personaje.cpp" />
     <ClCompile Include="source\utilities\PersonajeAutomatico.cpp" />
     <ClCompile Include="source\utilities\PruebasParser.cpp" />
+    <ClCompile Include="source\utilities\sinput.cpp" />
     <ClCompile Include="source\utilities\surface.cpp" />
     <ClCompile Include="source\utilities\Test.cpp" />
     <ClCompile Include="source\utilities\timer.cpp" />
@@ -54,6 +56,7 @@
     <ClInclude Include="source\display\resman.h" />
     <ClInclude Include="source\display\tile.h" />
     <ClInclude Include="source\utilities\aux_func.h" />
+    <ClInclude Include="source\utilities\chatwindow.h" />
     <ClInclude Include="source\utilities\config_entidad.h" />
     <ClInclude Include="source\utilities\config_entidad_en_juego.h" />
     <ClInclude Include="source\utilities\config_escenario.h" />
@@ -71,6 +74,7 @@
     <ClInclude Include="source\utilities\Personaje.h" />
     <ClInclude Include="source\utilities\PersonajeAutomatico.h" />
     <ClInclude Include="source\utilities\PruebasParser.h" />
+    <ClInclude Include="source\utilities\sinput.h" />
     <ClInclude Include="source\utilities\surface.h" />
     <ClInclude Include="source\utilities\Test.h" />
     <ClInclude Include="source\utilities\timer.h" />

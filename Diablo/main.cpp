@@ -16,6 +16,7 @@
 #include "source/constants/model.h"
 #include "source/utilities/Test.h"
 #include "source/utilities/coordenadas.h"
+#include "source/utilities/sinput.h"
 
 #include "source/utilities/logErrores.h"
 logErrores err_log("log.txt");
@@ -36,6 +37,10 @@ int main(int argc, char* args[]) {
 	screen = SDL_SetVideoMode(pantalla->get_ancho(), pantalla->get_alto(), 32, SDL_SWSURFACE|SDL_NOFRAME);
 	// Init a SDL_TTF
 	if(TTF_Init() == -1) { std::cerr << "Error @ TTF_Init(): " << TTF_GetError() << "\n"; return -1; }
+	// Enable Unicode
+	SDL_EnableUNICODE(SDL_ENABLE); 
+	// Para mantener la tecla apretada y que mande un keydown
+	SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL/3);
 	// Para confinar el mouse a la ventana
 	SDL_WM_GrabInput(SDL_GRAB_ON);
 	// Lo movemos al medio
@@ -52,6 +57,9 @@ int main(int argc, char* args[]) {
 	// Resman
 	ResMan resman;
 	if(!resman.init()) return -2;
+
+	SInput test_input;
+	test_input.init(&resman, Font::SIZE_NORMAL, 20, COLOR::WHITE);
 
 	// Cargo la entidad por default
 	resman.addRes("tierraDefault", "../resources/tile.png");
@@ -122,24 +130,43 @@ int main(int argc, char* args[]) {
 
 		// Input handling (esto despues se movera a donde corresponda)
 		while(SDL_PollEvent(&event)) {
-			// Detectar escape o quit
-			if(event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE || event.type == SDL_QUIT) {
-				quit = true;
-			}
-			// Detectar mouse motion
-			if(event.type == SDL_MOUSEMOTION) {
-				// Update para la camara
-				camara.update_speed(makeRect(event.motion.x, event.motion.y));
-			}
-			// Mouse clicks
-			if(event.type == SDL_MOUSEBUTTONDOWN) {
-				if(event.button.button == SDL_BUTTON_LEFT) {
-					vec2<int> tile_res = MouseCoords2Tile(vec2<int>(event.button.x, event.button.y), camara);
-					if(mapa.tileExists(tile_res.x, tile_res.y)) {
-						personaje.mover(mapa.getTile(tile_res.x,tile_res.y));
+
+			// Si tenemos el input abierto
+			if(test_input.isOpen()) {
+				int res = test_input.handleInput(event);
+				if(res == SInput::RES_ENTER) {
+					std::cout << "Se ingreso: " << test_input.getText() << "\n";
+					test_input.hide();
+				}else if(res == SInput::RES_CLOSE) {
+					std::cout << "Se cerro sin ingresar nada\n";
+					test_input.hide();
+				}
+
+			}else{
+
+				// Detectar escape o quit
+				if(event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE || event.type == SDL_QUIT) {
+					quit = true;
+				}else if(event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_RETURN) {
+					test_input.open();
+				}
+				// Detectar mouse motion
+				if(event.type == SDL_MOUSEMOTION) {
+					// Update para la camara
+					camara.update_speed(makeRect(event.motion.x, event.motion.y));
+				}
+				// Mouse clicks
+				if(event.type == SDL_MOUSEBUTTONDOWN) {
+					if(event.button.button == SDL_BUTTON_LEFT) {
+						vec2<int> tile_res = MouseCoords2Tile(vec2<int>(event.button.x, event.button.y), camara);
+						if(mapa.tileExists(tile_res.x, tile_res.y)) {
+							personaje.mover(mapa.getTile(tile_res.x,tile_res.y));
+						}
 					}
 				}
+
 			}
+			
 		}
 
 		// Cuenterio para hacer el timestep (CONST_DT) independiente de los FPS
@@ -174,6 +201,7 @@ int main(int argc, char* args[]) {
 		mapa.blit(screen, camara);
 		resman.getFont()->buffBlit(screen, 20, 10, "STRING DE PRUEBA", COLOR::WHITE);
 		resman.getFont(Font::SIZE_BIG)->buffBlit(screen, 20, 20, "STRING DE PRUEBA 2", COLOR::WHITE);
+		test_input.show(screen, 40, 40);
 		// Actualizar la pantalla
 		SDL_Flip(screen);
 	}

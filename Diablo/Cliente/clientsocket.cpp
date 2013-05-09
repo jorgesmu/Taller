@@ -5,10 +5,9 @@
 #include <fstream>
 
 using namespace std;
-
+extern bool pasoArchivos;
 bool ClientSocket::WSinit = false;
 size_t ClientSocket::ref_count = 0;
-
 ClientSocket::ClientSocket() {
 	// Increase ref count
 	ref_count++;
@@ -176,7 +175,7 @@ void ClientSocket::listenDo() {
 					std::string local_file;
 					bs >> local_file;
 					std::cout << "Receiving " << local_file << "...\n";
-					std::ofstream f(std::string("..\\resources\\")+local_file, std::ios_base::binary|std::ios_base::trunc);
+					std::ofstream f(std::string("..\\resources_cliente\\")+local_file, std::ios_base::binary|std::ios_base::trunc);
 					if(f.bad()) {
 						std::cerr << "Error opening " << local_file << "\n";
 						this->close();
@@ -210,6 +209,7 @@ void ClientSocket::listenDo() {
 					}
 				}
 				std::cout << "All files received\n";
+				pasoArchivos = true;
 			}else{
 				std::cout << "Unknown packet type " << int(pt) << " received\n";
 			}

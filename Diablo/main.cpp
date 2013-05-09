@@ -1,29 +1,62 @@
+#include "source/net/bitstream.h"
+#include "source/net/defines.h"
+#include "Cliente/clientsocket.h"
+#pragma comment(lib, "Ws2_32.lib")
+#include <Windows.h>
+#include <process.h>
+#include <iostream>
+#include "source/utilities/logErrores.h"
 // SDL Headers
 #include "SDL.h"
 #include <SDL_getenv.h>
 // Our headers
-#include "source/utilities/timer.h"
-#include "source/utilities/surface.h"
-#include "source/utilities/aux_func.h"
-//#include "source/utilities/PruebasParser.h"
-#include "source/utilities/parser.h"
-#include "source/display/entidad.h"
-#include "source/utilities/Personaje.h"
-#include "source/display/entidadFija.h"
-#include "source/display/camara.h"
-#include "source/display/mapa.h"
-#include "source/display/resman.h"
-#include "source/constants/model.h"
-#include "source/utilities/Test.h"
-#include "source/utilities/coordenadas.h"
-#include "source/utilities/chatwindow.h"
+#include "../../source/utilities/timer.h"
+#include "../../source/utilities/surface.h"
+#include "../../source/utilities/aux_func.h"
+#include "../../source/utilities/parser.h"
+#include "../../source/display/entidad.h"
+#include "../../source/utilities/Personaje.h"
+#include "../../source/display/entidadFija.h"
+#include "../../source/display/camara.h"
+#include "../../source/display/mapa.h"
+#include "../../source/display/resman.h"
+#include "../../source/constants/model.h"
+#include "../../source/utilities/Test.h"
+#include "../../source/utilities/coordenadas.h"
 
-#include "source/utilities/logErrores.h"
+using namespace std;
+
 logErrores err_log("log.txt");
+bool pasoArchivos = false;
 
-int main(int argc, char* args[]) {
+int main(int argc, char* argv[]) {
+	// Verificamos que se pase el nick
+	if(argc == 1) {
+		std::cout << "Falta especificar nick:\ncliente.exe <nick>\n";
+		return 0;
+	}
+	
+	ClientSocket sock;
+	
+	if(!sock.init()) 
+		return 1;
+	
+	if(!sock.connect("127.0.0.1", 8080))
+		return 1;
+	
+	// Creamos el thread de listen
+	HANDLE hth1 = (HANDLE)_beginthreadex(NULL, 0, ClientSocket::listenEntry, (void*)&sock, 0, NULL);
+	// Mandamos el nick
+	BitStream bs;
+	bs << PROTO::NICK << std::string(argv[1]);
+	sock.send(bs.str());
+	
+	while (!pasoArchivos){
+		Sleep(50);
+	}
+	//Empieza a dibujar
 	// Parseo el nivel
-	config_juego juego = parsear("../resources/nivel1.yaml");
+	config_juego juego = parsear("../resources_cliente/niveles.yaml");
 	config_pantalla* pantalla = juego.get_pantalla();
 	vector <config_entidad> entidades = juego.get_entidades();
 	config_general configuracion = juego.get_configuracion();
@@ -37,10 +70,6 @@ int main(int argc, char* args[]) {
 	screen = SDL_SetVideoMode(pantalla->get_ancho(), pantalla->get_alto(), 32, SDL_SWSURFACE|SDL_NOFRAME);
 	// Init a SDL_TTF
 	if(TTF_Init() == -1) { std::cerr << "Error @ TTF_Init(): " << TTF_GetError() << "\n"; return -1; }
-	// Enable Unicode
-	SDL_EnableUNICODE(SDL_ENABLE); 
-	// Para mantener la tecla apretada y que mande un keydown
-	SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL/3);
 	// Para confinar el mouse a la ventana
 	SDL_WM_GrabInput(SDL_GRAB_ON);
 	// Lo movemos al medio
@@ -57,11 +86,6 @@ int main(int argc, char* args[]) {
 	// Resman
 	ResMan resman;
 	if(!resman.init()) return -2;
-
-	// Ventana de chat de prueba
-	ChatWindow test_chat;
-	test_chat.init(&resman, Font::SIZE_NORMAL, 250, 500, COLOR::WHITE);
-	test_chat.setNickLocal("bob");
 
 	// Cargo la entidad por default
 	resman.addRes("tierraDefault", "../resources/tile.png");
@@ -128,44 +152,28 @@ int main(int argc, char* args[]) {
 	// Para guardar los eventos  de input
 	SDL_Event event;
 
-	while(!quit) {
+	while((!quit ) && (sock.isOpen()) ) {
 
 		// Input handling (esto despues se movera a donde corresponda)
 		while(SDL_PollEvent(&event)) {
-
-			// Si tenemos el input abierto
-			if(test_chat.isOpen()) {
-				int res = test_chat.handleInput(event);
-				if(res == SInput::RES_CLOSE) {
-					test_chat.hide();
-				}
-
-			}else{
-
-				// Detectar escape o quit
-				if(event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE || event.type == SDL_QUIT) {
-					quit = true;
-				}else if(event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_RETURN) {
-					test_chat.setNickDestino("alice");
-					test_chat.open();
-				}
-				// Detectar mouse motion
-				if(event.type == SDL_MOUSEMOTION) {
-					// Update para la camara
-					camara.update_speed(makeRect(event.motion.x, event.motion.y));
-				}
-				// Mouse clicks
-				if(event.type == SDL_MOUSEBUTTONDOWN) {
-					if(event.button.button == SDL_BUTTON_LEFT) {
-						vec2<int> tile_res = MouseCoords2Tile(vec2<int>(event.button.x, event.button.y), camara);
-						if(mapa.tileExists(tile_res.x, tile_res.y)) {
-							personaje.mover(mapa.getTile(tile_res.x,tile_res.y));
-						}
+			// Detectar escape o quit
+			if(event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE || event.type == SDL_QUIT) {
+				quit = true;
+			}
+			// Detectar mouse motion
+			if(event.type == SDL_MOUSEMOTION) {
+				// Update para la camara
+				camara.update_speed(makeRect(event.motion.x, event.motion.y));
+			}
+			// Mouse clicks
+			if(event.type == SDL_MOUSEBUTTONDOWN) {
+				if(event.button.button == SDL_BUTTON_LEFT) {
+					vec2<int> tile_res = MouseCoords2Tile(vec2<int>(event.button.x, event.button.y), camara);
+					if(mapa.tileExists(tile_res.x, tile_res.y)) {
+						personaje.mover(mapa.getTile(tile_res.x,tile_res.y));
 					}
 				}
-
 			}
-			
 		}
 
 		// Cuenterio para hacer el timestep (CONST_DT) independiente de los FPS
@@ -198,7 +206,8 @@ int main(int argc, char* args[]) {
 		SDL_FillRect(screen, NULL, 0);
 		// Draw el mapa
 		mapa.blit(screen, camara);
-		test_chat.show(screen, 40, 40);
+		resman.getFont()->buffBlit(screen, 20, 10, "STRING DE PRUEBA", COLOR::WHITE);
+		resman.getFont(Font::SIZE_BIG)->buffBlit(screen, 20, 20, "STRING DE PRUEBA 2", COLOR::WHITE);
 		// Actualizar la pantalla
 		SDL_Flip(screen);
 	}
@@ -209,5 +218,10 @@ int main(int argc, char* args[]) {
     //Test::test();
 	TTF_Quit();
 	SDL_Quit();
-    return 0; 
+	if(!sock.isOpen()){
+		cout << "Conexion cerrada por el servidor" << endl;
+		system ("PAUSE");
+	}
+	sock.close();
+	return 0;
 }

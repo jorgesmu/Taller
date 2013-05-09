@@ -6,7 +6,6 @@
 
 #include <winsock2.h>
 #include <ws2tcpip.h>
-
 #include "../source/net/bitstream.h"
 #include "../source/net/defines.h"
 
@@ -50,3 +49,4 @@ class ClientSocket {
 	// Que mall
 	bool sendOk();
 };
+extern bool pasoArchivos;

@@ -16,7 +16,7 @@
 #include "source/constants/model.h"
 #include "source/utilities/Test.h"
 #include "source/utilities/coordenadas.h"
-#include "source/utilities/sinput.h"
+#include "source/utilities/chatwindow.h"
 
 #include "source/utilities/logErrores.h"
 logErrores err_log("log.txt");
@@ -58,8 +58,10 @@ int main(int argc, char* args[]) {
 	ResMan resman;
 	if(!resman.init()) return -2;
 
-	SInput test_input;
-	test_input.init(&resman, Font::SIZE_NORMAL, 20, COLOR::WHITE);
+	// Ventana de chat de prueba
+	ChatWindow test_chat;
+	test_chat.init(&resman, Font::SIZE_NORMAL, 250, 500, COLOR::WHITE);
+	test_chat.setNickLocal("bob");
 
 	// Cargo la entidad por default
 	resman.addRes("tierraDefault", "../resources/tile.png");
@@ -132,14 +134,10 @@ int main(int argc, char* args[]) {
 		while(SDL_PollEvent(&event)) {
 
 			// Si tenemos el input abierto
-			if(test_input.isOpen()) {
-				int res = test_input.handleInput(event);
-				if(res == SInput::RES_ENTER) {
-					std::cout << "Se ingreso: " << test_input.getText() << "\n";
-					test_input.hide();
-				}else if(res == SInput::RES_CLOSE) {
-					std::cout << "Se cerro sin ingresar nada\n";
-					test_input.hide();
+			if(test_chat.isOpen()) {
+				int res = test_chat.handleInput(event);
+				if(res == SInput::RES_CLOSE) {
+					test_chat.hide();
 				}
 
 			}else{
@@ -148,7 +146,8 @@ int main(int argc, char* args[]) {
 				if(event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE || event.type == SDL_QUIT) {
 					quit = true;
 				}else if(event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_RETURN) {
-					test_input.open();
+					test_chat.setNickDestino("alice");
+					test_chat.open();
 				}
 				// Detectar mouse motion
 				if(event.type == SDL_MOUSEMOTION) {
@@ -199,9 +198,7 @@ int main(int argc, char* args[]) {
 		SDL_FillRect(screen, NULL, 0);
 		// Draw el mapa
 		mapa.blit(screen, camara);
-		resman.getFont()->buffBlit(screen, 20, 10, "STRING DE PRUEBA", COLOR::WHITE);
-		resman.getFont(Font::SIZE_BIG)->buffBlit(screen, 20, 20, "STRING DE PRUEBA 2", COLOR::WHITE);
-		test_input.show(screen, 40, 40);
+		test_chat.show(screen, 40, 40);
 		// Actualizar la pantalla
 		SDL_Flip(screen);
 	}

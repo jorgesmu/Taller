@@ -17,7 +17,7 @@ class Font {
 	public:
 	// Variables de clase para los 3 tamaños de fonts
 	const static int SIZE_NORMAL = 12;
-	const static int SIZE_SMALL = 9;
+	const static int SIZE_SMALL = 10;
 	const static int SIZE_BIG = 16;
 	// Ctor y destructor
 	Font();

@@ -24,6 +24,7 @@ void listFilesinDir(std::string dir, std::vector<std::string>& ret);
 
 // Constantes de colores generales
 namespace COLOR {
+	const SDL_Color BLACK = { 0, 0, 0 };
 	const SDL_Color RED = { 242, 0, 0 };
 	const SDL_Color BLUE = { 84, 84, 255 };
 	const SDL_Color GREEN = { 0, 234, 0};

@@ -72,7 +72,7 @@ void SInput::show(SDL_Surface* dest, int x, int y){
     if(!isOpen()) return;
     // Caso contrario mostramos (agregando o no el indicador)
 	if(append_indicator) {
-		rm->getFont(font_size)->blit(dest, x, y, str+std::string("|"), color);
+		rm->getFont(font_size)->blit(dest, x, y, str+std::string("_"), color);
 	}else{
 		if(str.size() > 0) {
 			rm->getFont(font_size)->blit(dest, x, y, str, color);

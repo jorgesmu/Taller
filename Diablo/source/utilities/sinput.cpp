@@ -23,6 +23,13 @@ void SInput::init(ResMan* rm, int font_size, int max_size, const SDL_Color& colo
 	this->max_input_size = max_size;
 	this->color = color;
 	indicator.start();
+
+	// Cosas de SDL
+	// Enable Unicode
+	SDL_EnableUNICODE(SDL_ENABLE); 
+	// Para mantener la tecla apretada y que mande un keydown
+	SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL/3);
+
 }
 
 const std::string& SInput::getText() const {
@@ -97,5 +104,6 @@ void SInput::open() {
 }
 
 void SInput::hide() {
+	str.clear();
 	showing = false;
 }

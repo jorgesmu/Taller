@@ -34,4 +34,6 @@ class Mapa {
 	void clean();
 	// Devuelve el tile segun su posicion en el mapa dado por el pixel superior
 	Tile* getTilePorPixeles(int pixelX , int pixelY);
+	// Getters para tamaño
+	void getSize(int* x, int* y) const;
 };

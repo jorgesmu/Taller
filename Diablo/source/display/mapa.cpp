@@ -103,3 +103,8 @@ Tile* Mapa::getTilePorPixeles(int pixelX , int pixelY) {
 	}
 	return retorno;
 }
+
+void Mapa::getSize(int* w, int* h) const {
+	*w = this->w;
+	*h = this->h;
+}

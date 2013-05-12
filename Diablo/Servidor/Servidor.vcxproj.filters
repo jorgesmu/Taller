@@ -27,6 +27,15 @@
     <ClCompile Include="..\source\utilities\aux_func.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="logErroresServer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="parserServer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="config_servidor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="serversocket.h">
@@ -39,6 +48,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\source\utilities\aux_func.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="logErroresServer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="parserServer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config_servidor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

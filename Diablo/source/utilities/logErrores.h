@@ -6,6 +6,7 @@
 #include "config_entidad.h"
 #include "config_general.h"
 #include "config_escenario.h"
+#include "config_cliente.h"
 using namespace std;
 //se declaran los valores por defecto
 const unsigned int anchoDef = 800;
@@ -28,6 +29,9 @@ const unsigned int posYdef = 17;
 const unsigned int spriteAltoDef = 10;
 const unsigned int spriteAnchoDef = 10;
 const bool esCaminableDef = true;
+const string ipDef = "127.0.0.1";
+const unsigned int puertoDef = 8080;
+
 //hay que mover la implementacion del .h al .cpp, se hace de esta forma ya que el compilador tira error sino!!
 class logErrores {
 	private:
@@ -75,6 +79,29 @@ class logErrores {
 			}
 
 		}
+		//verfica errores de configuracion de red del cliente
+		void verificar_errores(config_cliente& config_red, logErrores& logErrores){
+			string ip_destino = config_red.get_ip_servidor();
+			int puerto = config_red.get_puerto();
+			//verifico ip
+			if ( (config_red.get_completo_ip_servidor()) == false ){
+				logErrores.escribir ("No se ingreso la ip destino del servidor, se selecciona valor por defecto");
+				config_red.set_ip_server(ipDef);
+			}else if (!verificar_ip(ip_destino) ){
+				logErrores.escribir ("La ip ingresada no tiene un formato valido, se selecciona valor por defecto") ;
+				config_red.set_ip_server(ipDef);
+			}
+			//verifico puerto
+			if ( (config_red.get_completo_puerto()) == false ){
+				logErrores.escribir ("No se ingreso el puerto, se selecciona valor por defecto");
+				config_red.set_puerto(puertoDef);
+			}else if ( puerto < 0 ){
+				logErrores.escribir ("El puerto ingresado es menor o igual que la unidad, se selecciona valor por defecto");
+				config_red.set_puerto(puertoDef);		
+			}
+			
+		}
+
 		bool esNumerico(string valor){
 			bool res = true;
 			const char* a = valor.c_str();
@@ -121,7 +148,7 @@ class logErrores {
 				int anchoElemento = unaEntidad.get_ancho_base();
 				int altoElemento = unaEntidad.get_alto_base();
 				int pixelRefX = unaEntidad.get_pixel_ref_x();
-				int pixelRefY = unaEntidad.get_pixel_ref_x();
+				int pixelRefY = unaEntidad.get_pixel_ref_y();
 				string nombre = unaEntidad.get_nombre();
 				int fps = unaEntidad.get_fps();
 				string path = unaEntidad.get_path_imagen();
@@ -267,6 +294,50 @@ class logErrores {
 			config_entidad unaEntidad(nombreEntidadDef, imagenDef,anchoElementoDef,altoElementoDef,pixelRefXDef,pixelRefYDef, fpsDef, delayDef); 
 			entidades.push_back(unaEntidad);
 
+		}
+		//verifica si una ip tiene un formato valido
+		bool verificar_ip(string ip){
+			//ip con formato xxx.xxx.xxx.xxx ( 0<=x<999)
+			int index = 0;
+			int count = 0;
+			int pos[3]; // guarda las posiciones de los . en la ip 
+			//recorro cadena
+			while(index < ip.length()){
+				string caracter = ip.substr(index, 1);
+				//guardo ocurrencia
+				if (caracter.compare(".") == 0){
+					if (count < 3){
+						pos[count] = index;
+					}
+					count ++;
+				}
+				index++;
+			}
+			if (count != 3)
+				return false;
+			string campo1,campo2,campo3,campo4; //guardo los campos de la ip
+			campo1 = ip.substr(0,pos[0]);
+			campo2 = ip.substr(pos[0]+1,pos[1]-pos[0]-1);
+			campo3 = ip.substr(pos[1]+1,pos[2]-pos[1]-1);
+			campo4 = ip.substr(pos[2]+1,ip.length()-pos[2]);
+			//si algun campo esta vacio n oes valido
+			if ((campo1.size() == 0) ||(campo2.size() == 0)||(campo3.size() == 0)||(campo4.size() == 0))
+				return false;
+			//si algun campo tiene mas de 3 caracteres no es valido
+			if ((campo1.size() > 3) ||(campo2.size() > 3)||(campo3.size() > 3)||(campo4.size() > 3))
+				return false;
+			//valido que sean campos numericos 
+			if ((!esNumerico(campo1)) || (!esNumerico(campo2))|| (!esNumerico(campo2))|| (!esNumerico(campo3))|| (!esNumerico(campo4)))
+				return false;
+			//verifico que tenga valor maximo correco correctos
+			int valor1,valor2,valor3,valor4;
+			valor1 = atoi(campo1.c_str());
+			valor2 = atoi(campo2.c_str());
+			valor3 = atoi(campo3.c_str());
+			valor4 = atoi(campo4.c_str());
+			if ( (valor1 < 0) || (valor1>999) || (valor2 < 0) || (valor2>999) || (valor3 < 0) || (valor3>999) || (valor4 < 0) || (valor4>999))
+				return false;
+			return true;
 		}
 		//verfica errores de escenario, se le pasan las entidades por si es necesario agregar una por defecto
 		void verificar_errores(vector <config_escenario>& config, logErrores& logErrores,vector<config_entidad>& entidades){
@@ -435,7 +506,6 @@ class logErrores {
 			unsigned int size = entidades.size();
 			bool encontrado = false;
 			unsigned int indice = 0;
-			config_entidad_en_juego resultado();
 			while ( (!encontrado) && (indice<size) ){
 				config_entidad otraEntidad = entidades[indice];
 				if ( otraEntidad.get_nombre() == nombre){

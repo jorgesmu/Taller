@@ -10,6 +10,7 @@
 #include "config_juego.h"
 #include "config_entidad_en_juego.h"
 #include "logErrores.h"
+#include "config_cliente.h"
 using namespace std;
 const int errorConstante = -1;
 //VARIABLES GLOBALES
@@ -60,6 +61,34 @@ void operator >> (const YAML::Node& node, config_general& config) {
 				}
 			}else {
 				err_log.escribir("atributo de configuracion erroeneo",clave,valor);
+			}
+		}
+   }
+
+}
+void operator >> (const YAML::Node& node, config_cliente& config) {
+
+   for(unsigned i=0;i<node.size();i++) {
+      	for(YAML::Iterator it=node[i].begin();it!=node[i].end();++it) {
+			//leo los atributos de pantalla
+			string clave;
+			string valor;
+			it.first() >> clave;
+			it.second() >> valor;
+			//y los asigno
+			if (clave == "ip_server"){
+				//actualizo atributos
+				config.set_ip_server(valor);
+			}else if (clave == "puerto"){
+				//actualizo atributos
+				if( err_log.esNumerico(valor) ){
+					config.set_puerto(atoi(valor.c_str()));
+				}else{
+					config.set_puerto(errorConstante);
+				}
+
+			}else {
+				err_log.escribir("atributo de red erroeneo",clave , valor);
 			}
 		}
    }
@@ -149,6 +178,7 @@ void operator >> (const YAML::Node& node, vector <config_entidad>& entidades) {
 				}
 			}else if (clave == "pixel_ref_x"){
 				creoEntidad = true;
+				nuevaEntidad.completo_pixelX();
 				if( err_log.esNumerico(valor) ){
 					nuevaEntidad.set_pixel_ref_x(atoi(valor.c_str()));
 				}else{
@@ -361,6 +391,18 @@ void verificar_tags_ppales(YAML::Node& nodoPpal){
 	}
 	return;
 }
+//verifica que no se haya enviado algun nodo ppal incorrecto
+void verificar_tags_ppales_red(YAML::Node& nodoPpal){
+	for(YAML::Iterator it=nodoPpal.begin();it!=nodoPpal.end();++it) {
+		std::string clave, valor;
+		it.first() >> clave;
+		if ( (clave != "red")){
+			err_log.escribir( "Se ingreso nodo principal erroneo ", clave );
+		}
+	}
+	return;
+}
+
 config_juego parser_nivel(char* path){
 
 
@@ -419,7 +461,7 @@ config_juego parser_nivel(char* path){
 	return juego;
 }
 
-config_juego parsear(char* path){
+config_juego parsear_juego(char* path){
 	//ejemplos basado en: https://code.google.com/p/yaml-cpp/wiki/HowToParseADocument
 	
 	config_juego juego;
@@ -446,4 +488,30 @@ config_juego parsear(char* path){
 	}
 
 	return juego;
+}
+config_cliente parsear_red(char* path){
+	//ejemplos basado en: https://code.google.com/p/yaml-cpp/wiki/HowToParseADocument
+	//declaro variables resultado
+	config_cliente configuracion("0.0.0.0",8080);
+
+	try{
+		//abro el documento y parseo el nodo
+		std::ifstream archivo(path);
+		YAML::Parser parser(archivo);
+		YAML::Node doc;
+		parser.GetNextDocument(doc);
+	
+		//parseo configuracion de red
+		if(const YAML::Node *pName = doc.FindValue("red")) {
+			doc["red"] >> configuracion;
+		}else{
+			err_log.escribir("No existe el valor red para conectarse con el server");
+		}
+		err_log.verificar_errores(configuracion,err_log);
+		verificar_tags_ppales_red(doc);
+	} catch(exception& ){
+		//dejo en un estado valido si fallo
+		err_log.verificar_errores(configuracion,err_log);
+	}
+	return configuracion;
 }

@@ -23,32 +23,37 @@
 #include "../../source/constants/model.h"
 #include "../../source/utilities/Test.h"
 #include "../../source/utilities/coordenadas.h"
+#include "source/utilities/config_cliente.h"
 
 using namespace std;
 
-logErrores err_log("log.txt");
+logErrores err_log("log_cliente.txt");
 bool pasoArchivos = false;
 
 int main(int argc, char* argv[]) {
 	// Verificamos que se pase el nick
-	if(argc == 1) {
+	/*if(argc == 1) {
 		std::cout << "Falta especificar nick:\ncliente.exe <nick>\n";
 		return 0;
-	}
+	}*/
 	
 	ClientSocket sock;
 	
 	if(!sock.init()) 
 		return 1;
-	
-	if(!sock.connect("127.0.0.1", 8080))
+
+	//cargo ip servidor y puerto
+	config_cliente configuracion_red = parsear_red("../resources_cliente/red.yaml");
+
+	if(!sock.connect(configuracion_red.get_ip_servidor(),configuracion_red.get_puerto()))
 		return 1;
 	
 	// Creamos el thread de listen
 	HANDLE hth1 = (HANDLE)_beginthreadex(NULL, 0, ClientSocket::listenEntry, (void*)&sock, 0, NULL);
 	// Mandamos el nick
 	BitStream bs;
-	bs << PROTO::NICK << std::string(argv[1]);
+	//bs << PROTO::NICK << std::string(argv[1]);
+	bs << PROTO::NICK << "nickname";
 	sock.send(bs.str());
 	
 	while (!pasoArchivos){
@@ -56,7 +61,7 @@ int main(int argc, char* argv[]) {
 	}
 	//Empieza a dibujar
 	// Parseo el nivel
-	config_juego juego = parsear("../resources_cliente/niveles.yaml");
+	config_juego juego = parsear_juego("../resources_cliente/niveles.yaml");
 	config_pantalla* pantalla = juego.get_pantalla();
 	vector <config_entidad> entidades = juego.get_entidades();
 	config_general configuracion = juego.get_configuracion();

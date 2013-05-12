@@ -25,6 +25,7 @@
     <ClCompile Include="source\net\bitstream.cpp" />
     <ClCompile Include="source\utilities\aux_func.cpp" />
     <ClCompile Include="source\utilities\chatwindow.cpp" />
+    <ClCompile Include="source\utilities\config_cliente.cpp" />
     <ClCompile Include="source\utilities\config_entidad.cpp" />
     <ClCompile Include="source\utilities\config_entidad_en_juego.cpp" />
     <ClCompile Include="source\utilities\config_escenario.cpp" />
@@ -62,6 +63,7 @@
     <ClInclude Include="source\net\defines.h" />
     <ClInclude Include="source\utilities\aux_func.h" />
     <ClInclude Include="source\utilities\chatwindow.h" />
+    <ClInclude Include="source\utilities\config_cliente.h" />
     <ClInclude Include="source\utilities\config_entidad.h" />
     <ClInclude Include="source\utilities\config_entidad_en_juego.h" />
     <ClInclude Include="source\utilities\config_escenario.h" />

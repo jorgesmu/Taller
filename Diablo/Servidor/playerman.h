@@ -19,6 +19,7 @@ class Player {
 	void setPos(int x, int y);
 	int getX() const;
 	int getY() const;
+	std::string getTipo() const;
 	bool isOn() const;
 	void setOffline();
 	void setOnline();

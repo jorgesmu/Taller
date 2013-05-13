@@ -1,14 +1,22 @@
 #include "../source/net/bitstream.h"
 #include "../source/net/defines.h"
+#include "../source/display/mapa.h"
+#include "../../source/net/PjeManager.h"
 #include "clientsocket.h"
 #include <iostream>
 #include <fstream>
 
 using namespace std;
+// Variables globales
 extern bool pasoArchivos;
+extern Mapa mapa;
+extern PjeManager pm;
+extern std::string pje_local_tipo;
+extern int start_pos_x, start_pos_y;
+
 bool ClientSocket::WSinit = false;
 size_t ClientSocket::ref_count = 0;
-ClientSocket::ClientSocket() {
+ClientSocket::ClientSocket(CRITICAL_SECTION* main_cs) : main_cs(main_cs) {
 	// Increase ref count
 	ref_count++;
 	// Init status
@@ -137,83 +145,98 @@ unsigned int __stdcall ClientSocket::listenEntry(void* pthis) {
 void ClientSocket::listenDo() {
 	std::string buff;
 	while(this->receive(buff)) {
+		EnterCriticalSection(this->main_cs);
+		// This is for debugging purposes
+		//std::cout << "(" << buff.size() << ")" << buff << "\n";
 
-			// This is for debugging purposes
-			//std::cout << "(" << buff.size() << ")" << buff << "\n";
+		// Build the bitstream
+		BitStream bs(buff.c_str(), buff.size());
+		// Branch based on packet type
+		unsigned char pt;
+		bs >> pt;
 
-			// Build the bitstream
-			BitStream bs(buff.c_str(), buff.size());
-			// Branch based on packet type
-			unsigned char pt;
-			bs >> pt;
+		if(pt == PROTO::TEXTMSG) {
+			std::string msg;
+			bs >> msg;
+			std::cout << "Server says: " << msg << "\n";
+		}else if(pt == PROTO::FILE_SEND_COUNT) {
+			// Leemos la cantidad de archivos
+			Uint16 fcount;
+			bs >> fcount;
+			std::cout << "Receiving " << fcount << " files\n";
+			if(!sendOk()) return;
 
-			if(pt == PROTO::TEXTMSG) {
-				std::string msg;
-				bs >> msg;
-				std::cout << "Server says: " << msg << "\n";
-			}else if(pt == PROTO::FILE_SEND_COUNT) {
-				// Leemos la cantidad de archivos
-				Uint16 fcount;
-				bs >> fcount;
-				std::cout << "Receiving " << fcount << " files\n";
+			// Loop de archivos
+			for(int i = 0;i < fcount;i++) {
+				// Esperamos el header ahora
+				this->receive(buff);
+				bs.load(buff.c_str(), buff.size());
+				bs >> pt;
+				if(pt != PROTO::FILE_HEADER) {
+					std::cerr << "Unexpected packet, expected FILE_HEADER\n";
+					this->close();
+					return;
+				}
+
 				if(!sendOk()) return;
 
-				// Loop de archivos
-				for(int i = 0;i < fcount;i++) {
-					// Esperamos el header ahora
-					this->receive(buff);
+				std::string local_file;
+				bs >> local_file;
+				std::cout << "Receiving " << local_file << "...\n";
+				std::ofstream f(std::string("../resources/")+local_file, std::ios_base::binary|std::ios_base::trunc);
+				if(f.fail()) {
+					std::cout << "Error opening " << local_file << "\n";
+					this->close();
+					return;
+				}
+				// Loopeamos hasta recibir todo el archivo
+				while(this->receive(buff)) {
+					//std::cout << buff << "\n";
+					//std::cout << "--------------------------------------------\n";
+					//std::cout << "--------------------------------------------\n";
+					std::string tmp_chunk;
 					bs.load(buff.c_str(), buff.size());
 					bs >> pt;
-					if(pt != PROTO::FILE_HEADER) {
-						std::cerr << "Unexpected packet, expected FILE_HEADER\n";
+					if(pt == PROTO::FILE_PART) {
+						bs >> tmp_chunk;
+						f.write(tmp_chunk.c_str(), tmp_chunk.size());
+						//std::cout << "Writing chunk..\n";
+						if(!sendOk()) return;
+					}else if(pt == PROTO::FILE_DONE) {
+						f.close();
+						std::cout << "File done!\n";
+						if(!sendOk()) return;
+						break;
+					}else{
+						f.write(bs.data(), bs.size());
+						//f.close();
+						std::cerr << "Unexpected packet type during file transfer (" << int(pt) << "), aborting\n";
 						this->close();
 						return;
-					}
-
-					if(!sendOk()) return;
-
-					std::string local_file;
-					bs >> local_file;
-					std::cout << "Receiving " << local_file << "...\n";
-					std::ofstream f(std::string("..\\resources_cliente\\")+local_file, std::ios_base::binary|std::ios_base::trunc);
-					if(f.bad()) {
-						std::cerr << "Error opening " << local_file << "\n";
-						this->close();
-						return;
-					}
-					// Loopeamos hasta recibir todo el archivo
-					while(this->receive(buff)) {
-						//std::cout << buff << "\n";
-						//std::cout << "--------------------------------------------\n";
-						//std::cout << "--------------------------------------------\n";
-						std::string tmp_chunk;
-						bs.load(buff.c_str(), buff.size());
-						bs >> pt;
-						if(pt == PROTO::FILE_PART) {
-							bs >> tmp_chunk;
-							f.write(tmp_chunk.c_str(), tmp_chunk.size());
-							//std::cout << "Writing chunk..\n";
-							if(!sendOk()) return;
-						}else if(pt == PROTO::FILE_DONE) {
-							f.close();
-							std::cout << "File done!\n";
-							if(!sendOk()) return;
-							break;
-						}else{
-							f.write(bs.data(), bs.size());
-							//f.close();
-							std::cerr << "Unexpected packet type during file transfer (" << int(pt) << "), aborting\n";
-							this->close();
-							return;
-						}
 					}
 				}
-				std::cout << "All files received\n";
-				pasoArchivos = true;
-			}else{
-				std::cout << "Unknown packet type " << int(pt) << " received\n";
 			}
+			std::cout << "All files received\n";
+			pasoArchivos = true;
+		}else if(pt == PROTO::PREVIOUSTYPE) {
+			std::string tipo;
+			bs >> tipo;
+			pje_local_tipo=tipo;
+			sendOk();
+		}else if(pt == PROTO::DEFTYPE) {
+			std::string tipo;
+			bs >> tipo;
+			pje_local_tipo=tipo;
+			sendOk();
+		}else if(pt == PROTO::INITPOS) {
+			bs >> start_pos_x;
+			bs >> start_pos_y;
+			sendOk();
+		}else{
+			std::cout << "Unknown packet type " << int(pt) << " received\n";
+		}
 
+		LeaveCriticalSection(this->main_cs);
 	}
 }
 

@@ -1,6 +1,7 @@
 #include "tile.h"
 
 Tile::Tile() {
+	esCaminable = true;
 }
 
 //deprecated

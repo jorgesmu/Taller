@@ -21,4 +21,5 @@ config_entidad::config_entidad(std::string nombre_i, std::string path_imagen_i, 
 	completoAltoSprite = false;
 	completoAnchoSprite = false;
 	completoCaminable = false;
+	esDefault = false;
 }

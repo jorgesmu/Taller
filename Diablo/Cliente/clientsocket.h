@@ -23,10 +23,11 @@ class ClientSocket {
 	SOCKET ConnectSocket;
 	char recvbuf[DEFAULT_BUFLEN];
 	bool open;
+	CRITICAL_SECTION* main_cs; // CS para el loop principal
 
 	public:
 	// Constructor
-	ClientSocket();
+	ClientSocket(CRITICAL_SECTION* main_cs);
 	// Destructor
 	~ClientSocket();
 	// Funcion de inicializacion

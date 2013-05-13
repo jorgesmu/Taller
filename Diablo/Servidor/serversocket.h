@@ -16,7 +16,7 @@
 const size_t DEFAULT_BUFLEN = 2048;
 const size_t CHUNK_SIZE = 1024;
 typedef std::string addr;
-const std::string res_dir = "..\\server_resources";
+const std::string res_dir = "../Servidor/resources2client";
 
 // Estructura POD con los datos que queremos guardar de cada conexion
 struct Client {
@@ -75,10 +75,17 @@ class ServerSocket {
 	bool sendAll(const std::string& msg);
 	// Cierra el socket y todas sus conexiones
 	void close();
+	
 	// Funcion de entry para el socket en modo receive
 	static unsigned int __stdcall acceptLastEntry(void* pthis);
 	// Funcion de listen 
 	void acceptLastDo();
+
+	// Funcion de entry para el socket en modo receive
+	static unsigned int __stdcall listenLoopEntry(void* pthis);
+	// Funcion de listen 
+	void listenLoop();
+
 	// Que mal que programo
 	bool waitForOk(const std::string& cid);
 };

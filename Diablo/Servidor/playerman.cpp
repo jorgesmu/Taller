@@ -19,8 +19,9 @@ void Player::init(const std::string& nick, const std::string& pje) {
 	this->nick = nick;
 	this->tipo_personaje = pje;
 }
-
+#include <iostream>
 void Player::setPos(int x, int y) {
+	std::cout << "relocando pje <" << this->nick << "> a " << x << ":" << y << "\n";
 	this->x = x;
 	this->y = y;
 }
@@ -31,6 +32,10 @@ int Player::getX() const {
 
 int Player::getY() const {
 	return y;
+}
+
+std::string Player::getTipo() const {
+	return tipo_personaje;
 }
 
 bool Player::isOn() const {

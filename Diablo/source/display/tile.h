@@ -32,4 +32,15 @@ class Tile {
 	int getY();
 	// Devuelve true si el tile no tiene ninguna entidad
 	bool sinEntidades() const;
+
+	// Servidor
+	private:
+	bool esCaminable;
+	public:
+	bool isCaminable() const { 
+		return esCaminable;
+	}
+	void marcarNoCaminable() {
+		esCaminable = false;
+	}
 };

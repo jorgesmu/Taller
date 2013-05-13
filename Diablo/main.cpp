@@ -23,28 +23,49 @@
 #include "../../source/constants/model.h"
 #include "../../source/utilities/Test.h"
 #include "../../source/utilities/coordenadas.h"
-#include "source/utilities/config_cliente.h"
+#include "../../source/utilities/config_cliente.h"
+#include "../../source/net/PjeManager.h"
+#include "../../source/utilities/chatwindow.h"
 
 using namespace std;
 
 logErrores err_log("log_cliente.txt");
 bool pasoArchivos = false;
 
+// Variables globales
+// Critical section
+CRITICAL_SECTION cs_main;
+// Mapa
+Mapa mapa;
+// Personaje Manager
+PjeManager pjm;
+// Configuracion del personaje local
+std::string pje_local_nick;
+std::string pje_local_tipo;
+int start_pos_x, start_pos_y;
+// Ventana de chat
+ChatWindow chat_window;
+
 int main(int argc, char* argv[]) {
-	// Verificamos que se pase el nick
-	/*if(argc == 1) {
-		std::cout << "Falta especificar nick:\ncliente.exe <nick>\n";
+	// Verificamos que se pase el nick y el tipo
+	if(argc != 3) {
+		std::cout << "Falta especificar nick:\ncliente.exe <nick> <tipo_personaje>\n";
 		return 0;
-	}*/
-	
-	ClientSocket sock;
-	
+	}else{
+		// Cargamos el nick y tipo de la consola
+		pje_local_nick = argv[1];
+		pje_local_tipo = argv[2];
+	}
+
+	InitializeCriticalSection(&cs_main);
+	// Socket de cliente
+	ClientSocket sock(&cs_main);
 	if(!sock.init()) 
 		return 1;
 
 	//cargo ip servidor y puerto
-	config_cliente configuracion_red = parsear_red("../resources_cliente/red.yaml");
-
+	config_cliente configuracion_red = parsear_red("../resources/static/red.yaml");
+	// Conectamos
 	if(!sock.connect(configuracion_red.get_ip_servidor(),configuracion_red.get_puerto()))
 		return 1;
 	
@@ -53,15 +74,16 @@ int main(int argc, char* argv[]) {
 	// Mandamos el nick
 	BitStream bs;
 	//bs << PROTO::NICK << std::string(argv[1]);
-	bs << PROTO::NICK << "nickname";
+	bs << PROTO::NICKANDTYPE << pje_local_nick << pje_local_tipo;
 	sock.send(bs.str());
-	
+
+	// Esperamos el paso de archivos
 	while (!pasoArchivos){
 		Sleep(50);
 	}
 	//Empieza a dibujar
 	// Parseo el nivel
-	config_juego juego = parsear_juego("../resources_cliente/niveles.yaml");
+	config_juego juego = parsear_juego("../resources/niveles.yaml");
 	config_pantalla* pantalla = juego.get_pantalla();
 	vector <config_entidad> entidades = juego.get_entidades();
 	config_general configuracion = juego.get_configuracion();
@@ -85,12 +107,14 @@ int main(int argc, char* argv[]) {
 	Camara camara;
 	camara.init(pantalla->get_ancho(), pantalla->get_alto(), configuracion.get_margen_scroll());
 
-	// Mapa
-	Mapa mapa;
 	mapa.resize(escenarios[0].get_tam_x(), escenarios[0].get_tam_x());
 	// Resman
 	ResMan resman;
 	if(!resman.init()) return -2;
+	
+	// Ventana de chat
+	chat_window.init(&resman, 40, 40, Font::SIZE_NORMAL, 250, 500, COLOR::WHITE);
+	chat_window.setNickLocal(pje_local_nick);
 
 	// Cargo la entidad por default
 	resman.addRes("tierraDefault", "../resources/tile.png");
@@ -146,8 +170,9 @@ int main(int argc, char* argv[]) {
 
 
 	// Agrega el personaje
-	Personaje personaje(escenarios[0].get_protagonista().get_nombre() , 1 , 1 , 50 , 5, 100, 100 ,	configuracion.get_vel_personaje(),	0 , 70 , NULL , resman , Imagen::COLOR_KEY);
-	mapa.getTile(escenarios[0].get_protagonista().get_pos_x(), escenarios[0].get_protagonista().get_pos_y()) ->addEntidad(&personaje);
+	pjm.getPjeLocal().init(pje_local_tipo , 1 , 1 , 50 , 5, 100, 100 ,	configuracion.get_vel_personaje(),	0 , 70 , NULL , resman , Imagen::COLOR_KEY);
+	// Posiciono el personaje
+	mapa.getTile(start_pos_x, start_pos_y)->addEntidad(&(pjm.getPjeLocal()));
 
 	// Variables para el game-loop
 	double curr_time = SDL_GetTicks();
@@ -159,25 +184,45 @@ int main(int argc, char* argv[]) {
 
 	while((!quit ) && (sock.isOpen()) ) {
 
+		// Sync stuff
+		EnterCriticalSection(&cs_main);
+
 		// Input handling (esto despues se movera a donde corresponda)
 		while(SDL_PollEvent(&event)) {
-			// Detectar escape o quit
-			if(event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE || event.type == SDL_QUIT) {
-				quit = true;
-			}
-			// Detectar mouse motion
-			if(event.type == SDL_MOUSEMOTION) {
-				// Update para la camara
-				camara.update_speed(makeRect(event.motion.x, event.motion.y));
-			}
-			// Mouse clicks
-			if(event.type == SDL_MOUSEBUTTONDOWN) {
-				if(event.button.button == SDL_BUTTON_LEFT) {
-					vec2<int> tile_res = MouseCoords2Tile(vec2<int>(event.button.x, event.button.y), camara);
-					if(mapa.tileExists(tile_res.x, tile_res.y)) {
-						personaje.mover(mapa.getTile(tile_res.x,tile_res.y));
+
+			if(chat_window.isOpen()) {
+
+				int res = chat_window.handleInput(event);
+				if(res == SInput::RES_CLOSE) {
+					chat_window.hide();
+				}else if(res == SInput::RES_ENTER) {
+					// Enviar el mensaje al servidor
+				}
+
+			}else{
+
+				// Detectar escape o quit
+				if(event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE || event.type == SDL_QUIT) {
+					quit = true;
+				}
+				if(event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_RETURN) {
+					chat_window.open();
+				}
+				// Detectar mouse motion
+				if(event.type == SDL_MOUSEMOTION) {
+					// Update para la camara
+					camara.update_speed(makeRect(event.motion.x, event.motion.y));
+				}
+				// Mouse clicks
+				if(event.type == SDL_MOUSEBUTTONDOWN) {
+					if(event.button.button == SDL_BUTTON_LEFT) {
+						vec2<int> tile_res = MouseCoords2Tile(vec2<int>(event.button.x, event.button.y), camara);
+						if(mapa.tileExists(tile_res.x, tile_res.y)) {
+							pjm.getPjeLocal().mover(mapa.getTile(tile_res.x,tile_res.y));
+						}
 					}
 				}
+
 			}
 		}
 
@@ -200,8 +245,12 @@ int main(int argc, char* argv[]) {
 			for(auto it = entidades_cargadas.begin(); it != entidades_cargadas.end(); ++it){
 				(*it)->update(&mapa);
 			}
-			// Actualiza el personaje
-			personaje.update(&mapa);
+			// Actualizamos los personajes
+			for(auto it = pjm.getPjes().begin();it != pjm.getPjes().end(); it++) {
+				it->second.update(&mapa);
+			}
+			// Actualizamos el personaje principal
+			pjm.getPjeLocal().update(&mapa);
 			// Decrease al accum
 			accum -= CONST_DT;
 		}
@@ -211,10 +260,13 @@ int main(int argc, char* argv[]) {
 		SDL_FillRect(screen, NULL, 0);
 		// Draw el mapa
 		mapa.blit(screen, camara);
-		resman.getFont()->buffBlit(screen, 20, 10, "STRING DE PRUEBA", COLOR::WHITE);
-		resman.getFont(Font::SIZE_BIG)->buffBlit(screen, 20, 20, "STRING DE PRUEBA 2", COLOR::WHITE);
+		// Dibujamos la ventana de chat
+		chat_window.show(screen);
 		// Actualizar la pantalla
 		SDL_Flip(screen);
+
+		LeaveCriticalSection(&cs_main);
+
 	}
 	
 	mapa.clean();

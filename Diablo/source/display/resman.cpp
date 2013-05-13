@@ -39,13 +39,13 @@ bool ResMan::init() {
 	}
 	// Cargamos los fonts
 	fonts[0] = new Font;
-	if(!fonts[0]->init("..\\resources\\font.ttf", Font::SIZE_SMALL)) return false;
+	if(!fonts[0]->init("../resources/static/font.ttf", Font::SIZE_SMALL)) return false;
 
 	fonts[1] = new Font;
-	if(!fonts[1]->init("..\\resources\\font.ttf", Font::SIZE_NORMAL)) return false;
+	if(!fonts[1]->init("../resources/static/font.ttf", Font::SIZE_NORMAL)) return false;
 	
 	fonts[2] = new Font;
-	if(!fonts[2]->init("..\\resources\\font.ttf", Font::SIZE_BIG)) return false;
+	if(!fonts[2]->init("../resources/static/font.ttf", Font::SIZE_BIG)) return false;
 
 }
 

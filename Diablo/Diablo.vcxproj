@@ -23,6 +23,7 @@
     <ClCompile Include="source\display\resman.cpp" />
     <ClCompile Include="source\display\tile.cpp" />
     <ClCompile Include="source\net\bitstream.cpp" />
+    <ClCompile Include="source\net\PjeManager.cpp" />
     <ClCompile Include="source\utilities\aux_func.cpp" />
     <ClCompile Include="source\utilities\chatwindow.cpp" />
     <ClCompile Include="source\utilities\config_cliente.cpp" />
@@ -61,6 +62,7 @@
     <ClInclude Include="source\display\tile.h" />
     <ClInclude Include="source\net\bitstream.h" />
     <ClInclude Include="source\net\defines.h" />
+    <ClInclude Include="source\net\PjeManager.h" />
     <ClInclude Include="source\utilities\aux_func.h" />
     <ClInclude Include="source\utilities\chatwindow.h" />
     <ClInclude Include="source\utilities\config_cliente.h" />

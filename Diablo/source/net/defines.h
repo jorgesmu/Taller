@@ -8,7 +8,7 @@ namespace PROTO {
 const unsigned char CHAT = 'a';
 
 // Mensaje de set de nick: <str:nuevo_nick>
-const unsigned char NICK = 'b';
+const unsigned char NICKANDTYPE = 'b';
 
 // Mensaje de texto de parte del server
 const unsigned char TEXTMSG = 'c';
@@ -21,5 +21,14 @@ const unsigned char FILE_HEADER = 'e';
 const unsigned char FILE_PART = 'f';
 // Mensaje de fin de envio archivo
 const unsigned char FILE_DONE = 'g';
+
+// Mensaje de sincronizacion de tipo de personaje
+const unsigned char PREVIOUSTYPE = 'h';
+
+// Mensaje de sincronizacion de tipo default de personaje
+const unsigned char DEFTYPE = 'i';
+
+// Mensaje de sincronizacion de posicion inicial de personaje
+const unsigned char INITPOS = 'j';
 
 }

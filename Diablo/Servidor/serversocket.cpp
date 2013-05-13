@@ -1,13 +1,21 @@
 #include "serversocket.h"
 
 #include "../source/utilities/aux_func.h"
+#include "parserServer.h"
 
 #include <iostream>
 #include <sstream>
 #include <cassert>
+#include <vector>
 
 #include <Windows.h>
 #include <process.h>
+
+#include "playerman.h"
+
+extern PlayerManager pm;
+extern Mapa mapa;
+extern std::vector <config_entidad> entidades;
 
 bool ServerSocket::WSinit = false;
 size_t ServerSocket::ref_count = 0;
@@ -240,6 +248,19 @@ std::string ServerSocket::buildId(const sockaddr_in& sckaddr) {
 	return conn_id.str();
 }
 
+unsigned int __stdcall ServerSocket::listenLoopEntry(void* pthis) {
+	ServerSocket* pt = (ServerSocket*)pthis;
+	pt->listenLoop();
+	return 0;
+}
+
+void ServerSocket::listenLoop() {
+	// Aceptar conexiones indefinidamente
+	while(accept()) {
+		//
+	}
+}
+
 unsigned int __stdcall ServerSocket::acceptLastEntry(void* pthis) {
 	ServerSocket* pt = (ServerSocket*)pthis;
 	pt->acceptLastDo();
@@ -266,23 +287,24 @@ void ServerSocket::acceptLastDo() {
 		this->receive(cid, buff);
 		BitStream tmp_bs(buff.c_str(), buff.size());
 		unsigned char bt;
-		std::string new_nick;
+		std::string new_nick, new_type;
 		tmp_bs >> bt;
 		tmp_bs >> new_nick;
+		tmp_bs >> new_type;
 		// Validamos
-		if(bt != PROTO::NICK || new_nick.size() == 0) {
+		if(bt != PROTO::NICKANDTYPE || new_nick.size() == 0 || new_type.size() == 0) {
 			BitStream reply;
-			reply << PROTO::TEXTMSG << "Transaction error, valid nickname expected";
+			reply << PROTO::TEXTMSG << "Transaction error, valid nickname/type expected";
 			this->send(cid, reply.str());
 			removeClient(cid);
 			return;
 		}
-		// Verificamos que el nick no esté en uso ya
+		// Verificamos si el nick está en uso
 		for(auto it = clients_map.begin();it != clients_map.end();it++) {
 			//std::cout << "NICK: " << it->second.nick << "\n";
 			if(it->second.nick == new_nick) {
 				BitStream reply;
-				reply << PROTO::TEXTMSG << "Nickname already in use";
+				reply << PROTO::TEXTMSG << "Nickname already connected";
 				this->send(cid, reply.str());
 				removeClient(cid);
 				return;
@@ -298,6 +320,49 @@ void ServerSocket::acceptLastDo() {
 			removeClient(cid);
 			return;
 		}
+
+		// Agregamos al playermanager si no existe
+		if(pm.playerExists(new_nick)) {
+			std::string tipo = pm.getPlayer(new_nick).getTipo();
+			BitStream bs;
+			bs << PROTO::PREVIOUSTYPE << tipo;
+			send(cid, bs.str());
+		}else{
+			bool found=false;
+			for (auto it=entidades.begin();it!=entidades.end();it++) {
+				if (it->get_nombre()==new_type) {
+					found=true;
+					break;
+				}
+			}
+			if(!found) {
+				BitStream bs;
+				std::string tipo="nohay";
+				for (auto it=entidades.begin();it!=entidades.end();it++) {
+					if (it->get_es_default()) {
+						tipo=it->get_nombre();
+						break;
+					}
+				}
+				bs << PROTO::DEFTYPE << tipo;
+				send(cid, bs.str());
+				new_type = tipo;
+			}
+			// Agregamos el jugador
+			pm.addPlayer(new_nick, new_type, mapa);
+
+		}
+		
+		// Le mandamos la posicion inicial
+		waitForOk(cid);
+		BitStream bs;
+		bs << PROTO::INITPOS << pm.getPlayer(new_nick).getX() << pm.getPlayer(new_nick).getY();
+		send(cid, bs.str());
+		waitForOk(cid);
+
+		// Mandamos todos los otros players
+		//
+
 
 		// Receive loop
 		while(this->receive(cid, buff)) {
@@ -329,7 +394,7 @@ void ServerSocket::acceptLastDo() {
 		// Cuando hay una desconexion loggeamos e informamos al resto
 		ss.str("");
 		ss << getClient(cid).nick << " - disconnected\n";
-		BitStream bs;
+		bs.clear();
 		bs << PROTO::TEXTMSG << ss.str();
 		removeClient(cid);
 		this->sendAll(bs.str());

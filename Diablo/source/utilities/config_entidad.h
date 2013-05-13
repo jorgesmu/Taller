@@ -11,6 +11,7 @@ class config_entidad {
 			completoDelay, completoAltoSprite, completoAnchoSprite;
 
 		bool caminable, completoCaminable;
+		bool esDefault;
 	public:
 		//Constructor
 		//i: inicial
@@ -60,6 +61,8 @@ class config_entidad {
 		bool get_completo_ancho_sprite() { return completoAnchoSprite;}
 
 		bool get_completo_caminable() { return completoCaminable;}
+
+		bool get_es_default() { return esDefault; }
 
 		//Setters
 		void set_nombre(std::string newValue) { nombre = newValue;}
@@ -117,5 +120,9 @@ class config_entidad {
 		}
 		void completo_caminable(){
 			completoCaminable = true;
+		}
+
+		void set_es_default(bool esDef) {
+			esDefault=esDef;
 		}
 };

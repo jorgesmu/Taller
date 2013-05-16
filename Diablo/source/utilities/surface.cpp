@@ -6,7 +6,8 @@
 #include <sstream>
 
 Surface::Surface() {
-	image = NULL;
+	this -> image = NULL;
+	this -> imageGris = NULL;
 }
 
 void Surface::nuevoSurfaceConfigurado(const int alto , const int ancho , const SDL_VideoInfo* vi ,

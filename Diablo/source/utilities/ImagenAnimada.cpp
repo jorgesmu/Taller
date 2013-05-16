@@ -1,6 +1,44 @@
 #include "ImagenAnimada.h"
 
 /**
+	Pre: El parametro path es una ruta no nula y los parametros alto y ancho son
+	positivos.
+	
+	Post: Si se logra abrir el archivo y tomar memoria, la instancia se
+	iniciliza de acuerdo a la imagen dada por el path.
+**/
+ImagenAnimada::ImagenAnimada(ImagenAnimada* imagen){
+
+	if (imagen != NULL){
+		this -> alto = imagen -> alto;
+		this -> ancho = imagen -> ancho;
+		
+		delay = imagen -> delay;
+		fps = imagen -> fps;
+
+		//seteo la distancia entre frames
+		this -> deltaFrame = imagen -> deltaFrame;
+	
+		//calculo de tiempos
+		this -> tiempoProximoFrame = imagen -> tiempoProximoFrame;
+	
+		//creacion de un surfaceOrigen
+		this -> surfaceOrigen = imagen -> surfaceOrigen;
+
+		this -> surfaceActual = imagen -> surfaceActual;
+		
+		this -> maxColumnas = imagen -> maxColumnas;
+
+		this -> maxFilas = imagen -> maxFilas;
+
+		this -> filaActual = imagen -> filaActual;
+		this -> columnaActual = imagen -> columnaActual;
+		this -> colorKey = imagen -> colorKey;
+		this -> compartida = imagen -> compartida;
+	}
+}
+
+/**
 	Pre: Condiciones sobre la entrada:
 		
 		path: no nulo, caso contrario se vuelca a NULL
@@ -206,9 +244,11 @@ void ImagenAnimada::nextSprite() {
 			rect.w = this ->getAncho();
 			rect.x = this -> columnaActual * this -> getAncho();
 			rect.y = this -> filaActual * this -> getAlto();
-			if (this ->surfaceOrigen != NULL){
+			if (this -> surfaceOrigen != NULL){
+				this -> surfaceOrigen-> blitGris( (this -> surfaceActual).getSDL_SurfaceGris() , 
+												0 , 0, rect);				
 				this -> surfaceOrigen-> blit( (this -> surfaceActual).getSDL_Surface() , 
-											0 , 0, rect);
+												0 , 0, rect);
 			}
 		}
 	}
@@ -225,6 +265,7 @@ Surface* ImagenAnimada::getSurface() {
 	this -> nextSprite();
 	return & (this -> surfaceActual);
 }
+
 
 /**
 	Pre: La instancia ha sido creada.
@@ -244,4 +285,8 @@ int ImagenAnimada::getFPS() {
 **/
 int ImagenAnimada::getDelay() {
 	return this -> delay;
+}
+
+bool ImagenAnimada::isImagenAnimada(){
+	return true;
 }

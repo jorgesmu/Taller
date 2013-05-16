@@ -19,6 +19,8 @@ class Surface {
 	private:
 
 	SDL_Surface* image;
+
+	SDL_Surface* imageGris;
 	
 	public:
 	// Constructor
@@ -41,8 +43,18 @@ class Surface {
 	void blit(SDL_Surface* destination, int x, int y);
 	// Idem anterior pero lleva un parametro extra para clippear (spritesheets)
 	void blit(SDL_Surface* destination, int x, int y, SDL_Rect& clip);
+	// Toma como argumentos la surface de destino (aka screen) y offset coords x, y
+	void blitGris(SDL_Surface* destination, int x, int y);
+	// Idem anterior pero lleva un parametro extra para clippear (spritesheets)
+	void blitGris(SDL_Surface* destination, int x, int y, SDL_Rect& clip);
+	// cambiar escala de grises
+	Uint32 getpixel(SDL_Surface* surface, int x, int y);
+	//cambiar escala de grises
+	void putpixel(SDL_Surface* surface, int x, int y, Uint32 pixel);
 	// Retorna el Surface contenido.
 	SDL_Surface* getSDL_Surface();
+	// Retorna el Surface contenido.
+	SDL_Surface* getSDL_SurfaceGris();
 	//Asocia la Surface con una nueva SDL_Surface
 	void setSurface(SDL_Surface* nuevaSurface);
 	/*

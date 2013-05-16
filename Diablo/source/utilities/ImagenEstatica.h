@@ -60,4 +60,7 @@ public:
 		
 	**/
 	virtual Surface* getSurface();
+
+	virtual bool isImagenAnimada();
+
 };

@@ -1,8 +1,10 @@
 #pragma once
-
+//#include "../utilities/Personaje.h"
 #include "tile.h"
 #include <vector>
 #include "SDL.h"
+class Personaje;
+class Tile;
 
 typedef std::vector<Tile> TileVec;
 
@@ -29,7 +31,9 @@ class Mapa {
 	// Getter para el vector de tiles, para recorrerlo entero
 	TileVec& allTiles();
 	// Blittea todo el mapa
-	void blit(SDL_Surface* dest, Camara& camara);
+	void blit(SDL_Surface* dest, Camara& camara , Personaje* personaje);
+	//setea entidades dibujadas en false
+	void setEntidadesDibujadasFalse();
 	// Libera los recursos
 	void clean();
 	// Devuelve el tile segun su posicion en el mapa dado por el pixel superior

@@ -1,0 +1,19 @@
+-ERROR: No se ingreso el ancho de una entidad piso, se selecciona valor por defecto.
+-ERROR: No se ingreso el alto de una entidad piso, se selecciona valor por defecto.
+-ERROR: No se ingreso el pixel de referencia X de una entidad piso, se selecciona valor por defecto.
+-ERROR: No se ingreso el pixel de referencia Y de una entidad piso, se selecciona valor por defecto.
+-ERROR: No se ingreso el ancho de una entidad agua, se selecciona valor por defecto.
+-ERROR: No se ingreso el alto de una entidad agua, se selecciona valor por defecto.
+-ERROR: No se ingreso el pixel de referencia X de una entidad agua, se selecciona valor por defecto.
+-ERROR: No se ingreso el pixel de referencia Y de una entidad agua, se selecciona valor por defecto.
+-ERROR: No se ingreso el ancho de una entidad soldado, se selecciona valor por defecto.
+-ERROR: No se ingreso el alto de una entidad soldado, se selecciona valor por defecto.
+-ERROR: No se ingreso el pixel de referencia X de una entidad soldado, se selecciona valor por defecto.
+-ERROR: No se ingreso el pixel de referencia Y de una entidad soldado, se selecciona valor por defecto.
+-ERROR: No se ingreso el ancho de una entidad orco, se selecciona valor por defecto.
+-ERROR: No se ingreso el alto de una entidad orco, se selecciona valor por defecto.
+-ERROR: No se ingreso el pixel de referencia X de una entidad orco, se selecciona valor por defecto.
+-ERROR: No se ingreso el pixel de referencia Y de una entidad orco, se selecciona valor por defecto.
+-ERROR: No se ingreso ningun protagonista en un escenariobosque_encantado, se selecciona uno por defecto.
+-ERROR: La posicion x de una entidad pino en el escenario bosque_encantadoingresada es menor que la unidad, se selecciona valor por defecto.
+-ERROR: La posicion y de una entidad pino en el escenario bosque_encantadoingresada es menor que la unidad, se selecciona valor por defecto.

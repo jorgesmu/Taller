@@ -2,7 +2,6 @@
 #include "tile.h"
 #include "mapa.h"
 
-
 /*
 	Pre:-
 
@@ -30,6 +29,7 @@ void Entidad::inicializarAtributosEnValoresDefault() {
 	this -> posY = 0;
 	//seteo como compartido
 	this -> compartido = true;
+	
 }
 
 /*
@@ -51,14 +51,14 @@ Entidad::Entidad(){
 		NOTA: ImagenEstatica
 */
 Entidad::Entidad(const std::string& name, 
-				const unsigned int wTiles , const unsigned int hTiles ,
+				const unsigned int wTiles , const unsigned int hTiles , bool caminable ,
 				int pixel_ref_x ,int pixel_ref_y,
 				Tile* tile,
 				ResMan& rm , const int colorKey){
 	// seteo del puntero a imagen
 	this -> imagen = NULL;
 	//carga de imagen y configuración inicial.
-	init(name , wTiles , hTiles , pixel_ref_x , pixel_ref_y, tile , rm , colorKey);
+	init(name , wTiles , hTiles ,caminable, pixel_ref_x , pixel_ref_y, tile , rm , colorKey);
 }
 
 /*
@@ -68,7 +68,7 @@ Entidad::Entidad(const std::string& name,
 	NOTA: ImagenAnimada
 */
 Entidad::Entidad(const std::string& name, 
-				const unsigned int wTiles , const unsigned int hTiles , 
+				const unsigned int wTiles , const unsigned int hTiles , bool caminable ,
 				const unsigned int fps , const unsigned int delay , 
 				int pixel_ref_x ,int pixel_ref_y,
 				Tile* tile , 
@@ -76,7 +76,7 @@ Entidad::Entidad(const std::string& name,
 	// seteo del puntero a imagen
 	this -> imagen = NULL;
 	//carga de imagen y configuración inicial.
-	init(name , wTiles , hTiles , fps , delay ,
+	init(name , wTiles , hTiles ,caminable , fps , delay ,
 		Imagen::ALTO_DEFAULT , Imagen::ANCHO_DEFAULT ,
 		pixel_ref_x , pixel_ref_y, 
 		tile , rm , colorKey);
@@ -90,7 +90,7 @@ Entidad::Entidad(const std::string& name,
 	NOTA: ImagenAnimada
 */
 Entidad::Entidad(const std::string& name, 
-		const unsigned int wTiles , const unsigned int hTiles , 
+		const unsigned int wTiles , const unsigned int hTiles , bool caminable ,
 		const unsigned int fps , const unsigned int delay , 
 		const unsigned int altoSprite , const unsigned int anchoSprite ,
 		const int pixel_ref_x , const int pixel_ref_y,
@@ -99,7 +99,7 @@ Entidad::Entidad(const std::string& name,
 	// seteo del puntero a imagen
 	this -> imagen = NULL;
 	//carga de imagen y configuración inicial.
-	init(name , wTiles , hTiles , fps , delay , 
+	init(name , wTiles , hTiles , caminable ,fps , delay , 
 		altoSprite , anchoSprite ,
 		pixel_ref_x , pixel_ref_y, 
 		tile , rm , colorKey);
@@ -113,7 +113,7 @@ Entidad::Entidad(const std::string& name,
 	NOTA: ImagenAnimada
 */
 void Entidad::init(const std::string& name, 
-				const unsigned int wTiles , const unsigned int hTiles , 
+				const unsigned int wTiles , const unsigned int hTiles , bool caminable ,
 				const unsigned int fps , const unsigned int delay , 
 				const unsigned int  altoSprite , const unsigned int anchoSprite ,
 				int pixel_ref_x ,int pixel_ref_y,
@@ -151,6 +151,7 @@ void Entidad::init(const std::string& name,
 	this -> tileAncla = tile;
 	//seteo como compartido
 	this -> compartido = true;
+	this -> caminable = caminable;
 }
 
 /*
@@ -161,7 +162,7 @@ void Entidad::init(const std::string& name,
 	NOTA: ImagenEstatica
 */
 void Entidad::init(const std::string& name,  
-				const unsigned int wTiles , const unsigned int hTiles , 
+				const unsigned int wTiles , const unsigned int hTiles , bool caminable , 
 				int pixel_ref_x ,int pixel_ref_y , 
 				Tile* tile , 
 				ResMan& rm , const int colorKey){
@@ -196,87 +197,111 @@ void Entidad::init(const std::string& name,
 	this -> tileAncla = tile;
 	//seteo como compartido
 	this -> compartido = true;
+	this ->caminable = caminable;
 }
 	
-	/*
-		Pre: La instancia ha sido creada.
+/*
+	Pre: La instancia ha sido creada.
 		 
-		Post: Se ha destruido la instancia liberando los recursos asociados.
-	*/
-	Entidad::~Entidad() {
-		if (this -> imagen != NULL) {
-			delete(this -> imagen);
-			this -> imagen = NULL;
-		}
-		this -> surf = NULL;
-		this -> tileAncla = NULL;
+	Post: Se ha destruido la instancia liberando los recursos asociados.
+*/
+Entidad::~Entidad() {
+	if (this -> imagen != NULL) {
+		delete(this -> imagen);
+		this -> imagen = NULL;
 	}
+	this -> surf = NULL;
+	this -> tileAncla = NULL;
+}
 
-	std::string Entidad::get_nombre(){
-		return name;
-	}
+std::string Entidad::get_nombre(){
+	return name;
+}
 					
-	/*
-		retorna el alto en tiles
-	*/
-	unsigned int Entidad::getHighInTiles() {
-		return this -> highInTiles;
-	}
+/*
+	retorna el alto en tiles
+*/
+unsigned int Entidad::getHighInTiles() {
+	return this -> highInTiles;
+}
 
-	/*
-		retorna el ancho en tiles
-	*/
-	unsigned int Entidad::getWidthInTiles() {
-		return this -> widthInTiles;
-	}
+/*
+	retorna el ancho en tiles
+*/
+unsigned int Entidad::getWidthInTiles() {
+	return this -> widthInTiles;
+}
 
-	// Actualiza las cosas internas, si hubiese
-	void Entidad::update(Mapa* mapa) {
-		if(this -> imagen != NULL) {
-			this -> surf = this -> imagen -> getSurface();
-		}
-	}
 	
-	/*
-		Pre: Los parámetros cumplen las siguiente condiciones:
+unsigned int Entidad::getX(){
+	return this -> posX;
+}
 
-			dest: Surface sobre el que se quiere pintar.
+unsigned int Entidad::getY(){
+	return this -> posY;
+}
 
-			camara: Camara correspondiente.
+bool Entidad::getDibujada(){
+	return this->dibujada;
+}
 
-			mapa: mapa correspondiente
+void Entidad::setDibujada(bool seDibujo){
+	this->dibujada = seDibujo;
+}
 
-			tileX , tileY : Tile sobre el 
 
-			NOTA: Cuidado al momento de hacer updates, ya que hay entidades que 
-			ocupan varios Tiles. En sintesis, un update por entidad al momento
-			de pintar toda la pantalla.
+// Actualiza las cosas internas, si hubiese
+void Entidad::update(Mapa* mapa) {
+	if(this -> imagen != NULL) {
+		this -> surf = this -> imagen -> getSurface();
+	}
+}
+	
+/*
+	Pre: Los parámetros cumplen las siguiente condiciones:
 
-		Post: Se ha pintado la entidad en el surface dest según la camara y el mapa.
-		Si la entidad tiene una base rectangular de un sólo Tile se pinta sin mayores 
-		cuidados.
-		En cambio si la entidad tiene una base superior a un tile se realiza un tratamiento
-		especial.
+		dest: Surface sobre el que se quiere pintar.
 
-	*/
-	void Entidad::blit(SDL_Surface* dest , Camara* camara , Mapa* mapa,
-						const unsigned int tileX ,	const unsigned int tileY){
-		if ( (this -> imagen != NULL) && (this -> surf != NULL) &&
-			(camara != NULL) ) {
-			if(this -> surf -> getSDL_Surface() != NULL){
-				int posX;
-				int posY;
-				if (compartido){
-					posX = tileX - (int)(camara -> getX()) - this -> pixel_ref_x;
-					posY = tileY - (int)(camara -> getY()) - this -> pixel_ref_y;
-				} else {
-					posX = this -> posX - (int)(camara -> getX()) - this -> pixel_ref_x;
-					posY = this -> posY - (int)(camara -> getY()) - this -> pixel_ref_y;
-				}
+		camara: Camara correspondiente.
+
+		mapa: mapa correspondiente
+
+		tileX , tileY : Tile sobre el 
+
+		NOTA: Cuidado al momento de hacer updates, ya que hay entidades que 
+		ocupan varios Tiles. En sintesis, un update por entidad al momento
+		de pintar toda la pantalla.
+
+	Post: Se ha pintado la entidad en el surface dest según la camara y el mapa.
+	Si la entidad tiene una base rectangular de un sólo Tile se pinta sin mayores 
+	cuidados.
+	En cambio si la entidad tiene una base superior a un tile se realiza un tratamiento
+	especial.
+
+*/
+void Entidad::blit(SDL_Surface* dest , Camara* camara , Mapa* mapa,
+					const unsigned int tileX ,	const unsigned int tileY){	
+	if ( (this -> imagen != NULL) && (this -> surf != NULL) &&
+		(camara != NULL) ) {
+		if(this -> surf -> getSDL_Surface() != NULL){
+			int posX;
+			int posY;
+			if (compartido){
+				posX = tileX - (int)(camara -> getX()) - this -> pixel_ref_x;
+				posY = tileY - (int)(camara -> getY()) - this -> pixel_ref_y;
+			} else {
+				posX = this -> posX - (int)(camara -> getX()) - this -> pixel_ref_x;
+				posY = this -> posY - (int)(camara -> getY()) - this -> pixel_ref_y;
+			}
+			if (!this->color) {
+				this -> surf -> blitGris(dest , posX ,posY);	
+			} else {
 				this -> surf -> blit(dest , posX ,posY);		
 			}
 		}
 	}
+}
+
 /*	
 	Pre;
 */
@@ -319,6 +344,9 @@ bool Entidad::isCaminable(Tile* tile , Mapa* mapa){
 	return true;
 }
 
+bool Entidad::isCaminable(){
+	return true;
+}
 /*
 	Pre: La instancia ha sido creada.
 	Post: Se retorna el tile donde se encuentra la instancia.
@@ -331,3 +359,20 @@ Tile* Entidad::getPosicion(Mapa* mapa){
 	return retorno;
 }
 
+
+
+std::vector<Tile*> Entidad::getTilesExplorados(){
+	return tilesExplorados;
+}
+
+void Entidad::agregarTilesExplorados(Tile* tile){
+	this -> tilesExplorados.push_back(tile);
+}
+
+void Entidad::setColor(bool value){
+	this -> color = value;
+}
+
+void Entidad::setColor(bool value , int tileX , int tileY) {
+	this ->setColor(value);
+}

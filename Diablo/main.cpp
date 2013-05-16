@@ -48,7 +48,7 @@ ChatWindow chat_window;
 
 int main(int argc, char* argv[]) {
 	// Verificamos que se pase el nick y el tipo
-	if(argc != 3) {
+/*	if(argc != 3) {
 		std::cout << "Falta especificar nick:\ncliente.exe <nick> <tipo_personaje>\n";
 		return 0;
 	}else{
@@ -56,6 +56,10 @@ int main(int argc, char* argv[]) {
 		pje_local_nick = argv[1];
 		pje_local_tipo = argv[2];
 	}
+*/
+	//borrar estas dos lineas
+		pje_local_nick = "jugador";
+		pje_local_tipo = "soldado";
 
 	InitializeCriticalSection(&cs_main);
 	// Socket de cliente
@@ -118,7 +122,7 @@ int main(int argc, char* argv[]) {
 
 	// Cargo la entidad por default
 	resman.addRes("tierraDefault", "../resources/tile.png");
-	Entidad entidadPisoPorDefecto("tierraDefault", 1 , 1 , 0 , 0 , NULL, resman , Imagen::COLOR_KEY);
+	Entidad entidadPisoPorDefecto("tierraDefault", 1 , 1 , true , 0 , 0 , NULL, resman , Imagen::COLOR_KEY);
 
 	// Cargamos el tile por defecto
 	for(auto it = mapa.allTiles().begin();it != mapa.allTiles().end(); ++it) {
@@ -133,10 +137,10 @@ int main(int argc, char* argv[]) {
 		resman.addRes(it->get_nombre(), it->get_path_imagen(), Imagen::COLOR_KEY);
 		EntidadFija* entidad;
 		if(it->get_fps() > 0 && it->get_alto_sprite() > 0 && it->get_ancho_sprite() > 0){
-			entidad = new EntidadFija (it->get_nombre(), it->get_ancho_base(), it->get_alto_base(), it->get_fps(), it->get_delay(),
+			entidad = new EntidadFija (it->get_nombre(), it->get_ancho_base(), it->get_alto_base(), it->get_caminable(), it->get_fps(), it->get_delay(),
 								it->get_alto_sprite(), it->get_ancho_sprite(), it->get_pixel_ref_x(), it->get_pixel_ref_y(), NULL, &mapa, resman, Imagen::COLOR_KEY);
 		}else{
-			entidad = new EntidadFija (it->get_nombre(), it->get_ancho_base(), it->get_alto_base(), it->get_pixel_ref_x(), it->get_pixel_ref_y(),
+			entidad = new EntidadFija (it->get_nombre(), it->get_ancho_base(), it->get_alto_base(), it->get_caminable(), it->get_pixel_ref_x(), it->get_pixel_ref_y(),
 								NULL, &mapa, resman, Imagen::COLOR_KEY);
 		}
 		entidades_cargadas.push_back(entidad);
@@ -152,7 +156,7 @@ int main(int argc, char* argv[]) {
 			if(it->get_nombre() == (*it2)->get_nombre()){
 				EntidadFija* copia;
 				
-				copia = new EntidadFija (*it2);
+				copia = new EntidadFija (*it2, &mapa);
 
 				mapa.getTile(it->get_pos_x(), it->get_pos_y())->addEntidad(copia);
 				(copia)->setTileActual(mapa.getTile(it->get_pos_x(), it->get_pos_y()), &mapa);
@@ -259,7 +263,8 @@ int main(int argc, char* argv[]) {
 		// Despues se movera a donde corresponda
 		SDL_FillRect(screen, NULL, 0);
 		// Draw el mapa
-		mapa.blit(screen, camara);
+		mapa.blit(screen, camara, &(pjm.getPjeLocal()));
+		mapa.setEntidadesDibujadasFalse();
 		// Dibujamos la ventana de chat
 		chat_window.show(screen);
 		// Actualizar la pantalla

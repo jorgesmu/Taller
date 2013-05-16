@@ -4,8 +4,12 @@
 #include "../display/tile.h"
 #include "../display/mapa.h"
 class Tile;
+class Mapa;
 class Personaje : public Entidad {
 public:
+
+		const static int RADIO_VISION = 2;// los tiles a menos de 1 tiles de distancia del personaje son visibles
+
 		//Direccion
 		const static unsigned int SUR = 0;
 		const static unsigned int SURESTE = 1;
@@ -44,7 +48,7 @@ protected:
 		clock_t tiempoProximoUpdate;
 
 		bool actualizandoPosicion;
-
+				
 public:
 	
 	/*
@@ -68,6 +72,13 @@ public:
 			const int pixel_ref_x , const int pixel_ref_y,
 			Tile* tile, 
 			ResMan& rm , const int colorKey);
+
+	/*
+		Pre: La instancia ha sido creada.
+	 
+		Post: Se ha destruido la instancia liberando los recursos asociados.
+	*/
+	Personaje::~Personaje();
 
 	/*
 		Pre: Se ha creado la instancia.
@@ -96,7 +107,26 @@ public:
 		en algun Tile en el que no estaba, y se de de baja en alguno en cual estaba.
 	*/
 	virtual void mover(Tile* tileDestino);
+
+	/*
+		Pre: Mapa distinto de null
+
+		Post: Se ha encaminado el movimiento de la entidad al Tile correspondiente.
+
+		Nota: Puede suceder que si una entidad ocupa varios Tiles la entidad se de de alta
+		en algun Tile en el que no estaba, y se de de baja en alguno en cual estaba.
+	*/
+	virtual void mover(Tile* tileDestino , Mapa* mapa);
 	
+	/*
+		Pre: Mapa distinto de null. El parametro tileDestino es cualquier tile en la 
+		dirección del ataque.
+
+		Post: Se ha realizado un ataque en la direccion correspondiente del tile parametro.
+
+	*/
+	virtual void ataque(Tile* tileDestino , Mapa* mapa);
+
 	/*
 		Pre: La instancia ha sido creada.
 		Post: Se setea el Tile destino.
@@ -127,6 +157,8 @@ public:
 		Post: Se actualiza el movimiento de la instancia.
 	*/
 	virtual void update(Mapa* mapa);
+
+	
 
 protected:
 		
@@ -187,4 +219,6 @@ protected:
 
 	*/
 	virtual void inicializarAtributosEnValoresDefault();
+	
+	
 };

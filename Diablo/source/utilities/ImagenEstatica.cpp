@@ -80,6 +80,9 @@ ImagenEstatica::ImagenEstatica(const char* name , ResMan& rm, const int ckey) {
 		if (this -> surface -> getSDL_Surface() != NULL){
 			SDL_SetColorKey(this -> surface -> getSDL_Surface(), SDL_SRCCOLORKEY, ckey);
 		}
+		if (this -> surface -> getSDL_SurfaceGris() != NULL){
+			SDL_SetColorKey(this -> surface -> getSDL_SurfaceGris(), SDL_SRCCOLORKEY, ckey);
+		}
 		this -> compartida = true;	
 	} else {
 		this -> setAlto(0);
@@ -111,4 +114,8 @@ ImagenEstatica::~ImagenEstatica() {
 **/
 Surface* ImagenEstatica::getSurface(){
 	return (this -> surface);
+}
+
+bool ImagenEstatica::isImagenAnimada(){
+	return false;
 }

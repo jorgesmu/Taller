@@ -223,7 +223,8 @@ void ImagenPersonaje::setAccionEfectiva(unsigned int accion) {
 
 	Post: Se ha seteado la accion.
 */
-void ImagenPersonaje::setAccion(unsigned int accion){
+bool ImagenPersonaje::setAccion(unsigned int accion){
+	bool retorno = false;
 	if (accion > ImagenPersonaje::MUERTE) {
 		if (accion <= ImagenPersonaje::ESTATICO_DIRECCION_ACTUAL) {
 			switch (accion) {
@@ -264,6 +265,10 @@ void ImagenPersonaje::setAccion(unsigned int accion){
 	} else {
 		this -> setAccionEfectiva(accion);
 	}
+	if (this -> columnaActual == this -> maxFilas) {
+		retorno = true;
+	}
+	return retorno;
 }
 
 /*
@@ -291,7 +296,12 @@ void ImagenPersonaje::nextSprite() {
 			rect.y = this -> filaActual * this -> getAlto();
 			if (this ->surfaceOrigen != NULL) {
 				this -> surfaceOrigen -> blit( (this -> surfaceActual).getSDL_Surface() , 0 , 0, rect);
+				this -> surfaceOrigen -> blitGris( (this -> surfaceActual).getSDL_SurfaceGris() , 0 , 0, rect);
 			}
 		}
 	}
+}
+
+bool ImagenPersonaje::isImagenAnimada() {
+	return false;
 }

@@ -42,6 +42,8 @@ public:
 	const static unsigned int ATAQUE_DIRECCION_ACTUAL = 26;
 	//Quieto en direccion actual
 	const static unsigned int ESTATICO_DIRECCION_ACTUAL = 27;
+	//Continua con la accion actual
+	const static unsigned int CONTINUAR_CON_ACCION_ACTUAL = 28;
 
 private:
 
@@ -106,7 +108,7 @@ public:
 
 		Post: Se ha seteado la accion.
 	*/
-	void setAccion(unsigned int accion);
+	bool setAccion(unsigned int accion);
 	
 	/*
 		Pre: Se han inicilizado todos los parametros.
@@ -115,7 +117,9 @@ public:
 	*/
 	virtual void nextSprite();
 
-	private:
+	virtual bool isImagenAnimada();
+
+private:
 
 	/*
 		Pre: La instancia ha sido creada y el parametro es una accion entre 0 y 24.
@@ -123,6 +127,7 @@ public:
 		Post: Se ha seteado la accion.
 	*/
 	void setAccionEfectiva(unsigned int accion);	
+
 };
 
 

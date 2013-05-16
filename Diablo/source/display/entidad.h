@@ -1,6 +1,6 @@
 #pragma	once
-
 #include <string>
+#include <vector>
 #include "../utilities/surface.h"
 #include "../utilities/Imagen.h"
 #include "../utilities/ImagenEstatica.h"
@@ -49,7 +49,15 @@ class Entidad {
 
 		bool compartido; //si es compartido por varios tiles
 
-	public:
+		bool dibujada; //
+
+		std::vector<Tile*> tilesExplorados; //los tiles que ya visito
+
+		bool color;
+
+		bool caminable;
+
+public:
 	
 	/*
 		Pre:-
@@ -66,7 +74,7 @@ class Entidad {
 		NOTA: ImagenEstatica
 	*/
 	Entidad(const std::string& name,
-			const unsigned int wTiles , const unsigned int hTiles ,
+			const unsigned int wTiles , const unsigned int hTiles , bool caminable ,
 			const int pixel_ref_x , const int pixel_ref_y,
 			Tile* tile , 
 			ResMan& rm , const int colorKey);
@@ -79,7 +87,7 @@ class Entidad {
 		NOTA: ImagenAnimada
 	*/
 	Entidad(const std::string& name, 
-			const unsigned int wTiles , const unsigned int hTiles , 
+			const unsigned int wTiles , const unsigned int hTiles , bool caminable ,
 			const unsigned int fps , const unsigned int delay , 
 			const int pixel_ref_x , const int pixel_ref_y,
 			Tile* tile,
@@ -93,7 +101,7 @@ class Entidad {
 		NOTA: ImagenAnimada
 	*/
 	Entidad(const std::string& name, 
-			const unsigned int wTiles , const unsigned int hTiles , 
+			const unsigned int wTiles , const unsigned int hTiles , bool caminable ,
 			const unsigned int fps , const unsigned int delay , 
 			const unsigned int altoSprite , const unsigned  int anchoSprite ,
 			const int pixel_ref_x , const int pixel_ref_y,
@@ -115,7 +123,7 @@ class Entidad {
 		NOTA: ImagenEstatica
 	*/
 	virtual void init(const std::string& name, 
-					const unsigned int wTiles , const unsigned int hTiles , 
+					const unsigned int wTiles , const unsigned int hTiles , bool caminable ,
 					const int pixel_ref_x , const int pixel_ref_y , 
 					Tile* tile , 
 					ResMan& rm , const int colorKey);
@@ -128,7 +136,7 @@ class Entidad {
 		NOTA: ImagenAnimada
 	*/
 	virtual void init(const std::string& name,
-					const unsigned int wTiles , const unsigned int hTiles , 
+					const unsigned int wTiles , const unsigned int hTiles , bool caminable ,
 					const unsigned int fps , const unsigned int delay ,
 					const unsigned int altoSprite , const unsigned int anchoSprite ,
 					const int pixel_ref_x , const int pixel_ref_y,
@@ -174,6 +182,10 @@ class Entidad {
 	virtual void blit(SDL_Surface* dest, Camara* camara , Mapa* mapa,
 					const unsigned int tileX ,	const unsigned int tileY /*Tile* tile*/);
 	
+	/*
+	virtual void blitGris(SDL_Surface* dest, Camara* camara , Mapa* mapa,
+					const unsigned int tileX ,	const unsigned int tileY );
+	*/
 	//deprecated
 	virtual void setTileActual(Tile* tile);
 	
@@ -187,11 +199,28 @@ class Entidad {
 	*/
 	virtual bool isCaminable(Tile* tile , Mapa* mapa);
 
+	virtual bool isCaminable();
 	/*
 		Pre: La instancia ha sido creada.
 		Post: Se retorna el tile donde se encuentra la instancia.
 	*/
 	virtual Tile* getPosicion(Mapa* mapa);
+
+	unsigned int getX();
+
+	unsigned int getY();
+
+	bool getDibujada();
+
+	void setDibujada(bool seDibujo);
+
+	virtual std::vector<Tile*> getTilesExplorados();
+
+	void agregarTilesExplorados(Tile* tile);
+
+	virtual void setColor(bool value);
+
+	virtual void setColor(bool value , int tileX , int tileY);
 
 protected:	
 		

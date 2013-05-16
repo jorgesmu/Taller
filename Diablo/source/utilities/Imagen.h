@@ -14,7 +14,7 @@ public:
 
 	const static int COLOR_KEY = 0x00000000;
 
-private:
+protected:
 	
 	int alto; //en pixeles
 	
@@ -47,6 +47,8 @@ public:
 	**/
 	virtual Surface* getSurface() = 0;
 		
+	virtual bool isImagenAnimada() = 0;
+
 protected:
 
 	/**

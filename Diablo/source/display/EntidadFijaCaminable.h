@@ -21,7 +21,7 @@ class EntidadFijaCaminable : public EntidadFija{
 		NOTA: ImagenEstatica
 	*/
 	EntidadFijaCaminable(const std::string& name,
-			const unsigned int wTiles , const unsigned int hTiles ,
+			const unsigned int wTiles , const unsigned int hTiles , bool caminable ,
 			const int pixel_ref_x , const int pixel_ref_y,
 			Tile* tile , Mapa* mapa,
 			ResMan& rm , const int colorKey);
@@ -34,7 +34,7 @@ class EntidadFijaCaminable : public EntidadFija{
 		NOTA: ImagenAnimada
 	*/
 	EntidadFijaCaminable(const std::string& name, 
-			const unsigned int wTiles , const unsigned int hTiles , 
+			const unsigned int wTiles , const unsigned int hTiles , bool caminable , 
 			const unsigned int fps , const unsigned int delay , 
 			const unsigned int altoSprite , const unsigned  int anchoSprite ,
 			const int pixel_ref_x , const int pixel_ref_y,
@@ -42,8 +42,8 @@ class EntidadFijaCaminable : public EntidadFija{
 			ResMan& rm , const int colorKey);
 
 	
-
-	EntidadFijaCaminable(EntidadFija* entidadFija);
+	/* TODO::  arreglar esto*/ 
+//	EntidadFijaCaminable(EntidadFija* entidadFijaCaminable);
 		
 		
 	/*

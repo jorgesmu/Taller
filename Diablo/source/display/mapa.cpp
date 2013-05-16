@@ -31,7 +31,7 @@ TileVec& Mapa::allTiles() {
 	return tiles;
 }
 
-void Mapa::blit(SDL_Surface* dest, Camara& camara) {
+void Mapa::blit(SDL_Surface* dest, Camara& camara, Personaje* personaje) {
 	// Primero calculamos cuantos tiles nos vamos a tener que mover horizontal y verticalmente
 	const int tile_count_x = (camara.getW() / Tile::TILE_ANCHO) + 5;
 	const int tile_count_y = 2*((camara.getH() / Tile::TILE_ALTO) + 5);
@@ -50,7 +50,7 @@ void Mapa::blit(SDL_Surface* dest, Camara& camara) {
 		for(int x = 0;x < tile_count_x;x++) {
 			// Si el tile en el que estamos parados es valido, lo blitteamos
 			if(tileExists(curr_tile.x, curr_tile.y)) {
-				getTile(curr_tile.x, curr_tile.y)->blit(dest, camara);
+				getTile(curr_tile.x, curr_tile.y)->blit(dest, camara, personaje, this);
 			}
 			// Nos movemos para el oeste
 			curr_tile = tileWalk(curr_tile, GDIR::O);
@@ -77,11 +77,24 @@ void Mapa::clean() {
 	}
 }
 
+
+void Mapa::setEntidadesDibujadasFalse(){
+	for(auto it = tiles.begin(); it != tiles.end(); ++it) {
+		std::vector<Entidad*> entidadesTile = it->getEntidades();
+		for(auto it2 = entidadesTile.begin(); it2 != entidadesTile.end(); ++it2){
+			(*it2)->setDibujada(false);
+		}
+	}
+}
+
+
 void Mapa::assignTileCoords() {
 	int x, y;
 	for(x = 0;x < w;x++) {
 		for(y = 0;y < h;y++) {
-			getTile(x,y)->setBlitCoords((x-y)*Tile::TILE_ANCHO/2, (x+y)*Tile::TILE_ALTO/2);
+			Tile* tile = getTile(x,y);
+			tile->setBlitCoords((x-y)*Tile::TILE_ANCHO/2, (x+y)*Tile::TILE_ALTO/2);
+			tile->setLogicCoords(x,y);
 		}
 	}
 }

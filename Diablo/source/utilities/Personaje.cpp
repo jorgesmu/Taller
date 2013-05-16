@@ -75,6 +75,20 @@ Personaje::Personaje(const std::string& name,
 }
 
 /*
+	Pre: La instancia ha sido creada.
+	 
+	Post: Se ha destruido la instancia liberando los recursos asociados.
+*/
+Personaje::~Personaje() {
+	if (this -> imagen != NULL) {
+		delete(this -> imagen);
+		this -> imagen = NULL;
+	}
+	this -> surf = NULL;
+	this -> tileAncla = NULL;
+}
+
+/*
 	Pre:-
 		 
 	Post: Se ha inicializado la instancia segun el archivo y los par?etros.
@@ -195,8 +209,24 @@ unsigned int Personaje::calcularDireccion(Mapa* mapa){
 	}
 	return CENTRO;
 }
-
+/*
+void Personaje::actualizarPosicion(Mapa* mapa){
+	if (this -> actualizarPosicionExplicita(mapa)) {
+		if (this->colaTilesDestino != NULL){
+			Tile* tileDestinoSiguiente = this -> tileDestino = this -> colaTilesDestino -> pop();
+			if (tileDestinoSiguiente != NULL){
+				this -> tileDestino = tileDestinoSiguiente;	
+				//printf("Actualizar %d %d \n",this -> tileDestino -> getX(),this -> tileDestino -> getY());
+			} else {
+				//printf("NULL\n");
+				this -> tileDestino = NULL;
+			}
+		}
+	}
+}
+*/
 void Personaje::actualizarPosicion(Mapa* mapa) {
+	//bool destinoAlcanzado = false;
 	//Pongo en verdadero el flag de actualizar posicion
 	this -> actualizandoPosicion = true;		
 	//Calculo de direccion
@@ -242,7 +272,7 @@ void Personaje::actualizarPosicion(Mapa* mapa) {
 							if (this -> tileAncla != tileSiguiente){
 								tileSiguiente -> addEntidad(this);
 							}
-						}								
+						}	
 					}
 				} else{
 					Tile* tileActual = mapa -> getTilePorPixeles(this -> posX , this -> posY);
@@ -260,11 +290,16 @@ void Personaje::actualizarPosicion(Mapa* mapa) {
 					if (tileSiguiente != tileActual) {	
 						if (tileActual != NULL) {
 							tileActual -> deleteEntidad(this);
-						} 								
+						} 		
 					}
 				}
+				
 			}
 		}
+		/*
+		if ((this -> posX != tileDestino -> getX()) && (this -> posY != tileDestino -> getY()) && (direccion == CENTRO)) {
+			destinoAlcanzado = true;
+		}*/
 	}
 	this -> actualizandoPosicion = false;
 	this -> actualizarImagen(direccion);
@@ -381,15 +416,26 @@ void Personaje::setTileDestino(Tile* tile){
 void Personaje::mover(Tile* tileDestino) {
 	if (tileDestino != NULL) {
 		this -> tileDestino = tileDestino;
-		int deltaX = this -> tileDestino -> getX() - posX;
-		int deltaY = this -> tileDestino -> getY() - posY;
-		//seteo de velocidad
-		int distancia = deltaX*deltaX + deltaY*deltaY;
-		if (distancia <= Personaje::COTA_VELOCIDAD_BAJA) {
-			this -> deltaUpdatePosicion = Personaje::BASE_DE_TIEMPO/this -> velocidad;
-		} else {
-			this -> deltaUpdatePosicion = Personaje::BASE_DE_TIEMPO_RAPIDO/this -> velocidad;
-		}
+	}
+}
+
+
+/*
+	Pre: Los parámetros respetan la siguiente convención:
+
+	"x" e "y": Coordenadas del Tile destino
+
+	Post: Se ha encaminado el movimiento de la entidad al Tile correspondiente.
+
+	Nota: Puede suceder que si una entidad ocupa varios Tiles la entidad se de de alta
+	en algun Tile en el que no estaba, y se de de baja en alguno en cual estaba.
+		
+	Nota2: Los destinos no validos no traeran problemas al algoritmo, es decir que
+	le podes pasar cualquier destino aunque supere las dimensiones del mapa.
+*/
+void Personaje::mover(Tile* tileDestino , Mapa* mapa) {
+	if (tileDestino != NULL) {
+		this -> tileDestino = tileDestino;
 	}
 }
 
@@ -437,7 +483,7 @@ Tile* Personaje::getPosicion(Mapa* mapa){
 
 // Actualiza las cosas internas, si hubiese
 void Personaje::update(Mapa* mapa) {
-	if (this -> tiempoProximoUpdate <= clock()){
+	if (this -> tiempoProximoUpdate <= clock()){	
 		if (this -> tileDestino != NULL) {
 			//actualizacion de posicion
 			this -> actualizarPosicion(mapa);
@@ -448,4 +494,61 @@ void Personaje::update(Mapa* mapa) {
 		}
 		this -> tiempoProximoUpdate = clock() + this -> deltaUpdatePosicion;
 	} 
+}
+/*
+	Pre: Mapa distinto de null. El parametro tileDestino es cualquier tile en la 
+	dirección del ataque.
+
+	Post: Se ha realizado un ataque en la direccion correspondiente del tile parametro.
+
+*/
+void Personaje::ataque(Tile* tileDestino , Mapa* mapa) {
+	// chequeo que el tileDestino y el mapa sean diferentes de null
+	if ( (tileDestino != NULL) && (mapa != NULL)) {
+		this -> tileDestino = NULL;
+		unsigned int direccionAtaque = ImagenPersonaje::ATAQUE_DIRECCION_ACTUAL;
+		int deltaX = tileDestino -> getX() - posX;
+		int deltaY = tileDestino -> getY() - posY;
+		//calculo de direccion
+		if (deltaX > 0){
+			if(deltaY < 0){
+				direccionAtaque = ImagenPersonaje::AT_NORESTE;
+			} else{
+				if(deltaY == 0){
+					direccionAtaque = ImagenPersonaje::AT_ESTE;
+				} else {
+					direccionAtaque = ImagenPersonaje::AT_SURESTE;
+				}
+			}
+			ImagenPersonaje* imagenPersonaje = static_cast<ImagenPersonaje*> (this -> imagen);
+			if (imagenPersonaje != NULL){
+				imagenPersonaje -> setAccion(direccionAtaque);
+			}
+		}else {
+			if (deltaX < 0) {
+				if (deltaY < 0){
+					direccionAtaque = ImagenPersonaje::AT_NOROESTE;
+				}else{
+					if (deltaY == 0) {
+						direccionAtaque = ImagenPersonaje::AT_OESTE;
+					}else {
+						direccionAtaque = ImagenPersonaje::AT_SUROESTE;
+					}
+				}
+			}else{
+				if (deltaY < 0){
+					direccionAtaque = ImagenPersonaje::AT_NORTE;
+				} else{
+					if(deltaY > 0){
+						direccionAtaque = ImagenPersonaje::AT_SUR;
+					}
+				}
+			}
+			ImagenPersonaje* imagenPersonaje = static_cast<ImagenPersonaje*> (this -> imagen);
+			if (imagenPersonaje != NULL){
+				imagenPersonaje -> setAccion(direccionAtaque);
+			}
+		}
+		printf("Direccion Ataque %d \n", direccionAtaque);
+	}
 }

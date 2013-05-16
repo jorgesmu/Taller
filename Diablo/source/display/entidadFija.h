@@ -41,7 +41,7 @@ class EntidadFija : public Entidad {
 		NOTA: ImagenEstatica
 	*/
 	EntidadFija(const std::string& name,
-			const unsigned int wTiles , const unsigned int hTiles ,
+			const unsigned int wTiles , const unsigned int hTiles , bool caminable,
 			const int pixel_ref_x , const int pixel_ref_y,
 			Tile* tile , Mapa* mapa,
 			ResMan& rm , const int colorKey);
@@ -54,7 +54,7 @@ class EntidadFija : public Entidad {
 		NOTA: ImagenAnimada
 	*/
 	EntidadFija(const std::string& name, 
-			const unsigned int wTiles , const unsigned int hTiles , 
+			const unsigned int wTiles , const unsigned int hTiles , bool caminable,
 			const unsigned int fps , const unsigned int delay , 
 			const unsigned int altoSprite , const unsigned  int anchoSprite ,
 			const int pixel_ref_x , const int pixel_ref_y,
@@ -63,7 +63,7 @@ class EntidadFija : public Entidad {
 
 	
 
-	EntidadFija(EntidadFija* entidadFija);
+	EntidadFija(EntidadFija* entidadFija , Mapa* mapa);
 		
 		
 	/*
@@ -73,6 +73,8 @@ class EntidadFija : public Entidad {
 	*/
 	virtual ~EntidadFija();
 
+	virtual void setColor(bool value , int tileX , int tileY);
+
 	/*
 		Pre:-
 		 
@@ -81,7 +83,7 @@ class EntidadFija : public Entidad {
 		NOTA: ImagenEstatica
 	*/
 	virtual void init(const std::string& name, 
-					const unsigned int wTiles , const unsigned int hTiles , 
+					const unsigned int wTiles , const unsigned int hTiles , bool caminable,
 					const int pixel_ref_x , const int pixel_ref_y , 
 					Tile* tile , Mapa* mapa,
 					ResMan& rm , const int colorKey);
@@ -94,7 +96,7 @@ class EntidadFija : public Entidad {
 		NOTA: ImagenAnimada
 	*/
 	virtual void init(const std::string& name,
-					const unsigned int wTiles , const unsigned int hTiles , 
+					const unsigned int wTiles , const unsigned int hTiles , bool caminable,
 					const unsigned int fps , const unsigned int delay ,
 					const unsigned int altoSprite , const unsigned int anchoSprite ,
 					const int pixel_ref_x , const int pixel_ref_y,
@@ -141,7 +143,11 @@ class EntidadFija : public Entidad {
 	*/
 	virtual void blit(SDL_Surface* dest, Camara* camara , Mapa* mapa,
 					const unsigned int tileX ,	const unsigned int tileY);
-	
+	/*
+	virtual void blitGris(SDL_Surface* dest, Camara* camara , Mapa* mapa,
+					const unsigned int tileX ,	const unsigned int tileY);
+					*/
+
 	//deprecated
 	virtual void setTileActual(Tile* tile);
 
@@ -159,14 +165,16 @@ class EntidadFija : public Entidad {
 	*/
 	virtual bool isCaminable(Tile* tile , Mapa* mapa);
 
+	virtual bool isCaminable();
+	
 	/*
 		Pre: La instancia ha sido creada.
 		Post: Se retorna el tile donde se encuentra la instancia.
 	*/
 	virtual Tile* getPosicion(Mapa* mapa);
-
+/*
 protected:	
-
+	
 	/*
 		Pre: La instancia ha sido creada.
 		Post: Se han agregado las anclas correspondientes de acuerdo a la base.

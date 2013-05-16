@@ -22,14 +22,14 @@
 		NOTA: ImagenEstatica
 	*/
 	EntidadFija::EntidadFija(const std::string& name, 
-					const unsigned int wTiles , const unsigned int hTiles ,
+					const unsigned int wTiles , const unsigned int hTiles , bool caminable ,
 					int pixel_ref_x ,int pixel_ref_y,
 					Tile* tile, Mapa* mapa,
 					ResMan& rm , const int colorKey){
 		// seteo del puntero a imagen
 		this -> imagen = NULL;
 		//carga de imagen y configuración inicial.
-		init(name , wTiles , hTiles , pixel_ref_x , pixel_ref_y, tile, mapa , rm , colorKey);
+		init(name , wTiles , hTiles , caminable , pixel_ref_x , pixel_ref_y, tile, mapa , rm , colorKey);
 	}
 		
 	/*
@@ -40,7 +40,7 @@
 		NOTA: ImagenAnimada
 	*/
 	EntidadFija::EntidadFija(const std::string& name, 
-			const unsigned int wTiles , const unsigned int hTiles , 
+			const unsigned int wTiles , const unsigned int hTiles , bool caminable ,
 			const unsigned int fps , const unsigned int delay , 
 			const unsigned int altoSprite , const unsigned int anchoSprite ,
 			const int pixel_ref_x , const int pixel_ref_y,
@@ -49,7 +49,7 @@
 		// seteo del puntero a imagen
 		this -> imagen = NULL;
 		//carga de imagen y configuración inicial.
-		init(name , wTiles , hTiles , fps , delay , 
+		init(name , wTiles , hTiles , caminable , fps , delay , 
 			altoSprite , anchoSprite ,
 			pixel_ref_x , pixel_ref_y, 
 			tile, mapa, rm , colorKey);
@@ -63,7 +63,7 @@
 		NOTA: ImagenAnimada
 	*/
 	void EntidadFija::init(const std::string& name, 
-					const unsigned int wTiles , const unsigned int hTiles , 
+					const unsigned int wTiles , const unsigned int hTiles , bool caminable ,
 					const unsigned int fps , const unsigned int delay , 
 					const unsigned int  altoSprite , const unsigned int anchoSprite ,
 					int pixel_ref_x ,int pixel_ref_y,
@@ -97,6 +97,7 @@
 			this -> posY = tile -> getY();
 			this -> agregarAnclas(mapa);
 		}
+		this ->caminable = caminable;
 	}
 
 	/*
@@ -107,7 +108,7 @@
 		NOTA: ImagenEstatica
 	*/
 	void EntidadFija::init(const std::string& name,  
-					const unsigned int wTiles , const unsigned int hTiles , 
+					const unsigned int wTiles , const unsigned int hTiles , bool caminable , 
 					int pixel_ref_x ,int pixel_ref_y , 
 					Tile* tile , Mapa* mapa,
 					ResMan& rm , const int colorKey){
@@ -138,10 +139,15 @@
 			this -> posY = tile -> getY();
 			this -> agregarAnclas(mapa);
 		}
+		this -> caminable = caminable;
 	}
 	
-	EntidadFija::EntidadFija(EntidadFija* entidadFija){
-		this->imagen = entidadFija->imagen;
+	EntidadFija::EntidadFija(EntidadFija* entidadFija , Mapa* mapa){
+		if(entidadFija -> imagen -> isImagenAnimada()){
+			this -> imagen = new ImagenAnimada((ImagenAnimada*) (entidadFija -> imagen));
+		} else {
+			this -> imagen = entidadFija -> imagen;
+		}
 		this->widthInTiles = entidadFija->widthInTiles;
 		this->highInTiles = entidadFija->highInTiles;
 		this->tileAncla = entidadFija->tileAncla;
@@ -152,6 +158,8 @@
 		this->posX = entidadFija->posX;
 		this->posY = entidadFija->posY;
 		this->compartido = entidadFija->compartido;
+		this->tileAncla=NULL;		
+		this ->caminable=entidadFija->caminable;
 	}
 
 	/*
@@ -168,6 +176,10 @@
 		this -> tileAncla = NULL;
 	}
 		
+	void EntidadFija::setColor(bool value , int tileX , int tileY) {
+		this -> color = value;	
+	}
+
 	/*
 		Pre: Los parámetros cumplen las siguiente condiciones:
 
@@ -184,24 +196,34 @@
 
 		NOTA: Se supone que se llama luego de acceder al tile donde fue anclada.
 	*/
+
 	void EntidadFija::blit(SDL_Surface* dest , Camara* camara , Mapa* mapa,
 						const unsigned int tileX ,	const unsigned int tileY){
 		if ( (this -> imagen != NULL) && (this -> surf != NULL) &&
 			(camara != NULL) ) {
 			if(this -> surf -> getSDL_Surface() != NULL){
+				
 				// Esto no andaba bien, lo "comente" y ahora funciona
 				if( (this -> widthInTiles <= 1) && (this -> highInTiles <= 1) && false) {
 					int posX;
 					int posY;
 					posX = (int)tileX - (int)(camara -> getX()) - this -> pixel_ref_x;
 					posY = (int)tileY - (int)(camara -> getY()) - this -> pixel_ref_y;
-					this -> surf -> blit(dest , tileX , tileY);	
+					if (this -> color) {
+						this -> surf -> blit(dest , tileX , tileY);	
+					} else {
+						this -> surf -> blitGris(dest , tileX , tileY);	
+					}
 				}
 				else {
 					if ( ((tileX == posX) && (tileY == posY)) || (this -> tileAncla == NULL) ){
 						int posX = this -> posX - (int)(camara -> getX()) - this -> pixel_ref_x;
 						int posY = this -> posY - (int)(camara -> getY()) - this -> pixel_ref_y;
-						this -> surf -> blit(dest , posX , posY);
+						if (this -> color) {
+							this -> surf -> blit(dest , posX , posY);
+						} else {
+							this -> surf -> blitGris(dest , posX , posY);
+						}
 					} else{
 						int posX;
 						int posY = this -> posY - (int)(camara -> getY()) - this -> pixel_ref_y;
@@ -212,13 +234,53 @@
 						rect.y = 0;
 						rect.h = this -> imagen -> getAlto();
 						rect.w = Tile::TILE_ANCHO;
-						this -> surf -> blit(dest , posX , posY , rect);
+						if (this -> color) {
+							this -> surf -> blit(dest , posX , posY , rect);
+						}else{
+							this -> surf -> blitGris(dest , posX , posY , rect);
+						}
 					}
 				}
 			}
 		}
 	}
-	
+	/*
+	void EntidadFija::blitGris(SDL_Surface* dest , Camara* camara , Mapa* mapa,
+						const unsigned int tileX ,	const unsigned int tileY){
+		if ( (this -> imagen != NULL) && (this -> surf != NULL) &&
+			(camara != NULL) ) {
+			if(this -> surf -> getSDL_SurfaceGris() != NULL){
+				this->imagen->setGris(true);
+				// Esto no andaba bien, lo "comente" y ahora funciona
+				if( (this -> widthInTiles <= 1) && (this -> highInTiles <= 1) && false) {
+					int posX;
+					int posY;
+					posX = (int)tileX - (int)(camara -> getX()) - this -> pixel_ref_x;
+					posY = (int)tileY - (int)(camara -> getY()) - this -> pixel_ref_y;
+					this -> surf -> blitGris(dest , tileX , tileY);	
+				}
+				else {
+					if ( ((tileX == posX) && (tileY == posY)) || (this -> tileAncla == NULL) ){
+						int posX = this -> posX - (int)(camara -> getX()) - this -> pixel_ref_x;
+						int posY = this -> posY - (int)(camara -> getY()) - this -> pixel_ref_y;
+						this -> surf -> blitGris(dest , posX , posY);
+					} else{
+						int posX;
+						int posY = this -> posY - (int)(camara -> getY()) - this -> pixel_ref_y;
+						int delta = (int)tileX - this -> tileAncla -> getX();
+						SDL_Rect rect;					
+						posX = this -> posX - (int)(camara -> getX()) - this -> pixel_ref_x + delta;
+						rect.x = delta;
+						rect.y = 0;
+						rect.h = this -> imagen -> getAlto();
+						rect.w = Tile::TILE_ANCHO;
+						this -> surf -> blitGris(dest , posX , posY , rect);
+					}
+				}
+			}
+		}
+	}
+	*/
 	/*
 		Pre: La instancia ha sido creada.
 		Post: Se han agregado las anclas correspondientes de acuerdo a la base.
@@ -258,8 +320,7 @@
 	void EntidadFija::setTileActual(Tile* tile){
 		
 	}
-
-	
+		
 	/*
 		Pre: La instancia ha sido creada.
 
@@ -293,6 +354,9 @@
 		return false;
 	}
 
+	bool EntidadFija::isCaminable(){
+		return this->caminable;
+	}
 	/*
 		Pre: La instancia ha sido creada.
 		Post: Se retorna el tile donde se encuentra la instancia.

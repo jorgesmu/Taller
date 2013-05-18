@@ -97,7 +97,6 @@
 			this -> posY = tile -> getY();
 			this -> agregarAnclas(mapa);
 		}
-		this ->caminable = caminable;
 	}
 
 	/*
@@ -139,7 +138,6 @@
 			this -> posY = tile -> getY();
 			this -> agregarAnclas(mapa);
 		}
-		this -> caminable = caminable;
 	}
 	
 	EntidadFija::EntidadFija(EntidadFija* entidadFija , Mapa* mapa){
@@ -159,7 +157,6 @@
 		this->posY = entidadFija->posY;
 		this->compartido = entidadFija->compartido;
 		this->tileAncla=NULL;		
-		this ->caminable=entidadFija->caminable;
 	}
 
 	/*
@@ -244,43 +241,7 @@
 			}
 		}
 	}
-	/*
-	void EntidadFija::blitGris(SDL_Surface* dest , Camara* camara , Mapa* mapa,
-						const unsigned int tileX ,	const unsigned int tileY){
-		if ( (this -> imagen != NULL) && (this -> surf != NULL) &&
-			(camara != NULL) ) {
-			if(this -> surf -> getSDL_SurfaceGris() != NULL){
-				this->imagen->setGris(true);
-				// Esto no andaba bien, lo "comente" y ahora funciona
-				if( (this -> widthInTiles <= 1) && (this -> highInTiles <= 1) && false) {
-					int posX;
-					int posY;
-					posX = (int)tileX - (int)(camara -> getX()) - this -> pixel_ref_x;
-					posY = (int)tileY - (int)(camara -> getY()) - this -> pixel_ref_y;
-					this -> surf -> blitGris(dest , tileX , tileY);	
-				}
-				else {
-					if ( ((tileX == posX) && (tileY == posY)) || (this -> tileAncla == NULL) ){
-						int posX = this -> posX - (int)(camara -> getX()) - this -> pixel_ref_x;
-						int posY = this -> posY - (int)(camara -> getY()) - this -> pixel_ref_y;
-						this -> surf -> blitGris(dest , posX , posY);
-					} else{
-						int posX;
-						int posY = this -> posY - (int)(camara -> getY()) - this -> pixel_ref_y;
-						int delta = (int)tileX - this -> tileAncla -> getX();
-						SDL_Rect rect;					
-						posX = this -> posX - (int)(camara -> getX()) - this -> pixel_ref_x + delta;
-						rect.x = delta;
-						rect.y = 0;
-						rect.h = this -> imagen -> getAlto();
-						rect.w = Tile::TILE_ANCHO;
-						this -> surf -> blitGris(dest , posX , posY , rect);
-					}
-				}
-			}
-		}
-	}
-	*/
+	
 	/*
 		Pre: La instancia ha sido creada.
 		Post: Se han agregado las anclas correspondientes de acuerdo a la base.
@@ -339,10 +300,11 @@
 	/*
 		Actualiza el surface de la instancia.
 	*/
-	void EntidadFija::update(Mapa* mapa) {
+	unsigned int EntidadFija::update(Mapa* mapa) {
 		if (this->imagen != NULL){
 			this -> surf = this -> imagen -> getSurface();
 		}
+		return 0;
 	}
 
 	/*
@@ -355,8 +317,9 @@
 	}
 
 	bool EntidadFija::isCaminable(){
-		return this->caminable;
+		return false;
 	}
+
 	/*
 		Pre: La instancia ha sido creada.
 		Post: Se retorna el tile donde se encuentra la instancia.

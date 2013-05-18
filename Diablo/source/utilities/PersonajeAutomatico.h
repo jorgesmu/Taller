@@ -58,5 +58,5 @@ public:
 
 		Post: Se actualiza el movimiento de la instancia.
 	*/
-	virtual void update(Mapa* mapa);
+	virtual unsigned int update(Mapa* mapa);
 };

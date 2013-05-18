@@ -3,6 +3,8 @@
 #include "../utilities/ImagenPersonaje.h"
 #include "../display/tile.h"
 
+// EntidadFijaCaminable obviamente es caminable
+
 class EntidadFijaCaminable : public EntidadFija{
 	public:
 	
@@ -59,6 +61,13 @@ class EntidadFijaCaminable : public EntidadFija{
 		por dicha instancia.
 	*/
 	virtual bool isCaminable(Tile* tile , Mapa* mapa);
+
+	/*
+		Pre: La instancia ha sido creada.
+		Post: Se retorna verdadero si se puede ocupar el tile ocupado 
+		por dicha instancia.
+	*/
+	virtual bool isCaminable();
 
 };
 

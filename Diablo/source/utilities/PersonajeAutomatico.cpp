@@ -95,7 +95,7 @@ void PersonajeAutomatico::init(const std::string& name,
 }
 
 // Actualiza las cosas internas, si hubiese
-void PersonajeAutomatico::update(Mapa* mapa) {
+unsigned int PersonajeAutomatico::update(Mapa* mapa) {
 	if (this -> tiempoProximoUpdate <= clock()){
 		if (this -> tileDestino != NULL) {
 			//actualizacion de posicion
@@ -135,4 +135,5 @@ void PersonajeAutomatico::update(Mapa* mapa) {
 									PersonajeAutomatico::DELTA_TIEMPO_UPDATE_DIRECCION;
 		}
 	}
+	return Personaje::ESPERANDO_ACCION;
 }

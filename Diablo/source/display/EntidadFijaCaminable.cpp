@@ -48,11 +48,6 @@
 			tile , mapa , rm , colorKey){
 	}
 	
-	/* TODO::  arreglar esto*/ 
-/*	EntidadFijaCaminable::EntidadFijaCaminable(EntidadFija* entidadFijaCaminable) : 
-				EntidadFija(entidadFijaCaminable){
-	}*/
-
 	/*
 		Pre: La instancia ha sido creada.
 		 
@@ -73,5 +68,14 @@
 		por dicha instancia.
 	*/
 	bool EntidadFijaCaminable::isCaminable(Tile* tile , Mapa* mapa){
-		return false;
+		return true;
+	}
+
+	/*
+		Pre: La instancia ha sido creada.
+		Post: Se retorna verdadero si se puede ocupar el tile ocupado 
+		por dicha instancia.
+	*/
+	bool EntidadFijaCaminable::isCaminable(){
+		return true;
 	}

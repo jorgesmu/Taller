@@ -21,6 +21,10 @@ class Tile;    // Declaración adelantada de Tile
 	  ---------------
 	Pinta en la posicion de las anclas.
 
+
+	NOTA:  La entidad Fija no es caminable.
+
+
 */
 class EntidadFija : public Entidad {
 
@@ -117,7 +121,7 @@ class EntidadFija : public Entidad {
 		Actualiza el surface de la instancia.
 
 	*/
-	virtual void update(Mapa* mapa);
+	virtual unsigned int update(Mapa* mapa);
 
 	/*
 		Pre: Los parámetros cumplen las siguiente condiciones:

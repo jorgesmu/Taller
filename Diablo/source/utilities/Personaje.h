@@ -23,6 +23,25 @@ public:
 		const static unsigned int SUROESTE = 7;	
 		const static unsigned int CENTRO = 8;
 
+		//Informacion de acciones
+		const static unsigned int MOVER_EN_CURSO = 0;
+		const static unsigned int MOVER_COMPLETADO = 1;
+		const static unsigned int MOVER_ERROR = 2;
+		//Atacar
+		const static unsigned int ATACAR_EN_CURSO = 3;
+		const static unsigned int ATACAR_COMPLETADO = 4;
+		const static unsigned int ATACAR_ERROR = 5;
+		//Defender
+		const static unsigned int DEFENDER_EN_CURSO = 6;
+		const static unsigned int DEFENDER_COMPLETADO = 7;
+		const static unsigned int DEFENDER_ERROR = 8;
+		//Freezar
+		const static unsigned int FREEZAR_EN_CURSO = 9;
+		const static unsigned int FREEZAR_COMPLETADO = 10;
+		const static unsigned int FREEZAR_ERROR = 11;
+		//Esperando accion
+		const static unsigned int ESPERANDO_ACCION = 12;
+
 		//Velocidad por defecto
 		const static int VELOCIDAD_DEFAULT = 5;
 
@@ -127,7 +146,7 @@ public:
 		Post: Se ha realizado un ataque en la direccion correspondiente del tile parametro.
 
 	*/
-	virtual void ataque(Tile* tileDestino , Mapa* mapa);
+	virtual unsigned int ataque(Tile* tileDestino , Mapa* mapa);
 
 	/*
 		Pre: La instancia ha sido creada.
@@ -142,13 +161,6 @@ public:
 
 	/*
 		Pre: La instancia ha sido creada.
-		Post: Se retorna verdadero si se puede ocupar el tile ocupado 
-		por dicha instancia.
-	*/
-	virtual bool isCaminable(Tile* tile , Mapa* mapa);
-
-	/*
-		Pre: La instancia ha sido creada.
 		Post: Se retorna el tile donde se encuentra la instancia.
 	*/
 	virtual Tile* getPosicion(Mapa* mapa);
@@ -158,13 +170,27 @@ public:
 
 		Post: Se actualiza el movimiento de la instancia.
 	*/
-	virtual void update(Mapa* mapa);
+	virtual unsigned int update(Mapa* mapa);
 
 	// Retorna el ancla de niebla X adecuada
 	virtual int getXAnclajeNiebla();
 
 	// Retorna el ancla de niebla Y adecuada
 	virtual int getYAnclajeNiebla();
+
+	/*
+		Pre: La instancia ha sido creada.
+		Post: Se retorna verdadero si se puede ocupar el tile donde se encuentra la
+		instancia.
+	*/
+	virtual bool isCaminable(Tile* tile , Mapa* mapa);
+
+	/*
+		Pre: La instancia ha sido creada.
+		Post: Se retorna verdadero si se puede ocupar el tile donde se encuentra la
+		instancia.
+	*/
+	virtual bool isCaminable();	
 
 protected:
 		
@@ -190,7 +216,7 @@ protected:
 	virtual unsigned int calcularDireccion(Mapa* mapa);
 
 
-	virtual void actualizarPosicion(Mapa* mapa);
+	virtual unsigned int actualizarPosicion(Mapa* mapa);
 
 	
 	virtual void calcularPosicionTentativa(unsigned int direccion , 
@@ -226,5 +252,12 @@ protected:
 	*/
 	virtual void inicializarAtributosEnValoresDefault();
 	
-	
+	/*
+ 		Pre: La instancia ha sido creada.
+
+ 		Post: Se retorna verdadero si se puede ocupar el tile destino de la instancia, caso contrario
+		se retorna falso.
+	*/
+	bool verificarDestinoCaminable(Mapa* mapa);
+
 };

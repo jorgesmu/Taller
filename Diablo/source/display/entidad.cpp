@@ -151,7 +151,6 @@ void Entidad::init(const std::string& name,
 	this -> tileAncla = tile;
 	//seteo como compartido
 	this -> compartido = true;
-	this -> caminable = caminable;
 }
 
 /*
@@ -197,7 +196,6 @@ void Entidad::init(const std::string& name,
 	this -> tileAncla = tile;
 	//seteo como compartido
 	this -> compartido = true;
-	this ->caminable = caminable;
 }
 	
 /*
@@ -251,10 +249,11 @@ void Entidad::setDibujada(bool seDibujo){
 
 
 // Actualiza las cosas internas, si hubiese
-void Entidad::update(Mapa* mapa) {
+unsigned int Entidad::update(Mapa* mapa) {
 	if(this -> imagen != NULL) {
 		this -> surf = this -> imagen -> getSurface();
 	}
+	return 0;
 }
 	
 /*
@@ -358,8 +357,6 @@ Tile* Entidad::getPosicion(Mapa* mapa){
 	}
 	return retorno;
 }
-
-
 
 std::vector<Tile*> Entidad::getTilesExplorados(){
 	return tilesExplorados;

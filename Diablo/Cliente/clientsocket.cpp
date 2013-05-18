@@ -233,12 +233,22 @@ void ClientSocket::listenDo() {
 		}else if(pt == PROTO::INITPOS) {
 			bs >> start_pos_x;
 			bs >> start_pos_y;
-			std::cout << "RECEIVED INIT POS: (" << start_pos_x << "," << start_pos_y << ")\n";
+			//std::cout << "RECEIVED INIT POS: (" << start_pos_x << "," << start_pos_y << ")\n";
 			sendOk();
 		}else if(pt == PROTO::ESC_ID) {
 			bs >> escenario_elegido_id;
-			std::cout << "RECEIVED ESC ID: (" << escenario_elegido_id << ")\n";
+			//std::cout << "RECEIVED ESC ID: (" << escenario_elegido_id << ")\n";
 			sendOk();
+		}else if(pt == PROTO::NIEBLA_LIST) {
+			short tile_list_size;
+			bs >> tile_list_size;
+			std::cout << "RECEIVED NIEBLA_LIST (" << tile_list_size << "): \n";
+			for(int i = 0;i < tile_list_size;i++) {
+				short x, y;
+				bs >> x >> y;
+				std::cout << x << "," << y << " ";
+			}
+			std::cout << "\n";
 		}else{
 			std::cout << "Unknown packet type " << int(pt) << " received\n";
 		}

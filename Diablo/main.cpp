@@ -44,6 +44,12 @@ std::string pje_local_nick;
 std::string pje_local_tipo;
 int start_pos_x, start_pos_y;
 int escenario_elegido_id;
+// Cosas para mantener al server actualizado sobre los tiles que recorrimos
+struct {
+	vec2<int> tile_actual, tile_anterior;
+	Timer timer;
+	static const int INTERVAL = 200; // ms
+} update_recorrido;
 // Ventana de chat
 ChatWindow chat_window;
 
@@ -182,6 +188,9 @@ int main(int argc, char* argv[]) {
 	start_pos_y = 0;
 	mapa.getTile(start_pos_x, start_pos_y)->addEntidad(&(pjm.getPjeLocal()));
 	pjm.getPjeLocal().setTileActual(mapa.getTile(start_pos_x, start_pos_y));
+	// Inicializo el recorridor
+	update_recorrido.tile_anterior = update_recorrido.tile_actual = vec2<int>(start_pos_x, start_pos_y);
+	update_recorrido.timer.start();
 	// Centro la camara
 	camara.center(mapa.getTile(start_pos_x, start_pos_y)->getX(), mapa.getTile(start_pos_x, start_pos_y)->getY());
 
@@ -283,6 +292,21 @@ int main(int argc, char* argv[]) {
 			}
 			// Actualizamos el personaje principal
 			pjm.getPjeLocal().update(&mapa);
+			
+			// Update a tiles recorridos
+			if(update_recorrido.timer.getTicks() > update_recorrido.INTERVAL) {
+				update_recorrido.timer.start();
+				auto t = mapa.getTilePorPixeles(pjm.getPjeLocal().getX(), pjm.getPjeLocal().getY());
+				update_recorrido.tile_actual = vec2<int>(t->getU(), t->getV());
+				//std::cout << "Tile actual: (" << update_recorrido.tile_actual.x << "," << update_recorrido.tile_actual.y << ")\n";
+				if(update_recorrido.tile_actual != update_recorrido.tile_anterior) {
+					update_recorrido.tile_anterior = update_recorrido.tile_actual;
+					BitStream bs;
+					bs << PROTO::NIEBLA_SYNC << update_recorrido.tile_actual.x << update_recorrido.tile_actual.y;
+					sock.send(bs.str());
+				}
+			}
+
 			// Decrease al accum
 			accum -= CONST_DT;
 		}

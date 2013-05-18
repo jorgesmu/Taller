@@ -366,16 +366,27 @@ void ServerSocket::acceptLastDo() {
 		waitForOk(cid);
 		BitStream bs;
 		bs << PROTO::INITPOS << pm.getPlayer(new_nick).getX() << pm.getPlayer(new_nick).getY();
-		std::cout << "SEND INIT POS (" << pm.getPlayer(new_nick).getX() << "," << pm.getPlayer(new_nick).getY() << ")\n";
+		// al pedo: pm.getPlayer(new_nick).addTileRecorrido(pm.getPlayer(new_nick).getX(), pm.getPlayer(new_nick).getY());
+		//std::cout << "SEND INIT POS (" << pm.getPlayer(new_nick).getX() << "," << pm.getPlayer(new_nick).getY() << ")\n";
 		send(cid, bs.str());
 		waitForOk(cid);
 
 		// Le mandamos el id escenario
 		bs.clear();
 		bs << PROTO::ESC_ID << escenario_elegido_id;
-		std::cout << "SEND ESC ID (" << escenario_elegido_id << ")\n";
+		//std::cout << "SEND ESC ID (" << escenario_elegido_id << ")\n";
 		send(cid, bs.str());
 		waitForOk(cid);
+
+		// Mandamos los tiles recorridos
+		if(pm.getPlayer(new_nick).getTilesRecorridos().size() > 0) {
+			bs.clear();
+			bs << PROTO::NIEBLA_LIST << short(pm.getPlayer(new_nick).getTilesRecorridos().size());
+			for(auto it = pm.getPlayer(new_nick).getTilesRecorridos().begin(); it != pm.getPlayer(new_nick).getTilesRecorridos().end();it++) {
+				bs << it->first << it->second;
+			}
+			send(cid, bs.str());
+		}
 
 		// Mandamos todos los otros players
 		//
@@ -386,8 +397,8 @@ void ServerSocket::acceptLastDo() {
 
 			// This is for debugging purposes
 			std::stringstream ss;
-			ss << "<" << cid << "> " << buff << "\n";
-			std::cout << ss.str();
+			//ss << "<" << cid << "> " << buff << "\n";
+			//std::cout << ss.str();
 
 			// Build the bitstream
 			BitStream bs(buff.c_str(), buff.size());
@@ -401,6 +412,11 @@ void ServerSocket::acceptLastDo() {
 				ss << "<" << getClient(cid).nick << "> " << buff.substr(1, buff.size());
 				bs << PROTO::TEXTMSG << ss.str();
 				this->sendAll(bs.str());
+			}else if(pt == PROTO::NIEBLA_SYNC) {
+				int new_tile_x, new_tile_y;
+				bs >> new_tile_x >> new_tile_y;
+				pm.getPlayer(new_nick).addTileRecorrido(new_tile_x, new_tile_y);
+				std::cout << "RECEIVED NIEBLA SYNC: " << new_tile_x << "," << new_tile_y << "\n";
 			}else{
 				bs.clear();
 				bs << PROTO::TEXTMSG << "Unknown packet type";

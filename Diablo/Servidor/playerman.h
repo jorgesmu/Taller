@@ -8,7 +8,7 @@
 #include "mapaservidor.h"
 #include "../source/utilities/vec2.h"
 
-typedef std::vector< std::pair<int,int> > TilesRecorridos;
+typedef std::vector< std::pair<short,short> > TilesRecorridos;
 
 class Player {
 	private:
@@ -30,7 +30,7 @@ class Player {
 	void setOffline();
 	void setOnline();
 
-	void addTileRecorrido(int x, int y);
+	void addTileRecorrido(short x, short y);
 	TilesRecorridos& getTilesRecorridos();
 
 };

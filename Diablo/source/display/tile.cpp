@@ -32,19 +32,17 @@ std::vector<Entidad*> Tile::getEntidades(){
 }
 
 void Tile::setearExplorados(int tileX, int tileY, Personaje* personaje, Mapa* mapa){
-	Tile* tile = mapa->getTile(tileX, tileY);	
-	
-	for(int posX = tileX-(Personaje::RADIO_VISION_X/Tile::TILE_ANCHO); posX < tileX+(Personaje::RADIO_VISION_X/Tile::TILE_ANCHO); posX++){
-		for(int posY = tileY-(Personaje::RADIO_VISION_Y/Tile::TILE_ALTO); posY < tileY+(Personaje::RADIO_VISION_Y/Tile::TILE_ALTO); posY++){
-			int deltaX = posX - tileX;
-			int deltaY = posY - tileY;
-			if((abs(deltaX) <= Personaje::RADIO_VISION_X/Tile::TILE_ANCHO) && (abs(deltaY) <= Personaje::RADIO_VISION_Y/Tile::TILE_ANCHO)){
-				//si no estaba en los explorados lo agrego
-				Tile* tileActual = mapa->getTile(posX, posY);
-				if(mapa->tileExists(posX,posY)){				
-					personaje->agregarTilesExplorados(mapa->getTile(posX,posY));
-				}
+
+	Tile* tile = mapa->getTile(tileX, tileY);
+	for(int posX = (Tile::TILE_ANCHO/2) + tile->getX()-(Personaje::RADIO_VISION_X); posX < tile->getX()+(Personaje::RADIO_VISION_X); posX+=Tile::TILE_ANCHO/2){
+		for(int posY = (Tile::TILE_ANCHO/2) + tile->getY()-(Personaje::RADIO_VISION_Y); posY < tile->getY()+(Personaje::RADIO_VISION_Y); posY+=Tile::TILE_ALTO/2){
+			int deltaX = tile->getX() - posX;
+			int deltaY = tile->getY() - posY;
+
+			if((abs(deltaX) <= Personaje::RADIO_VISION_X) && (abs(deltaY) <= Personaje::RADIO_VISION_Y)){
+				personaje->agregarTilesExplorados(mapa->getTilePorPixeles(posX, posY));
 			}
+
 		}
 	}
 }
@@ -61,11 +59,7 @@ void Tile::blit(SDL_Surface* pantalla, Camara& cam, Personaje* personaje, Mapa* 
 			(*it)->blit(pantalla, &cam, NULL,x, y);
 			(*it)->setDibujada(true);
 		}
-		std::vector<Tile*> tilesExplorados = personaje->getTilesExplorados();
-		//si no estaba en los explorados lo agrego
-		if (std::find(tilesExplorados.begin(), tilesExplorados.end(), this) == tilesExplorados.end()){
-			personaje->agregarTilesExplorados(this);
-		}
+		personaje->agregarTilesExplorados(this);
 	}else{
 		std::vector<Tile*> tilesExplorados = personaje->getTilesExplorados();
 		

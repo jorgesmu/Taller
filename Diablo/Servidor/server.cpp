@@ -18,13 +18,13 @@
 //#include "../source/utilities/config_juego.h"
 #include "parserServer.h"
 #include "playerman.h"
-#include "../source/display/mapa.h"
+#include "mapaservidor.h"
 #include <cstdlib>
 #include <ctime>
 
 logErrores err_log("log_parser.txt");
 PlayerManager pm;
-Mapa mapa;
+MapaServidor mapa;
 
 config_juego juego;
 config_pantalla* pantalla;

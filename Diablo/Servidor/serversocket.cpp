@@ -12,9 +12,10 @@
 #include <process.h>
 
 #include "playerman.h"
+#include "mapaservidor.h"
 
 extern PlayerManager pm;
-extern Mapa mapa;
+extern MapaServidor mapa;
 extern std::vector <config_entidad> entidades;
 
 bool ServerSocket::WSinit = false;

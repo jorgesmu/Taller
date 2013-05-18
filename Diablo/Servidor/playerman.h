@@ -3,7 +3,7 @@
 #include <string>
 #include <map>
 
-#include "../source/display/mapa.h"
+#include "mapaservidor.h"
 
 class Player {
 	private:
@@ -35,7 +35,7 @@ class PlayerManager {
 	bool playerExists(const std::string& nick) const;
 	// Agrega un jugador
 	// Inicializa en una posicion aleatoria del mapa
-	void addPlayer(const std::string& nick, const std::string& tipo_pj, Mapa& mapa);
+	void addPlayer(const std::string& nick, const std::string& tipo_pj, MapaServidor& mapa);
 	// Devuelve un jugador
 	Player& getPlayer(const std::string& nick);
 

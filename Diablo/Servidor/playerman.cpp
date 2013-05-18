@@ -60,7 +60,7 @@ bool PlayerManager::playerExists(const std::string& nick) const {
 }
 
 // Agrega un jugador
-void PlayerManager::addPlayer(const std::string& nick, const std::string& tipo_pje, Mapa& mapa) {
+void PlayerManager::addPlayer(const std::string& nick, const std::string& tipo_pje, MapaServidor& mapa) {
 	// Chequeo de sanidad
 	assert(!playerExists(nick));
 	Player& p = player_map[nick];

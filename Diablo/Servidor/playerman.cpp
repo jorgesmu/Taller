@@ -3,6 +3,8 @@
 
 #include <exception>
 #include <cassert>
+#include <ctime>
+#include <set>
 
 Player::Player() {
 	nick = "uninit-nick-pm";
@@ -19,9 +21,8 @@ void Player::init(const std::string& nick, const std::string& pje) {
 	this->nick = nick;
 	this->tipo_personaje = pje;
 }
-#include <iostream>
+
 void Player::setPos(int x, int y) {
-	std::cout << "relocando pje <" << this->nick << "> a " << x << ":" << y << "\n";
 	this->x = x;
 	this->y = y;
 }
@@ -50,6 +51,17 @@ void Player::setOnline() {
 	isOnline = true;
 }
 
+void Player::addTileRecorrido(int x, int y) {
+	// ToDo: Esto se puede mejorar usando sort+binary search
+	auto p = std::make_pair(x, y);
+	if(std::find(tiles_recorridos.begin(), tiles_recorridos.end(), p) == tiles_recorridos.end()) {
+		this->tiles_recorridos.push_back(p);
+	}
+}
+
+TilesRecorridos& Player::getTilesRecorridos() {
+	return tiles_recorridos;
+}
 
 //////////////
 
@@ -70,11 +82,13 @@ void PlayerManager::addPlayer(const std::string& nick, const std::string& tipo_p
 	int x = 0; // Contador de iteraciones
 	int w, h; // Para guardar el tamaño del mapa
 	mapa.getSize(&w, &h);
+	//std::cout << "Mapa size: " << w << "," << h << "\n";
 	int rand_x, rand_y;
 	// Limitamos la cantidad de iteraciones
 	while(!found && x < 1000) {
 		rand_x = intRand(0, w);
 		rand_y = intRand(0, h);
+		//std::cout << rand_x << "," << rand_y << "\n";
 		if(mapa.getTile(rand_x, rand_y)->isCaminable()) {
 			found = true;
 		}

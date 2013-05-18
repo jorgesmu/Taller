@@ -21,6 +21,8 @@ class Camara {
 	void init(int w, int h, int marg_width);
 	// Cambia la posicion de la camara
 	void mover(float x, float y);
+	// Centra en el pixel x, y
+	void center(int x, int y);
 	// Getters para la posicion
 	float getX() const;
 	float getY() const;

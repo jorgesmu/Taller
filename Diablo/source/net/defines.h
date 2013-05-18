@@ -31,4 +31,7 @@ const unsigned char DEFTYPE = 'i';
 // Mensaje de sincronizacion de posicion inicial de personaje
 const unsigned char INITPOS = 'j';
 
+// Mensaje de sincronizacion de id escenario
+const unsigned char ESC_ID = 'K';
+
 }

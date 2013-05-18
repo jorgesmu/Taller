@@ -13,6 +13,7 @@ extern Mapa mapa;
 extern PjeManager pm;
 extern std::string pje_local_tipo;
 extern int start_pos_x, start_pos_y;
+extern int escenario_elegido_id;
 
 bool ClientSocket::WSinit = false;
 size_t ClientSocket::ref_count = 0;
@@ -108,7 +109,7 @@ bool ClientSocket::receive(std::string& buff) {
 	if(res > 0) {
 		buff.clear();
 		buff.assign(recvbuf, res);
-		//std::cout << "Received " << res << " bytes: ";
+		//std::cout << "Received " << res << " bytes: \n";
 		//std::cout.write(buff.c_str(), buff.size());
 		//std::cout << "\n";
 		return true;
@@ -218,6 +219,7 @@ void ClientSocket::listenDo() {
 			}
 			std::cout << "All files received\n";
 			pasoArchivos = true;
+			sendOk();
 		}else if(pt == PROTO::PREVIOUSTYPE) {
 			std::string tipo;
 			bs >> tipo;
@@ -231,6 +233,11 @@ void ClientSocket::listenDo() {
 		}else if(pt == PROTO::INITPOS) {
 			bs >> start_pos_x;
 			bs >> start_pos_y;
+			std::cout << "RECEIVED INIT POS: (" << start_pos_x << "," << start_pos_y << ")\n";
+			sendOk();
+		}else if(pt == PROTO::ESC_ID) {
+			bs >> escenario_elegido_id;
+			std::cout << "RECEIVED ESC ID: (" << escenario_elegido_id << ")\n";
 			sendOk();
 		}else{
 			std::cout << "Unknown packet type " << int(pt) << " received\n";

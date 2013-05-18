@@ -13,8 +13,8 @@
 #include "../source/net/defines.h"
 
 // Tamaño del buffer de envio/recepcion
-const size_t DEFAULT_BUFLEN = 2048;
-const size_t CHUNK_SIZE = 1024;
+const size_t DEFAULT_BUFLEN = 16384;
+const size_t CHUNK_SIZE = 8192;
 typedef std::string addr;
 const std::string res_dir = "../Servidor/resources2client";
 

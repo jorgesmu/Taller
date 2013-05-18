@@ -3,6 +3,7 @@
 #include <vector>
 
 // clase de Tile para el mapa servidor
+// por default es caminable
 class TileServidor {
 	private:
 	bool caminable;

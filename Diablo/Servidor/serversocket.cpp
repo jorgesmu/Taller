@@ -7,6 +7,7 @@
 #include <sstream>
 #include <cassert>
 #include <vector>
+#include <ctime>
 
 #include <Windows.h>
 #include <process.h>
@@ -17,6 +18,7 @@
 extern PlayerManager pm;
 extern MapaServidor mapa;
 extern std::vector <config_entidad> entidades;
+extern int escenario_elegido_id;
 
 bool ServerSocket::WSinit = false;
 size_t ServerSocket::ref_count = 0;
@@ -194,7 +196,9 @@ bool ServerSocket::receive(const std::string& cid, std::string& buff) {
 
 	int res = ::recv(sock, recvbuf, DEFAULT_BUFLEN, 0);
 	if(res > 0) {
-		//std::cout << "Received " << res << " bytes\n";
+		//std::cout << "Received " << res << " bytes: ";
+		//std::cout.write(buff.c_str(), buff.size());
+		//std::cout << "\n";
 		buff.clear();
 		buff.assign(recvbuf, res);
 		return true;
@@ -269,6 +273,10 @@ unsigned int __stdcall ServerSocket::acceptLastEntry(void* pthis) {
 }
 
 void ServerSocket::acceptLastDo() {
+
+	// Iniciamos el seed de srand
+	std::srand(std::time(NULL));
+
 	EnterCriticalSection(&critSect);
 	if(clients_queue.empty()) {
 		std::cerr << "Empty queue on acceptLastDo()\n";
@@ -358,6 +366,14 @@ void ServerSocket::acceptLastDo() {
 		waitForOk(cid);
 		BitStream bs;
 		bs << PROTO::INITPOS << pm.getPlayer(new_nick).getX() << pm.getPlayer(new_nick).getY();
+		std::cout << "SEND INIT POS (" << pm.getPlayer(new_nick).getX() << "," << pm.getPlayer(new_nick).getY() << ")\n";
+		send(cid, bs.str());
+		waitForOk(cid);
+
+		// Le mandamos el id escenario
+		bs.clear();
+		bs << PROTO::ESC_ID << escenario_elegido_id;
+		std::cout << "SEND ESC ID (" << escenario_elegido_id << ")\n";
 		send(cid, bs.str());
 		waitForOk(cid);
 

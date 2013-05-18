@@ -2,8 +2,13 @@
 
 #include <string>
 #include <map>
+#include <vector>
+#include <algorithm>
 
 #include "mapaservidor.h"
+#include "../source/utilities/vec2.h"
+
+typedef std::vector< std::pair<int,int> > TilesRecorridos;
 
 class Player {
 	private:
@@ -11,6 +16,7 @@ class Player {
 	std::string tipo_personaje;
 	bool isOnline;
 	int x, y; // Pos en tiles logicos en el mapa
+	TilesRecorridos tiles_recorridos;
 	
 	public:
 	Player();
@@ -23,6 +29,10 @@ class Player {
 	bool isOn() const;
 	void setOffline();
 	void setOnline();
+
+	void addTileRecorrido(int x, int y);
+	TilesRecorridos& getTilesRecorridos();
+
 };
 
 class PlayerManager {

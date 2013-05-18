@@ -43,6 +43,7 @@ PjeManager pjm;
 std::string pje_local_nick;
 std::string pje_local_tipo;
 int start_pos_x, start_pos_y;
+int escenario_elegido_id;
 // Ventana de chat
 ChatWindow chat_window;
 
@@ -111,7 +112,7 @@ int main(int argc, char* argv[]) {
 	Camara camara;
 	camara.init(pantalla->get_ancho(), pantalla->get_alto(), configuracion.get_margen_scroll());
 
-	mapa.resize(escenarios[0].get_tam_x(), escenarios[0].get_tam_x());
+	mapa.resize(escenarios[escenario_elegido_id].get_tam_x(), escenarios[escenario_elegido_id].get_tam_x());
 	// Resman
 	ResMan resman;
 	if(!resman.init()) return -2;
@@ -147,7 +148,7 @@ int main(int argc, char* argv[]) {
 	}
 
 	// Vector de entidades en este mapa
-	vector<config_entidad_en_juego> entidades_en_juego = escenarios[0].get_entidades();
+	vector<config_entidad_en_juego> entidades_en_juego = escenarios[escenario_elegido_id].get_entidades();
 
 	// Llenamos el mapa con las entidades
 	for(auto it = entidades_en_juego.begin(); it != entidades_en_juego.end(); ++it){
@@ -177,6 +178,9 @@ int main(int argc, char* argv[]) {
 	pjm.getPjeLocal().init(pje_local_tipo , 1 , 1 , 50 , 5, 100, 100 ,	configuracion.get_vel_personaje(),	0 , 70 , NULL , resman , Imagen::COLOR_KEY);
 	// Posiciono el personaje
 	mapa.getTile(start_pos_x, start_pos_y)->addEntidad(&(pjm.getPjeLocal()));
+	pjm.getPjeLocal().setTileActual(mapa.getTile(start_pos_x, start_pos_y));
+	// Centro la camara
+	camara.center(mapa.getTile(start_pos_x, start_pos_y)->getX(), mapa.getTile(start_pos_x, start_pos_y)->getY());
 
 	// Variables para el game-loop
 	double curr_time = SDL_GetTicks();

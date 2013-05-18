@@ -75,3 +75,7 @@ void Camara::update_speed(const SDL_Rect& mouse_coords) {
 		vx = vy = 0.0f;
 	}
 }
+
+void Camara::center(int x, int y) {
+	mover(x - float(getW())/2, y - float(getH())/2);
+}

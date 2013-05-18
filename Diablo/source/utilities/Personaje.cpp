@@ -552,3 +552,13 @@ void Personaje::ataque(Tile* tileDestino , Mapa* mapa) {
 		printf("Direccion Ataque %d \n", direccionAtaque);
 	}
 }
+
+// Por ahora retorna trivialmente la posicion en X
+int Personaje::getXAnclajeNiebla(){
+	return this -> getX();
+}
+
+// Por ahora retorna trivialmente la posicion en Y
+int Personaje::getYAnclajeNiebla(){
+	return this -> getY();
+}

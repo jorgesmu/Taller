@@ -8,7 +8,9 @@ class Mapa;
 class Personaje : public Entidad {
 public:
 
-		const static int RADIO_VISION = 2;// los tiles a menos de 1 tiles de distancia del personaje son visibles
+		const static int RADIO_VISION_Y = 225;
+
+		const static int RADIO_VISION_X = 2 * RADIO_VISION_Y; // En pixeles
 
 		//Direccion
 		const static unsigned int SUR = 0;
@@ -158,7 +160,11 @@ public:
 	*/
 	virtual void update(Mapa* mapa);
 
-	
+	// Retorna el ancla de niebla X adecuada
+	virtual int getXAnclajeNiebla();
+
+	// Retorna el ancla de niebla Y adecuada
+	virtual int getYAnclajeNiebla();
 
 protected:
 		

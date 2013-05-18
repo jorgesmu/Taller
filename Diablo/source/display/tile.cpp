@@ -34,14 +34,9 @@ std::vector<Entidad*> Tile::getEntidades(){
 void Tile::blit(SDL_Surface* pantalla, Camara& cam, Personaje* personaje, Mapa* mapa){
 
 	Tile* tilePersonaje = mapa->getTilePorPixeles(personaje->getX(), personaje->getY());
-	int deltaX = tilePersonaje->u - u;
-	int deltaY = tilePersonaje->v - v;
-
-	//if((tilePersonaje->getU() == 4) && (tilePersonaje->getV() == 3)){
-	//	int a = 0;
-	//}
-
-	if((abs(deltaX) <= Personaje::RADIO_VISION) && (abs(deltaY) <= Personaje::RADIO_VISION)){
+	int deltaX = personaje -> getXAnclajeNiebla() - x;
+	int deltaY = personaje -> getYAnclajeNiebla() - y;
+	if((abs(deltaX) <= Personaje::RADIO_VISION_X) && (abs(deltaY) <= Personaje::RADIO_VISION_Y)){
 		//dibujo en colores normales
 		for(auto it = entidades.begin(); it != entidades.end(); ++it) {
 			(*it)->setColor(true,u,v);

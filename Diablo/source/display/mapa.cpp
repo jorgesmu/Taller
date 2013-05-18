@@ -2,6 +2,8 @@
 #include "camara.h"
 #include "../utilities/vec2.h"
 #include "../utilities/coordenadas.h"
+#include "../utilities/grafo.h"
+#include "../net/PjeManager.h"
 
 // Ctor
 Mapa::Mapa() {
@@ -120,4 +122,104 @@ Tile* Mapa::getTilePorPixeles(int pixelX , int pixelY) {
 void Mapa::getSize(int* w, int* h) const {
 	*w = this->w;
 	*h = this->h;
+}
+
+vector <pair<int,int> > Mapa::getCaminoMinimo(Tile* tileOrigen, Tile* tileDestino, PjeManager pjm){
+	if(tileOrigen == tileDestino){
+		std::vector<pair<int, int>> vacio;
+		return vacio;
+	}
+
+	int altoMapa = this->h;
+	int anchoMapa = this->w;
+	double raizDeDos = 1.4142;
+	double pesoNoCaminable = 500;
+	grafo miGrafo(anchoMapa,altoMapa);
+
+	std::map<std::string, Personaje>& personajesDelMapa = pjm.getPjes();
+
+	for (auto it= allTiles().begin(); it != allTiles().end(); ++it){
+		int tileX = it->getU();
+		int tileY = it->getV();
+
+		if((tileX-1)>=0){
+			//izquierda
+			Tile* tileArista = getTile(tileX-1,tileY);
+			if(tileArista->isCaminable()){
+				miGrafo.agregar_arista(tileX,tileY,tileX-1,tileY,1);			
+			}else{
+				miGrafo.agregar_arista(tileX,tileY,tileX-1,tileY,pesoNoCaminable);								
+			}
+		}
+		if((tileY-1)>=0){
+			//arriba
+			Tile* tileArista = getTile(tileX,tileY-1);
+			if(tileArista->isCaminable()){
+				miGrafo.agregar_arista(tileX,tileY,tileX,tileY-1,1);			
+			}else{
+				miGrafo.agregar_arista(tileX,tileY,tileX,tileY-1,pesoNoCaminable);								
+			}
+		}
+		if((tileX+1)<=anchoMapa-1){
+			//derecha
+			Tile* tileArista = getTile(tileX+1,tileY);
+			if(tileArista->isCaminable()){
+				miGrafo.agregar_arista(tileX,tileY,tileX+1,tileY,1);			
+			}else{
+				miGrafo.agregar_arista(tileX,tileY,tileX+1,tileY,pesoNoCaminable);								
+			}
+		}
+		if((tileY+1)<=altoMapa-1){
+			//abajo
+			Tile* tileArista = getTile(tileX,tileY+1);
+			if(tileArista->isCaminable()){
+				miGrafo.agregar_arista(tileX,tileY,tileX,tileY+1,1);			
+			}else{
+				miGrafo.agregar_arista(tileX,tileY,tileX,tileY+1,pesoNoCaminable);								
+			}
+		}
+		if(((tileX-1)>=0) && ((tileY-1)>=0)){
+			//arriba izquierda
+			Tile* tileArista = getTile(tileX-1,tileY-1);
+			if(tileArista->isCaminable()){
+				miGrafo.agregar_arista(tileX,tileY,tileX-1,tileY-1,raizDeDos);			
+			}else{
+				miGrafo.agregar_arista(tileX,tileY,tileX-1,tileY-1,pesoNoCaminable*raizDeDos);								
+			}
+		}
+		if(((tileX-1)>=0) && ((tileY+1)<=altoMapa-1)){
+			//abajo izquierda
+			Tile* tileArista = getTile(tileX-1,tileY+1);
+			if(tileArista->isCaminable()){
+				miGrafo.agregar_arista(tileX,tileY,tileX-1,tileY+1,raizDeDos);			
+			}else{
+				miGrafo.agregar_arista(tileX,tileY,tileX-1,tileY+1,pesoNoCaminable*raizDeDos);								
+			}
+		}
+		if(((tileX+1)<=anchoMapa-1) && ((tileY-1)>=0)){
+			//arriba derecha
+			Tile* tileArista = getTile(tileX+1,tileY-1);
+			if(tileArista->isCaminable()){
+				miGrafo.agregar_arista(tileX,tileY,tileX+1,tileY-1,raizDeDos);			
+			}else{
+				miGrafo.agregar_arista(tileX,tileY,tileX+1,tileY-1,pesoNoCaminable*raizDeDos);								
+			}
+		}
+		if(((tileX+1)<=anchoMapa-1) && ((tileY+1)<=altoMapa-1)){
+			//abajo derecha
+			Tile* tileArista = getTile(tileX+1,tileY+1);
+			if(tileArista->isCaminable()){
+				miGrafo.agregar_arista(tileX,tileY,tileX+1,tileY+1,raizDeDos);			
+			}else{
+				miGrafo.agregar_arista(tileX,tileY,tileX+1,tileY+1,pesoNoCaminable*raizDeDos);								
+			}
+		}
+	}
+	int tileOrigenX = tileOrigen->getU();
+	int tileOrigenY = tileOrigen->getV();
+	int tileDestinoX = tileDestino->getU();
+	int tileDestinoY = tileDestino->getV();
+	vector <pair<int,int>> camino = miGrafo.camino(tileOrigenX,tileOrigenY,tileDestinoX,tileDestinoY);
+
+	return camino;
 }

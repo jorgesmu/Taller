@@ -100,7 +100,6 @@ vector<pair<int,int> > grafo::camino(int posXOrigen,int posYOrigen, int posXDest
 		cola.pop();
 		int pos_x_vertice = unVertice.get_x();
 		int pos_y_vertice = unVertice.get_y();
-		printf("\n\n\n desencolo %d,%d con peso:%f  \n\n\n",pos_x_vertice,pos_y_vertice, unPar.second);
 
 		vector<arista> aristas = unVertice.get_aristas();
 		visitado[pos_x_vertice][pos_y_vertice] = true; // lo visito
@@ -111,16 +110,14 @@ vector<pair<int,int> > grafo::camino(int posXOrigen,int posYOrigen, int posXDest
 			int destinoAristaY = aristas[idx_arista].get_y_destino();
 			if (!visitado[destinoAristaX][destinoAristaY]){
 				double peso = aristas[idx_arista].get_peso();
-
-				distancia[destinoAristaX][destinoAristaY] = distancia[pos_x_vertice][pos_y_vertice] + peso;
-				padre[destinoAristaX][destinoAristaY] = make_pair<int,int>(pos_x_vertice,pos_y_vertice);
-				pair<vertice, double> nuevoPar = make_pair<vertice,double>(vertices[destinoAristaX][destinoAristaY],distancia[destinoAristaX][destinoAristaY]);
-				cola.push(nuevoPar); // push v[destino]
-				printf(" %d,%d es padre de %d,%d  \n\n",pos_x_vertice,pos_y_vertice,destinoAristaX,destinoAristaY);	
-				printf("encolo %d,%d peso: %f  \n\n",destinoAristaX,destinoAristaY,peso);	
+				if	(distancia[destinoAristaX][destinoAristaY] > distancia[pos_x_vertice][pos_y_vertice] + peso){		
+					distancia[destinoAristaX][destinoAristaY] = distancia[pos_x_vertice][pos_y_vertice] + peso;
+					padre[destinoAristaX][destinoAristaY] = make_pair<int,int>(pos_x_vertice,pos_y_vertice);
+					pair<vertice, double> nuevoPar = make_pair<vertice,double>(vertices[destinoAristaX][destinoAristaY],distancia[destinoAristaX][destinoAristaY]);
+					cola.push(nuevoPar); // push v[destino]
+				}
 			}
 		}
-		system("PAUSE");
 	}
 	//reconstruyo el camino
 	vector<pair<int,int> > resultado = reconstruir_camino(posXOrigen,posYOrigen,posXDestino,posYDestino);

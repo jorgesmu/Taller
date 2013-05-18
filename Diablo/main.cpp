@@ -59,8 +59,9 @@ int main(int argc, char* argv[]) {
 	}
 */
 	//borrar estas dos lineas
-		pje_local_nick = "jugador";
-		pje_local_tipo = "soldado";
+	pje_local_nick = "jugador";
+	pje_local_tipo = "soldado";
+	escenario_elegido_id = 0;
 
 	InitializeCriticalSection(&cs_main);
 	// Socket de cliente
@@ -177,6 +178,8 @@ int main(int argc, char* argv[]) {
 	// Agrega el personaje
 	pjm.getPjeLocal().init(pje_local_tipo , 1 , 1 , 50 , 5, 100, 100 ,	configuracion.get_vel_personaje(),	0 , 70 , NULL , resman , Imagen::COLOR_KEY);
 	// Posiciono el personaje
+	start_pos_x = 0;
+	start_pos_y = 0;
 	mapa.getTile(start_pos_x, start_pos_y)->addEntidad(&(pjm.getPjeLocal()));
 	pjm.getPjeLocal().setTileActual(mapa.getTile(start_pos_x, start_pos_y));
 	// Centro la camara
@@ -189,6 +192,10 @@ int main(int argc, char* argv[]) {
 
 	// Para guardar los eventos  de input
 	SDL_Event event;
+
+
+	Tile::setearExplorados(20,20, &pjm.getPjeLocal(), &mapa);
+
 
 	while((!quit ) && (sock.isOpen()) ) {
 
@@ -226,7 +233,24 @@ int main(int argc, char* argv[]) {
 					if(event.button.button == SDL_BUTTON_LEFT) {
 						vec2<int> tile_res = MouseCoords2Tile(vec2<int>(event.button.x, event.button.y), camara);
 						if(mapa.tileExists(tile_res.x, tile_res.y)) {
-							pjm.getPjeLocal().mover(mapa.getTile(tile_res.x,tile_res.y));
+							pjm.getPjeLocal().mover(mapa.getTile(tile_res.x,tile_res.y));							
+
+							//Tile* tilePersonaje = mapa.getTilePorPixeles(pjm.getPjeLocal().getX(), pjm.getPjeLocal().getY());
+							//Tile* tileDestino = mapa.getTile(tile_res.x, tile_res.y);
+							//tileDestino = mapa.getTile(tile_res.x, tile_res.y);
+							//vector<pair<int, int> > caminoMinimo = mapa.getCaminoMinimo(tilePersonaje, tileDestino, pjm);
+							//int indice = 1;
+							//while(pjm.getPjeLocal().getX() != tileDestino->getX() && pjm.getPjeLocal().getY() != tileDestino->getY()){						
+							//	pair<int, int> proximoTile = caminoMinimo[indice];
+							//	pjm.getPjeLocal().mover(mapa.getTile(proximoTile.first, proximoTile.second));
+							//	Tile* tileActual = mapa.getTilePorPixeles(pjm.getPjeLocal().getX(), pjm.getPjeLocal().getY());
+							//	while (tileActual->getU() != proximoTile.first || tileActual->getV() != proximoTile.second){
+							//		// Actualizamos el personaje principal
+							//		pjm.getPjeLocal().update(&mapa);
+							//		tileActual = mapa.getTilePorPixeles(pjm.getPjeLocal().getX(), pjm.getPjeLocal().getY());
+							//	}
+							//	indice ++;
+							//}
 						}
 					}
 				}

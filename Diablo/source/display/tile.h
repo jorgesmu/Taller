@@ -28,6 +28,7 @@ class Tile {
 	std::vector<Entidad*> getEntidades();
 	void setBlitCoords(int x, int y);
 	void setLogicCoords(int u, int v);
+	static void setearExplorados(int tileX, int tileY, Personaje* personaje, Mapa* mapa);
 	// Blittea todas las entidades en este tile (en el orden que estan en el vector)
 	void blit(SDL_Surface* pantalla, Camara& cam, Personaje* personaje, Mapa* mapa);
 	// Libera recursos si hace falta

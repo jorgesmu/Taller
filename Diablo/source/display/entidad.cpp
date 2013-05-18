@@ -366,7 +366,9 @@ std::vector<Tile*> Entidad::getTilesExplorados(){
 }
 
 void Entidad::agregarTilesExplorados(Tile* tile){
-	this -> tilesExplorados.push_back(tile);
+	if (std::find(tilesExplorados.begin(), tilesExplorados.end(), tile) == tilesExplorados.end()){
+		this -> tilesExplorados.push_back(tile);
+	}
 }
 
 void Entidad::setColor(bool value){

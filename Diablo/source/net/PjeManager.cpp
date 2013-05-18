@@ -1,4 +1,5 @@
 #include "PjeManager.h"
+
 #include <cassert>
 
 void PjeManager::addPje(const std::string& nick) {

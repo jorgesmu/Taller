@@ -5,11 +5,11 @@
 #include "SDL.h"
 class Personaje;
 class Tile;
-
+using namespace std;
 typedef std::vector<Tile> TileVec;
 
 class Camara;
-
+class PjeManager;
 class Mapa {
 	private:
 	TileVec tiles; // Vector de tiles para el mapa
@@ -40,4 +40,6 @@ class Mapa {
 	Tile* getTilePorPixeles(int pixelX , int pixelY);
 	// Getters para tamaño
 	void getSize(int* x, int* y) const;
+	//devuelve el camino minimo
+	vector <pair<int,int>> getCaminoMinimo(Tile* tileOrigen, Tile* tileDestino, PjeManager pjm);
 };

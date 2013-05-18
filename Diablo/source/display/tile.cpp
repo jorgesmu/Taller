@@ -31,6 +31,24 @@ std::vector<Entidad*> Tile::getEntidades(){
 	return this->entidades;
 }
 
+void Tile::setearExplorados(int tileX, int tileY, Personaje* personaje, Mapa* mapa){
+	Tile* tile = mapa->getTile(tileX, tileY);	
+	
+	for(int posX = tileX-(Personaje::RADIO_VISION_X/Tile::TILE_ANCHO); posX < tileX+(Personaje::RADIO_VISION_X/Tile::TILE_ANCHO); posX++){
+		for(int posY = tileY-(Personaje::RADIO_VISION_Y/Tile::TILE_ALTO); posY < tileY+(Personaje::RADIO_VISION_Y/Tile::TILE_ALTO); posY++){
+			int deltaX = posX - tileX;
+			int deltaY = posY - tileY;
+			if((abs(deltaX) <= Personaje::RADIO_VISION_X/Tile::TILE_ANCHO) && (abs(deltaY) <= Personaje::RADIO_VISION_Y/Tile::TILE_ANCHO)){
+				//si no estaba en los explorados lo agrego
+				Tile* tileActual = mapa->getTile(posX, posY);
+				if(mapa->tileExists(posX,posY)){				
+					personaje->agregarTilesExplorados(mapa->getTile(posX,posY));
+				}
+			}
+		}
+	}
+}
+
 void Tile::blit(SDL_Surface* pantalla, Camara& cam, Personaje* personaje, Mapa* mapa){
 
 	Tile* tilePersonaje = mapa->getTilePorPixeles(personaje->getX(), personaje->getY());

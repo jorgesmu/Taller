@@ -33,3 +33,13 @@ template <typename T, typename Y>
 vec2<T> operator*(Y a, const vec2<T>& b) {
 	return vec2<T>(a*b.x, a*b.y);
 }
+
+template <typename T, typename Y>
+bool operator==(Y a, const vec2<T>& b) {
+	return a.x == b.x && a.y == b.y;
+}
+
+template <typename T, typename Y>
+bool operator!=(Y a, const vec2<T>& b) {
+	return !(a == b);
+}

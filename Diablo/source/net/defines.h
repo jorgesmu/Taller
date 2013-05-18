@@ -32,6 +32,10 @@ const unsigned char DEFTYPE = 'i';
 const unsigned char INITPOS = 'j';
 
 // Mensaje de sincronizacion de id escenario
-const unsigned char ESC_ID = 'K';
+const unsigned char ESC_ID = 'k';
+
+// Mensajes de sincronizacion de nieble
+const unsigned char NIEBLA_SYNC = 'm'; // cliente
+const unsigned char NIEBLA_LIST = 'n'; // servidor
 
 }

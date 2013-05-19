@@ -301,6 +301,56 @@ void Entidad::blit(SDL_Surface* dest , Camara* camara , Mapa* mapa,
 	}
 }
 
+/*
+	Pre: Los parámetros cumplen las siguiente condiciones:
+
+		dest: Surface sobre el que se quiere pintar.
+
+		camara: Camara correspondiente.
+
+		mapa: mapa correspondiente
+
+		tileX , tileY : Tile sobre el 
+
+		NOTA: Cuidado al momento de hacer updates, ya que hay entidades que 
+		ocupan varios Tiles. En sintesis, un update por entidad al momento
+		de pintar toda la pantalla.
+
+	Post: Se ha pintado la entidad en el surface dest según la camara y el mapa.
+	Si la entidad tiene una base rectangular de un sólo Tile se pinta sin mayores 
+	cuidados.
+	En cambio si la entidad tiene una base superior a un tile se realiza un tratamiento
+	especial.
+
+*/
+void Entidad::blit(SDL_Surface* dest , Camara* camara , Mapa* mapa,
+					const unsigned int tileX ,	const unsigned int tileY , 
+					bool color){	
+	if ( (this -> imagen != NULL) && (this -> surf != NULL) &&
+		(camara != NULL) ) {
+		bool colorAux = this -> color;
+		if ( (this ->highInTiles == 1) && (this -> widthInTiles == 1) ){
+			colorAux = color;
+		}
+		if(this -> surf -> getSDL_Surface() != NULL){
+			int posX;
+			int posY;
+			if (compartido){
+				posX = tileX - (int)(camara -> getX()) - this -> pixel_ref_x;
+				posY = tileY - (int)(camara -> getY()) - this -> pixel_ref_y;
+			} else {
+				posX = this -> posX - (int)(camara -> getX()) - this -> pixel_ref_x;
+				posY = this -> posY - (int)(camara -> getY()) - this -> pixel_ref_y;
+			}
+			if (!colorAux) {
+				this -> surf -> blitGris(dest , posX ,posY);	
+			} else {
+				this -> surf -> blit(dest , posX ,posY);		
+			}
+		}
+	}
+}
+
 /*	
 	Pre;
 */
@@ -343,6 +393,7 @@ bool Entidad::isCaminable(Tile* tile , Mapa* mapa){
 	return true;
 }
 
+// Deprecated
 bool Entidad::isCaminable(){
 	return true;
 }
@@ -368,10 +419,14 @@ void Entidad::agregarTilesExplorados(Tile* tile){
 	}
 }
 
+// Deprecated
 void Entidad::setColor(bool value){
 	this -> color = value;
 }
 
+
 void Entidad::setColor(bool value , int tileX , int tileY) {
-	this ->setColor(value);
+	if ( (this -> posX == tileX) && (this -> posY) == tileY) {
+		this -> color = value;	
+	}
 }

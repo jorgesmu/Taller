@@ -79,3 +79,17 @@
 	bool EntidadFijaCaminable::isCaminable(){
 		return true;
 	}
+
+
+	void EntidadFijaCaminable::setColor(bool value , int tileX , int tileY) {
+		if ( (this -> widthInTiles > 1) || (this -> highInTiles >1)){
+			if ( (this -> posX == tileX) && (this -> posY == tileY)) {
+				this -> color = value;	
+			}
+		} 
+	}
+
+	// Deprecated
+	void EntidadFijaCaminable::setColor(bool value) {
+		this -> color = value;
+	}

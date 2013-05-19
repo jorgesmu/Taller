@@ -67,7 +67,12 @@ class EntidadFijaCaminable : public EntidadFija{
 		Post: Se retorna verdadero si se puede ocupar el tile ocupado 
 		por dicha instancia.
 	*/
+	// Deprecated
 	virtual bool isCaminable();
 
+	void setColor(bool value , int tileX , int tileY);
+
+	// Deprecated
+	void setColor(bool value);
 };
 

@@ -55,8 +55,8 @@ void Tile::blit(SDL_Surface* pantalla, Camara& cam, Personaje* personaje, Mapa* 
 	if((abs(deltaX) <= Personaje::RADIO_VISION_X) && (abs(deltaY) <= Personaje::RADIO_VISION_Y)){
 		//dibujo en colores normales
 		for(auto it = entidades.begin(); it != entidades.end(); ++it) {
-			(*it)->setColor(true,u,v);
-			(*it)->blit(pantalla, &cam, NULL,x, y);
+			(*it)->setColor(true,x,y);
+			(*it)->blit(pantalla, &cam, NULL,x, y,true);
 			(*it)->setDibujada(true);
 		}
 		personaje->agregarTilesExplorados(this);
@@ -67,11 +67,11 @@ void Tile::blit(SDL_Surface* pantalla, Camara& cam, Personaje* personaje, Mapa* 
 			//lo bliteo en gris
 			for(auto it = entidades.begin(); it != entidades.end(); ++it) {
 				if((!((*it)->getDibujada())) || ((*it)->get_nombre() == "tierraDefault")){
-					(*it)->setColor(false,u,v);
-					(*it)->blit(pantalla, &cam, NULL,x, y);
+					(*it)->setColor(false,x,y);
+					(*it)->blit(pantalla, &cam, NULL,x, y,false);
 					(*it)->setDibujada(true);
 				}else{
-					(*it)->blit(pantalla, &cam, NULL,x, y);
+					(*it)->blit(pantalla, &cam, NULL,x, y,false);
 				}
 			}
 		}

@@ -190,6 +190,7 @@ public:
 		Post: Se retorna verdadero si se puede ocupar el tile donde se encuentra la
 		instancia.
 	*/
+	// Deprecated
 	virtual bool isCaminable();	
 
 protected:

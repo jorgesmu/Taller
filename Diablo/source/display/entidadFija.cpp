@@ -172,9 +172,15 @@
 		this -> surf = NULL;
 		this -> tileAncla = NULL;
 	}
-		
+	
 	void EntidadFija::setColor(bool value , int tileX , int tileY) {
-		this -> color = value;	
+		if ( (this -> posX == tileX) && (this -> posY == tileY)) {
+			this -> color = value;	
+		} 
+	}
+
+	void EntidadFija::setColor(bool value) {
+		this -> color = value;
 	}
 
 	/*
@@ -242,6 +248,73 @@
 		}
 	}
 	
+	/*
+		Pre: Los parámetros cumplen las siguiente condiciones:
+
+			dest: Surface sobre el que se quiere pintar.
+
+			camara: Camara correspondiente.
+
+			mapa: mapa correspondiente
+
+			tileX , tileY : Tile sobre el 
+
+		Post: Se ha pintado la entidad en el surface dest según la camara y el mapa.
+		Se pinta en la posicion actual de la imagen.
+
+		NOTA: Se supone que se llama luego de acceder al tile donde fue anclada.
+	*/
+
+	void EntidadFija::blit(SDL_Surface* dest , Camara* camara , Mapa* mapa,
+						const unsigned int tileX ,	const unsigned int tileY ,
+						bool color){
+		if ( (this -> imagen != NULL) && (this -> surf != NULL) &&
+			(camara != NULL) ) {
+			if(this -> surf -> getSDL_Surface() != NULL){
+				bool colorAux = this -> color;
+				// Esto no andaba bien, lo "comente" y ahora funciona
+				if( (this -> widthInTiles <= 1) && (this -> highInTiles <= 1) && false) {
+					int posX;
+					int posY;
+					colorAux = color;
+					posX = (int)tileX - (int)(camara -> getX()) - this -> pixel_ref_x;
+					posY = (int)tileY - (int)(camara -> getY()) - this -> pixel_ref_y;
+					if (colorAux) {
+						this -> surf -> blit(dest , tileX , tileY);	
+					} else {
+						this -> surf -> blitGris(dest , tileX , tileY);	
+					}
+				}
+				else {
+					if ( ((tileX == posX) && (tileY == posY)) || (this -> tileAncla == NULL) ){
+						int posX = this -> posX - (int)(camara -> getX()) - this -> pixel_ref_x;
+						int posY = this -> posY - (int)(camara -> getY()) - this -> pixel_ref_y;
+						if (colorAux) {
+							this -> surf -> blit(dest , posX , posY);
+						} else {
+							this -> surf -> blitGris(dest , posX , posY);
+						}
+					} else{
+						int posX;
+						int posY = this -> posY - (int)(camara -> getY()) - this -> pixel_ref_y;
+						int delta = (int)tileX - this -> tileAncla -> getX();
+						SDL_Rect rect;					
+						posX = this -> posX - (int)(camara -> getX()) - this -> pixel_ref_x + delta;
+						rect.x = delta;
+						rect.y = 0;
+						rect.h = this -> imagen -> getAlto();
+						rect.w = Tile::TILE_ANCHO;
+						if (colorAux) {
+							this -> surf -> blit(dest , posX , posY , rect);
+						}else{
+							this -> surf -> blitGris(dest , posX , posY , rect);
+						}
+					}
+				}
+			}
+		}
+	}
+
 	/*
 		Pre: La instancia ha sido creada.
 		Post: Se han agregado las anclas correspondientes de acuerdo a la base.
@@ -316,6 +389,7 @@
 		return false;
 	}
 
+	// Deprecated
 	bool EntidadFija::isCaminable(){
 		return false;
 	}

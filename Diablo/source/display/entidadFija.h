@@ -76,6 +76,9 @@ class EntidadFija : public Entidad {
 		Post: Se ha destruido la instancia liberando los recursos asociados.
 	*/
 	virtual ~EntidadFija();
+	
+	// Deprecated
+	virtual void setColor(bool value);
 
 	virtual void setColor(bool value , int tileX , int tileY);
 
@@ -147,10 +150,31 @@ class EntidadFija : public Entidad {
 	*/
 	virtual void blit(SDL_Surface* dest, Camara* camara , Mapa* mapa,
 					const unsigned int tileX ,	const unsigned int tileY);
+
 	/*
-	virtual void blitGris(SDL_Surface* dest, Camara* camara , Mapa* mapa,
-					const unsigned int tileX ,	const unsigned int tileY);
-					*/
+		Pre: Los parámetros cumplen las siguiente condiciones:
+
+			dest: Surface sobre el que se quiere pintar.
+
+			camara: Camara correspondiente.
+
+			mapa: mapa correspondiente
+
+			tileX , tileY : Tile sobre el 
+
+			NOTA: Cuidado al momento de hacer updates, ya que hay entidades que 
+			ocupan varios Tiles. En sintesis, un update por entidad al momento
+			de pintar toda la pantalla.
+
+		Post: Se ha pintado la entidad en el surface dest según la camara y el mapa.
+		Si la entidad tiene una base rectangular de un sólo Tile se pinta sin mayores 
+		cuidados.
+		En cambio si la entidad tiene una base superior a un tile se realiza un tratamiento
+		especial.
+
+	*/
+	virtual void blit(SDL_Surface* dest, Camara* camara , Mapa* mapa,
+					const unsigned int tileX ,	const unsigned int tileY , bool color);
 
 	//deprecated
 	virtual void setTileActual(Tile* tile);
@@ -176,7 +200,7 @@ class EntidadFija : public Entidad {
 		Post: Se retorna el tile donde se encuentra la instancia.
 	*/
 	virtual Tile* getPosicion(Mapa* mapa);
-/*
+
 protected:	
 	
 	/*

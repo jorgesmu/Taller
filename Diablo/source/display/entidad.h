@@ -178,7 +178,27 @@ public:
 
 	*/
 	virtual void blit(SDL_Surface* dest, Camara* camara , Mapa* mapa,
-					const unsigned int tileX ,	const unsigned int tileY /*Tile* tile*/);
+					const unsigned int tileX ,	const unsigned int tileY);
+
+	/*
+		Pre: Los parámetros cumplen las siguiente condiciones:
+
+			dest: Surface sobre el que se quiere pintar.
+
+			camara: Camara correspondiente.
+
+			mapa: mapa correspondiente
+
+			tileX , tileY : Tile sobre el que se trata de dibujar la entidad.
+			NOTA: Cuidado al momento de hacer updates, ya que hay entidades que 
+			ocupan varios Tiles. En sintesis, un update por entidad al momento
+			de pintar toda la pantalla.
+
+		Post: Se ha pintado la entidad en el surface dest según la camara y el mapa.
+
+	*/
+	virtual void blit(SDL_Surface* dest, Camara* camara , Mapa* mapa,
+					const unsigned int tileX ,	const unsigned int tileY , bool color);
 	
 	/*
 	virtual void blitGris(SDL_Surface* dest, Camara* camara , Mapa* mapa,
@@ -216,6 +236,7 @@ public:
 
 	void agregarTilesExplorados(Tile* tile);
 
+	// Deprecated
 	virtual void setColor(bool value);
 
 	virtual void setColor(bool value , int tileX , int tileY);

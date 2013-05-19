@@ -15,5 +15,7 @@ public:
 	int get_y_destino(); 
 
 	double get_peso(); 
+	//setter
+	void set_peso(double newValue);
 
 };

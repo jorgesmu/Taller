@@ -10,11 +10,15 @@ private:
 	vector < vector<bool> > visitado;
 	int ancho,alto;
 public:
+	grafo();
 	grafo(int tamAncho,int tamAlto);
 
 	//setter
 	//agrega una arista a un vertice de un grafo
 	void agregar_arista (int pos_x_vertice, int pos_y_vertice,int pos_x_arista, int pos_y_arista,double peso_arista);
+	//actualiza el valor de la arista, si dicha arista existe
+	void actualizar_arista (int pos_x_origen, int pos_y_origen,int pos_x_destino, int pos_y_destino,double peso_arista);
+
 	//getters
 	//devuelve los vectores
 	vector<vector<vertice> > get_vertices();

@@ -7,7 +7,7 @@ class Personaje;
 class Tile;
 using namespace std;
 typedef std::vector<Tile> TileVec;
-
+#include "../utilities/grafo.h"
 class Camara;
 class PjeManager;
 class Mapa {
@@ -17,6 +17,7 @@ class Mapa {
 	// Assigna a los tiles las coordenadas
 	// Esta funcion es privada y se llama automaticamente cuando se hace un resize del mapa
 	// (en teoria deberia ser una sola vez, cuando ser carga el mapa)
+	grafo grafoVertices;
 	void assignTileCoords();
 
 	public:
@@ -40,6 +41,12 @@ class Mapa {
 	Tile* getTilePorPixeles(int pixelX , int pixelY);
 	// Getters para tamaño
 	void getSize(int* x, int* y) const;
+	//carga el grafo con la informacion del mapa en ese momento
+	void cargarGrafo();
+	//actualiza unicamente un vertice
+	void Mapa::actualizarGrafoVertice(int tileX,int tileY);
+	//actualiza el grafo con la informacion del mapa luego de moverse de un tile a otro
+	void actualizarGrafo(int xOrigen, int yOrigen,int xDestino,int yDestino);
 	//devuelve el camino minimo
 	vector <pair<int,int>> getCaminoMinimo(Tile* tileOrigen, Tile* tileDestino);
 };

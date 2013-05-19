@@ -19,3 +19,7 @@ int arista::get_y_destino(){
 double arista::get_peso(){
 	return peso;
 }
+//setters
+void arista::set_peso(double newValue){
+	peso = newValue;
+}

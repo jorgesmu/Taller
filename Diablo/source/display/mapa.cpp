@@ -124,19 +124,14 @@ void Mapa::getSize(int* w, int* h) const {
 	*h = this->h;
 }
 
-vector <pair<int,int> > Mapa::getCaminoMinimo(Tile* tileOrigen, Tile* tileDestino){
-	if(tileOrigen == tileDestino){
-		std::vector<pair<int, int>> vacio;
-		return vacio;
-	}
-
+//carga el grafo con la informacion del mapa en ese momento
+void Mapa::cargarGrafo(){
 	int altoMapa = this->h;
 	int anchoMapa = this->w;
 	double raizDeDos = 1.4142;
 	double pesoNoCaminable = 500;
-	grafo miGrafo(anchoMapa,altoMapa);
 
-	//std::map<std::string, Personaje>& personajesDelMapa = pjm.getPjes();
+	this->grafoVertices = grafo(altoMapa,anchoMapa);
 
 	for (auto it= allTiles().begin(); it != allTiles().end(); ++it){
 		int tileX = it->getU();
@@ -146,80 +141,250 @@ vector <pair<int,int> > Mapa::getCaminoMinimo(Tile* tileOrigen, Tile* tileDestin
 			//izquierda
 			Tile* tileArista = getTile(tileX-1,tileY);
 			if(tileArista->isCaminable()){
-				miGrafo.agregar_arista(tileX,tileY,tileX-1,tileY,1);			
+				grafoVertices.agregar_arista(tileX,tileY,tileX-1,tileY,1);			
 			}else{
-				miGrafo.agregar_arista(tileX,tileY,tileX-1,tileY,pesoNoCaminable);								
+				grafoVertices.agregar_arista(tileX,tileY,tileX-1,tileY,pesoNoCaminable);								
 			}
 		}
 		if((tileY-1)>=0){
 			//arriba
 			Tile* tileArista = getTile(tileX,tileY-1);
 			if(tileArista->isCaminable()){
-				miGrafo.agregar_arista(tileX,tileY,tileX,tileY-1,1);			
+				grafoVertices.agregar_arista(tileX,tileY,tileX,tileY-1,1);			
 			}else{
-				miGrafo.agregar_arista(tileX,tileY,tileX,tileY-1,pesoNoCaminable);								
+				grafoVertices.agregar_arista(tileX,tileY,tileX,tileY-1,pesoNoCaminable);								
 			}
 		}
 		if((tileX+1)<=anchoMapa-1){
 			//derecha
 			Tile* tileArista = getTile(tileX+1,tileY);
 			if(tileArista->isCaminable()){
-				miGrafo.agregar_arista(tileX,tileY,tileX+1,tileY,1);			
+				grafoVertices.agregar_arista(tileX,tileY,tileX+1,tileY,1);			
 			}else{
-				miGrafo.agregar_arista(tileX,tileY,tileX+1,tileY,pesoNoCaminable);								
+				grafoVertices.agregar_arista(tileX,tileY,tileX+1,tileY,pesoNoCaminable);								
 			}
 		}
 		if((tileY+1)<=altoMapa-1){
 			//abajo
 			Tile* tileArista = getTile(tileX,tileY+1);
 			if(tileArista->isCaminable()){
-				miGrafo.agregar_arista(tileX,tileY,tileX,tileY+1,1);			
+				grafoVertices.agregar_arista(tileX,tileY,tileX,tileY+1,1);			
 			}else{
-				miGrafo.agregar_arista(tileX,tileY,tileX,tileY+1,pesoNoCaminable);								
+				grafoVertices.agregar_arista(tileX,tileY,tileX,tileY+1,pesoNoCaminable);								
 			}
 		}
 		if(((tileX-1)>=0) && ((tileY-1)>=0)){
 			//arriba izquierda
 			Tile* tileArista = getTile(tileX-1,tileY-1);
 			if(tileArista->isCaminable()){
-				miGrafo.agregar_arista(tileX,tileY,tileX-1,tileY-1,raizDeDos);			
+				grafoVertices.agregar_arista(tileX,tileY,tileX-1,tileY-1,raizDeDos);			
 			}else{
-				miGrafo.agregar_arista(tileX,tileY,tileX-1,tileY-1,pesoNoCaminable*raizDeDos);								
+				grafoVertices.agregar_arista(tileX,tileY,tileX-1,tileY-1,pesoNoCaminable*raizDeDos);								
 			}
 		}
 		if(((tileX-1)>=0) && ((tileY+1)<=altoMapa-1)){
 			//abajo izquierda
 			Tile* tileArista = getTile(tileX-1,tileY+1);
 			if(tileArista->isCaminable()){
-				miGrafo.agregar_arista(tileX,tileY,tileX-1,tileY+1,raizDeDos);			
+				grafoVertices.agregar_arista(tileX,tileY,tileX-1,tileY+1,raizDeDos);			
 			}else{
-				miGrafo.agregar_arista(tileX,tileY,tileX-1,tileY+1,pesoNoCaminable*raizDeDos);								
+				grafoVertices.agregar_arista(tileX,tileY,tileX-1,tileY+1,pesoNoCaminable*raizDeDos);								
 			}
 		}
 		if(((tileX+1)<=anchoMapa-1) && ((tileY-1)>=0)){
 			//arriba derecha
 			Tile* tileArista = getTile(tileX+1,tileY-1);
 			if(tileArista->isCaminable()){
-				miGrafo.agregar_arista(tileX,tileY,tileX+1,tileY-1,raizDeDos);			
+				grafoVertices.agregar_arista(tileX,tileY,tileX+1,tileY-1,raizDeDos);			
 			}else{
-				miGrafo.agregar_arista(tileX,tileY,tileX+1,tileY-1,pesoNoCaminable*raizDeDos);								
+				grafoVertices.agregar_arista(tileX,tileY,tileX+1,tileY-1,pesoNoCaminable*raizDeDos);								
 			}
 		}
 		if(((tileX+1)<=anchoMapa-1) && ((tileY+1)<=altoMapa-1)){
 			//abajo derecha
 			Tile* tileArista = getTile(tileX+1,tileY+1);
 			if(tileArista->isCaminable()){
-				miGrafo.agregar_arista(tileX,tileY,tileX+1,tileY+1,raizDeDos);			
+				grafoVertices.agregar_arista(tileX,tileY,tileX+1,tileY+1,raizDeDos);			
 			}else{
-				miGrafo.agregar_arista(tileX,tileY,tileX+1,tileY+1,pesoNoCaminable*raizDeDos);								
+				grafoVertices.agregar_arista(tileX,tileY,tileX+1,tileY+1,pesoNoCaminable*raizDeDos);								
 			}
 		}
 	}
+}
+//actualiza unicamente un vertice
+void Mapa::actualizarGrafoVertice(int tileX,int tileY){
+	int altoMapa = this ->h ;
+	int anchoMapa = this->w;
+	double raizDeDos = 1.4142;
+	double pesoNoCaminable = 500;
+
+
+
+	if((tileX-1)>=0){
+		//izquierda
+		Tile* tileArista = getTile(tileX-1,tileY);
+		if(tileArista->isCaminable()){
+			grafoVertices.actualizar_arista(tileX,tileY,tileX-1,tileY,1);			
+		}else{
+			grafoVertices.actualizar_arista(tileX,tileY,tileX-1,tileY,pesoNoCaminable);								
+		}
+	}
+	if((tileY-1)>=0){
+		//arriba
+		Tile* tileArista = getTile(tileX,tileY-1);
+		if(tileArista->isCaminable()){
+			grafoVertices.actualizar_arista(tileX,tileY,tileX,tileY-1,1);			
+		}else{
+			grafoVertices.actualizar_arista(tileX,tileY,tileX,tileY-1,pesoNoCaminable);								
+		}
+	}
+	if((tileX+1)<=anchoMapa-1){
+		//derecha
+		Tile* tileArista = getTile(tileX+1,tileY);
+		if(tileArista->isCaminable()){
+			grafoVertices.actualizar_arista(tileX,tileY,tileX+1,tileY,1);			
+		}else{
+			grafoVertices.actualizar_arista(tileX,tileY,tileX+1,tileY,pesoNoCaminable);								
+		}
+	}
+	if((tileY+1)<=altoMapa-1){
+		//abajo
+		Tile* tileArista = getTile(tileX,tileY+1);
+		if(tileArista->isCaminable()){
+			grafoVertices.actualizar_arista(tileX,tileY,tileX,tileY+1,1);			
+		}else{
+			grafoVertices.actualizar_arista(tileX,tileY,tileX,tileY+1,pesoNoCaminable);								
+		}
+	}
+	if(((tileX-1)>=0) && ((tileY-1)>=0)){
+		//arriba izquierda
+		Tile* tileArista = getTile(tileX-1,tileY-1);
+		if(tileArista->isCaminable()){
+			grafoVertices.actualizar_arista(tileX,tileY,tileX-1,tileY-1,raizDeDos);			
+		}else{
+			grafoVertices.actualizar_arista(tileX,tileY,tileX-1,tileY-1,pesoNoCaminable*raizDeDos);								
+		}
+	}
+	if(((tileX-1)>=0) && ((tileY+1)<=altoMapa-1)){
+		//abajo izquierda
+		Tile* tileArista = getTile(tileX-1,tileY+1);
+		if(tileArista->isCaminable()){
+			grafoVertices.actualizar_arista(tileX,tileY,tileX-1,tileY+1,raizDeDos);			
+		}else{
+			grafoVertices.actualizar_arista(tileX,tileY,tileX-1,tileY+1,pesoNoCaminable*raizDeDos);								
+		}
+	}
+	if(((tileX+1)<=anchoMapa-1) && ((tileY-1)>=0)){
+		//arriba derecha
+		Tile* tileArista = getTile(tileX+1,tileY-1);
+		if(tileArista->isCaminable()){
+			grafoVertices.actualizar_arista(tileX,tileY,tileX+1,tileY-1,raizDeDos);			
+		}else{
+			grafoVertices.actualizar_arista(tileX,tileY,tileX+1,tileY-1,pesoNoCaminable*raizDeDos);								
+		}
+	}
+	if(((tileX+1)<=anchoMapa-1) && ((tileY+1)<=altoMapa-1)){
+		//abajo derecha
+		Tile* tileArista = getTile(tileX+1,tileY+1);
+		if(tileArista->isCaminable()){
+			grafoVertices.actualizar_arista(tileX,tileY,tileX+1,tileY+1,raizDeDos);			
+		}else{
+			grafoVertices.actualizar_arista(tileX,tileY,tileX+1,tileY+1,pesoNoCaminable*raizDeDos);								
+		}
+	}
+	
+}
+//actualiza el grafo con la informacion del mapa luego de moverse de un tile a otro
+void Mapa::actualizarGrafo(int xOrigen, int yOrigen,int xDestino,int yDestino){
+	//actualizo origen y adyacencias
+	actualizarGrafoVertice(xOrigen,yOrigen);
+	//actualizo adyacencias de x
+	if (tileExists(xOrigen - 1 ,yOrigen)){
+		//derecha
+		actualizarGrafoVertice(xOrigen + 1,yOrigen);
+	}
+	if (tileExists(xOrigen - 1 ,yOrigen)){
+		//izquierda
+		actualizarGrafoVertice(xOrigen - 1,yOrigen);
+	}
+	if (tileExists(xOrigen ,yOrigen -1)){
+		//arriba
+		actualizarGrafoVertice(xOrigen,yOrigen -1);
+	}
+	if (tileExists(xOrigen ,yOrigen + 1)){
+		//abajo
+		actualizarGrafoVertice(xOrigen,yOrigen + 1);
+	}
+	if (tileExists(xOrigen + 1 ,yOrigen -1)){
+		//derecha arriba
+		actualizarGrafoVertice(xOrigen + 1,yOrigen -1);
+	}
+	if (tileExists(xOrigen + 1 ,yOrigen + 1)){
+		//derecha abajo
+		actualizarGrafoVertice(xOrigen + 1,yOrigen + 1);
+	}
+	
+	if (tileExists(xOrigen -1 ,yOrigen + 1)){
+		//izquierda abajo
+		actualizarGrafoVertice(xOrigen - 1,yOrigen + 1);
+	}
+	if (tileExists(xOrigen -1 ,yOrigen - 1)){
+		//izquierda arriba
+		actualizarGrafoVertice(xOrigen - 1,yOrigen - 1);
+	}
+
+	//ahora actualizo para el vertice destino destino
+	actualizarGrafoVertice(xDestino,yDestino);
+	//actualizo adyacencias de x
+	if (tileExists(xDestino - 1 ,yDestino)){
+		//derecha
+		actualizarGrafoVertice(xDestino + 1,yDestino);
+	}
+	if (tileExists(xDestino - 1 ,yDestino)){
+		//izquierda
+		actualizarGrafoVertice(xDestino - 1,yDestino);
+	}
+	if (tileExists(xDestino ,yDestino -1)){
+		//arriba
+		actualizarGrafoVertice(xDestino,yDestino -1);
+	}
+	if (tileExists(xDestino ,yDestino + 1)){
+		//abajo
+		actualizarGrafoVertice(xDestino,yDestino + 1);
+	}
+	if (tileExists(xDestino + 1 ,yDestino -1)){
+		//derecha arriba
+		actualizarGrafoVertice(xDestino + 1,yDestino -1);
+	}
+	if (tileExists(xDestino + 1 ,yDestino + 1)){
+		//derecha abajo
+		actualizarGrafoVertice(xDestino + 1,yDestino + 1);
+	}
+	
+	if (tileExists(xDestino -1 ,yDestino + 1)){
+		//izquierda abajo
+		actualizarGrafoVertice(xOrigen - 1,yDestino + 1);
+	}
+	if (tileExists(xDestino -1 ,yDestino - 1)){
+		//izquierda arriba
+		actualizarGrafoVertice(xDestino - 1,yDestino - 1);
+	}
+}
+vector <pair<int,int> > Mapa::getCaminoMinimo(Tile* tileOrigen, Tile* tileDestino){
+	if(tileOrigen == tileDestino){
+		std::vector<pair<int, int>> vacio;
+		return vacio;
+	}
+
+	if(!tileDestino->isCaminable()){
+		std::vector<pair<int, int>> vacio;
+		return vacio;
+	}
+
 	int tileOrigenX = tileOrigen->getU();
 	int tileOrigenY = tileOrigen->getV();
 	int tileDestinoX = tileDestino->getU();
 	int tileDestinoY = tileDestino->getV();
-	vector <pair<int,int>> camino = miGrafo.camino(tileOrigenX,tileOrigenY,tileDestinoX,tileDestinoY);
-
+	vector <pair<int,int>> camino = grafoVertices.camino(tileOrigenX,tileOrigenY,tileDestinoX,tileDestinoY);
 	return camino;
 }

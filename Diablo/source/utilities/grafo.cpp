@@ -5,6 +5,7 @@
 const int infinito = 999;
 const int huerfano =-1; //huerfano = no tiene padre
 using namespace std;
+grafo::grafo(){};
 grafo::grafo(int tamAncho,int tamAlto){
 	ancho = tamAncho;
 	alto = tamAlto;
@@ -45,6 +46,24 @@ void grafo::agregar_arista (int pos_x_vertice, int pos_y_vertice,int pos_x_arist
 //devuelve los vectores
 vector< vector<vertice> > grafo::get_vertices(){
 	return vertices;
+}
+//actualiza el valor de la arista, si dicha arista existe
+void grafo::actualizar_arista (int pos_x_origen, int pos_y_origen,int pos_x_destino, int pos_y_destino,double peso_arista){
+	vertice& unVertice = vertices[pos_x_origen][pos_y_origen];
+	vector <arista>& aristas = unVertice.get_aristas();
+	bool encontrada = false;
+	int indice = 0;
+	while (indice < aristas.size() && !encontrada){
+		//busco arista
+		arista& unaArista = aristas[indice];
+		int xArista = unaArista.get_x_destino();
+		int yArista = unaArista.get_y_destino();
+		if(xArista == pos_x_destino && yArista == pos_y_destino){
+			encontrada = true;
+			unaArista.set_peso(peso_arista);
+		}
+		indice ++;
+	}
 }
 	
 //devuelve un vertice 
@@ -100,13 +119,17 @@ vector<pair<int,int> > grafo::camino(int posXOrigen,int posYOrigen, int posXDest
 	parInicial.distancia = 0;
 
 	cola.push(parInicial); // push v[origen],dist[origen]
-
-	while(!cola.empty()){
+	bool termino = false;
+	while(!cola.empty() && !termino){
 		Par unPar = cola.top();
 		vertice unVertice = unPar.vertice;
 		cola.pop();
 		int pos_x_vertice = unVertice.get_x();
 		int pos_y_vertice = unVertice.get_y();
+
+		if(pos_x_vertice == posXDestino && pos_y_vertice == posYDestino){
+			termino = true;
+		}
 
 		vector<arista> aristas = unVertice.get_aristas();
 		visitado[pos_x_vertice][pos_y_vertice] = true; // lo visito

@@ -205,11 +205,12 @@ int main(int argc, char* argv[]) {
 
 	Tile::setearExplorados(20,20, &pjm.getPjeLocal(), &mapa);
 
-	//variable de movimiento
+	//variables para el control del movimiento
 	vector< pair<int,int> > caminoMinimo;
-	int indice = 0;
-	int estadoMovimiento = 0;
-	bool puedeMoverse = false; 
+	int indice = 0; //indica que paso del movimiento se encuentra
+	int estadoPersonaje = 0; //estado del personaje
+	bool puedeMoverse = false; // indica si el personaje ya termino un movimiento anterior y puede seguir su camino o esta esperando un nuevo camino 
+	mapa.cargarGrafo(); //cargo el grafo con la configuracion inicial
 	while((!quit ) && (sock.isOpen()) ) {
 
 		// Sync stuff
@@ -283,18 +284,19 @@ int main(int argc, char* argv[]) {
 				it->second.update(&mapa);
 			}
 			// Actualizamos el personaje principal
-			if (puedeMoverse ){
+			if (puedeMoverse){
 				//si termino de ir al tile anterior
 				if(indice < caminoMinimo.size()){
+					//establezo proximo tile del camino
 					pair <int,int> proximoTile = caminoMinimo[indice];
 					pjm.getPjeLocal().mover(mapa.getTile(proximoTile.first,proximoTile.second));										
 					indice++;
 				}
 			}
-			estadoMovimiento = pjm.getPjeLocal().update(&mapa);
-			if (estadoMovimiento == 1){
+			estadoPersonaje = pjm.getPjeLocal().update(&mapa);
+			if (estadoPersonaje == 1){
 				puedeMoverse = true;
-			}else if (estadoMovimiento == 0 || estadoMovimiento == 2){
+			}else if (estadoPersonaje == 0 || estadoPersonaje == 2){
 				puedeMoverse = false;
 			}
 			// Update a tiles recorridos

@@ -52,12 +52,16 @@ vertice grafo::get_vertice(int pos_x,int pos_y){
 	return vertices.at(pos_x).at(pos_y);
 }
 
+struct Par {
+	vertice vertice;
+	double distancia;
+} ;
 //otros
 struct comparar  
 {  
-  bool operator()(const pair<vertice,double>& primero, const pair<vertice,double>& segundo)  
+  bool operator()(const Par& primero, const Par& segundo)  
   {  
-	  return primero.second > segundo.second;  
+	  return primero.distancia > segundo.distancia;  
   }  
 };  
 //busca camino de atras para adelante
@@ -90,20 +94,20 @@ vector<pair<int,int> > grafo::camino(int posXOrigen,int posYOrigen, int posXDest
 	}
 	//encolo el origen
 	distancia[posXOrigen][posYOrigen] = 0;
-	priority_queue< pair<vertice,double>,vector< pair<vertice,double> >,comparar > cola;
-	pair<vertice, double> parInicial = make_pair<vertice,double>(vertices[posXOrigen][posYOrigen],0);
+	priority_queue< Par,vector< Par >,comparar > cola;
+	Par parInicial;
+	parInicial.vertice = vertices[posXOrigen][posYOrigen];
+	parInicial.distancia = 0;
+
 	cola.push(parInicial); // push v[origen],dist[origen]
-	bool termino = false;
-	while( (!cola.empty() || (termino == false))){
-		pair<vertice,double> unPar = cola.top();
-		vertice unVertice = unPar.first;
+
+	while(!cola.empty()){
+		Par unPar = cola.top();
+		vertice unVertice = unPar.vertice;
 		cola.pop();
 		int pos_x_vertice = unVertice.get_x();
 		int pos_y_vertice = unVertice.get_y();
 
-		//termine
-		if (unVertice.get_x() == posXDestino && unVertice.get_y() == posYDestino)
-			termino = true;
 		vector<arista> aristas = unVertice.get_aristas();
 		visitado[pos_x_vertice][pos_y_vertice] = true; // lo visito
 		//recorro todas las aristas
@@ -113,10 +117,17 @@ vector<pair<int,int> > grafo::camino(int posXOrigen,int posYOrigen, int posXDest
 			int destinoAristaY = aristas[idx_arista].get_y_destino();
 			if (!visitado[destinoAristaX][destinoAristaY]){
 				double peso = aristas[idx_arista].get_peso();
-				if	(distancia[destinoAristaX][destinoAristaY] > distancia[pos_x_vertice][pos_y_vertice] + peso){		
+
+				if (distancia[destinoAristaX][destinoAristaY] > distancia[pos_x_vertice][pos_y_vertice] + peso)
+				{
+					
 					distancia[destinoAristaX][destinoAristaY] = distancia[pos_x_vertice][pos_y_vertice] + peso;
 					padre[destinoAristaX][destinoAristaY] = make_pair<int,int>(pos_x_vertice,pos_y_vertice);
-					pair<vertice, double> nuevoPar = make_pair<vertice,double>(vertices[destinoAristaX][destinoAristaY],distancia[destinoAristaX][destinoAristaY]);
+				
+					Par nuevoPar;
+					nuevoPar.vertice = vertices[destinoAristaX][destinoAristaY];
+					nuevoPar.distancia = distancia[destinoAristaX][destinoAristaY];
+
 					cola.push(nuevoPar); // push v[destino]
 				}
 			}

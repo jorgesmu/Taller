@@ -205,7 +205,11 @@ int main(int argc, char* argv[]) {
 
 	Tile::setearExplorados(20,20, &pjm.getPjeLocal(), &mapa);
 
-
+	//variable de movimiento
+	vector< pair<int,int> > caminoMinimo;
+	int indice = 0;
+	int estadoMovimiento = 0;
+	bool puedeMoverse = false; 
 	while((!quit ) && (sock.isOpen()) ) {
 
 		// Sync stuff
@@ -242,24 +246,12 @@ int main(int argc, char* argv[]) {
 					if(event.button.button == SDL_BUTTON_LEFT) {
 						vec2<int> tile_res = MouseCoords2Tile(vec2<int>(event.button.x, event.button.y), camara);
 						if(mapa.tileExists(tile_res.x, tile_res.y)) {
-							pjm.getPjeLocal().mover(mapa.getTile(tile_res.x,tile_res.y));							
 
-							//Tile* tilePersonaje = mapa.getTilePorPixeles(pjm.getPjeLocal().getX(), pjm.getPjeLocal().getY());
-							//Tile* tileDestino = mapa.getTile(tile_res.x, tile_res.y);
-							//tileDestino = mapa.getTile(tile_res.x, tile_res.y);
-							//vector<pair<int, int> > caminoMinimo = mapa.getCaminoMinimo(tilePersonaje, tileDestino, pjm);
-							//int indice = 1;
-							//while(pjm.getPjeLocal().getX() != tileDestino->getX() && pjm.getPjeLocal().getY() != tileDestino->getY()){						
-							//	pair<int, int> proximoTile = caminoMinimo[indice];
-							//	pjm.getPjeLocal().mover(mapa.getTile(proximoTile.first, proximoTile.second));
-							//	Tile* tileActual = mapa.getTilePorPixeles(pjm.getPjeLocal().getX(), pjm.getPjeLocal().getY());
-							//	while (tileActual->getU() != proximoTile.first || tileActual->getV() != proximoTile.second){
-							//		// Actualizamos el personaje principal
-							//		pjm.getPjeLocal().update(&mapa);
-							//		tileActual = mapa.getTilePorPixeles(pjm.getPjeLocal().getX(), pjm.getPjeLocal().getY());
-							//	}
-							//	indice ++;
-							//}
+							Tile* tilePersonaje = mapa.getTilePorPixeles(pjm.getPjeLocal().getX(), pjm.getPjeLocal().getY());
+							Tile* tileDestino = mapa.getTile(tile_res.x, tile_res.y);
+							caminoMinimo = mapa.getCaminoMinimo(tilePersonaje, tileDestino);
+							indice = 1;
+
 						}
 					}
 				}
@@ -291,8 +283,20 @@ int main(int argc, char* argv[]) {
 				it->second.update(&mapa);
 			}
 			// Actualizamos el personaje principal
-			pjm.getPjeLocal().update(&mapa);
-			
+			if (puedeMoverse ){
+				//si termino de ir al tile anterior
+				if(indice < caminoMinimo.size()){
+					pair <int,int> proximoTile = caminoMinimo[indice];
+					pjm.getPjeLocal().mover(mapa.getTile(proximoTile.first,proximoTile.second));										
+					indice++;
+				}
+			}
+			estadoMovimiento = pjm.getPjeLocal().update(&mapa);
+			if (estadoMovimiento == 1){
+				puedeMoverse = true;
+			}else if (estadoMovimiento == 0 || estadoMovimiento == 2){
+				puedeMoverse = false;
+			}
 			// Update a tiles recorridos
 			if(update_recorrido.timer.getTicks() > update_recorrido.INTERVAL) {
 				update_recorrido.timer.start();

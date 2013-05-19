@@ -93,14 +93,17 @@ vector<pair<int,int> > grafo::camino(int posXOrigen,int posYOrigen, int posXDest
 	priority_queue< pair<vertice,double>,vector< pair<vertice,double> >,comparar > cola;
 	pair<vertice, double> parInicial = make_pair<vertice,double>(vertices[posXOrigen][posYOrigen],0);
 	cola.push(parInicial); // push v[origen],dist[origen]
-
-	while(!cola.empty()){
+	bool termino = false;
+	while( (!cola.empty() || (termino == false))){
 		pair<vertice,double> unPar = cola.top();
 		vertice unVertice = unPar.first;
 		cola.pop();
 		int pos_x_vertice = unVertice.get_x();
 		int pos_y_vertice = unVertice.get_y();
 
+		//termine
+		if (unVertice.get_x() == posXDestino && unVertice.get_y() == posYDestino)
+			termino = true;
 		vector<arista> aristas = unVertice.get_aristas();
 		visitado[pos_x_vertice][pos_y_vertice] = true; // lo visito
 		//recorro todas las aristas

@@ -124,7 +124,7 @@ void Mapa::getSize(int* w, int* h) const {
 	*h = this->h;
 }
 
-vector <pair<int,int> > Mapa::getCaminoMinimo(Tile* tileOrigen, Tile* tileDestino, PjeManager pjm){
+vector <pair<int,int> > Mapa::getCaminoMinimo(Tile* tileOrigen, Tile* tileDestino){
 	if(tileOrigen == tileDestino){
 		std::vector<pair<int, int>> vacio;
 		return vacio;
@@ -136,7 +136,7 @@ vector <pair<int,int> > Mapa::getCaminoMinimo(Tile* tileOrigen, Tile* tileDestin
 	double pesoNoCaminable = 500;
 	grafo miGrafo(anchoMapa,altoMapa);
 
-	std::map<std::string, Personaje>& personajesDelMapa = pjm.getPjes();
+	//std::map<std::string, Personaje>& personajesDelMapa = pjm.getPjes();
 
 	for (auto it= allTiles().begin(); it != allTiles().end(); ++it){
 		int tileX = it->getU();

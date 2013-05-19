@@ -41,5 +41,5 @@ class Mapa {
 	// Getters para tamaño
 	void getSize(int* x, int* y) const;
 	//devuelve el camino minimo
-	vector <pair<int,int>> getCaminoMinimo(Tile* tileOrigen, Tile* tileDestino, PjeManager pjm);
+	vector <pair<int,int>> getCaminoMinimo(Tile* tileOrigen, Tile* tileDestino);
 };

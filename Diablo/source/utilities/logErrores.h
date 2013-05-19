@@ -297,7 +297,7 @@ class logErrores {
 		}
 		//verifica si una ip tiene un formato valido
 		bool verificar_ip(string ip){
-			//ip con formato xxx.xxx.xxx.xxx ( 0<=x<999)
+			//ip con formato xxx.xxx.xxx.xxx ( 0<=x<256)
 			int index = 0;
 			int count = 0;
 			int pos[3]; // guarda las posiciones de los . en la ip 
@@ -335,7 +335,7 @@ class logErrores {
 			valor2 = atoi(campo2.c_str());
 			valor3 = atoi(campo3.c_str());
 			valor4 = atoi(campo4.c_str());
-			if ( (valor1 < 0) || (valor1>999) || (valor2 < 0) || (valor2>999) || (valor3 < 0) || (valor3>999) || (valor4 < 0) || (valor4>999))
+			if ( (valor1 < 0) || (valor1>255) || (valor2 < 0) || (valor2>255) || (valor3 < 0) || (valor3>255) || (valor4 < 0) || (valor4>255))
 				return false;
 			return true;
 		}

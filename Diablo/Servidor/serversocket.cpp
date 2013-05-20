@@ -531,10 +531,8 @@ void ServerSocket::acceptLastDo() {
 		}
 
 		// Cuando hay una desconexion loggeamos e informamos al resto
-		ss.str("");
-		ss << getClient(cid).nick << " - disconnected\n";
 		bs.clear();
-		bs << PROTO::TEXTMSG << ss.str();
+		bs << PROTO::PLAYER_EXIT << new_nick;
 		removeClient(cid);
 		this->sendAll(bs.str());
 		

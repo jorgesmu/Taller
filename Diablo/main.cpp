@@ -262,10 +262,10 @@ int main(int argc, char* argv[]) {
 								}
 							}*/
 
-							if(!found_pje) {
+							//if(!found_pje) {
 								caminoMinimo = mapa.getCaminoMinimo(tilePersonaje, tileDestino);
 								indice = 1;
-							}
+							//}
 
 						}
 					}

@@ -41,5 +41,6 @@ const unsigned char NIEBLA_LIST = 'n'; // servidor
 // Mensajes de sincronizacion de jugadores
 // Sintaxis: <nick:string><tipo:string><x:int><y:int><gris:bool>
 const unsigned char NEW_PLAYER = 'o'; // Informa al cliente que agregue un jugador nuevo
-
+// Sintax: <nick:string>
+const unsigned char PLAYER_EXIT = 'p'; // Informa al cliente que se desconecto un jugador
 }

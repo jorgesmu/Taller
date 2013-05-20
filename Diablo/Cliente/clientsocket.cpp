@@ -312,13 +312,39 @@ void ClientSocket::listenDo() {
 			bool is_on;
 			bs >> new_nick >> new_type >> x >> y >> is_on;
 			//std::cout << "RECEIVED NEW_PLAYER: " << new_nick << " " << new_type << x << "," << y << " " << is_on << "\n";
-			pjm.addPje(new_nick);
-			auto& p = pjm.getPje(new_nick);
-			// Agrega el personaje
-			p.init(new_nick, pje_local_tipo , 1 , 1 , 50 , 5, 100, 100 ,	configuracion.get_vel_personaje(),	0 , 70 , NULL , resman , Imagen::COLOR_KEY);
-			// Posiciono el personaje
-			mapa.getTile(x, y)->addEntidad(&p);
-			p.setTileActual(mapa.getTile(x, y));
+			// Si no existe el personaje, lo creamos
+			if(!pjm.PjeExiste(new_nick)) {
+				pjm.addPje(new_nick);
+				auto& p = pjm.getPje(new_nick);
+				// Agrega el personaje
+				p.init(new_nick, new_type , 1 , 1 , 50 , 5, 100, 100 ,	configuracion.get_vel_personaje(),	0 , 70 , NULL , resman , Imagen::COLOR_KEY);
+				// Posiciono el personaje
+				mapa.getTile(x, y)->addEntidad(&p);
+				p.setTileActual(mapa.getTile(x, y));
+				if(!is_on) {
+					//p.setInactivo();
+				}
+			}else{
+				// Si existe, lo marcamos como color
+				auto& p = pjm.getPje(new_nick);
+				//p.setActivo();
+			}
+			}else if(pt == PROTO::PLAYER_EXIT) {
+			// Esperamos a que cargue el mapa
+			while(!cargoMapa) {
+				Sleep(10);
+			}
+			std::string who_nick;
+			bs >> who_nick;
+			std::cout << "RECEIVED PLAYER_EXIT: " << who_nick << "\n";
+			// Si no existe el personaje, error
+			if(!pjm.PjeExiste(who_nick)) {
+				std::cerr << "Error @ PLAYER_EXIT: " << who_nick << " not found\n";
+			}else{
+				// Si existe, lo marcamos como desconectado
+				auto& p = pjm.getPje(who_nick);
+				//p.setInactivo();
+			}
 		}else{
 			std::cout << "Unknown packet type " << int(pt) << " received\n";
 		}

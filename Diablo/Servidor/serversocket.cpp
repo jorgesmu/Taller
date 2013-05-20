@@ -183,33 +183,17 @@ bool ServerSocket::send(SOCKET sock, const std::string& msg) {
 		LeaveCriticalSection(&critSect);
 		return false;
 	}
-	int res = ::send(sock, msg.c_str(), msg.size(), 0);
-	if(res == SOCKET_ERROR) {
-		std::cerr << "Error enviando mensaje: " << WSAGetLastError() << "\n";
-		LeaveCriticalSection(&critSect);
-		return false;
-	}else{
-		//std::cout << "Se enviaron " << res << " bytes\n";
-		LeaveCriticalSection(&critSect);
-		return true;
-	}
-}
 
-bool ServerSocket::send(const std::string& cid, const char* msg, size_t size) {
-	EnterCriticalSection(&critSect);
-	SOCKET sock = getClient(cid).sock;
-	if(sock == SOCKET_ERROR) {
-		std::cerr << "Cliente invalid pasado a send(): " << cid << "\n";
-		LeaveCriticalSection(&critSect);
-		return false;
-	}
-	int res = ::send(sock, msg, size, 0);
+	BitStream bs;
+	bs << msg;
+
+	int res = ::send(sock, bs.str().c_str(), bs.str().size(), 0);
 	if(res == SOCKET_ERROR) {
 		std::cerr << "Error enviando mensaje: " << WSAGetLastError() << "\n";
 		LeaveCriticalSection(&critSect);
 		return false;
 	}else{
-		//std::cout << "Se enviaron " << res << " bytes\n";
+		//std::cout << "Se enviaron " << res << " bytes: " << bs.str() << "\n";
 		LeaveCriticalSection(&critSect);
 		return true;
 	}
@@ -410,20 +394,17 @@ void ServerSocket::acceptLastDo() {
 		}
 		
 		// Le mandamos la posicion inicial
-		waitForOk(cid);
 		BitStream bs;
 		bs << PROTO::INITPOS << pm.getPlayer(new_nick).getX() << pm.getPlayer(new_nick).getY();
 		// al pedo: pm.getPlayer(new_nick).addTileRecorrido(pm.getPlayer(new_nick).getX(), pm.getPlayer(new_nick).getY());
 		//std::cout << "SEND INIT POS (" << pm.getPlayer(new_nick).getX() << "," << pm.getPlayer(new_nick).getY() << ")\n";
 		send(cid, bs.str());
-		waitForOk(cid);
 
 		// Le mandamos el id escenario
 		bs.clear();
 		bs << PROTO::ESC_ID << escenario_elegido_id;
 		//std::cout << "SEND ESC ID (" << escenario_elegido_id << ")\n";
 		send(cid, bs.str());
-		waitForOk(cid);
 
 		// Mandamos los tiles recorridos
 		if(pm.getPlayer(new_nick).getTilesRecorridos().size() > 0) {
@@ -433,7 +414,6 @@ void ServerSocket::acceptLastDo() {
 				bs << it->first << it->second;
 			}
 			send(cid, bs.str());
-			waitForOk(cid);
 		}
 
 		// Para tipear menos, p_local = referencia al player de este thread
@@ -514,8 +494,6 @@ bool ServerSocket::sendFilesInDir(const std::string& cid, const std::string& dir
 	if(!this->send(cid, bs.str()))
 		return false;
 
-	if(!waitForOk(cid)) return false;
-
 	std::cout << "Sending " << fcount << " files to " << getClient(cid).nick << "\n";
 
 	// Recorremos todos los archivos
@@ -525,8 +503,6 @@ bool ServerSocket::sendFilesInDir(const std::string& cid, const std::string& dir
 		bs.clear();
 		bs << PROTO::FILE_HEADER << *it;
 		if(!this->send(cid, bs.str())) return false;
-
-		if(!waitForOk(cid)) return false;
 
 		// Mandamos los chunks
 		size_t fs = fileSize(local_file);
@@ -549,12 +525,10 @@ bool ServerSocket::sendFilesInDir(const std::string& cid, const std::string& dir
 			fs -= csize;
 			if(!this->send(cid, bs.str())) return false;
 			//std::cout << "Chunk sent, size: " << csize << "\n";
-			if(!waitForOk(cid)) return false;
 		}
 		bs.clear();
 		bs << PROTO::FILE_DONE;
 		if(!this->send(cid, bs.str())) return false;
-		if(!waitForOk(cid)) return false;
 		f.close();
 	}
 
@@ -573,17 +547,4 @@ std::string ServerSocket::getCIDbyNick(const std::string& nick) {
 	}
 	LeaveCriticalSection(&critSect);
 	return "";
-}
-
-bool ServerSocket::waitForOk(const std::string& cid) {
-	std::string buff;
-	//std::cout << "Waiting for ok...";
-	// Esperamos la respuesta
-	if(!this->receive(cid, buff)) return false;
-	if(buff != "OK") {
-		std::cout << "Malformed OK received\n";
-		return false;
-	}
-	//std::cout << "ACK\n";
-	return true;
 }

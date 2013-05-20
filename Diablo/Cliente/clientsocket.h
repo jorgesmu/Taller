@@ -22,6 +22,7 @@ class ClientSocket {
 	// Variables para manejo del socket
 	SOCKET ConnectSocket;
 	char recvbuf[DEFAULT_BUFLEN];
+	std::string queue_buf;
 	bool open;
 	CRITICAL_SECTION* main_cs; // CS para el loop principal
 
@@ -47,7 +48,5 @@ class ClientSocket {
 	static unsigned int __stdcall listenEntry(void* pthis);
 	// Funcion de listen 
 	void listenDo();
-	// Que mall
-	bool sendOk();
 };
 extern bool pasoArchivos;

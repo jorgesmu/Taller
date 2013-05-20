@@ -72,7 +72,6 @@ class ServerSocket {
 	// Funcion de send - toma como parametro el ID de la conexion a mandar y el mensaje
 	bool send(const std::string& cid, const std::string& msg);
 	bool send(SOCKET sock, const std::string& msg);
-	bool send(const std::string& cid, const char* msg, size_t size);
 	// Funcion para enviar a todos los clientes
 	bool sendAll(const std::string& msg);
 	// Cierra el socket y todas sus conexiones
@@ -87,7 +86,4 @@ class ServerSocket {
 	static unsigned int __stdcall listenLoopEntry(void* pthis);
 	// Funcion de listen 
 	void listenLoop();
-
-	// Que mal que programo
-	bool waitForOk(const std::string& cid);
 };

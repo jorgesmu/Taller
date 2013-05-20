@@ -110,22 +110,74 @@ bool ClientSocket::send(const char* msg, size_t size) {
 
 // Funcion de receive
 bool ClientSocket::receive(std::string& buff) {
-	int res = ::recv(ConnectSocket, recvbuf, DEFAULT_BUFLEN, 0);
-	if(res > 0) {
-		buff.clear();
-		buff.assign(recvbuf, res);
-		//std::cout << "Received " << res << " bytes: \n";
-		//std::cout.write(buff.c_str(), buff.size());
-		//std::cout << "\n";
-		return true;
-	}else if(res == 0) {
-		std::cout << "Connection closed\n";
-		this->close();
-		return false;
-	}else{
-		std::cout << "Receive error: " << WSAGetLastError() << "\n";
-		this->close();
-		return false;
+	std::string packet;
+	int packet_size = -1;
+	int bytes_read = 0;
+	// Loop until we read a full packet
+	while(true) {
+		std::string tmp;
+		// If we have something in the queue, push it it
+		if(queue_buf.size() > 0) {
+			tmp = queue_buf;
+			//std::cout << "APPENDING FROM QUEUE (" << queue_buf.size() << ")\n";
+			bytes_read += queue_buf.size();
+			queue_buf.clear();
+		}
+		// If we have an empty packet, read the size first
+		if(packet_size == -1 && !tmp.empty()) {
+			// First 2 bytes 
+			unsigned char buf[sizeof(short)];
+			std::copy(tmp.begin(), tmp.begin()+sizeof(short), buf);
+			packet_size = *(reinterpret_cast<short*>(&buf));
+			packet_size += sizeof(short); // Add the size size
+			//std::cout << "Got a packet with size: " << packet_size << "\n";
+			//std::cout << tmp << "\n";
+			tmp = tmp.substr(sizeof(short)); // Remove the 2 byte prefix		
+		}
+
+		// We finish the loop if we've read our packet size and we've already reached it
+		if(packet_size != -1 ) {
+			if(bytes_read > packet_size) {
+				//std::cout << "Got more: " << bytes_read << "," << packet_size << "-----------------------------------\n";
+				// Trim and store
+				//std::cout << "Delta: " << bytes_read - packet_size << "\n";
+				queue_buf = tmp.substr(tmp.size() - (bytes_read - packet_size));
+				//std::cout << "STORING EXTRA (" << queue_buf.size() << ")\n";
+				packet.append(tmp.substr(0, packet_size));
+				//std::cout << "APPENDING " << packet_size << "\n";
+				buff = packet;
+				//std::cout << "DONE WITH PACKET\n";
+				//std::cout << buff << "\n";
+				return true;
+			}else if(bytes_read == packet_size) {
+				packet.append(tmp);
+				buff = packet;
+				//std::cout << "Got exact\n";
+				//std::cout << "DONE WITH PACKET\n";
+				//std::cout << buff << "\n";
+				return true;
+			}else if(bytes_read < packet_size) {
+				//std::cout << "Got less||||||||||||||||||||||||||||||||||||||||\n";
+				packet.append(tmp);
+			}
+		}
+
+		int res = ::recv(ConnectSocket, recvbuf, DEFAULT_BUFLEN, 0);
+		if(res > 0) {
+			//bytes_read += res;
+			//std::cout << "Read " << res << " bytes\n";
+			//std::cout << "BytesRead: " << bytes_read << "\n";
+			queue_buf.append(recvbuf, res);
+			//std::cout << "(" << queue_buf.size() << ") " << queue_buf << "\n";
+		}else if(res == 0) {
+			std::cout << "Connection closed\n";
+			this->close();
+			return false;
+		}else{
+			std::cout << "Receive error: " << WSAGetLastError() << "\n";
+			this->close();
+			return false;
+		}
 	}
 }
 
@@ -170,7 +222,6 @@ void ClientSocket::listenDo() {
 			Uint16 fcount;
 			bs >> fcount;
 			std::cout << "Receiving " << fcount << " files\n";
-			if(!sendOk()) return;
 
 			// Loop de archivos
 			for(int i = 0;i < fcount;i++) {
@@ -183,8 +234,6 @@ void ClientSocket::listenDo() {
 					this->close();
 					return;
 				}
-
-				if(!sendOk()) return;
 
 				std::string local_file;
 				bs >> local_file;
@@ -207,11 +256,9 @@ void ClientSocket::listenDo() {
 						bs >> tmp_chunk;
 						f.write(tmp_chunk.c_str(), tmp_chunk.size());
 						//std::cout << "Writing chunk..\n";
-						if(!sendOk()) return;
 					}else if(pt == PROTO::FILE_DONE) {
 						f.close();
 						std::cout << "File done!\n";
-						if(!sendOk()) return;
 						break;
 					}else{
 						f.write(bs.data(), bs.size());
@@ -224,26 +271,21 @@ void ClientSocket::listenDo() {
 			}
 			std::cout << "All files received\n";
 			pasoArchivos = true;
-			sendOk();
 		}else if(pt == PROTO::PREVIOUSTYPE) {
 			std::string tipo;
 			bs >> tipo;
 			pje_local_tipo=tipo;
-			sendOk();
 		}else if(pt == PROTO::DEFTYPE) {
 			std::string tipo;
 			bs >> tipo;
 			pje_local_tipo=tipo;
-			sendOk();
 		}else if(pt == PROTO::INITPOS) {
 			bs >> start_pos_x;
 			bs >> start_pos_y;
 			//std::cout << "RECEIVED INIT POS: (" << start_pos_x << "," << start_pos_y << ")\n";
-			sendOk();
 		}else if(pt == PROTO::ESC_ID) {
 			bs >> escenario_elegido_id;
 			//std::cout << "RECEIVED ESC ID: (" << escenario_elegido_id << ")\n";
-			sendOk();
 		}else if(pt == PROTO::NIEBLA_LIST) {
 			// Esperamos a que cargue el mapa
 			while(!cargoMapa) {
@@ -259,7 +301,6 @@ void ClientSocket::listenDo() {
 				//std::cout << x << "," << y << " ";
 			}
 			//std::cout << "\n";
-			sendOk();
 		}else if(pt == PROTO::NEW_PLAYER) {
 			std::string new_nick, new_type;
 			int x, y;
@@ -276,8 +317,4 @@ void ClientSocket::listenDo() {
 
 bool ClientSocket::isOpen() const {
 	return this->open;
-}
-
-bool ClientSocket::sendOk() {
-	return this->send("OK", 2);
 }

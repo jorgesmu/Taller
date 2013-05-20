@@ -216,26 +216,82 @@ bool ServerSocket::receive(const std::string& cid, std::string& buff) {
 		std::cerr << "Cliente invalid pasado a receive(): " << cid << "\n";
 		return false;
 	}
+	std::string packet;
+	int packet_size = -1;
+	int bytes_read = 0;
+	// Loop until we read a full packet
+	while(true) {
+		EnterCriticalSection(&critSect);
+		std::string tmp;
+		// If we have something in the queue, push it it
+		if(queue_buf[cid].size() > 0) {
+			tmp = queue_buf[cid];
+			//std::cout << "APPENDING FROM QUEUE (" << queue_buf.size() << ")\n";
+			bytes_read += queue_buf[cid].size();
+			queue_buf.clear();
+		}
+		// If we have an empty packet, read the size first
+		if(packet_size == -1 && !tmp.empty()) {
+			// First 2 bytes 
+			unsigned char buf[sizeof(short)];
+			std::copy(tmp.begin(), tmp.begin()+sizeof(short), buf);
+			packet_size = *(reinterpret_cast<short*>(&buf));
+			packet_size += sizeof(short); // Add the size size
+			//std::cout << "Got a packet with size: " << packet_size << "\n";
+			//std::cout << tmp << "\n";
+			tmp = tmp.substr(sizeof(short)); // Remove the 2 byte prefix		
+		}
 
-	int res = ::recv(sock, recvbuf, DEFAULT_BUFLEN, 0);
-	EnterCriticalSection(&critSect);
-	if(res > 0) {
-		//std::cout << "Received " << res << " bytes: ";
-		//std::cout.write(buff.c_str(), buff.size());
-		//std::cout << "\n";
-		buff.clear();
-		buff.assign(recvbuf, res);
+		// We finish the loop if we've read our packet size and we've already reached it
+		if(packet_size != -1 ) {
+			if(bytes_read > packet_size) {
+				//std::cout << "Got more: " << bytes_read << "," << packet_size << "-----------------------------------\n";
+				// Trim and store
+				//std::cout << "Delta: " << bytes_read - packet_size << "\n";
+				queue_buf[cid] = tmp.substr(tmp.size() - (bytes_read - packet_size));
+				//std::cout << "STORING EXTRA (" << queue_buf.size() << ")\n";
+				packet.append(tmp.substr(0, packet_size));
+				//std::cout << "APPENDING " << packet_size << "\n";
+				buff = packet;
+				//std::cout << "DONE WITH PACKET\n";
+				//std::cout << buff << "\n";
+				LeaveCriticalSection(&critSect);
+				return true;
+			}else if(bytes_read == packet_size) {
+				packet.append(tmp);
+				buff = packet;
+				//std::cout << "Got exact\n";
+				//std::cout << "DONE WITH PACKET\n";
+				//std::cout << buff << "\n";
+				LeaveCriticalSection(&critSect);
+				return true;
+			}else if(bytes_read < packet_size) {
+				//std::cout << "Got less||||||||||||||||||||||||||||||||||||||||\n";
+				packet.append(tmp);
+			}
+		}
 		LeaveCriticalSection(&critSect);
-		return true;
-	}else if(res == 0) {
-		std::cout << "Connection closed\n";
+		int res = ::recv(sock, recvbuf, DEFAULT_BUFLEN, 0);
+		EnterCriticalSection(&critSect);
+		if(res > 0) {
+			//bytes_read += res;
+			//std::cout << "Read " << res << " bytes\n";
+			//std::cout << "BytesRead: " << bytes_read << "\n";
+			queue_buf[cid].append(recvbuf, res);
+			//std::cout << "(" << queue_buf.size() << ") " << queue_buf << "\n";
+		}else if(res == 0) {
+			std::cout << "Connection closed\n";
+			LeaveCriticalSection(&critSect);
+			return false;
+		}else{
+			std::cout << "Receive error: " << WSAGetLastError() << "\n";
+			LeaveCriticalSection(&critSect);
+			return false;
+		}
 		LeaveCriticalSection(&critSect);
-		return false;
-	}else{
-		std::cout << "Receive error: " << WSAGetLastError() << "\n";
-		LeaveCriticalSection(&critSect);
-		return false;
 	}
+	LeaveCriticalSection(&critSect);
+	return false;
 }
 
 
@@ -252,7 +308,7 @@ bool ServerSocket::removeClient(const std::string& str_id) {
 		if(res == SOCKET_ERROR) {
 			std::cerr << "Cierre de conexion en removeClient() fallido para " << str_id << ": " << WSAGetLastError() << "\n";
 		}else{
-			std::cout << "Cierre de conexion exitosa para " << str_id << "\n";
+			std::cout << "Cierre de conexion para " << str_id << "\n";
 		}
 		// Borramos
 		clients_map.erase(str_id);
@@ -264,13 +320,15 @@ bool ServerSocket::removeClient(const std::string& str_id) {
 
 // Cierra el socket principal
 void ServerSocket::close() {
+	EnterCriticalSection(&critSect);
 	// En teoria esto basta para cerrar todas las conexiones que tenia abiertas
 	int res = closesocket(ListenSocket);
 	if(res == SOCKET_ERROR) {
 		std::cerr << "Cierre de conexion fallido: " << WSAGetLastError() << "\n";
 	}else{
-		std::cout << "Cierre de conexion exitosa\n";
+		std::cout << "Connection closed\n";
 	}
+	LeaveCriticalSection(&critSect);
 
 }
 

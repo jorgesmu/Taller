@@ -92,12 +92,9 @@ bool ClientSocket::connect(const std::string& dir, int port) {
 
 // Funcion de send
 bool ClientSocket::send(const std::string& msg) {
-	return this->send(msg.c_str(), msg.size());
-
-}
-
-bool ClientSocket::send(const char* msg, size_t size) {
-	int res = ::send(ConnectSocket, msg, size, 0);
+	BitStream bs;
+	bs << msg;
+	int res = ::send(ConnectSocket, bs.str().c_str(), bs.str().size(), 0);
 	if(res == SOCKET_ERROR) {
 		std::cerr << "Error enviando mensaje: " << WSAGetLastError() << "\n";
 		this->close();

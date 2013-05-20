@@ -39,7 +39,6 @@ class ClientSocket {
 	bool receive(std::string& buff);
 	// Funcion de send
 	bool send(const std::string& msg);
-	bool send(const char* msg, size_t len);
 	// Nos dice si el socket esta abierto o no
 	bool isOpen() const;
 	// Cierra el socket

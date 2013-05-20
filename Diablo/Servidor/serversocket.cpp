@@ -483,12 +483,18 @@ void ServerSocket::acceptLastDo() {
 			BitStream bs;
 			
 			bs << PROTO::NEW_PLAYER << new_nick << p_local.getTipo() << p_local.getX() << p_local.getY() << p_local.isOn();
-			//send(it->second.sock, bs.str());
-			//waitForOk(it->first);
+			send(it->second.sock, bs.str());
 		}
 
 		// Mandamos todos los otros players al que se unio
-		//
+		for(auto it = clients_map.begin();it != clients_map.end();it++) {
+			if(it->second.nick == new_nick) continue; // Salteamos a nuestro jugador			
+			auto p = pm.getPlayer(it->second.nick);
+			bs.clear();
+			bs << PROTO::NEW_PLAYER << it->second.nick << p.getTipo() << p.getX() << p.getY() << p.isOn();
+			send(cid, bs.str());
+		}
+		
 
 
 		LeaveCriticalSection(&critSect);

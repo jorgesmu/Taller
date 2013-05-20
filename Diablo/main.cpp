@@ -53,6 +53,10 @@ struct {
 } update_recorrido;
 // Ventana de chat
 ChatWindow chat_window;
+// ResMan
+ResMan resman;
+// Config
+config_general configuracion;
 
 int main(int argc, char* argv[]) {
 	// Verificamos que se pase el nick y el tipo
@@ -98,7 +102,7 @@ int main(int argc, char* argv[]) {
 	config_juego juego = parsear_juego("../resources/niveles.yaml");
 	config_pantalla* pantalla = juego.get_pantalla();
 	vector <config_entidad> entidades = juego.get_entidades();
-	config_general configuracion = juego.get_configuracion();
+	configuracion = juego.get_configuracion();
 	vector <config_escenario> escenarios = juego.get_escenarios();
 			
 	// Ventana de prueba
@@ -122,7 +126,6 @@ int main(int argc, char* argv[]) {
 	camara.init(pantalla->get_ancho(), pantalla->get_alto(), configuracion.get_margen_scroll(), mapa);
 
 	// Resman
-	ResMan resman;
 	if(!resman.init()) return -2;
 	
 	// Ventana de chat
@@ -184,7 +187,7 @@ int main(int argc, char* argv[]) {
 	cargoMapa = true;
 
 	// Agrega el personaje
-	pjm.getPjeLocal().init(pje_local_tipo , 1 , 1 , 50 , 5, 100, 100 ,	configuracion.get_vel_personaje(),	0 , 70 , NULL , resman , Imagen::COLOR_KEY);
+	pjm.getPjeLocal().init(pje_local_nick, pje_local_tipo , 1 , 1 , 50 , 5, 100, 100 ,	configuracion.get_vel_personaje(),	0 , 70 , NULL , resman , Imagen::COLOR_KEY);
 	// Posiciono el personaje
 	mapa.getTile(start_pos_x, start_pos_y)->addEntidad(&(pjm.getPjeLocal()));
 	pjm.getPjeLocal().setTileActual(mapa.getTile(start_pos_x, start_pos_y));
@@ -247,8 +250,22 @@ int main(int argc, char* argv[]) {
 
 							Tile* tilePersonaje = mapa.getTilePorPixeles(pjm.getPjeLocal().getX(), pjm.getPjeLocal().getY());
 							Tile* tileDestino = mapa.getTile(tile_res.x, tile_res.y);
-							caminoMinimo = mapa.getCaminoMinimo(tilePersonaje, tileDestino);
-							indice = 1;
+
+							// Verificamos si hay un personaje para activar el chat
+							/*const auto& ents = tileDestino->getEntidades();
+							bool found_pje = false;
+							for(auto it = ents.begin();it != ents.end();it++) {
+								if((*it)->esPersonaje()) { //??
+									chat_window.setNickDestino((*it)->getNick()); //??
+									chat_window.open();
+									found_pje = true;
+								}
+							}*/
+
+							if(!found_pje) {
+								caminoMinimo = mapa.getCaminoMinimo(tilePersonaje, tileDestino);
+								indice = 1;
+							}
 
 						}
 					}

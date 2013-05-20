@@ -108,7 +108,7 @@ public:
 
 		NOTA: ImagenAnimada
 	*/
-	virtual void init(const std::string& name,
+	virtual void init(const std::string& nickname, const std::string& name,
 					const unsigned int wTiles , const unsigned int hTiles , 
 					const unsigned int fps , const unsigned int delay ,
 					const unsigned int altoSprite , const unsigned int anchoSprite ,
@@ -154,6 +154,8 @@ public:
 	*/
 	virtual void setTileDestino(Tile* tile);
 
+	virtual const std::string& getNick() const;
+
 	//deprecated
 	virtual void setTileActual(Tile* tile);
 	
@@ -194,7 +196,10 @@ public:
 	virtual bool isCaminable();	
 
 protected:
-		
+
+	// Nombre del chabon
+	std::string nickname;
+
 	/*
 		Pre: Los parametros definen el Tile destino.
 

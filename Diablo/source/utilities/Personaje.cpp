@@ -48,6 +48,7 @@ Personaje::Personaje(){
 	this -> imagen = NULL;
 	// Se setean los atributos a sus valores por defecto.
 	this -> inicializarAtributosEnValoresDefault();
+	this->nickname = "untitled";
 }
 
 /*
@@ -67,7 +68,7 @@ Personaje::Personaje(const std::string& name,
 	// seteo del puntero a imagen
 	this -> imagen = NULL;
 	//carga de imagen y configuración inicial.
-	init(name , wTiles , hTiles , fps , delay , 
+	init("WTF?", name , wTiles , hTiles , fps , delay , 
 		altoSprite , anchoSprite ,
 		velocidad,
 		pixel_ref_x , pixel_ref_y, 
@@ -94,7 +95,7 @@ Personaje::~Personaje() {
 	Post: Se ha inicializado la instancia segun el archivo y los par?etros.
 
 */
-void Personaje::init(const std::string& name, 
+void Personaje::init(const std::string& nickname, const std::string& name, 
 		const unsigned int wTiles , const unsigned int hTiles , 
 		const unsigned int fps , const unsigned int delay , 
 		const unsigned int  altoSprite , const unsigned int anchoSprite ,
@@ -113,6 +114,7 @@ void Personaje::init(const std::string& name,
 	this -> imagen	= new ImagenPersonaje(name.c_str() , altoSprite , 
 							anchoSprite , fps , delay , rm ,colorKey);
 	// Seteo de nombre 
+	this->nickname = nickname;
 	this -> name = name;
 	// Seteo del Surface
 	this -> surf = this -> imagen -> getSurface();
@@ -573,4 +575,8 @@ bool Personaje::verificarDestinoCaminable(Mapa* mapa) {
 	}
 	retorno = true; // TODO: Quitar luego cuando efectivamente verifique
 	return retorno;
+}
+
+const std::string& Personaje::getNick() const {
+	return this->nickname;
 }

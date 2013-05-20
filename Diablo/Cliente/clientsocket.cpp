@@ -2,6 +2,8 @@
 #include "../source/net/defines.h"
 #include "../source/display/mapa.h"
 #include "../../source/net/PjeManager.h"
+#include "../../source/utilities/config_cliente.h"
+#include "../../source/utilities/parser.h"
 #include "clientsocket.h"
 #include <iostream>
 #include <fstream>
@@ -15,6 +17,8 @@ extern PjeManager pjm;
 extern std::string pje_local_tipo;
 extern int start_pos_x, start_pos_y;
 extern int escenario_elegido_id;
+extern config_general configuracion;
+extern ResMan resman;
 
 bool ClientSocket::WSinit = false;
 size_t ClientSocket::ref_count = 0;
@@ -299,11 +303,22 @@ void ClientSocket::listenDo() {
 			}
 			//std::cout << "\n";
 		}else if(pt == PROTO::NEW_PLAYER) {
+			// Esperamos a que cargue el mapa
+			while(!cargoMapa) {
+				Sleep(10);
+			}
 			std::string new_nick, new_type;
 			int x, y;
 			bool is_on;
 			bs >> new_nick >> new_type >> x >> y >> is_on;
-			std::cout << "RECEIVED NEW_PLAYER: " << new_nick << " " << new_type << x << "," << y << " " << is_on << "\n";
+			//std::cout << "RECEIVED NEW_PLAYER: " << new_nick << " " << new_type << x << "," << y << " " << is_on << "\n";
+			pjm.addPje(new_nick);
+			auto& p = pjm.getPje(new_nick);
+			// Agrega el personaje
+			p.init(new_nick, pje_local_tipo , 1 , 1 , 50 , 5, 100, 100 ,	configuracion.get_vel_personaje(),	0 , 70 , NULL , resman , Imagen::COLOR_KEY);
+			// Posiciono el personaje
+			mapa.getTile(x, y)->addEntidad(&p);
+			p.setTileActual(mapa.getTile(x, y));
 		}else{
 			std::cout << "Unknown packet type " << int(pt) << " received\n";
 		}

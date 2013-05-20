@@ -53,6 +53,17 @@ bool ServerSocket::init() {
 	// Creamos el socket
 	ListenSocket = INVALID_SOCKET;
     ListenSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+	BOOL val_true = TRUE;
+	int buff_size = 0;
+	if(setsockopt(ListenSocket, IPPROTO_TCP, TCP_NODELAY, (char*)&val_true, sizeof(BOOL)) != 0) {
+		std::cerr << "ERROR SETTING SOCK OPTIONS TCP_NODELAY\n";
+	}
+	//if(setsockopt(ListenSocket, SOL_SOCKET, SO_RCVBUF, (char*)&buff_size, sizeof(int)) != 0) {
+		//std::cerr << "ERROR SETTING SOCK OPTIONS SO_RCVBUF\n";
+	//}
+	if(setsockopt(ListenSocket, SOL_SOCKET, SO_SNDBUF, (char*)&buff_size, sizeof(int)) != 0) {
+		std::cerr << "ERROR SETTING SOCK OPTIONS SO_SNDBUF\n";
+	}
     if(ListenSocket == INVALID_SOCKET) {
         std::cerr << "Error at socket():" <<  WSAGetLastError() << "\n";
         return false;
@@ -98,6 +109,17 @@ bool ServerSocket::accept() {
 		std::cerr << "Error during accept(): " << WSAGetLastError() << "\n";
 		return false;
 	}else{
+		BOOL val_true = TRUE;
+		int buff_size = 0;
+		if(setsockopt(tmp_sck, IPPROTO_TCP, TCP_NODELAY, (char*)&val_true, sizeof(BOOL)) != 0) {
+			std::cerr << "ERROR SETTING SOCK OPTIONS TCP_NODELAY\n";
+		}
+		//if(setsockopt(tmp_sck, SOL_SOCKET, SO_RCVBUF, (char*)&buff_size, sizeof(int)) != 0) {
+			//std::cerr << "ERROR SETTING SOCK OPTIONS SO_RCVBUF\n";
+		//}
+		if(setsockopt(tmp_sck, SOL_SOCKET, SO_SNDBUF, (char*)&buff_size, sizeof(int)) != 0) {
+			std::cerr << "ERROR SETTING SOCK OPTIONS SO_SNDBUF\n";
+		}
 		// Ingresamos la conexion en la tabla
 		addClient(tmp_st, tmp_sck);
 		// "Devolvemos" el id para la conexion que se acaba de aceptar
@@ -142,35 +164,53 @@ Client& ServerSocket::getClient(const std::string& id) {
 
 // Funcion de send
 bool ServerSocket::send(const std::string& cid, const std::string& msg) {
+	EnterCriticalSection(&critSect);
 	SOCKET sock = getClient(cid).sock;
 	if(sock == SOCKET_ERROR) {
 		std::cerr << "Cliente invalid pasado a send(): " << cid << "\n";
+		LeaveCriticalSection(&critSect);
 		return false;
 	}
+	LeaveCriticalSection(&critSect);
+	return this->send(sock, msg);
+}
 
+// Funcion de send
+bool ServerSocket::send(SOCKET sock, const std::string& msg) {
+	EnterCriticalSection(&critSect);
+	if(sock == SOCKET_ERROR) {
+		std::cerr << "Cliente invalid pasado a send(): " << sock << "\n";
+		LeaveCriticalSection(&critSect);
+		return false;
+	}
 	int res = ::send(sock, msg.c_str(), msg.size(), 0);
 	if(res == SOCKET_ERROR) {
 		std::cerr << "Error enviando mensaje: " << WSAGetLastError() << "\n";
+		LeaveCriticalSection(&critSect);
 		return false;
 	}else{
 		//std::cout << "Se enviaron " << res << " bytes\n";
+		LeaveCriticalSection(&critSect);
 		return true;
 	}
 }
 
 bool ServerSocket::send(const std::string& cid, const char* msg, size_t size) {
+	EnterCriticalSection(&critSect);
 	SOCKET sock = getClient(cid).sock;
 	if(sock == SOCKET_ERROR) {
 		std::cerr << "Cliente invalid pasado a send(): " << cid << "\n";
+		LeaveCriticalSection(&critSect);
 		return false;
 	}
-
 	int res = ::send(sock, msg, size, 0);
 	if(res == SOCKET_ERROR) {
 		std::cerr << "Error enviando mensaje: " << WSAGetLastError() << "\n";
+		LeaveCriticalSection(&critSect);
 		return false;
 	}else{
 		//std::cout << "Se enviaron " << res << " bytes\n";
+		LeaveCriticalSection(&critSect);
 		return true;
 	}
 }
@@ -187,7 +227,6 @@ bool ServerSocket::sendAll(const std::string& msg) {
 
 // Funcion de receive
 bool ServerSocket::receive(const std::string& cid, std::string& buff) {
-
 	SOCKET sock = getClient(cid).sock;
 	if(sock == SOCKET_ERROR) {
 		std::cerr << "Cliente invalid pasado a receive(): " << cid << "\n";
@@ -195,21 +234,26 @@ bool ServerSocket::receive(const std::string& cid, std::string& buff) {
 	}
 
 	int res = ::recv(sock, recvbuf, DEFAULT_BUFLEN, 0);
+	EnterCriticalSection(&critSect);
 	if(res > 0) {
 		//std::cout << "Received " << res << " bytes: ";
 		//std::cout.write(buff.c_str(), buff.size());
 		//std::cout << "\n";
 		buff.clear();
 		buff.assign(recvbuf, res);
+		LeaveCriticalSection(&critSect);
 		return true;
 	}else if(res == 0) {
 		std::cout << "Connection closed\n";
+		LeaveCriticalSection(&critSect);
 		return false;
 	}else{
 		std::cout << "Receive error: " << WSAGetLastError() << "\n";
+		LeaveCriticalSection(&critSect);
 		return false;
 	}
 }
+
 
 // Funciones para eliminar un cliente (desconectarlo)
 bool ServerSocket::removeClient(const std::string& str_id) {
@@ -285,7 +329,7 @@ void ServerSocket::acceptLastDo() {
 	}else{
 		std::string cid = clients_queue.front();
 		clients_queue.pop();
-		LeaveCriticalSection(&critSect);
+		//LeaveCriticalSection(&critSect);
 		std::stringstream ss;
 		ss << "<" << cid << "> connected\n";
 		std::cout << ss.str();
@@ -293,7 +337,7 @@ void ServerSocket::acceptLastDo() {
 		std::string buff;
 
 		// First we read a nick for the connected client
-		this->receive(cid, buff);
+		if(!this->receive(cid, buff)) return;
 		BitStream tmp_bs(buff.c_str(), buff.size());
 		unsigned char bt;
 		std::string new_nick, new_type;
@@ -303,9 +347,10 @@ void ServerSocket::acceptLastDo() {
 		// Validamos
 		if(bt != PROTO::NICKANDTYPE || new_nick.size() == 0 || new_type.size() == 0) {
 			BitStream reply;
-			reply << PROTO::TEXTMSG << "Transaction error, valid nickname/type expected";
+			reply << PROTO::TEXTMSG << std::string("Transaction error, valid nickname/type expected");
 			this->send(cid, reply.str());
 			removeClient(cid);
+			LeaveCriticalSection(&critSect);
 			return;
 		}
 		// Verificamos si el nick está en uso
@@ -313,9 +358,10 @@ void ServerSocket::acceptLastDo() {
 			//std::cout << "NICK: " << it->second.nick << "\n";
 			if(it->second.nick == new_nick) {
 				BitStream reply;
-				reply << PROTO::TEXTMSG << "Nickname already connected";
+				reply << PROTO::TEXTMSG << std::string("Nickname already connected");
 				this->send(cid, reply.str());
 				removeClient(cid);
+				LeaveCriticalSection(&critSect);
 				return;
 			}
 		}
@@ -327,6 +373,7 @@ void ServerSocket::acceptLastDo() {
 		if(!sendFilesInDir(cid, res_dir)) {
 			std::cout << "Error enviando archivos a " << cid << " - " << getClient(cid).nick << "\n";
 			removeClient(cid);
+			LeaveCriticalSection(&critSect);
 			return;
 		}
 
@@ -386,12 +433,27 @@ void ServerSocket::acceptLastDo() {
 				bs << it->first << it->second;
 			}
 			send(cid, bs.str());
+			waitForOk(cid);
 		}
 
-		// Mandamos todos los otros players
+		// Para tipear menos, p_local = referencia al player de este thread
+		const auto p_local = pm.getPlayer(new_nick);
+
+		// Avisamos a los otros jugadores del nuevo jugador
+		for(auto it = clients_map.begin();it != clients_map.end();it++) {
+			if(it->second.nick == new_nick) continue; // Salteamos a nuestro jugador
+			BitStream bs;
+			
+			bs << PROTO::NEW_PLAYER << new_nick << p_local.getTipo() << p_local.getX() << p_local.getY() << p_local.isOn();
+			//send(it->second.sock, bs.str());
+			//waitForOk(it->first);
+		}
+
+		// Mandamos todos los otros players al que se unio
 		//
 
 
+		LeaveCriticalSection(&critSect);
 		// Receive loop
 		while(this->receive(cid, buff)) {
 
@@ -416,10 +478,10 @@ void ServerSocket::acceptLastDo() {
 				int new_tile_x, new_tile_y;
 				bs >> new_tile_x >> new_tile_y;
 				pm.getPlayer(new_nick).addTileRecorrido(new_tile_x, new_tile_y);
-				std::cout << "RECEIVED NIEBLA SYNC: " << new_tile_x << "," << new_tile_y << "\n";
+				//std::cout << "RECEIVED NIEBLA SYNC: " << new_tile_x << "," << new_tile_y << "\n";
 			}else{
 				bs.clear();
-				bs << PROTO::TEXTMSG << "Unknown packet type";
+				bs << PROTO::TEXTMSG << std::string("Unknown packet type");
 				this->send(cid, bs.str());
 			}
 		}

@@ -9,8 +9,9 @@
 using namespace std;
 // Variables globales
 extern bool pasoArchivos;
+extern bool cargoMapa;
 extern Mapa mapa;
-extern PjeManager pm;
+extern PjeManager pjm;
 extern std::string pje_local_tipo;
 extern int start_pos_x, start_pos_y;
 extern int escenario_elegido_id;
@@ -49,6 +50,17 @@ bool ClientSocket::init() {
 	// Creamos el socket
 	ConnectSocket = INVALID_SOCKET;
     ConnectSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+	BOOL val_true = TRUE;
+	int buff_size = 0;
+	if(setsockopt(ConnectSocket, IPPROTO_TCP, TCP_NODELAY, (char*)&val_true, sizeof(BOOL)) != 0) {
+		std::cerr << "ERROR SETTING SOCK OPTIONS TCP_NODELAY\n";
+	}
+	//if(setsockopt(ConnectSocket, SOL_SOCKET, SO_RCVBUF, (char*)&buff_size, sizeof(int)) != 0) {
+		//std::cerr << "ERROR SETTING SOCK OPTIONS SO_RCVBUF\n";
+	//}
+	if(setsockopt(ConnectSocket, SOL_SOCKET, SO_SNDBUF, (char*)&buff_size, sizeof(int)) != 0) {
+		std::cerr << "ERROR SETTING SOCK OPTIONS SO_SNDBUF\n";
+	}
     if(ConnectSocket == INVALID_SOCKET) {
         std::cerr << "Error at socket():" <<  WSAGetLastError() << "\n";
         return false;
@@ -80,15 +92,8 @@ bool ClientSocket::connect(const std::string& dir, int port) {
 
 // Funcion de send
 bool ClientSocket::send(const std::string& msg) {
-	int res = ::send(ConnectSocket, msg.c_str(), msg.size(), 0);
-	if(res == SOCKET_ERROR) {
-		std::cerr << "Error enviando mensaje: " << WSAGetLastError() << "\n";
-		this->close();
-		return false;
-	}else{
-		//std::cout << "Se enviaron " << res << " bytes\n";
-		return true;
-	}
+	return this->send(msg.c_str(), msg.size());
+
 }
 
 bool ClientSocket::send(const char* msg, size_t size) {
@@ -240,15 +245,27 @@ void ClientSocket::listenDo() {
 			//std::cout << "RECEIVED ESC ID: (" << escenario_elegido_id << ")\n";
 			sendOk();
 		}else if(pt == PROTO::NIEBLA_LIST) {
+			// Esperamos a que cargue el mapa
+			while(!cargoMapa) {
+				Sleep(10);
+			}
 			short tile_list_size;
 			bs >> tile_list_size;
-			std::cout << "RECEIVED NIEBLA_LIST (" << tile_list_size << "): \n";
+			//std::cout << "RECEIVED NIEBLA_LIST (" << tile_list_size << "): \n";
 			for(int i = 0;i < tile_list_size;i++) {
 				short x, y;
 				bs >> x >> y;
-				std::cout << x << "," << y << " ";
+				Tile::setearExplorados(x, y, &pjm.getPjeLocal(), &mapa);
+				//std::cout << x << "," << y << " ";
 			}
-			std::cout << "\n";
+			//std::cout << "\n";
+			sendOk();
+		}else if(pt == PROTO::NEW_PLAYER) {
+			std::string new_nick, new_type;
+			int x, y;
+			bool is_on;
+			bs >> new_nick >> new_type >> x >> y >> is_on;
+			std::cout << "RECEIVED NEW_PLAYER: " << new_nick << " " << new_type << x << "," << y << " " << is_on << "\n";
 		}else{
 			std::cout << "Unknown packet type " << int(pt) << " received\n";
 		}

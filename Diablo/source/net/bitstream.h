@@ -31,6 +31,8 @@ class BitStream {
         BitStream& operator >>(Sint8 &val);
         BitStream& operator <<(const char &val);
         BitStream& operator >>(char &val);
+        BitStream& operator <<(const bool &val);
+        BitStream& operator >>(bool &val);
         BitStream& operator <<(const float &val);
         BitStream& operator >>(float &val);
         BitStream& operator <<(const std::string &s);

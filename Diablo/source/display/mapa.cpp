@@ -20,7 +20,11 @@ void Mapa::resize(int w, int h) {
 
 // Getter para cada tile
 Tile* Mapa::getTile(int x, int y) {
-	return &(tiles[x*h + y]);
+	if(tileExists(x, y)) {
+		return &(tiles[x*h + y]);
+	}else{
+		return NULL;
+	}
 }
 
 // Chequea que el tile exista

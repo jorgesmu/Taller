@@ -38,4 +38,8 @@ const unsigned char ESC_ID = 'k';
 const unsigned char NIEBLA_SYNC = 'm'; // cliente
 const unsigned char NIEBLA_LIST = 'n'; // servidor
 
+// Mensajes de sincronizacion de jugadores
+// Sintaxis: <nick:string><tipo:string><x:int><y:int><gris:bool>
+const unsigned char NEW_PLAYER = 'o'; // Informa al cliente que agregue un jugador nuevo
+
 }

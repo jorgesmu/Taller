@@ -104,6 +104,21 @@ BitStream &BitStream::operator >>(char &val){
     return *this;
 }
 
+BitStream &BitStream::operator <<(const bool &val){
+    static unsigned char buf[sizeof(char)];
+    buf[0] = (val ? 1 : 0);
+    buffer.insert(buffer.end(), buf, buf+sizeof(char));
+    return *this;
+}
+
+BitStream &BitStream::operator >>(bool &val){
+    static unsigned char buf[sizeof(char)];
+    std::copy(buffer.begin()+cpos, buffer.begin()+cpos+sizeof(char), buf);
+    val = (char(buf[0]) == 1 ? true : false);
+    cpos += sizeof(char);
+    return *this;
+}
+
 BitStream &BitStream::operator <<(const float &val){
     Sint32 tmp = Sint32( val * float(PRECISION) );
 	const char* c = reinterpret_cast<char*>(&tmp);
@@ -121,14 +136,14 @@ BitStream &BitStream::operator >>(float &val){
 }
 
 BitStream &BitStream::operator <<(const std::string &s){
-	Uint16 len = s.size();
+	short len = s.size();
 	*this << len;
     buffer.insert(buffer.end(), s.begin(), s.end());
     return *this;
 }
-
+#include <exception>
 BitStream &BitStream::operator >>(std::string &s){
-    Uint16 len;
+    short len;
 	*this >> len;
     s.resize(len);
 	std::copy(buffer.begin()+cpos, buffer.begin()+cpos+len, s.begin());

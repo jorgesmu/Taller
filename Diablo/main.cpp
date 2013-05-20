@@ -31,6 +31,7 @@ using namespace std;
 
 logErrores err_log("log_cliente.txt");
 bool pasoArchivos = false;
+bool cargoMapa = false;
 
 // Variables globales
 // Critical section
@@ -55,7 +56,7 @@ ChatWindow chat_window;
 
 int main(int argc, char* argv[]) {
 	// Verificamos que se pase el nick y el tipo
-/*	if(argc != 3) {
+	if(argc != 3) {
 		std::cout << "Falta especificar nick:\ncliente.exe <nick> <tipo_personaje>\n";
 		return 0;
 	}else{
@@ -63,11 +64,10 @@ int main(int argc, char* argv[]) {
 		pje_local_nick = argv[1];
 		pje_local_tipo = argv[2];
 	}
-*/
 	//borrar estas dos lineas
-	pje_local_nick = "jugador";
-	pje_local_tipo = "soldado";
-	escenario_elegido_id = 0;
+	//pje_local_nick = "jugador";
+	//pje_local_tipo = "soldado";
+	//escenario_elegido_id = 0;
 
 	InitializeCriticalSection(&cs_main);
 	// Socket de cliente
@@ -105,12 +105,12 @@ int main(int argc, char* argv[]) {
 	SDL_Surface* screen;
 	putenv("SDL_VIDEO_CENTERED=1"); // Para centrar la ventana
 	if(SDL_Init(SDL_INIT_EVERYTHING) == -1) { std::cerr << "Error @ SDL_Init(): " << SDL_GetError() << "\n"; return -1; }
-	// Init the window
-	screen = SDL_SetVideoMode(pantalla->get_ancho(), pantalla->get_alto(), 32, SDL_SWSURFACE|SDL_NOFRAME);
+	// Init the window 
+	screen = SDL_SetVideoMode(pantalla->get_ancho(), pantalla->get_alto(), 32, SDL_SWSURFACE);
 	// Init a SDL_TTF
 	if(TTF_Init() == -1) { std::cerr << "Error @ TTF_Init(): " << TTF_GetError() << "\n"; return -1; }
 	// Para confinar el mouse a la ventana
-	SDL_WM_GrabInput(SDL_GRAB_ON);
+	//SDL_WM_GrabInput(SDL_GRAB_ON);
 	// Lo movemos al medio
 	SDL_WarpMouse(pantalla->get_ancho()/2, pantalla->get_alto()/2);
 	SDL_WM_SetCaption("Diablo", NULL);
@@ -179,13 +179,12 @@ int main(int argc, char* argv[]) {
 		}
 	}
 	 
-
+	// Avisamos al otro thread que ya cargo el mapa
+	cargoMapa = true;
 
 	// Agrega el personaje
 	pjm.getPjeLocal().init(pje_local_tipo , 1 , 1 , 50 , 5, 100, 100 ,	configuracion.get_vel_personaje(),	0 , 70 , NULL , resman , Imagen::COLOR_KEY);
 	// Posiciono el personaje
-	start_pos_x = 0;
-	start_pos_y = 0;
 	mapa.getTile(start_pos_x, start_pos_y)->addEntidad(&(pjm.getPjeLocal()));
 	pjm.getPjeLocal().setTileActual(mapa.getTile(start_pos_x, start_pos_y));
 	// Inicializo el recorridor
@@ -201,9 +200,6 @@ int main(int argc, char* argv[]) {
 
 	// Para guardar los eventos  de input
 	SDL_Event event;
-
-
-	Tile::setearExplorados(20,20, &pjm.getPjeLocal(), &mapa);
 
 	//variables para el control del movimiento
 	vector< pair<int,int> > caminoMinimo;
@@ -303,13 +299,15 @@ int main(int argc, char* argv[]) {
 			if(update_recorrido.timer.getTicks() > update_recorrido.INTERVAL) {
 				update_recorrido.timer.start();
 				auto t = mapa.getTilePorPixeles(pjm.getPjeLocal().getX(), pjm.getPjeLocal().getY());
-				update_recorrido.tile_actual = vec2<int>(t->getU(), t->getV());
-				//std::cout << "Tile actual: (" << update_recorrido.tile_actual.x << "," << update_recorrido.tile_actual.y << ")\n";
-				if(update_recorrido.tile_actual != update_recorrido.tile_anterior) {
-					update_recorrido.tile_anterior = update_recorrido.tile_actual;
-					BitStream bs;
-					bs << PROTO::NIEBLA_SYNC << update_recorrido.tile_actual.x << update_recorrido.tile_actual.y;
-					sock.send(bs.str());
+				if(t != NULL) {
+					update_recorrido.tile_actual = vec2<int>(t->getU(), t->getV());
+					//std::cout << "Tile actual: (" << update_recorrido.tile_actual.x << "," << update_recorrido.tile_actual.y << ")\n";
+					if(update_recorrido.tile_actual != update_recorrido.tile_anterior) {
+						update_recorrido.tile_anterior = update_recorrido.tile_actual;
+						BitStream bs;
+						bs << PROTO::NIEBLA_SYNC << update_recorrido.tile_actual.x << update_recorrido.tile_actual.y;
+						sock.send(bs.str());
+					}
 				}
 			}
 

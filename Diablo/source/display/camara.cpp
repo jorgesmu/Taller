@@ -1,5 +1,8 @@
 #include "camara.h"
 #include "../constants/model.h"
+#include "mapa.h"
+#include <cmath>
+#include <algorithm>
 
 // Ctor
 Camara::Camara() : x(0.0), y(0.0), w(0), h(0), vx(0.0), vy(0.0), margen(0) {
@@ -12,10 +15,15 @@ Camara::~Camara() {
 }
 
 // Settea el ancho de la camara y el ancho del margen de deslizamiento
-void Camara::init(int w, int h, int marg_width) {
+void Camara::init(int w, int h, int marg_width, const Mapa& mapa) {
 	this->w = w;
 	this->h = h;
 	this->margen = marg_width;
+	int mapa_w, mapa_h;
+	mapa.getSize(&mapa_w, &mapa_h);
+	// Traducimos a pixeles, tomando el maximo
+	mapa_wh = std::max(mapa_w, mapa_h);
+	mapa_wh *= Tile::TILE_ANCHO;
 }
 
 // Cambia la posicion de la camara
@@ -46,6 +54,19 @@ int Camara::getH() const {
 void Camara::update() {
 	x += vx * CONST_DT;
 	y += vy * CONST_DT;
+	// Mantenemos la camara dentro del mapa
+	if(x > mapa_wh/2 - this->w/2) {
+		x = mapa_wh/2 - this->w/2;
+	}
+	if(x < -mapa_wh/2 - this->w/2) {
+		x = -mapa_wh/2 - this->w/2;
+	}
+	if(y < -this->h/2) {
+		y = -this->h/2;
+	}
+	if(y > mapa_wh/2 - this->h/2) {
+		y = mapa_wh/2 - this->h/2;
+	}
 }
 
 // Actualiza la velocidad basado en la posicion del mouse

@@ -115,11 +115,12 @@ int main(int argc, char* argv[]) {
 	SDL_WarpMouse(pantalla->get_ancho()/2, pantalla->get_alto()/2);
 	SDL_WM_SetCaption("Diablo", NULL);
 
+	mapa.resize(escenarios[escenario_elegido_id].get_tam_x(), escenarios[escenario_elegido_id].get_tam_x());
+
 	// Camara
 	Camara camara;
-	camara.init(pantalla->get_ancho(), pantalla->get_alto(), configuracion.get_margen_scroll());
+	camara.init(pantalla->get_ancho(), pantalla->get_alto(), configuracion.get_margen_scroll(), mapa);
 
-	mapa.resize(escenarios[escenario_elegido_id].get_tam_x(), escenarios[escenario_elegido_id].get_tam_x());
 	// Resman
 	ResMan resman;
 	if(!resman.init()) return -2;

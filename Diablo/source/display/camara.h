@@ -3,6 +3,7 @@
 #include "SDL.h"
 
 const float DRAG_SPEED = 0.5f;
+class Mapa;
 
 class Camara {
 
@@ -11,14 +12,14 @@ class Camara {
 	int w, h; // Ancho y alto
 	float vx, vy; // Velocidad de la camara
 	int margen;
-
+	int mapa_wh;
 	public:
 	// Ctor
 	Camara();
 	// Dtor
 	~Camara();
 	// Settea el ancho de la camara y el ancho del margen de deslizamiento
-	void init(int w, int h, int marg_width);
+	void init(int w, int h, int marg_width, const Mapa& mapa);
 	// Cambia la posicion de la camara
 	void mover(float x, float y);
 	// Centra en el pixel x, y

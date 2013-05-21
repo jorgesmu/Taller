@@ -80,7 +80,7 @@ bool ServerSocket::listen(int port) {
 	// Cargamos los datos de conexion
 	sockaddr_in serverService;
     serverService.sin_family = AF_INET;
-    serverService.sin_addr.s_addr = inet_addr("127.0.0.1");
+    serverService.sin_addr.s_addr = htonl (INADDR_ANY);
     serverService.sin_port = htons(port);
 	// Creamos la conexion
 	if(::bind(ListenSocket, (SOCKADDR*)&serverService, sizeof(serverService)) == SOCKET_ERROR) {

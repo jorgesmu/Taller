@@ -130,7 +130,7 @@ int Tile::getV(){
 
 bool Tile::isCaminable(){
 	if(force_no_caminable) {
-		return true;
+		return false;
 	}else{
 		for (auto it = entidades.begin(); it != entidades.end(); ++it){
 			if((*it)->isCaminable(this) == false){

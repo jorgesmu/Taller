@@ -334,6 +334,7 @@ int main(int argc, char* argv[]) {
 			Tile* t = mapa.getTilePorPixeles(pjm.getPjeLocal().getX(),pjm.getPjeLocal().getY());
 			tileActual = make_pair<int,int>(t->getU(), t->getV());
 			if (puedeMoverse) {
+				//std::cout << puedeMoverse << " " << estadoMovimiento << "\n";
 				//si termino de ir al tile anterior
 				if(indice < caminoMinimo.size()){
 					//establezo proximo tile del camino
@@ -349,7 +350,7 @@ int main(int argc, char* argv[]) {
 						estadoMovimiento = MOV::MANDAR_POS;
 					}else if(estadoMovimiento == MOV::FAIL_RECV) {
 						std::cout << "FAIL_RECV\n";
-						estadoMovimiento = MOV::IDLE;
+						estadoMovimiento = MOV::MANDAR_POS;
 						// Marco el tile como no caminable temporalmente
 						Tile* tProx = mapa.getTile(proximoTile.first, proximoTile.second);
 						tProx->setNoCaminable();
@@ -357,15 +358,27 @@ int main(int argc, char* argv[]) {
 						mapa.actualizarGrafo(tProx->getU(),tProx->getV());
 						// recalculo el camino
 						//el camino va desde ultimo tile al que me movi, hasta el que hice click que es el ultimo del camino anterior
-						Tile* tilePersonaje = mapa.getTile(ultimoMovimientoX,ultimoMovimientoY);
+						Tile* tilePersonaje = mapa.getTile(ultimoMovimientoX, ultimoMovimientoY);
+						if(!mapa.tileExists(ultimoMovimientoX, ultimoMovimientoY)) {
+							tilePersonaje = mapa.getTile(start_pos_x, start_pos_y);
+							//std::cout << "POS PJE: " << pjm.getPjeLocal().getX() << ";" << pjm.getPjeLocal().getY() << "\n";
+							std::cout << "TILE PERSONAJE: " << tilePersonaje << "\n";
+						}
+						std::cout << "ULTIMO DESTINO: " << ultimoDestinoX << ";" << ultimoDestinoY << "\n";
 						Tile* tileDestino = mapa.getTile(ultimoDestinoX ,ultimoDestinoY);
+						std::cout << "TILE DESTINO - PERSONAJE: " << tileDestino << " - " << tilePersonaje << "\n";
 						//calculo el camino
 						caminoMinimo.clear();
 						caminoMinimo = mapa.getCaminoMinimo(tilePersonaje, tileDestino);
+						std::cout << "NUEVO CAMINO MINIMO:\n";
+						//for(auto it = caminoMinimo.begin();it != caminoMinimo.end();it++) {
+							//std::cout << "- " << it->first << ";" << it->second << "\n";
+						//}
 						indice = 1;
 						// Despues de actualizar el grafo, desmarco el tile
 						tProx->setCaminable();
 						mapa.actualizarGrafo(tProx->getU(),tProx->getV());
+						
 					}else if(estadoMovimiento == MOV::ESPERANDO_OK) {
 						//std::cout << "ESPERANDO_OK\n";
 						// Nada

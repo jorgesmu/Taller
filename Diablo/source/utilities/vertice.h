@@ -19,7 +19,7 @@ public:
 	void visitar();
 	
 	//getters
-	vector<arista> get_aristas();
+	vector<arista>& get_aristas();
 
 	int get_x();
 

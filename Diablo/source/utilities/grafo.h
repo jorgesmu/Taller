@@ -21,9 +21,9 @@ public:
 
 	//getters
 	//devuelve los vectores
-	vector<vector<vertice> > get_vertices();
+	vector<vector<vertice> >& get_vertices();
 	//devuelve un vertice 
-	vertice get_vertice(int pos_x,int pos_y);
+	vertice& get_vertice(int pos_x,int pos_y);
 	//otros
 	//devuelve el camino minimo entre un nodo inicial y uno final
 	vector<pair<int,int> > camino(int posXOrigen,int posYOrigen, int posXDestino,int posYDestino);

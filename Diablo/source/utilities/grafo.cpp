@@ -44,9 +44,10 @@ void grafo::agregar_arista (int pos_x_vertice, int pos_y_vertice,int pos_x_arist
 }
 //getters
 //devuelve los vectores
-vector< vector<vertice> > grafo::get_vertices(){
+vector< vector<vertice> >& grafo::get_vertices(){
 	return vertices;
 }
+#include <iostream>
 //actualiza el valor de la arista, si dicha arista existe
 void grafo::actualizar_arista (int pos_x_origen, int pos_y_origen,int pos_x_destino, int pos_y_destino,double peso_arista){
 	vertice& unVertice = vertices[pos_x_origen][pos_y_origen];
@@ -61,13 +62,14 @@ void grafo::actualizar_arista (int pos_x_origen, int pos_y_origen,int pos_x_dest
 		if(xArista == pos_x_destino && yArista == pos_y_destino){
 			encontrada = true;
 			unaArista.set_peso(peso_arista);
+			//std::cout << "Seteando peso " << peso_arista << " a la arista de " << pos_x_origen << ";" << pos_y_origen << " -> " << pos_x_destino << ";" << pos_y_destino << "\n";
 		}
 		indice ++;
 	}
 }
 	
 //devuelve un vertice 
-vertice grafo::get_vertice(int pos_x,int pos_y){
+vertice& grafo::get_vertice(int pos_x,int pos_y){
 	return vertices.at(pos_x).at(pos_y);
 }
 

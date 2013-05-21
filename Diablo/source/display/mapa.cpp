@@ -303,7 +303,7 @@ void Mapa::actualizarGrafo(int pos_x, int pos_y){
 	//actualizo origen y adyacencias
 	actualizarGrafoVertice(pos_x,pos_y);
 	//actualizo adyacencias de x
-	if (tileExists(pos_x - 1 ,pos_y)){
+	if (tileExists(pos_x + 1 ,pos_y)){
 		//derecha
 		actualizarGrafoVertice(pos_x + 1,pos_y);
 	}

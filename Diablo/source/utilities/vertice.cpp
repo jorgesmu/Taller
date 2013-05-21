@@ -26,7 +26,7 @@ int vertice::get_x(){
 int vertice::get_y(){
 	return y;
 }
-vector<arista> vertice::get_aristas(){
+vector<arista>& vertice::get_aristas(){
 	return aristas;
 }
 void vertice::set_x(int newValue){

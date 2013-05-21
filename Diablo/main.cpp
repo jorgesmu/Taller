@@ -291,15 +291,17 @@ int main(int argc, char* argv[]) {
 			for(auto it = pjm.getPjes().begin();it != pjm.getPjes().end(); it++) {
 				it->second.update(&mapa);
 			}
-			// Actualizamos el personaje principal
-			if (puedeMoverse){
+			// Actualizamos el personaje principal			
+			if (puedeMoverse) {
 				//si termino de ir al tile anterior
 				if(indice < caminoMinimo.size()){
 					//establezo proximo tile del camino
 					pair <int,int> proximoTile = caminoMinimo[indice];
-					pjm.getPjeLocal().mover(mapa.getTile(proximoTile.first,proximoTile.second));										
+					pjm.getPjeLocal().mover(mapa.getTile(proximoTile.first,proximoTile.second));	
+					std::cout << "TILE ACTUAL: " << mapa.getTilePorPixeles(pjm.getPjeLocal().getX(),pjm.getPjeLocal().getY())->getU() << ";" << mapa.getTilePorPixeles(pjm.getPjeLocal().getX(),pjm.getPjeLocal().getY())->getV() << "\n";
 					std::cout << "PROX TILE: " << proximoTile.first << ";" << proximoTile.second << "\n";
 					indice++;
+					puedeMoverse = false;
 				}
 			}
 			estadoPersonaje = pjm.getPjeLocal().update(&mapa);
@@ -308,6 +310,18 @@ int main(int argc, char* argv[]) {
 			}else if (estadoPersonaje == 0 || estadoPersonaje == 2){
 				puedeMoverse = false;
 			}
+			//Piso la señal de estado del personaje
+			/*
+			Tile* next = mapa.getTilePorPixeles(pjm.getPjeLocal().getX(),pjm.getPjeLocal().getY());
+			if (indice>0) {
+				if (next->getU()==caminoMinimo[indice-1].first && next->getU()==caminoMinimo[indice-1].second) {
+					puedeMoverse=true;
+				} else {
+					puedeMoverse=false;
+				}
+			}
+			if (indice==0) puedeMoverse=true;
+			*/
 			// Update a tiles recorridos
 			if(update_recorrido.timer.getTicks() > update_recorrido.INTERVAL) {
 				update_recorrido.timer.start();

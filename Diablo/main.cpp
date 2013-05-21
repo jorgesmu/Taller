@@ -33,7 +33,7 @@ using namespace std;
 logErrores err_log("log_cliente.txt");
 bool pasoArchivos = false;
 bool cargoMapa = false;
-
+const int NOSEMOVIO = -1;
 // Variables globales
 // Critical section
 CRITICAL_SECTION cs_main;
@@ -217,6 +217,11 @@ int main(int argc, char* argv[]) {
 	int estadoPersonaje = 0; //estado del personaje
 	bool puedeMoverse = false; // indica si el personaje ya termino un movimiento anterior y puede seguir su camino o esta esperando un nuevo camino 
 	mapa.cargarGrafo(); //cargo el grafo con la configuracion inicial
+	int ultimoMovimientoX = NOSEMOVIO; // ultimas posiciones pasadas al mover
+	int ultimoMovimientoY = NOSEMOVIO;// idem coordenada y
+	int ultimoDestinoX = NOSEMOVIO;//guarda el destino actual
+	int ultimoDestinoY = NOSEMOVIO;//guarda el destino actual
+	
 	while((!quit ) && (sock.isOpen()) ) {
 
 		// Sync stuff
@@ -265,9 +270,17 @@ int main(int argc, char* argv[]) {
 						vec2<int> tile_res = MouseCoords2Tile(vec2<int>(event.button.x, event.button.y), camara);
 						if(mapa.tileExists(tile_res.x, tile_res.y)) {
 
-							Tile* tilePersonaje = mapa.getTilePorPixeles(pjm.getPjeLocal().getX(), pjm.getPjeLocal().getY());
+							Tile* tilePersonaje; 
+							//chequeo sicronizacion para que calcule el camino minimo desde el tile al que se esta moviendo al destino
+							if (ultimoMovimientoX == NOSEMOVIO && ultimoMovimientoY == NOSEMOVIO){
+								tilePersonaje = mapa.getTilePorPixeles(pjm.getPjeLocal().getX(), pjm.getPjeLocal().getY());
+							}else{
+								tilePersonaje = mapa.getTile(ultimoMovimientoX,ultimoMovimientoY);
+							}
 							Tile* tileDestino = mapa.getTile(tile_res.x, tile_res.y);
-
+							//guardo el destino
+							ultimoDestinoX = tile_res.x;
+							ultimoDestinoY = tile_res.y;
 							// Verificamos si hay un personaje para activar el chat
 							bool found_pje = false;
 							//std::cout << "CLICK @ " << tile_res.x << ";" << tile_res.y << "\n";
@@ -328,13 +341,22 @@ int main(int argc, char* argv[]) {
 					if(estadoMovimiento == MOV::OK_RECV) {
 						std::cout << "OK_RECV\n";
 						pjm.getPjeLocal().mover(mapa.getTile(proximoTile.first,proximoTile.second));
+						//actualizo posiciones para calcular correctamente el camino minimo
+						ultimoMovimientoX = proximoTile.first;
+						ultimoMovimientoY = proximoTile.second;
 						indice++;
 						puedeMoverse = false;
 						estadoMovimiento = MOV::MANDAR_POS;
 					}else if(estadoMovimiento == MOV::FAIL_RECV) {
 						std::cout << "FAIL_RECV\n";
 						estadoMovimiento = MOV::IDLE;
-						// recalcular camino
+						// recalculo el camino
+						//el camino va desde ultimo tile al que me movi, hasta el que hice click que es el ultimo del camino anterior
+						Tile* tilePersonaje = mapa.getTile(ultimoMovimientoX,ultimoMovimientoY);
+						Tile* tileDestino = mapa.getTile(ultimoDestinoX ,ultimoDestinoY);
+						//calculo el camino
+						caminoMinimo = mapa.getCaminoMinimo(tilePersonaje, tileDestino);
+						indice = 1;
 					}else if(estadoMovimiento == MOV::ESPERANDO_OK) {
 						//std::cout << "ESPERANDO_OK\n";
 						// Nada

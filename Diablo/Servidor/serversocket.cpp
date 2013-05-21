@@ -55,7 +55,7 @@ bool ServerSocket::init() {
     ListenSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	BOOL val_true = TRUE;
 	int buff_size = 0;
-	if(setsockopt(ListenSocket, IPPROTO_TCP, TCP_NODELAY, (char*)&val_true, sizeof(BOOL)) != 0) {
+	/*if(setsockopt(ListenSocket, IPPROTO_TCP, TCP_NODELAY, (char*)&val_true, sizeof(BOOL)) != 0) {
 		std::cerr << "ERROR SETTING SOCK OPTIONS TCP_NODELAY\n";
 	}
 	//if(setsockopt(ListenSocket, SOL_SOCKET, SO_RCVBUF, (char*)&buff_size, sizeof(int)) != 0) {
@@ -63,7 +63,7 @@ bool ServerSocket::init() {
 	//}
 	if(setsockopt(ListenSocket, SOL_SOCKET, SO_SNDBUF, (char*)&buff_size, sizeof(int)) != 0) {
 		std::cerr << "ERROR SETTING SOCK OPTIONS SO_SNDBUF\n";
-	}
+	}*/
     if(ListenSocket == INVALID_SOCKET) {
         std::cerr << "Error at socket():" <<  WSAGetLastError() << "\n";
         return false;
@@ -111,7 +111,7 @@ bool ServerSocket::accept() {
 	}else{
 		BOOL val_true = TRUE;
 		int buff_size = 0;
-		if(setsockopt(tmp_sck, IPPROTO_TCP, TCP_NODELAY, (char*)&val_true, sizeof(BOOL)) != 0) {
+		/*if(setsockopt(tmp_sck, IPPROTO_TCP, TCP_NODELAY, (char*)&val_true, sizeof(BOOL)) != 0) {
 			std::cerr << "ERROR SETTING SOCK OPTIONS TCP_NODELAY\n";
 		}
 		//if(setsockopt(tmp_sck, SOL_SOCKET, SO_RCVBUF, (char*)&buff_size, sizeof(int)) != 0) {
@@ -119,7 +119,7 @@ bool ServerSocket::accept() {
 		//}
 		if(setsockopt(tmp_sck, SOL_SOCKET, SO_SNDBUF, (char*)&buff_size, sizeof(int)) != 0) {
 			std::cerr << "ERROR SETTING SOCK OPTIONS SO_SNDBUF\n";
-		}
+		}*/
 		// Ingresamos la conexion en la tabla
 		addClient(tmp_st, tmp_sck);
 		// "Devolvemos" el id para la conexion que se acaba de aceptar

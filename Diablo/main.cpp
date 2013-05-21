@@ -413,6 +413,7 @@ int main(int argc, char* argv[]) {
 		SDL_Flip(screen);
 
 		LeaveCriticalSection(&cs_main);
+		Sleep(50);
 
 	}
 	

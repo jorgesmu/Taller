@@ -59,7 +59,7 @@ bool ClientSocket::init() {
     ConnectSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	BOOL val_true = TRUE;
 	int buff_size = 0;
-	if(setsockopt(ConnectSocket, IPPROTO_TCP, TCP_NODELAY, (char*)&val_true, sizeof(BOOL)) != 0) {
+	/*if(setsockopt(ConnectSocket, IPPROTO_TCP, TCP_NODELAY, (char*)&val_true, sizeof(BOOL)) != 0) {
 		std::cerr << "ERROR SETTING SOCK OPTIONS TCP_NODELAY\n";
 	}
 	//if(setsockopt(ConnectSocket, SOL_SOCKET, SO_RCVBUF, (char*)&buff_size, sizeof(int)) != 0) {
@@ -67,7 +67,7 @@ bool ClientSocket::init() {
 	//}
 	if(setsockopt(ConnectSocket, SOL_SOCKET, SO_SNDBUF, (char*)&buff_size, sizeof(int)) != 0) {
 		std::cerr << "ERROR SETTING SOCK OPTIONS SO_SNDBUF\n";
-	}
+	}*/
     if(ConnectSocket == INVALID_SOCKET) {
         std::cerr << "Error at socket():" <<  WSAGetLastError() << "\n";
         return false;

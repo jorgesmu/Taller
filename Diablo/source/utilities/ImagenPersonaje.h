@@ -45,6 +45,19 @@ public:
 	//Continua con la accion actual
 	const static unsigned int CONTINUAR_CON_ACCION_ACTUAL = 28;
 
+	//Defender
+	const static unsigned int DEF_SUR = 29;
+	const static unsigned int DEF_SURESTE = 30;
+	const static unsigned int DEF_ESTE = 31;
+	const static unsigned int DEF_NORESTE = 32;
+	const static unsigned int DEF_NORTE = 33;
+	const static unsigned int DEF_NOROESTE = 34;
+	const static unsigned int DEF_OESTE = 35;
+	const static unsigned int DEF_SUROESTE = 36;
+
+	//Defender direccion actual
+	const static unsigned int DEFENSA_DIRECCION_ACTUAL = 37;
+
 private:
 
 	unsigned int accionActual;
@@ -109,6 +122,8 @@ public:
 		Post: Se ha seteado la accion.
 	*/
 	bool setAccion(unsigned int accion);
+
+	 unsigned int getTipoAccion();
 	
 	/*
 		Pre: Se han inicilizado todos los parametros.
@@ -129,6 +144,3 @@ private:
 	void setAccionEfectiva(unsigned int accion);	
 
 };
-
-
-

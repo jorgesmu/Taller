@@ -148,6 +148,8 @@ public:
 	*/
 	virtual unsigned int ataque(Tile* tileDestino , Mapa* mapa);
 
+	void muerte();
+
 	/*
 		Pre: La instancia ha sido creada.
 		Post: Se setea el Tile destino.

@@ -486,6 +486,7 @@ unsigned int Personaje::update(Mapa* mapa) {
 		} else {
 			if(this -> imagen != NULL) {
 				this -> surf = this -> imagen -> getSurface();
+				retorno = Personaje::ESPERANDO_ACCION;
 			}
 		}
 		this -> tiempoProximoUpdate = clock() + this -> deltaUpdatePosicion;
@@ -548,9 +549,25 @@ unsigned int Personaje::ataque(Tile* tileDestino , Mapa* mapa) {
 				imagenPersonaje -> setAccion(direccionAtaque);
 			}
 		}
-		printf("Direccion Ataque %d \n", direccionAtaque);
+	} else {
+		this -> tileDestino = NULL;
+		unsigned int direccionAtaque = ImagenPersonaje::ATAQUE_DIRECCION_ACTUAL;
+		ImagenPersonaje* imagenPersonaje = static_cast<ImagenPersonaje*> (this -> imagen);
+		if (imagenPersonaje != NULL){
+			imagenPersonaje -> setAccion(direccionAtaque);
+		}
 	}
 	return retorno;
+}
+
+/*
+*/
+void Personaje::muerte() {
+	ImagenPersonaje* imagenPersonaje = static_cast<ImagenPersonaje*> (this -> imagen);
+	this -> tileDestino = NULL;
+	if (imagenPersonaje != NULL){
+		imagenPersonaje -> setAccion(ImagenPersonaje::MUERTE);
+	}
 }
 
 // Por ahora retorna trivialmente la posicion en X

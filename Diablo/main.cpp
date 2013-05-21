@@ -239,6 +239,26 @@ int main(int argc, char* argv[]) {
 					// Update para la camara
 					camara.update_speed(makeRect(event.motion.x, event.motion.y));
 				}
+				// Atacar
+				if(event.type == SDL_KEYDOWN) {
+					
+					switch (event.key.keysym.sym) {
+						case 'a' : {
+							pjm.getPjeLocal().ataque(NULL , &mapa);
+							break;
+						}
+						case 'd' : {
+							printf(" Defenza ");
+							break;
+						}
+						case 'k' : {
+							pjm.getPjeLocal().muerte();
+							printf(" MUERTE ");
+							break;
+						}
+					}
+					
+				}
 				// Mouse clicks
 				if(event.type == SDL_MOUSEBUTTONDOWN) {
 					if(event.button.button == SDL_BUTTON_LEFT) {

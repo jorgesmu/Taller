@@ -40,7 +40,7 @@ int main(int argc, char* argv[]) {
 	// Parseamos el escenario a elegir
 	if(argc != 2) {
 		std::cerr << "Falta especificar el escenario:\n \tservidor.exe <escenario>\n";
-		//return -1;
+		return -1;
 	}else{
 		escenario_elegido = argv[1];
 	}

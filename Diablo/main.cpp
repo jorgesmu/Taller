@@ -52,6 +52,9 @@ struct {
 	Timer timer;
 	static const int INTERVAL = 200; // ms
 } update_recorrido;
+// Cosas de movimiento del personaje
+pair <int,int> tileActual, proximoTile;
+int estadoMovimiento;
 // Ventana de chat
 ChatWindow chat_window;
 // ResMan
@@ -195,6 +198,8 @@ int main(int argc, char* argv[]) {
 	// Inicializo el recorridor
 	update_recorrido.tile_anterior = update_recorrido.tile_actual = vec2<int>(start_pos_x, start_pos_y);
 	update_recorrido.timer.start();
+	// Cosas del movimiento
+	estadoMovimiento = MOV::IDLE;
 	// Centro la camara
 	camara.center(mapa.getTile(start_pos_x, start_pos_y)->getX(), mapa.getTile(start_pos_x, start_pos_y)->getY());
 
@@ -259,6 +264,7 @@ int main(int argc, char* argv[]) {
 							if(!found_pje) {
 								caminoMinimo = mapa.getCaminoMinimo(tilePersonaje, tileDestino);
 								indice = 1;
+								estadoMovimiento = MOV::MANDAR_POS;
 							}
 
 						}
@@ -291,17 +297,46 @@ int main(int argc, char* argv[]) {
 			for(auto it = pjm.getPjes().begin();it != pjm.getPjes().end(); it++) {
 				it->second.update(&mapa);
 			}
-			// Actualizamos el personaje principal			
+			// Actualizamos el personaje principal
+			Tile* t = mapa.getTilePorPixeles(pjm.getPjeLocal().getX(),pjm.getPjeLocal().getY());
+			tileActual = make_pair<int,int>(t->getU(), t->getV());
 			if (puedeMoverse) {
 				//si termino de ir al tile anterior
 				if(indice < caminoMinimo.size()){
 					//establezo proximo tile del camino
-					pair <int,int> proximoTile = caminoMinimo[indice];
-					pjm.getPjeLocal().mover(mapa.getTile(proximoTile.first,proximoTile.second));	
-					std::cout << "TILE ACTUAL: " << mapa.getTilePorPixeles(pjm.getPjeLocal().getX(),pjm.getPjeLocal().getY())->getU() << ";" << mapa.getTilePorPixeles(pjm.getPjeLocal().getX(),pjm.getPjeLocal().getY())->getV() << "\n";
-					std::cout << "PROX TILE: " << proximoTile.first << ";" << proximoTile.second << "\n";
-					indice++;
-					puedeMoverse = false;
+					proximoTile = caminoMinimo[indice];
+					if(estadoMovimiento == MOV::OK_RECV) {
+						std::cout << "OK_RECV\n";
+						pjm.getPjeLocal().mover(mapa.getTile(proximoTile.first,proximoTile.second));
+						indice++;
+						puedeMoverse = false;
+						estadoMovimiento = MOV::MANDAR_POS;
+					}else if(estadoMovimiento == MOV::FAIL_RECV) {
+						std::cout << "FAIL_RECV\n";
+						estadoMovimiento = MOV::IDLE;
+						// recalcular camino
+					}else if(estadoMovimiento == MOV::ESPERANDO_OK) {
+						//std::cout << "ESPERANDO_OK\n";
+						// Nada
+					}else if(estadoMovimiento == MOV::MANDAR_POS) {
+						std::cout << "MANDAR_POS\n";
+						estadoMovimiento = MOV::ESPERANDO_OK;
+						std::cout << "TILE ACTUAL: " << tileActual.first << ";" << tileActual.second << "\n";
+						std::cout << "PROX TILE: " << proximoTile.first << ";" << proximoTile.second << "\n";
+						BitStream bs;
+						bs << PROTO::REQUEST_POS << proximoTile.first << proximoTile.second;
+						sock.send(bs.str());
+					}
+					//std::cout << "TILE ACTUAL: " << tileActual.first << ";" << tileActual.second << "\n";
+					//std::cout << "PROX TILE: " << proximoTile.first << ";" << proximoTile.second << "\n";
+
+				}
+			}else{
+				if(indice < caminoMinimo.size()) {
+					proximoTile = caminoMinimo[indice];
+					estadoMovimiento == MOV::MANDAR_POS;
+				}else{
+					estadoMovimiento == MOV::IDLE;
 				}
 			}
 			estadoPersonaje = pjm.getPjeLocal().update(&mapa);
@@ -322,6 +357,10 @@ int main(int argc, char* argv[]) {
 			}
 			if (indice==0) puedeMoverse=true;
 			*/
+			// Update a todos los otros personajes
+			for(auto it = pjm.getPjes().begin();it != pjm.getPjes().end();it++) {
+				it->second.update(&mapa);
+			}
 			// Update a tiles recorridos
 			if(update_recorrido.timer.getTicks() > update_recorrido.INTERVAL) {
 				update_recorrido.timer.start();

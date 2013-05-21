@@ -538,6 +538,44 @@ void ServerSocket::acceptLastDo() {
 				bs >> new_tile_x >> new_tile_y;
 				pm.getPlayer(new_nick).addTileRecorrido(new_tile_x, new_tile_y);
 				//std::cout << "RECEIVED NIEBLA SYNC: " << new_tile_x << "," << new_tile_y << "\n";
+			}else if(pt == PROTO::REQUEST_POS) {
+				int x, y;
+				bs >> x >> y;
+				bool ok = true;
+				std::cout << "GOT REQUEST_POS <" << new_nick << ">: " << x << ";" << y << "\n";
+				// Iteramos para ver si hay algun personaje
+				for(auto it = pm.getPlayers().begin();it != pm.getPlayers().end();it++) {
+					if(it->second.getX() == x && it->second.getY() == y) {
+						ok = false;
+						break;
+					}
+				}
+				
+				
+				if(ok) {
+					// Si el movimiento esta ok, actualizamos la posicion
+					pm.getPlayer(new_nick).setPos(x, y);
+					// Informamos al jugador que esta ok
+					bs.clear();
+					bs << PROTO::POS_REQUEST_REPLY << true;
+					std::cout << "REPLY: OK\n";
+					this->send(cid, bs.str());
+					// Informamos a los demas del movimiento
+					bs.clear();
+					bs << PROTO::MOVE_PLAYER << new_nick << x << y;
+					for(auto it = clients_map.begin();it != clients_map.end();it++) {
+						if(it->second.nick == new_nick) continue; // Salteamos el jugador en cuestion
+						send(it->second.sock, bs.str());
+						std::cout << "Mandando update a " << it->second.nick << "\n";
+					}
+
+				}else{
+					// Si fallo, avisamos al cliente
+					bs.clear();
+					bs << PROTO::POS_REQUEST_REPLY << false;
+					std::cout << "REPLY: FAIL\n";
+					this->send(cid, bs.str());
+				}
 			}else{
 				bs.clear();
 				bs << PROTO::TEXTMSG << std::string("Unknown packet type");

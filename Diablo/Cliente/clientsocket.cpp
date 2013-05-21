@@ -21,6 +21,7 @@ extern int escenario_elegido_id;
 extern config_general configuracion;
 extern ResMan resman;
 extern ChatWindow chat_window;
+extern int estadoMovimiento;
 
 bool ClientSocket::WSinit = false;
 size_t ClientSocket::ref_count = 0;
@@ -349,7 +350,7 @@ void ClientSocket::listenDo() {
 					p.setActivo();
 				}
 			}
-			}else if(pt == PROTO::PLAYER_EXIT) {
+		}else if(pt == PROTO::PLAYER_EXIT) {
 			// Esperamos a que cargue el mapa
 			while(!cargoMapa) {
 				Sleep(10);
@@ -364,6 +365,31 @@ void ClientSocket::listenDo() {
 				// Si existe, lo marcamos como desconectado
 				auto& p = pjm.getPje(who_nick);
 				p.setInactivo();
+			}
+		}else if(pt == PROTO::POS_REQUEST_REPLY) {
+			bool reply;
+			bs >> reply;
+			if(estadoMovimiento != MOV::ESPERANDO_OK) {
+				std::cout << "Received POS_REQUEST_REPLY without MOV::ESPERANDO_OK\n";
+			}else{
+				if(reply) {
+					estadoMovimiento = MOV::OK_RECV;
+					std::cout << "GOT OK FROM SERVER\n";
+				}else{
+					estadoMovimiento = MOV::FAIL_RECV;
+					std::cout << "GOT FAIL FROM SERVER\n";
+				}
+			}
+		}else if(pt == PROTO::MOVE_PLAYER) {
+			std::string nick;
+			int x, y;
+			bs >> nick >> x >> y;
+			if(!pjm.PjeExiste(nick)) {
+				std::cout << "Server requested move of invalid PJ: " << nick << "\n";
+			}else{
+				auto& p = pjm.getPje(nick);
+				p.mover(mapa.getTile(x, y));
+				std::cout << "Server requested move of <" << nick << "> to " << x << ";" << y << "\n";
 			}
 		}else{
 			std::cout << "Unknown packet type " << int(pt) << " received\n";

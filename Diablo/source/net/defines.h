@@ -43,4 +43,21 @@ const unsigned char NIEBLA_LIST = 'n'; // servidor
 const unsigned char NEW_PLAYER = 'o'; // Informa al cliente que agregue un jugador nuevo
 // Sintax: <nick:string>
 const unsigned char PLAYER_EXIT = 'p'; // Informa al cliente que se desconecto un jugador
+
+// <x:int><y:int>
+const unsigned char REQUEST_POS = 'q';
+// <bool:ok/not ok>
+const unsigned char POS_REQUEST_REPLY = 'r';
+
+// <nick:string><x:int><y:int>
+const unsigned char MOVE_PLAYER = 's';
+}
+
+// Cosas de movimiento
+namespace MOV {
+	const int IDLE = 0;
+	const int ESPERANDO_OK = 1;
+	const int OK_RECV = 2;
+	const int FAIL_RECV = 3;
+	const int MANDAR_POS = 4;
 }

@@ -355,6 +355,7 @@ int main(int argc, char* argv[]) {
 						Tile* tilePersonaje = mapa.getTile(ultimoMovimientoX,ultimoMovimientoY);
 						Tile* tileDestino = mapa.getTile(ultimoDestinoX ,ultimoDestinoY);
 						//calculo el camino
+						caminoMinimo.clear();
 						caminoMinimo = mapa.getCaminoMinimo(tilePersonaje, tileDestino);
 						indice = 1;
 					}else if(estadoMovimiento == MOV::ESPERANDO_OK) {

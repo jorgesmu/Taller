@@ -97,6 +97,7 @@
 			this -> posY = tile -> getY();
 			this -> agregarAnclas(mapa);
 		}
+		this -> caminable = caminable;
 	}
 
 	/*
@@ -138,6 +139,7 @@
 			this -> posY = tile -> getY();
 			this -> agregarAnclas(mapa);
 		}
+		this -> caminable = caminable;
 	}
 	
 	EntidadFija::EntidadFija(EntidadFija* entidadFija , Mapa* mapa){
@@ -156,7 +158,8 @@
 		this->posX = entidadFija->posX;
 		this->posY = entidadFija->posY;
 		this->compartido = entidadFija->compartido;
-		this->tileAncla=NULL;		
+		this->tileAncla=NULL;
+		this->caminable = entidadFija->caminable;
 	}
 
 	/*
@@ -173,11 +176,42 @@
 		this -> tileAncla = NULL;
 	}
 	
-	void EntidadFija::setColor(bool value , int tileX , int tileY) {
-		if ( (this -> posX == tileX) && (this -> posY == tileY)) {
-			this -> color = value;	
-		} 
+	//void EntidadFija::setColor(bool value , int tileX , int tileY) {
+	//	if ( (this -> posX == tileX) && (this -> posY == tileY)) {
+	//		this -> color = value;	
+	//	} 
+	//}
+
+	void EntidadFija::setColor(bool value , int tileX , int tileY, Mapa* mapa, int persX, int persY) {		
+		int contTilesX = 0;
+		int delta = 1;
+		if (this -> tileAncla != NULL){
+			while(contTilesX < (int)(this -> widthInTiles)){
+				bool salida = false;
+				int contTilesY = 0;
+				Tile* ancla = NULL;
+				while((contTilesY < (int)(this -> highInTiles)) && (!salida)){
+					int posAnclaX = this -> posX + (contTilesX - contTilesY) * Tile::TILE_ANCHO/2;
+					int posAnclaY = this -> posY + (contTilesY + contTilesX)*Tile::TILE_ALTO/2;
+					Tile* ancla = mapa -> getTilePorPixeles(posAnclaX , posAnclaY);
+					if (ancla != NULL){
+						int deltaX = persX - ancla->getX();
+						int deltaY = persY - ancla->getY();
+						if((abs(deltaX) <= Personaje::RADIO_VISION_X) && (abs(deltaY) <= Personaje::RADIO_VISION_Y)){
+							this->color = true;
+							return;
+						}
+						contTilesY += delta;
+					} else {
+						salida = true;
+					}
+				}
+				this->color = false;
+				contTilesX += delta;
+			}
+		}	
 	}
+
 
 	void EntidadFija::setColor(bool value) {
 		this -> color = value;
@@ -385,13 +419,13 @@
 		Post: Se retorna verdadero si se puede ocupar el tile ocupado 
 		por dicha instancia.
 	*/
-	bool EntidadFija::isCaminable(Tile* tile , Mapa* mapa){
-		return false;
+	bool EntidadFija::isCaminable(Tile* tile){
+		return this->caminable;
 	}
 
 	// Deprecated
 	bool EntidadFija::isCaminable(){
-		return false;
+		return this->caminable;
 	}
 
 	/*
@@ -405,3 +439,31 @@
 		}
 		return retorno;
 	}
+
+	
+void EntidadFija::setDibujada(bool seDibujo, Mapa* mapa,Personaje* personaje){
+	this->dibujada = seDibujo;
+	if(seDibujo){
+		int contTilesX = 0;
+		int delta = 1;
+		if (this -> tileAncla != NULL){
+			while(contTilesX < (int)(this -> widthInTiles)){
+				bool salida = false;
+				int contTilesY = 0;
+				Tile* ancla = NULL;
+				while((contTilesY < (int)(this -> highInTiles)) && (!salida)){
+					int posAnclaX = this -> posX + (contTilesX - contTilesY) * Tile::TILE_ANCHO/2;
+					int posAnclaY = this -> posY + (contTilesY + contTilesX)*Tile::TILE_ALTO/2;
+					Tile* ancla = mapa -> getTilePorPixeles(posAnclaX , posAnclaY);
+					if (ancla != NULL){
+						personaje -> agregarTilesExplorados(ancla);
+						contTilesY += delta;
+					} else {
+						salida = true;
+					}
+				}
+				contTilesX += delta;
+			}
+		}	
+	}	
+}

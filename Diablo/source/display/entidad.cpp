@@ -29,7 +29,7 @@ void Entidad::inicializarAtributosEnValoresDefault() {
 	this -> posY = 0;
 	//seteo como compartido
 	this -> compartido = true;
-	
+	this -> caminable = true;
 }
 
 /*
@@ -151,6 +151,7 @@ void Entidad::init(const std::string& name,
 	this -> tileAncla = tile;
 	//seteo como compartido
 	this -> compartido = true;
+	this -> caminable = caminable;
 }
 
 /*
@@ -196,6 +197,7 @@ void Entidad::init(const std::string& name,
 	this -> tileAncla = tile;
 	//seteo como compartido
 	this -> compartido = true;
+	this -> caminable = caminable;
 }
 	
 /*
@@ -243,7 +245,7 @@ bool Entidad::getDibujada(){
 	return this->dibujada;
 }
 
-void Entidad::setDibujada(bool seDibujo){
+void Entidad::setDibujada(bool seDibujo, Mapa* mapa, Personaje* personaje){
 	this->dibujada = seDibujo;
 }
 
@@ -389,7 +391,7 @@ void Entidad::setTileActual(Tile* tile , Mapa* mapa){
 	Post: Se retorna verdadero si se puede ocupar el tile ocupado 
 	por dicha instancia.
 */
-bool Entidad::isCaminable(Tile* tile , Mapa* mapa){
+bool Entidad::isCaminable(Tile* tile){
 	return true;
 }
 
@@ -425,7 +427,7 @@ void Entidad::setColor(bool value){
 }
 
 
-void Entidad::setColor(bool value , int tileX , int tileY) {
+void Entidad::setColor(bool value , int tileX , int tileY, Mapa* mapa, int persX, int persY) {
 	if ( (this -> posX == tileX) && (this -> posY) == tileY) {
 		this -> color = value;	
 	}

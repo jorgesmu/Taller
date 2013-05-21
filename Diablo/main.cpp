@@ -17,6 +17,7 @@
 #include "../../source/display/entidad.h"
 #include "../../source/utilities/Personaje.h"
 #include "../../source/display/entidadFija.h"
+#include "../../source/display/entidadFijaCaminable.h"
 #include "../../source/display/camara.h"
 #include "../../source/display/mapa.h"
 #include "../../source/display/resman.h"
@@ -187,7 +188,7 @@ int main(int argc, char* argv[]) {
 	cargoMapa = true;
 
 	// Agrega el personaje
-	pjm.getPjeLocal().init(pje_local_nick, pje_local_tipo , 1 , 1 , 50 , 5, 100, 100 ,	configuracion.get_vel_personaje(),	0 , 70 , NULL , resman , Imagen::COLOR_KEY);
+	pjm.getPjeLocal().init(pje_local_nick, pje_local_tipo , 1 , 1 , 50 , 5, 100, 100 ,	configuracion.get_vel_personaje(),	0 , 50 , NULL , resman , Imagen::COLOR_KEY);
 	// Posiciono el personaje
 	mapa.getTile(start_pos_x, start_pos_y)->addEntidad(&(pjm.getPjeLocal()));
 	pjm.getPjeLocal().setTileActual(mapa.getTile(start_pos_x, start_pos_y));
@@ -338,7 +339,7 @@ int main(int argc, char* argv[]) {
 		SDL_FillRect(screen, NULL, 0);
 		// Draw el mapa
 		mapa.blit(screen, camara, &(pjm.getPjeLocal()));
-		mapa.setEntidadesDibujadasFalse();
+		mapa.setEntidadesDibujadasFalse(&pjm.getPjeLocal());
 		// Dibujamos la ventana de chat
 		chat_window.show(screen);
 		// Actualizar la pantalla

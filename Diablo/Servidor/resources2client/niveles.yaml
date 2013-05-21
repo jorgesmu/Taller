@@ -7,6 +7,7 @@ configuracion:
 entidades:
   - nombre: piso
     imagen: ../resources/tile2.png
+    caminable: true
   
   - nombre: agua
     imagen: ../resources/tileAgua.png
@@ -22,36 +23,40 @@ entidades:
     alto_base: 4
     pixel_ref_x: 150
     pixel_ref_y: 185
+    caminable: false
 
   - nombre: pino
     imagen: ../resources/pino.png
     ancho_base: 2
     alto_base: 2
-    pixel_ref_x: 120
-    pixel_ref_y: 130
+    pixel_ref_x: 30
+    pixel_ref_y: 120
+    caminable: false
 
   - nombre: arbol
     imagen: ../resources/arbol1.png
     ancho_base: 2
     alto_base: 2
-    pixel_ref_x: 120
-    pixel_ref_y: 80
+    pixel_ref_x: 30
+    pixel_ref_y: 70
+    caminable: false
 
   - nombre: molino
     imagen: ../resources/molino300x320.png
-    ancho_base: 4
-    alto_base: 4
+    ancho_base: 3
+    alto_base: 3
     pixel_ref_x: 120
     pixel_ref_y: 100
     fps: 10
     delay: 100
     alto_sprite: 300
     ancho_sprite: 320
+    caminable: false
 
   - nombre: molino2
     imagen: ../resources/molino300x320.png
-    ancho_base: 4
-    alto_base: 4
+    ancho_base: 3
+    alto_base: 3
     pixel_ref_x: 120
     pixel_ref_y: 100
     fps: 20
@@ -63,11 +68,15 @@ entidades:
   - nombre: soldado
     imagen: ../resources/Soldado.png
     fps: 10
+    pixel_ref_x: 20
+    pixel_ref_y: 20
     esDefault: true
+    caminable: false
 
   - nombre: orco
     imagen: ../resources/Orco.png
     fps: 10
+    caminable: false
 
 escenarios:
   - nombre: bosque_encantado
@@ -102,13 +111,11 @@ escenarios:
       - {x: 31, y: 11, entidad: agua}
       - {x: 31, y: 12, entidad: agua}
       - {x: 31, y: 13, entidad: agua}
-      - {x: 5, y: 5, entidad: pino}
-      - {x: a, y: 11, entidad: pino}
+      - {x: 3, y: 6, entidad: pino}
       - {x: 25, y: 20, entidad: pino}
-      - {x: 1, y: a, entidad: pino}
       - {x: 60, y: 60, entidad: pino}
       - {x: 75, y: 60, entidad: pino}
-      - {x: 3, y: 20, entidad: arbol}
+      - {x: 3, y: 0, entidad: arbol}
       - {x: 10, y: 70, entidad: arbol}
       - {x: 34, y: 17, entidad: arbol}
       - {x: 22, y: 43, entidad: arbol}
@@ -154,13 +161,11 @@ escenarios:
       - {x: 31, y: 11, entidad: agua}
       - {x: 31, y: 12, entidad: agua}
       - {x: 31, y: 13, entidad: agua}
-      - {x: 5, y: 5, entidad: pino}
-      - {x: a, y: 11, entidad: pino}
+      - {x: 3, y: 7, entidad: pino}
       - {x: 25, y: 20, entidad: pino}
-      - {x: 1, y: a, entidad: pino}
       - {x: 60, y: 60, entidad: pino}
       - {x: 75, y: 60, entidad: pino}
-      - {x: 3, y: 20, entidad: arbol}
+      - {x: 5, y: 0, entidad: arbol}
       - {x: 10, y: 70, entidad: arbol}
       - {x: 34, y: 17, entidad: arbol}
       - {x: 22, y: 43, entidad: arbol}

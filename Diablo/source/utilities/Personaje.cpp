@@ -459,8 +459,8 @@ bool Personaje::isCaminable(){
 	Post: Se retorna verdadero si se puede ocupar el tile ocupado 
 	por dicha instancia.
 */
-bool Personaje::isCaminable(Tile* tile , Mapa* mapa){
-	return ( (tile != NULL) && (this -> tileAncla != NULL) && (tile != this -> tileAncla) );
+bool Personaje::isCaminable(Tile* tile){
+	return ( (tile != NULL) && (this -> tileAncla != NULL) && (tile == this -> tileAncla) );
 }
 
 /*

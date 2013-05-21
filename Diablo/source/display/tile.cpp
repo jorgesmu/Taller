@@ -55,9 +55,9 @@ void Tile::blit(SDL_Surface* pantalla, Camara& cam, Personaje* personaje, Mapa* 
 	if((abs(deltaX) <= Personaje::RADIO_VISION_X) && (abs(deltaY) <= Personaje::RADIO_VISION_Y)){
 		//dibujo en colores normales
 		for(auto it = entidades.begin(); it != entidades.end(); ++it) {
-			(*it)->setColor(true,x,y);
+			(*it)->setColor(true,x,y, mapa, (personaje -> getXAnclajeNiebla()), (personaje -> getYAnclajeNiebla()));
 			(*it)->blit(pantalla, &cam, NULL,x, y,true);
-			(*it)->setDibujada(true);
+			(*it)->setDibujada(true, mapa,personaje);
 		}
 		personaje->agregarTilesExplorados(this);
 	}else{
@@ -67,9 +67,9 @@ void Tile::blit(SDL_Surface* pantalla, Camara& cam, Personaje* personaje, Mapa* 
 			//lo bliteo en gris
 			for(auto it = entidades.begin(); it != entidades.end(); ++it) {
 				if((!((*it)->getDibujada())) || ((*it)->get_nombre() == "tierraDefault")){
-					(*it)->setColor(false,x,y);
+					(*it)->setColor(true,x,y, mapa, (personaje -> getXAnclajeNiebla()), (personaje -> getYAnclajeNiebla()));
 					(*it)->blit(pantalla, &cam, NULL,x, y,false);
-					(*it)->setDibujada(true);
+					(*it)->setDibujada(true, mapa,personaje);
 				}else{
 					(*it)->blit(pantalla, &cam, NULL,x, y,false);
 				}
@@ -127,7 +127,7 @@ int Tile::getV(){
 
 bool Tile::isCaminable(){
 	for (auto it = entidades.begin(); it != entidades.end(); ++it){
-		if((*it)->isCaminable() == false){
+		if((*it)->isCaminable(this) == false){
 			return false;
 		}
 	}

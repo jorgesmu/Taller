@@ -80,7 +80,7 @@ class EntidadFija : public Entidad {
 	// Deprecated
 	virtual void setColor(bool value);
 
-	virtual void setColor(bool value , int tileX , int tileY);
+	virtual void setColor(bool value , int tileX , int tileY, Mapa* mapa, int persX, int persY);
 
 	/*
 		Pre:-
@@ -191,7 +191,7 @@ class EntidadFija : public Entidad {
 		Post: Se retorna verdadero si se puede ocupar el tile ocupado 
 		por dicha instancia.
 	*/
-	virtual bool isCaminable(Tile* tile , Mapa* mapa);
+	virtual bool isCaminable(Tile* tile);
 
 	virtual bool isCaminable();
 	
@@ -201,6 +201,8 @@ class EntidadFija : public Entidad {
 	*/
 	virtual Tile* getPosicion(Mapa* mapa);
 
+	virtual void setDibujada(bool seDibujo, Mapa* mapa , Personaje* personaje);
+	
 protected:	
 	
 	/*

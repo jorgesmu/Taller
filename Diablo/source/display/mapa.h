@@ -34,7 +34,7 @@ class Mapa {
 	// Blittea todo el mapa
 	void blit(SDL_Surface* dest, Camara& camara , Personaje* personaje);
 	//setea entidades dibujadas en false
-	void setEntidadesDibujadasFalse();
+	void setEntidadesDibujadasFalse(Personaje* personaje);
 	// Libera los recursos
 	void clean();
 	// Devuelve el tile segun su posicion en el mapa dado por el pixel superior

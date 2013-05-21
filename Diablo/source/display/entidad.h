@@ -10,6 +10,7 @@
 #include "SDL.h"
 class Mapa;    // Declaración adelantada de Mapa
 class Tile;    // Declaración adelantada de Tile
+class Personaje;
 /*	
 	Aclaraciones sobre esta clase:
 	
@@ -54,6 +55,8 @@ class Entidad {
 		std::vector<Tile*> tilesExplorados; //los tiles que ya visito
 
 		bool color;
+
+		bool caminable;
 
 public:
 	
@@ -215,7 +218,7 @@ public:
 		Post: Se retorna verdadero si se puede ocupar el tile donde se encuentra la
 		instancia.
 	*/
-	virtual bool isCaminable(Tile* tile , Mapa* mapa);
+	virtual bool isCaminable(Tile* tile);
 
 	virtual bool isCaminable();
 	/*
@@ -230,7 +233,7 @@ public:
 
 	bool getDibujada();
 
-	void setDibujada(bool seDibujo);
+	virtual void setDibujada(bool seDibujo, Mapa* mapa , Personaje* personaje);
 
 	virtual std::vector<Tile*> getTilesExplorados();
 
@@ -239,7 +242,7 @@ public:
 	// Deprecated
 	virtual void setColor(bool value);
 
-	virtual void setColor(bool value , int tileX , int tileY);
+	virtual void setColor(bool value , int tileX , int tileY, Mapa* mapa, int persX, int persY);
 
 protected:	
 		

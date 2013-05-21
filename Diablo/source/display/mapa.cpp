@@ -84,11 +84,11 @@ void Mapa::clean() {
 }
 
 
-void Mapa::setEntidadesDibujadasFalse(){
+void Mapa::setEntidadesDibujadasFalse(Personaje* personaje){
 	for(auto it = tiles.begin(); it != tiles.end(); ++it) {
 		std::vector<Entidad*> entidadesTile = it->getEntidades();
 		for(auto it2 = entidadesTile.begin(); it2 != entidadesTile.end(); ++it2){
-			(*it2)->setDibujada(false);
+			(*it2)->setDibujada(false , this , personaje);
 		}
 	}
 }

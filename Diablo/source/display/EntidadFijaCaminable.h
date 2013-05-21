@@ -60,7 +60,7 @@ class EntidadFijaCaminable : public EntidadFija{
 		Post: Se retorna verdadero si se puede ocupar el tile ocupado 
 		por dicha instancia.
 	*/
-	virtual bool isCaminable(Tile* tile , Mapa* mapa);
+	virtual bool isCaminable(Tile* tile);
 
 	/*
 		Pre: La instancia ha sido creada.

@@ -8,7 +8,7 @@ class Mapa;
 class Personaje : public Entidad {
 public:
 
-		const static int RADIO_VISION_Y = 225;
+		const static int RADIO_VISION_Y = 125;
 
 		const static int RADIO_VISION_X = 2 * RADIO_VISION_Y; // En pixeles
 
@@ -185,7 +185,7 @@ public:
 		Post: Se retorna verdadero si se puede ocupar el tile donde se encuentra la
 		instancia.
 	*/
-	virtual bool isCaminable(Tile* tile , Mapa* mapa);
+	virtual bool isCaminable(Tile* tile);
 
 	/*
 		Pre: La instancia ha sido creada.

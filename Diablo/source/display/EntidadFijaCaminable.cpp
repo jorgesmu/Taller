@@ -67,7 +67,7 @@
 		Post: Se retorna verdadero si se puede ocupar el tile ocupado 
 		por dicha instancia.
 	*/
-	bool EntidadFijaCaminable::isCaminable(Tile* tile , Mapa* mapa){
+	bool EntidadFijaCaminable::isCaminable(Tile* tile){
 		return true;
 	}
 

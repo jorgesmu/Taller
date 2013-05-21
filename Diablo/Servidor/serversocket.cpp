@@ -312,6 +312,7 @@ bool ServerSocket::removeClient(const std::string& str_id) {
 		}
 		// Borramos
 		clients_map.erase(str_id);
+		queue_buf.erase(str_id);
 		ret = true;
 	}
 	LeaveCriticalSection(&critSect);
@@ -450,6 +451,7 @@ void ServerSocket::acceptLastDo() {
 			pm.addPlayer(new_nick, new_type, mapa);
 
 		}
+		pm.getPlayer(new_nick).setOnline();
 		
 		// Le mandamos la posicion inicial
 		BitStream bs;
@@ -487,11 +489,11 @@ void ServerSocket::acceptLastDo() {
 		}
 
 		// Mandamos todos los otros players al que se unio
-		for(auto it = clients_map.begin();it != clients_map.end();it++) {
-			if(it->second.nick == new_nick) continue; // Salteamos a nuestro jugador			
-			auto p = pm.getPlayer(it->second.nick);
+		for(auto it = pm.getPlayers().begin();it != pm.getPlayers().end();it++) {
+			if(it->second.getNick() == new_nick) continue; // Salteamos a nuestro jugador			
+			auto p = pm.getPlayer(it->second.getNick());
 			bs.clear();
-			bs << PROTO::NEW_PLAYER << it->second.nick << p.getTipo() << p.getX() << p.getY() << p.isOn();
+			bs << PROTO::NEW_PLAYER << it->second.getNick() << p.getTipo() << p.getX() << p.getY() << p.isOn();
 			send(cid, bs.str());
 		}
 		
@@ -513,11 +515,24 @@ void ServerSocket::acceptLastDo() {
 			bs >> pt;
 
 			if(pt == PROTO::CHAT) {
+				// Leemos para saber a quien mandar
+				std::string nick_destino, nick_source, mensaje;
+				bs >> nick_source >> nick_destino >> mensaje;
 				bs.clear();
-				ss.str("");
-				ss << "<" << getClient(cid).nick << "> " << buff.substr(1, buff.size());
-				bs << PROTO::TEXTMSG << ss.str();
-				this->sendAll(bs.str());
+				bs << PROTO::CHAT << nick_source << nick_destino << mensaje;
+				int found_count = 0;
+				for(auto it = clients_map.begin();it != clients_map.end();it++) {
+					if(it->second.nick == nick_source || it->second.nick == nick_destino) {
+						this->send(it->second.sock, bs.str());
+						found_count++;
+					}
+				}
+				// No se encontro el destino (calculo)
+				if(found_count < 2) {
+					bs.clear();
+					bs << PROTO::CHAT << std::string("SERVER") << std::string("SERVER") << std::string("Player unavailable");
+					send(cid, bs.str());
+				}
 			}else if(pt == PROTO::NIEBLA_SYNC) {
 				int new_tile_x, new_tile_y;
 				bs >> new_tile_x >> new_tile_y;
@@ -534,6 +549,7 @@ void ServerSocket::acceptLastDo() {
 		bs.clear();
 		bs << PROTO::PLAYER_EXIT << new_nick;
 		removeClient(cid);
+		pm.getPlayer(new_nick).setOffline();
 		this->sendAll(bs.str());
 		
 

@@ -62,10 +62,12 @@ void Tile::blit(SDL_Surface* pantalla, Camara& cam, Personaje* personaje, Mapa* 
 		personaje->agregarTilesExplorados(this);
 	}else{
 		std::vector<Tile*> tilesExplorados = personaje->getTilesExplorados();
-		
+
 		if(std::find(tilesExplorados.begin(), tilesExplorados.end(), this) != tilesExplorados.end()){
 			//lo bliteo en gris
 			for(auto it = entidades.begin(); it != entidades.end(); ++it) {
+				if((*it)->noDibujaFueraDelRadio()) continue;
+
 				if((!((*it)->getDibujada())) || ((*it)->get_nombre() == "tierraDefault")){
 					(*it)->setColor(true,x,y, mapa, (personaje -> getXAnclajeNiebla()), (personaje -> getYAnclajeNiebla()));
 					(*it)->blit(pantalla, &cam, NULL,x, y,false);

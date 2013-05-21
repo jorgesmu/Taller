@@ -39,6 +39,10 @@ std::string Player::getTipo() const {
 	return tipo_personaje;
 }
 
+std::string Player::getNick() const {
+	return nick;
+}
+
 bool Player::isOn() const {
 	return this->isOnline;
 }
@@ -106,4 +110,8 @@ void PlayerManager::addPlayer(const std::string& nick, const std::string& tipo_p
 Player& PlayerManager::getPlayer(const std::string& nick) {
 	assert(playerExists(nick));
 	return player_map[nick];
+}
+
+PlayerMapT& PlayerManager::getPlayers() {
+	return this->player_map;
 }

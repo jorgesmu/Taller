@@ -1,6 +1,8 @@
 #include "chatwindow.h"
 #include "../display/resman.h"
 #include "../utilities/aux_func.h"
+#include "../../Cliente/clientsocket.h"
+#include "../net/bitstream.h"
 
 #include <sstream>
 
@@ -38,14 +40,15 @@ void ChatWindow::init(ResMan* rm, int x, int y, int font_size, int height, int w
 
 }
 
-int ChatWindow::handleInput(SDL_Event &event) {
+int ChatWindow::handleInput(SDL_Event &event, ClientSocket& sock) {
 	// Control del input de texto
 	int res = input_box.handleInput(event);
 	if(res == SInput::RES_CLOSE) {
 		this->hide();
 	}else if(res == SInput::RES_ENTER) {
-		// En vez de nicklocal iria personajes.getLocal().getNombre() o algo asi
-		this->addMsg(nick_local, input_box.getText());
+		BitStream bs;
+		bs << PROTO::CHAT << nick_local << nick_destino << input_box.getText();
+		sock.send(bs.str());
 	}
 	// Control del input del mouse
 	if(event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT) {
@@ -55,6 +58,7 @@ int ChatWindow::handleInput(SDL_Event &event) {
 				event.button.y < y + CLOSE_BUTTON_SIDE)
 		{
 			res = SInput::RES_CLOSE;
+			this->hide();
 		}
 		
 	}
@@ -101,6 +105,24 @@ void ChatWindow::addMsg(const std::string& nick, const std::string& msg) {
 	std::stringstream ss;
 	ss << "<" << nick << "> " << msg;
 	std::string res = ss.str();
+	if(res.size() > max_msg_width) {
+		while(res.size() > max_msg_width) {
+			const int delta = res.size() - max_msg_width;
+			msg_queue.push_back(res.substr(0, max_msg_width));
+			res.erase(0, max_msg_width);
+		}
+		msg_queue.push_back(res);
+	}else{
+		msg_queue.push_back(res);
+	}
+	while(msg_queue.size() > this->max_msg_count) {
+		msg_queue.pop_front();
+	}
+}
+
+void ChatWindow::addMsgRaw(const std::string& msg) {
+	// Formateamos y agregamos el mensaje
+	std::string res = msg;
 	if(res.size() > max_msg_width) {
 		while(res.size() > max_msg_width) {
 			const int delta = res.size() - max_msg_width;

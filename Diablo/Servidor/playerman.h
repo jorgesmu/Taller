@@ -29,16 +29,19 @@ class Player {
 	bool isOn() const;
 	void setOffline();
 	void setOnline();
+	std::string getNick() const;
 
 	void addTileRecorrido(short x, short y);
 	TilesRecorridos& getTilesRecorridos();
 
 };
 
+typedef std::map<std::string, Player> PlayerMapT;
+
 class PlayerManager {
 	private:
 	// Hash con los jugadores que entraron al servidor
-	std::map<std::string, Player> player_map;
+	PlayerMapT player_map;
 
 	public:
 	// Devuelve si un player existe
@@ -48,5 +51,7 @@ class PlayerManager {
 	void addPlayer(const std::string& nick, const std::string& tipo_pj, MapaServidor& mapa);
 	// Devuelve un jugador
 	Player& getPlayer(const std::string& nick);
+	// Devuelve el mapa de jugadores
+	PlayerMapT& getPlayers();
 
 };

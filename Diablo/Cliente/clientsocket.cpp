@@ -5,6 +5,7 @@
 #include "../../source/utilities/config_cliente.h"
 #include "../../source/utilities/parser.h"
 #include "clientsocket.h"
+#include "../../source/utilities/chatwindow.h"
 #include <iostream>
 #include <fstream>
 
@@ -19,6 +20,7 @@ extern int start_pos_x, start_pos_y;
 extern int escenario_elegido_id;
 extern config_general configuracion;
 extern ResMan resman;
+extern ChatWindow chat_window;
 
 bool ClientSocket::WSinit = false;
 size_t ClientSocket::ref_count = 0;
@@ -218,6 +220,18 @@ void ClientSocket::listenDo() {
 			std::string msg;
 			bs >> msg;
 			std::cout << "Server says: " << msg << "\n";
+		}else if(pt == PROTO::CHAT) {
+			std::string nick_source, nick_destino, mensaje;
+			bs >> nick_source >> nick_destino >> mensaje;
+			if(nick_source == "SERVER" && nick_destino == "SERVER") {
+				chat_window.addMsgRaw(mensaje);
+			}else{
+				if(nick_source != pjm.getPjeLocal().getNick()) {
+					chat_window.setNickDestino(nick_source);	
+				}
+				chat_window.addMsg(nick_source, mensaje);
+			}
+			chat_window.open();
 		}else if(pt == PROTO::FILE_SEND_COUNT) {
 			// Leemos la cantidad de archivos
 			Uint16 fcount;
@@ -238,7 +252,7 @@ void ClientSocket::listenDo() {
 
 				std::string local_file;
 				bs >> local_file;
-				std::cout << "Receiving " << local_file << "...\n";
+				std::cout << "Receiving " << local_file;
 				std::ofstream f(std::string("../resources/")+local_file, std::ios_base::binary|std::ios_base::trunc);
 				if(f.fail()) {
 					std::cout << "Error opening " << local_file << "\n";
@@ -256,10 +270,10 @@ void ClientSocket::listenDo() {
 					if(pt == PROTO::FILE_PART) {
 						bs >> tmp_chunk;
 						f.write(tmp_chunk.c_str(), tmp_chunk.size());
-						//std::cout << "Writing chunk..\n";
+						std::cout << "." << std::flush;
 					}else if(pt == PROTO::FILE_DONE) {
 						f.close();
-						std::cout << "File done!\n";
+						std::cout << "Ok!\n";
 						break;
 					}else{
 						f.write(bs.data(), bs.size());
@@ -322,12 +336,18 @@ void ClientSocket::listenDo() {
 				mapa.getTile(x, y)->addEntidad(&p);
 				p.setTileActual(mapa.getTile(x, y));
 				if(!is_on) {
-					//p.setInactivo();
+					p.setInactivo();
+				}else{
+					p.setActivo();
 				}
 			}else{
 				// Si existe, lo marcamos como color
 				auto& p = pjm.getPje(new_nick);
-				//p.setActivo();
+				if(!is_on) {
+					p.setInactivo();
+				}else{
+					p.setActivo();
+				}
 			}
 			}else if(pt == PROTO::PLAYER_EXIT) {
 			// Esperamos a que cargue el mapa
@@ -336,14 +356,14 @@ void ClientSocket::listenDo() {
 			}
 			std::string who_nick;
 			bs >> who_nick;
-			std::cout << "RECEIVED PLAYER_EXIT: " << who_nick << "\n";
+			//std::cout << "RECEIVED PLAYER_EXIT: " << who_nick << "\n";
 			// Si no existe el personaje, error
 			if(!pjm.PjeExiste(who_nick)) {
 				std::cerr << "Error @ PLAYER_EXIT: " << who_nick << " not found\n";
 			}else{
 				// Si existe, lo marcamos como desconectado
 				auto& p = pjm.getPje(who_nick);
-				//p.setInactivo();
+				p.setInactivo();
 			}
 		}else{
 			std::cout << "Unknown packet type " << int(pt) << " received\n";

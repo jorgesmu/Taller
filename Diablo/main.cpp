@@ -221,22 +221,13 @@ int main(int argc, char* argv[]) {
 		while(SDL_PollEvent(&event)) {
 
 			if(chat_window.isOpen()) {
-
-				int res = chat_window.handleInput(event);
-				if(res == SInput::RES_CLOSE) {
-					chat_window.hide();
-				}else if(res == SInput::RES_ENTER) {
-					// Enviar el mensaje al servidor
-				}
+				chat_window.handleInput(event, sock);
 
 			}else{
 
 				// Detectar escape o quit
 				if(event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE || event.type == SDL_QUIT) {
 					quit = true;
-				}
-				if(event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_RETURN) {
-					chat_window.open();
 				}
 				// Detectar mouse motion
 				if(event.type == SDL_MOUSEMOTION) {
@@ -253,20 +244,22 @@ int main(int argc, char* argv[]) {
 							Tile* tileDestino = mapa.getTile(tile_res.x, tile_res.y);
 
 							// Verificamos si hay un personaje para activar el chat
-							/*const auto& ents = tileDestino->getEntidades();
 							bool found_pje = false;
-							for(auto it = ents.begin();it != ents.end();it++) {
-								if((*it)->esPersonaje()) { //??
-									chat_window.setNickDestino((*it)->getNick()); //??
-									chat_window.open();
+							//std::cout << "CLICK @ " << tile_res.x << ";" << tile_res.y << "\n";
+							for(auto it = pjm.getPjes().begin();it != pjm.getPjes().end();it++) {
+								if(tileDestino == mapa.getTilePorPixeles(it->second.getX(), it->second.getY())) {
 									found_pje = true;
+									if(!it->second.isActivo()) continue; // Si no está activo, no abrimos el chat
+									chat_window.setNickDestino(it->second.getNick());
+									chat_window.open();
+									break;
 								}
-							}*/
+							}
 
-							//if(!found_pje) {
+							if(!found_pje) {
 								caminoMinimo = mapa.getCaminoMinimo(tilePersonaje, tileDestino);
 								indice = 1;
-							//}
+							}
 
 						}
 					}
@@ -305,6 +298,7 @@ int main(int argc, char* argv[]) {
 					//establezo proximo tile del camino
 					pair <int,int> proximoTile = caminoMinimo[indice];
 					pjm.getPjeLocal().mover(mapa.getTile(proximoTile.first,proximoTile.second));										
+					std::cout << "PROX TILE: " << proximoTile.first << ";" << proximoTile.second << "\n";
 					indice++;
 				}
 			}

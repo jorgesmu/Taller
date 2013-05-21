@@ -30,6 +30,7 @@ void Entidad::inicializarAtributosEnValoresDefault() {
 	//seteo como compartido
 	this -> compartido = true;
 	this -> caminable = true;
+	this -> no_dibujar_fuera_flag = false;
 }
 
 /*
@@ -198,6 +199,7 @@ void Entidad::init(const std::string& name,
 	//seteo como compartido
 	this -> compartido = true;
 	this -> caminable = caminable;
+	this -> entidadDesconectada = false;
 }
 	
 /*
@@ -294,7 +296,7 @@ void Entidad::blit(SDL_Surface* dest , Camara* camara , Mapa* mapa,
 				posX = this -> posX - (int)(camara -> getX()) - this -> pixel_ref_x;
 				posY = this -> posY - (int)(camara -> getY()) - this -> pixel_ref_y;
 			}
-			if (!this->color) {
+			if (!this->color || entidadDesconectada) {
 				this -> surf -> blitGris(dest , posX ,posY);	
 			} else {
 				this -> surf -> blit(dest , posX ,posY);		
@@ -344,7 +346,7 @@ void Entidad::blit(SDL_Surface* dest , Camara* camara , Mapa* mapa,
 				posX = this -> posX - (int)(camara -> getX()) - this -> pixel_ref_x;
 				posY = this -> posY - (int)(camara -> getY()) - this -> pixel_ref_y;
 			}
-			if (!colorAux) {
+			if (!colorAux || entidadDesconectada) {
 				this -> surf -> blitGris(dest , posX ,posY);	
 			} else {
 				this -> surf -> blit(dest , posX ,posY);		

@@ -15,7 +15,6 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="source\display\camara.cpp" />
     <ClCompile Include="source\display\entidad.cpp" />
-    <ClCompile Include="source\display\entidad2.cpp" />
     <ClCompile Include="source\display\entidadFija.cpp" />
     <ClCompile Include="source\display\EntidadFijaCaminable.cpp" />
     <ClCompile Include="source\display\font.cpp" />
@@ -56,7 +55,6 @@
     <ClInclude Include="source\constants\model.h" />
     <ClInclude Include="source\display\camara.h" />
     <ClInclude Include="source\display\entidad.h" />
-    <ClInclude Include="source\display\entidad2.h" />
     <ClInclude Include="source\display\entidadFija.h" />
     <ClInclude Include="source\display\EntidadFijaCaminable.h" />
     <ClInclude Include="source\display\font.h" />

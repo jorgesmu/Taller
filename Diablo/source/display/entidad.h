@@ -50,6 +50,9 @@ class Entidad {
 
 		bool compartido; //si es compartido por varios tiles
 
+		bool entidadDesconectada; // true si la entidad es siempre gris (ej, personaje offline)
+		bool no_dibujar_fuera_flag; // true para cosas que no se dibujan en zona gris
+
 		bool dibujada; //
 
 		std::vector<Tile*> tilesExplorados; //los tiles que ya visito
@@ -144,7 +147,13 @@ public:
 					Tile* tile , 
 					ResMan& rm , const int colorKey);
 
+	// Cosas varias para red
 	std::string get_nombre();
+	void setInactivo() { entidadDesconectada = true; }
+	void setActivo() { entidadDesconectada = false; }
+	bool isActivo() const { return entidadDesconectada == false; }
+	void setNoDibujaFueraDelRadio() { no_dibujar_fuera_flag = true; }
+	bool noDibujaFueraDelRadio() { return no_dibujar_fuera_flag; }
 				
 	/*
 		retorna el alto en tiles

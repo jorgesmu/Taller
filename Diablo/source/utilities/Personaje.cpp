@@ -148,6 +148,7 @@ void Personaje::init(const std::string& nickname, const std::string& name,
 	this -> compartido = false;
 	//seteo flag de actualizando posicion
 	this -> actualizandoPosicion = false;
+	this -> setNoDibujaFueraDelRadio();
 }
 
 /*

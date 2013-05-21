@@ -299,80 +299,45 @@ void Mapa::actualizarGrafoVertice(int tileX,int tileY){
 	
 }
 //actualiza el grafo con la informacion del mapa luego de moverse de un tile a otro
-void Mapa::actualizarGrafo(int xOrigen, int yOrigen,int xDestino,int yDestino){
+void Mapa::actualizarGrafo(int pos_x, int pos_y){
 	//actualizo origen y adyacencias
-	actualizarGrafoVertice(xOrigen,yOrigen);
+	actualizarGrafoVertice(pos_x,pos_y);
 	//actualizo adyacencias de x
-	if (tileExists(xOrigen - 1 ,yOrigen)){
+	if (tileExists(pos_x - 1 ,pos_y)){
 		//derecha
-		actualizarGrafoVertice(xOrigen + 1,yOrigen);
+		actualizarGrafoVertice(pos_x + 1,pos_y);
 	}
-	if (tileExists(xOrigen - 1 ,yOrigen)){
+	if (tileExists(pos_x - 1 ,pos_y)){
 		//izquierda
-		actualizarGrafoVertice(xOrigen - 1,yOrigen);
+		actualizarGrafoVertice(pos_x - 1,pos_y);
 	}
-	if (tileExists(xOrigen ,yOrigen -1)){
+	if (tileExists(pos_x ,pos_y -1)){
 		//arriba
-		actualizarGrafoVertice(xOrigen,yOrigen -1);
+		actualizarGrafoVertice(pos_x,pos_y -1);
 	}
-	if (tileExists(xOrigen ,yOrigen + 1)){
+	if (tileExists(pos_x ,pos_y + 1)){
 		//abajo
-		actualizarGrafoVertice(xOrigen,yOrigen + 1);
+		actualizarGrafoVertice(pos_x,pos_y + 1);
 	}
-	if (tileExists(xOrigen + 1 ,yOrigen -1)){
+	if (tileExists(pos_x + 1 ,pos_y -1)){
 		//derecha arriba
-		actualizarGrafoVertice(xOrigen + 1,yOrigen -1);
+		actualizarGrafoVertice(pos_x + 1,pos_y -1);
 	}
-	if (tileExists(xOrigen + 1 ,yOrigen + 1)){
+	if (tileExists(pos_x + 1 ,pos_y + 1)){
 		//derecha abajo
-		actualizarGrafoVertice(xOrigen + 1,yOrigen + 1);
+		actualizarGrafoVertice(pos_x + 1,pos_y + 1);
 	}
 	
-	if (tileExists(xOrigen -1 ,yOrigen + 1)){
+	if (tileExists(pos_x -1 ,pos_y + 1)){
 		//izquierda abajo
-		actualizarGrafoVertice(xOrigen - 1,yOrigen + 1);
+		actualizarGrafoVertice(pos_x - 1,pos_y + 1);
 	}
-	if (tileExists(xOrigen -1 ,yOrigen - 1)){
+	if (tileExists(pos_x -1 ,pos_y - 1)){
 		//izquierda arriba
-		actualizarGrafoVertice(xOrigen - 1,yOrigen - 1);
+		actualizarGrafoVertice(pos_x - 1,pos_y - 1);
 	}
 
-	//ahora actualizo para el vertice destino destino
-	actualizarGrafoVertice(xDestino,yDestino);
-	//actualizo adyacencias de x
-	if (tileExists(xDestino - 1 ,yDestino)){
-		//derecha
-		actualizarGrafoVertice(xDestino + 1,yDestino);
-	}
-	if (tileExists(xDestino - 1 ,yDestino)){
-		//izquierda
-		actualizarGrafoVertice(xDestino - 1,yDestino);
-	}
-	if (tileExists(xDestino ,yDestino -1)){
-		//arriba
-		actualizarGrafoVertice(xDestino,yDestino -1);
-	}
-	if (tileExists(xDestino ,yDestino + 1)){
-		//abajo
-		actualizarGrafoVertice(xDestino,yDestino + 1);
-	}
-	if (tileExists(xDestino + 1 ,yDestino -1)){
-		//derecha arriba
-		actualizarGrafoVertice(xDestino + 1,yDestino -1);
-	}
-	if (tileExists(xDestino + 1 ,yDestino + 1)){
-		//derecha abajo
-		actualizarGrafoVertice(xDestino + 1,yDestino + 1);
-	}
-	
-	if (tileExists(xDestino -1 ,yDestino + 1)){
-		//izquierda abajo
-		actualizarGrafoVertice(xOrigen - 1,yDestino + 1);
-	}
-	if (tileExists(xDestino -1 ,yDestino - 1)){
-		//izquierda arriba
-		actualizarGrafoVertice(xDestino - 1,yDestino - 1);
-	}
+
 }
 vector <pair<int,int> > Mapa::getCaminoMinimo(Tile* tileOrigen, Tile* tileDestino){
 	if(tileOrigen == tileDestino){

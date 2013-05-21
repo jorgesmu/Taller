@@ -354,6 +354,7 @@ int main(int argc, char* argv[]) {
 						Tile* tProx = mapa.getTile(proximoTile.first, proximoTile.second);
 						tProx->setNoCaminable();
 						// Actualizo el grafo
+						mapa.actualizarGrafo(tProx->getU(),tProx->getV());
 						// recalculo el camino
 						//el camino va desde ultimo tile al que me movi, hasta el que hice click que es el ultimo del camino anterior
 						Tile* tilePersonaje = mapa.getTile(ultimoMovimientoX,ultimoMovimientoY);
@@ -364,6 +365,7 @@ int main(int argc, char* argv[]) {
 						indice = 1;
 						// Despues de actualizar el grafo, desmarco el tile
 						tProx->setCaminable();
+						mapa.actualizarGrafo(tProx->getU(),tProx->getV());
 					}else if(estadoMovimiento == MOV::ESPERANDO_OK) {
 						//std::cout << "ESPERANDO_OK\n";
 						// Nada

@@ -46,7 +46,7 @@ class Mapa {
 	//actualiza unicamente un vertice
 	void Mapa::actualizarGrafoVertice(int tileX,int tileY);
 	//actualiza el grafo con la informacion del mapa luego de moverse de un tile a otro
-	void actualizarGrafo(int xOrigen, int yOrigen,int xDestino,int yDestino);
+	void Mapa::actualizarGrafo(int pos_x, int pos_y);
 	//devuelve el camino minimo
 	vector <pair<int,int>> getCaminoMinimo(Tile* tileOrigen, Tile* tileDestino);
 };

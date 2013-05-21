@@ -350,6 +350,10 @@ int main(int argc, char* argv[]) {
 					}else if(estadoMovimiento == MOV::FAIL_RECV) {
 						std::cout << "FAIL_RECV\n";
 						estadoMovimiento = MOV::IDLE;
+						// Marco el tile como no caminable temporalmente
+						Tile* tProx = mapa.getTile(proximoTile.first, proximoTile.second);
+						tProx->setNoCaminable();
+						// Actualizo el grafo
 						// recalculo el camino
 						//el camino va desde ultimo tile al que me movi, hasta el que hice click que es el ultimo del camino anterior
 						Tile* tilePersonaje = mapa.getTile(ultimoMovimientoX,ultimoMovimientoY);
@@ -358,6 +362,8 @@ int main(int argc, char* argv[]) {
 						caminoMinimo.clear();
 						caminoMinimo = mapa.getCaminoMinimo(tilePersonaje, tileDestino);
 						indice = 1;
+						// Despues de actualizar el grafo, desmarco el tile
+						tProx->setCaminable();
 					}else if(estadoMovimiento == MOV::ESPERANDO_OK) {
 						//std::cout << "ESPERANDO_OK\n";
 						// Nada

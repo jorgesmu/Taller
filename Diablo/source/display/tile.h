@@ -45,4 +45,7 @@ class Tile {
 	bool sinEntidades() const;
 
 	bool isCaminable();
+	bool force_no_caminable;
+	void setNoCaminable();
+	void setCaminable();
 };

@@ -2,6 +2,7 @@
 #include "mapa.h"
 
 Tile::Tile() {
+	force_no_caminable = false;
 }
 
 //deprecated
@@ -128,10 +129,22 @@ int Tile::getV(){
 }
 
 bool Tile::isCaminable(){
-	for (auto it = entidades.begin(); it != entidades.end(); ++it){
-		if((*it)->isCaminable(this) == false){
-			return false;
+	if(force_no_caminable) {
+		return true;
+	}else{
+		for (auto it = entidades.begin(); it != entidades.end(); ++it){
+			if((*it)->isCaminable(this) == false){
+				return false;
+			}
 		}
+		return true;
 	}
-	return true;
+}
+
+void Tile::setNoCaminable() {
+	force_no_caminable = true;
+}
+
+void Tile::setCaminable() {
+	force_no_caminable = false;
 }

@@ -46,7 +46,6 @@ public:
 	const static unsigned int DEF_NOROESTE = 30;
 	const static unsigned int DEF_OESTE = 31;
 	const static unsigned int DEF_SUROESTE = 32;
-
 	//Avanzar direccion actual
 	const static unsigned int AVANCE_DIRECCION_ACTUAL = 33;
 	//Atacar en direccion actual
@@ -55,14 +54,18 @@ public:
 	const static unsigned int ESTATICO_DIRECCION_ACTUAL = 35;
 	//Defender direccion actual
 	const static unsigned int DEFENSA_DIRECCION_ACTUAL = 36;
+	//Freezar accion actual
+	const static unsigned int FREEZAR_ACCION_ACTUAL = 37;
 	//Continua con la accion actual
-	const static unsigned int CONTINUAR_CON_ACCION_ACTUAL = 37;
+	const static unsigned int CONTINUAR_CON_ACCION_ACTUAL = 38;
 
 private:
 
 	unsigned int accionActual;
 	 
 	unsigned int accionSiguiente;
+
+	bool freezado;
 
 public:	
 
@@ -133,6 +136,8 @@ public:
 	virtual void nextSprite();
 
 	virtual bool isImagenAnimada();
+
+	virtual bool isImagenFreezada();
 
 private:
 

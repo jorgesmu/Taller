@@ -23,6 +23,7 @@ ImagenPersonaje::ImagenPersonaje(const char* name , const int altoSprite ,
 				ImagenAnimada(name ,altoSprite , anchoSprite , fps , delay , rm , colorKey) {
 	this -> accionActual = ImagenPersonaje::EST_SUR;
 	this -> setAccion(ImagenPersonaje::EST_SUR);
+	this -> freezado = false;
 }
 
 /**
@@ -49,6 +50,7 @@ ImagenPersonaje::ImagenPersonaje(const char* path , const int altoSprite , const
 				ImagenAnimada(path , altoSprite , anchoSprite , fps , delay , colorKey) {
 	this -> accionActual = ImagenPersonaje::EST_SUR;
 	this -> setAccion(ImagenPersonaje::EST_SUR);
+	this -> freezado = false;
 }
 
 
@@ -368,7 +370,11 @@ bool ImagenPersonaje::setAccion(unsigned int accion){
 						}
 					}
 					break;
-				}		
+				}
+				//Freezar / Desfreezar
+				case ImagenPersonaje::FREEZAR_ACCION_ACTUAL : {
+					this -> freezado = ! this -> freezado;
+				}	
 			}
 		}	
 	} else {
@@ -386,36 +392,38 @@ bool ImagenPersonaje::setAccion(unsigned int accion){
 	Post: Se ha actualizado surfaceActual
 */
 void ImagenPersonaje::nextSprite() {
-	clock_t tiempoActual = clock();
-	if (this -> tiempoProximoFrame <= tiempoActual) {
-		this -> surfaceActual.nuevoSurfaceConfigurado(this -> getAlto() ,
-					this -> getAncho() , SDL_GetVideoInfo() , colorKey);
-		if ((this -> maxColumnas > 0) && (this -> maxFilas > 0) ) {
-			this -> setAccion(this -> accionSiguiente);
-			this -> columnaActual++;
-			this -> tiempoProximoFrame += this -> deltaFrame;
-			// Ataques o defesas vuelven a su estatico correspondiente
-			if (this -> columnaActual >= this -> maxColumnas) { 
-				if ( (this -> accionActual >= ImagenPersonaje::AT_SUR) &&
-					 (this -> accionActual <= ImagenPersonaje::AT_SUROESTE) ){
-						 this -> accionSiguiente = this -> accionActual + 8;
-				} else {
-					if ( (this -> accionActual >= ImagenPersonaje::DEF_SUR) &&
-					 (this -> accionActual <= ImagenPersonaje::DEF_SUROESTE) ){
-						 this -> accionSiguiente = this -> accionActual - 9;
+	if (!this -> freezado) {
+		clock_t tiempoActual = clock();
+		if (this -> tiempoProximoFrame <= tiempoActual) {
+			this -> surfaceActual.nuevoSurfaceConfigurado(this -> getAlto() ,
+						this -> getAncho() , SDL_GetVideoInfo() , colorKey);
+			if ((this -> maxColumnas > 0) && (this -> maxFilas > 0) ) {
+				this -> setAccion(this -> accionSiguiente);
+				this -> columnaActual++;
+				this -> tiempoProximoFrame += this -> deltaFrame;
+				// Ataques o defesas vuelven a su estatico correspondiente
+				if (this -> columnaActual >= this -> maxColumnas) { 
+					if ( (this -> accionActual >= ImagenPersonaje::AT_SUR) &&
+						 (this -> accionActual <= ImagenPersonaje::AT_SUROESTE) ){
+							 this -> accionSiguiente = this -> accionActual + 8;
+					} else {
+						if ( (this -> accionActual >= ImagenPersonaje::DEF_SUR) &&
+						 (this -> accionActual <= ImagenPersonaje::DEF_SUROESTE) ){
+							 this -> accionSiguiente = this -> accionActual - 9;
+						}
 					}
+					this -> columnaActual = 0;
+					this -> tiempoProximoFrame += this -> delay;
 				}
-				this -> columnaActual = 0;
-				this -> tiempoProximoFrame += this -> delay;
-			}
-			SDL_Rect rect;
-			rect.h = this -> getAlto();
-			rect.w = this ->getAncho();
-			rect.x = this -> columnaActual * this -> getAncho();
-			rect.y = this -> filaActual * this -> getAlto();
-			if (this ->surfaceOrigen != NULL) {
-				this -> surfaceOrigen -> blit( (this -> surfaceActual).getSDL_Surface() , 0 , 0, rect);
-				this -> surfaceOrigen -> blitGris( (this -> surfaceActual).getSDL_SurfaceGris() , 0 , 0, rect);
+				SDL_Rect rect;
+				rect.h = this -> getAlto();
+				rect.w = this ->getAncho();
+				rect.x = this -> columnaActual * this -> getAncho();
+				rect.y = this -> filaActual * this -> getAlto();
+				if (this ->surfaceOrigen != NULL) {
+					this -> surfaceOrigen -> blit( (this -> surfaceActual).getSDL_Surface() , 0 , 0, rect);
+					this -> surfaceOrigen -> blitGris( (this -> surfaceActual).getSDL_SurfaceGris() , 0 , 0, rect);
+				}
 			}
 		}
 	}
@@ -444,4 +452,8 @@ unsigned int ImagenPersonaje::getTipoAccion() {
 		}
 	}
 	return retorno;
+}
+
+bool ImagenPersonaje::isImagenFreezada(){
+	return this -> freezado;
 }

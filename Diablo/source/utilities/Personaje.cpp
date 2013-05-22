@@ -479,17 +479,26 @@ Tile* Personaje::getPosicion(Mapa* mapa){
 // Actualiza las cosas internas, si hubiese
 unsigned int Personaje::update(Mapa* mapa) {
 	unsigned int retorno = Personaje::ESPERANDO_ACCION;
-	if (this -> tiempoProximoUpdate <= clock()){	
-		if (this -> tileDestino != NULL) {
-			//actualizacion de posicion
-			retorno = this -> actualizarPosicion(mapa);
-		} else {
-			if(this -> imagen != NULL) {
-				this -> surf = this -> imagen -> getSurface();
-				retorno = Personaje::ESPERANDO_ACCION;
+	if (this -> imagen != NULL) {		
+		ImagenPersonaje* imagenPersonaje = static_cast<ImagenPersonaje*> (this -> imagen);
+		if (imagenPersonaje != NULL){
+			if (imagenPersonaje -> isImagenFreezada()) {
+				retorno = Personaje::FREEZAR_EN_CURSO;
+			} else {
+				if (this -> tiempoProximoUpdate <= clock()){	
+					if (this -> tileDestino != NULL) {
+						//actualizacion de posicion
+						retorno = this -> actualizarPosicion(mapa);
+					} else {
+						if(this -> imagen != NULL) {
+							this -> surf = this -> imagen -> getSurface();
+							retorno = Personaje::ESPERANDO_ACCION;
+						}
+					}
+					this -> tiempoProximoUpdate = clock() + this -> deltaUpdatePosicion;
+				}
 			}
 		}
-		this -> tiempoProximoUpdate = clock() + this -> deltaUpdatePosicion;
 	}
 	return retorno;
 }
@@ -626,6 +635,20 @@ unsigned int Personaje::defender(Tile* tileDestino , Mapa* mapa) {
 	return retorno;
 }
 
+/*
+	Pre: Mapa distinto de null. El parametro tileDestino es cualquier tile en la 
+	dirección del ataque.
+
+	Post: Se ha realizado un ataque en la direccion correspondiente del tile parametro.
+
+*/
+void Personaje::freezar(){
+	ImagenPersonaje* imagenPersonaje = static_cast<ImagenPersonaje*> (this -> imagen);
+	if (imagenPersonaje != NULL){
+		imagenPersonaje -> setAccion(ImagenPersonaje::FREEZAR_ACCION_ACTUAL);
+		this -> entidadDesconectada = imagenPersonaje -> isImagenFreezada();
+	}
+}
 
 /*
 */

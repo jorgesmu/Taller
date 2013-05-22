@@ -256,9 +256,13 @@ int main(int argc, char* argv[]) {
 							pjm.getPjeLocal().defender(NULL , &mapa);
 							break;
 						}
+						case 'f' : {
+							pjm.getPjeLocal().freezar();
+							printf(" Freezar ");
+							break;
+						}
 						case 'k' : {
 							pjm.getPjeLocal().muerte();
-							printf(" MUERTE ");
 							break;
 						}
 					}
@@ -412,7 +416,9 @@ int main(int argc, char* argv[]) {
 				 (estadoPersonaje == Personaje::ESPERANDO_ACCION)){
 				puedeMoverse = true;
 			}else if ( (estadoPersonaje == Personaje::MOVER_EN_CURSO) || 
-				(estadoPersonaje == Personaje::MOVER_ERROR)){
+				(estadoPersonaje == Personaje::MOVER_ERROR) ||
+				(estadoPersonaje == Personaje::FREEZAR_EN_CURSO)
+				){
 				puedeMoverse = false;
 			}
 			//Piso la señal de estado del personaje

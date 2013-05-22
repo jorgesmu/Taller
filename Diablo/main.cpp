@@ -250,19 +250,21 @@ int main(int argc, char* argv[]) {
 					switch (event.key.keysym.sym) {
 						case 'a' : {
 							pjm.getPjeLocal().ataque(NULL , &mapa);
+							caminoMinimo.clear();
 							break;
 						}
 						case 'd' : {
 							pjm.getPjeLocal().defender(NULL , &mapa);
+							caminoMinimo.clear();
 							break;
 						}
 						case 'f' : {
 							pjm.getPjeLocal().freezar();
-							printf(" Freezar ");
 							break;
 						}
 						case 'k' : {
 							pjm.getPjeLocal().muerte();
+							caminoMinimo.clear();
 							break;
 						}
 					}
@@ -409,6 +411,8 @@ int main(int argc, char* argv[]) {
 				}
 			}
 			estadoPersonaje = pjm.getPjeLocal().update(&mapa);
+			
+			/*
 			if ( (estadoPersonaje == Personaje::MOVER_COMPLETADO) || 
 				 (estadoPersonaje == Personaje::ATACAR_COMPLETADO) ||
 				 (estadoPersonaje == Personaje::DEFENDER_COMPLETADO) ||
@@ -420,7 +424,16 @@ int main(int argc, char* argv[]) {
 				(estadoPersonaje == Personaje::FREEZAR_EN_CURSO)
 				){
 				puedeMoverse = false;
-			}
+			}*/
+			if ((estadoPersonaje == Personaje::MOVER_COMPLETADO)) 
+				 {
+				puedeMoverse = true;
+			}else if ( (estadoPersonaje == Personaje::MOVER_EN_CURSO) || 
+				(estadoPersonaje == Personaje::MOVER_ERROR)){
+ 				puedeMoverse = false;
+ 			}
+
+
 			//Piso la señal de estado del personaje
 			/*
 			Tile* next = mapa.getTilePorPixeles(pjm.getPjeLocal().getX(),pjm.getPjeLocal().getY());

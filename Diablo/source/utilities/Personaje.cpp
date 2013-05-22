@@ -478,7 +478,7 @@ Tile* Personaje::getPosicion(Mapa* mapa){
 
 // Actualiza las cosas internas, si hubiese
 unsigned int Personaje::update(Mapa* mapa) {
-	unsigned int retorno = Personaje::ESPERANDO_ACCION;
+	unsigned int retorno = Personaje::MOVER_EN_CURSO;
 	if (this -> imagen != NULL) {		
 		ImagenPersonaje* imagenPersonaje = static_cast<ImagenPersonaje*> (this -> imagen);
 		if (imagenPersonaje != NULL){
@@ -492,7 +492,7 @@ unsigned int Personaje::update(Mapa* mapa) {
 					} else {
 						if(this -> imagen != NULL) {
 							this -> surf = this -> imagen -> getSurface();
-							retorno = Personaje::ESPERANDO_ACCION;
+							retorno = Personaje::MOVER_COMPLETADO; // ESPERANDO_ACCION
 						}
 					}
 					this -> tiempoProximoUpdate = clock() + this -> deltaUpdatePosicion;

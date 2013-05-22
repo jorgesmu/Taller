@@ -336,7 +336,7 @@ void Mapa::actualizarGrafo(int pos_x, int pos_y){
 		//izquierda arriba
 		actualizarGrafoVertice(pos_x - 1,pos_y - 1);
 	}
-
+	
 
 }
 vector <pair<int,int> > Mapa::getCaminoMinimo(Tile* tileOrigen, Tile* tileDestino){

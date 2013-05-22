@@ -452,7 +452,7 @@ void Personaje::actualizarImagen(const unsigned int direccion){
 	por dicha instancia.
 */
 bool Personaje::isCaminable(){
-	return false;
+	return true;
 }
 
 /*

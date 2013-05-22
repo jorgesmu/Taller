@@ -359,6 +359,7 @@ int main(int argc, char* argv[]) {
 						// recalculo el camino
 						//el camino va desde ultimo tile al que me movi, hasta el que hice click que es el ultimo del camino anterior
 						Tile* tilePersonaje = mapa.getTile(ultimoMovimientoX, ultimoMovimientoY);
+						
 						if(!mapa.tileExists(ultimoMovimientoX, ultimoMovimientoY)) {
 							tilePersonaje = mapa.getTile(start_pos_x, start_pos_y);
 							//std::cout << "POS PJE: " << pjm.getPjeLocal().getX() << ";" << pjm.getPjeLocal().getY() << "\n";

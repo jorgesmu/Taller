@@ -71,12 +71,12 @@ entidades:
     pixel_ref_x: 20
     pixel_ref_y: 20
     esDefault: true
-    caminable: false
+    caminable: true
 
   - nombre: orco
     imagen: ../resources/Orco.png
     fps: 10
-    caminable: false
+    caminable: true
 
 escenarios:
   - nombre: bosque_encantado

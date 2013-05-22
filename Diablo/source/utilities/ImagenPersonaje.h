@@ -36,27 +36,27 @@ public:
 
 	//Muerte
 	const static unsigned int MUERTE = 24;
-	//Avanzar direccion actual
-	const static unsigned int AVANCE_DIRECCION_ACTUAL = 25;
-	//Atacar en direccion actual
-	const static unsigned int ATAQUE_DIRECCION_ACTUAL = 26;
-	//Quieto en direccion actual
-	const static unsigned int ESTATICO_DIRECCION_ACTUAL = 27;
-	//Continua con la accion actual
-	const static unsigned int CONTINUAR_CON_ACCION_ACTUAL = 28;
 
 	//Defender
-	const static unsigned int DEF_SUR = 29;
-	const static unsigned int DEF_SURESTE = 30;
-	const static unsigned int DEF_ESTE = 31;
-	const static unsigned int DEF_NORESTE = 32;
-	const static unsigned int DEF_NORTE = 33;
-	const static unsigned int DEF_NOROESTE = 34;
-	const static unsigned int DEF_OESTE = 35;
-	const static unsigned int DEF_SUROESTE = 36;
+	const static unsigned int DEF_SUR = 25;
+	const static unsigned int DEF_SURESTE = 26;
+	const static unsigned int DEF_ESTE = 27;
+	const static unsigned int DEF_NORESTE = 28;
+	const static unsigned int DEF_NORTE = 29;
+	const static unsigned int DEF_NOROESTE = 30;
+	const static unsigned int DEF_OESTE = 31;
+	const static unsigned int DEF_SUROESTE = 32;
 
+	//Avanzar direccion actual
+	const static unsigned int AVANCE_DIRECCION_ACTUAL = 33;
+	//Atacar en direccion actual
+	const static unsigned int ATAQUE_DIRECCION_ACTUAL = 34;
+	//Quieto en direccion actual
+	const static unsigned int ESTATICO_DIRECCION_ACTUAL = 35;
 	//Defender direccion actual
-	const static unsigned int DEFENSA_DIRECCION_ACTUAL = 37;
+	const static unsigned int DEFENSA_DIRECCION_ACTUAL = 36;
+	//Continua con la accion actual
+	const static unsigned int CONTINUAR_CON_ACCION_ACTUAL = 37;
 
 private:
 

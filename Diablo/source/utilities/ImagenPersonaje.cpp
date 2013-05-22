@@ -72,7 +72,7 @@ ImagenPersonaje::~ImagenPersonaje() {
 	Post: Se ha seteado la accion.
 */
 void ImagenPersonaje::setAccionEfectiva(unsigned int accion) {
-	if ((accion < (unsigned int) this -> maxFilas) && (accion <= ImagenPersonaje::MUERTE)) {
+	if ((accion < (unsigned int) this -> maxFilas) && (accion <= ImagenPersonaje::DEF_SUROESTE)) {
 		this -> accionSiguiente = accion;
 		int delta = this -> accionSiguiente	- this -> accionActual;	
 		if (delta != 0) {
@@ -119,7 +119,7 @@ void ImagenPersonaje::setAccionEfectiva(unsigned int accion) {
 							} else {
 								//Siguiente Desplazamiento y Actual Defensa
 								if ( (accionActual >= DEF_SUR) && (accionActual <= DEF_SUROESTE)){
-									this -> accionActual-= 29;
+									this -> accionActual-= 9;
 									this -> columnaActual = 0;
 								}
 							}
@@ -172,7 +172,7 @@ void ImagenPersonaje::setAccionEfectiva(unsigned int accion) {
 								} else {
 									//Siguiente Ataque y Actual Defensa
 									if ( (accionActual >= DEF_SUR) && (accionActual <= DEF_SUROESTE)){
-										this -> accionActual-= 21;
+										this -> accionActual-= 17;
 										this -> columnaActual = 0;
 									}
 								}
@@ -205,27 +205,58 @@ void ImagenPersonaje::setAccionEfectiva(unsigned int accion) {
 											}
 										}
 									} else {
-									if (delta >=-3) {
-										this -> accionActual--;
-									} else {
-										if (this -> accionActual == EST_SUROESTE) {
-											this -> accionActual = EST_SUR;
+										if (delta >=-3) {
+											this -> accionActual--;
 										} else {
-											this -> accionActual++;
+											if (this -> accionActual == EST_SUROESTE) {
+												this -> accionActual = EST_SUR;
+											} else {
+												this -> accionActual++;
+											}
 										}
-									}
-								}										
+									}										
 								// Siguiente Estatico actual Muerte
 								} else {
-									this -> accionActual = ImagenPersonaje::EST_SUR;
-									this -> columnaActual = 0;
+									if (this ->accionActual == ImagenPersonaje::MUERTE){
+										this -> accionActual = ImagenPersonaje::EST_SUR;
+										this -> columnaActual = 0;
+									} else {
+										//Siguiente Estatico actual defensa
+										this -> accionActual -= 9;
+										this -> columnaActual = 0;
+									}
 								}
 							}
 						}
-					// Siguiente Muerte
+					// Siguiente Defensa
 					} else {
-						this -> accionActual = ImagenPersonaje::MUERTE;
-						this -> columnaActual = 0;
+						if ( (accionSiguiente >= DEF_SUR) && (accionSiguiente <= DEF_SUROESTE)){
+							// Siguiente Desfensa y Actual Desplasamiento
+							if (this->accionActual < ImagenPersonaje::AT_SUR) {
+								this -> accionActual+= 25;
+								this -> columnaActual = 0;
+							} else {
+								//Siguiente Defensa y Actual Ataque
+								if (this->accionActual < ImagenPersonaje::EST_SUR) {
+									this -> accionActual += 17;
+									this -> columnaActual = 0;
+								} else {
+									//Siguiente Defensa y Actual Estatico
+									if ( this -> accionActual < ImagenPersonaje::MUERTE) {
+										this -> accionActual += 9;
+										this -> columnaActual = 0;
+									} else {
+										if ( this ->accionActual == ImagenPersonaje::MUERTE) {
+											this -> accionActual = ImagenPersonaje::MUERTE;
+										}									
+									}
+								}
+							}
+							// Siguiente Muerte
+						} else {
+							this -> accionActual = ImagenPersonaje::MUERTE;
+							this -> columnaActual = 0;
+						}
 					}
 				}
 			}
@@ -242,8 +273,8 @@ void ImagenPersonaje::setAccionEfectiva(unsigned int accion) {
 */
 bool ImagenPersonaje::setAccion(unsigned int accion){
 	bool retorno = false;
-	if (accion > ImagenPersonaje::MUERTE) {
-		if (accion <= ImagenPersonaje::ESTATICO_DIRECCION_ACTUAL) {
+	if (accion > ImagenPersonaje::DEF_SUROESTE) {
+		if (accion < ImagenPersonaje::CONTINUAR_CON_ACCION_ACTUAL) {
 			switch (accion) {
 				case ImagenPersonaje::AVANCE_DIRECCION_ACTUAL : {
 					// Accion actual no es desplazamiento
@@ -262,7 +293,7 @@ bool ImagenPersonaje::setAccion(unsigned int accion){
 								} else {
 									// Si accion actual defensa
 									if ( (accionActual >= DEF_SUR) && (accionActual <= DEF_SUROESTE)){
-										this -> setAccionEfectiva(this -> accionActual-29);
+										this -> setAccionEfectiva(this -> accionActual-25);
 									}
 								}
 							}
@@ -286,7 +317,7 @@ bool ImagenPersonaje::setAccion(unsigned int accion){
 							} else {
 								// Accion actual defensa
 								if ( (accionActual >= DEF_SUR) && (accionActual <= DEF_SUROESTE) ) {
-									this -> setAccionEfectiva( this -> accionActual-21);
+									this -> setAccionEfectiva( this -> accionActual-17);
 								}
 							}
 						}
@@ -309,7 +340,7 @@ bool ImagenPersonaje::setAccion(unsigned int accion){
 								// Accion actual defensa
 								if ( (this ->accionActual >= ImagenPersonaje::DEF_SUR) &&
 									 (this ->accionActual <= ImagenPersonaje::DEF_SUROESTE)) {
-									this -> setAccionEfectiva(this -> accionActual - 13);
+									this -> setAccionEfectiva(this -> accionActual - 9);
 								}
 							}
 						}
@@ -319,15 +350,15 @@ bool ImagenPersonaje::setAccion(unsigned int accion){
 				case ImagenPersonaje::DEFENSA_DIRECCION_ACTUAL : {
 					// Accion actual desplazamiento
 					if (this -> accionActual < ImagenPersonaje::AT_SUR){
-						this -> setAccionEfectiva(this -> accionActual + 29);
+						this -> setAccionEfectiva(this -> accionActual + 25);
 					} else {
 						// Accion actual ataque
 						if (this -> accionActual < ImagenPersonaje::EST_SUR){
-							this -> setAccionEfectiva(this -> accionActual + 21);
+							this -> setAccionEfectiva(this -> accionActual + 17);
 						} else {
 							// Accion actual estatico
 							if ( this -> accionActual < ImagenPersonaje::MUERTE) {
-								this -> setAccionEfectiva(this -> accionActual + 13);
+								this -> setAccionEfectiva(this -> accionActual + 9);
 							} else {
 								// Accion actual muerte
 								if ( this -> accionActual == ImagenPersonaje::MUERTE) {
@@ -363,6 +394,7 @@ void ImagenPersonaje::nextSprite() {
 			this -> setAccion(this -> accionSiguiente);
 			this -> columnaActual++;
 			this -> tiempoProximoFrame += this -> deltaFrame;
+			// Ataques o defesas vuelven a su estatico correspondiente
 			if (this -> columnaActual >= this -> maxColumnas) { 
 				if ( (this -> accionActual >= ImagenPersonaje::AT_SUR) &&
 					 (this -> accionActual <= ImagenPersonaje::AT_SUROESTE) ){
@@ -370,7 +402,7 @@ void ImagenPersonaje::nextSprite() {
 				} else {
 					if ( (this -> accionActual >= ImagenPersonaje::DEF_SUR) &&
 					 (this -> accionActual <= ImagenPersonaje::DEF_SUROESTE) ){
-						 this -> accionSiguiente = this -> accionActual - 13;
+						 this -> accionSiguiente = this -> accionActual - 9;
 					}
 				}
 				this -> columnaActual = 0;

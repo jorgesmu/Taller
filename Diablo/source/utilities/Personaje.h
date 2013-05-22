@@ -148,6 +148,16 @@ public:
 	*/
 	virtual unsigned int ataque(Tile* tileDestino , Mapa* mapa);
 
+	/*
+		Pre: Mapa distinto de null. El parametro tileDestino es cualquier tile en la 
+		dirección del ataque.
+
+		Post: Se ha realizado un ataque en la direccion correspondiente del tile parametro.
+
+	*/
+	virtual unsigned int defender(Tile* tileDestino , Mapa* mapa);
+	
+
 	void muerte();
 
 	/*

@@ -561,6 +561,73 @@ unsigned int Personaje::ataque(Tile* tileDestino , Mapa* mapa) {
 }
 
 /*
+	Pre: Mapa distinto de null. El parametro tileDestino es cualquier tile en la 
+	dirección del ataque.
+
+	Post: Se ha realizado un ataque en la direccion correspondiente del tile parametro.
+
+*/
+unsigned int Personaje::defender(Tile* tileDestino , Mapa* mapa) {
+	unsigned int retorno = Personaje::DEFENDER_COMPLETADO;
+	// chequeo que el tileDestino y el mapa sean diferentes de null
+	if ( (tileDestino != NULL) && (mapa != NULL)) {
+		this -> tileDestino = NULL;
+		unsigned int direccionAtaque = ImagenPersonaje::DEFENSA_DIRECCION_ACTUAL;
+		int deltaX = tileDestino -> getX() - posX;
+		int deltaY = tileDestino -> getY() - posY;
+		//calculo de direccion
+		if (deltaX > 0){
+			if(deltaY < 0){
+				direccionAtaque = ImagenPersonaje::DEF_NORESTE;
+			} else{
+				if(deltaY == 0){
+					direccionAtaque = ImagenPersonaje::DEF_ESTE;
+				} else {
+					direccionAtaque = ImagenPersonaje::DEF_SURESTE;
+				}
+			}
+			ImagenPersonaje* imagenPersonaje = static_cast<ImagenPersonaje*> (this -> imagen);
+			if (imagenPersonaje != NULL){
+				imagenPersonaje -> setAccion(direccionAtaque);
+			}
+		}else {
+			if (deltaX < 0) {
+				if (deltaY < 0){
+					direccionAtaque = ImagenPersonaje::DEF_NOROESTE;
+				}else{
+					if (deltaY == 0) {
+						direccionAtaque = ImagenPersonaje::DEF_OESTE;
+					}else {
+						direccionAtaque = ImagenPersonaje::DEF_SUROESTE;
+					}
+				}
+			}else{
+				if (deltaY < 0){
+					direccionAtaque = ImagenPersonaje::DEF_NORTE;
+				} else{
+					if(deltaY > 0){
+						direccionAtaque = ImagenPersonaje::DEF_SUR;
+					}
+				}
+			}
+			ImagenPersonaje* imagenPersonaje = static_cast<ImagenPersonaje*> (this -> imagen);
+			if (imagenPersonaje != NULL){
+				imagenPersonaje -> setAccion(direccionAtaque);
+			}
+		}
+	} else {
+		this -> tileDestino = NULL;
+		unsigned int direccionDefensa = ImagenPersonaje::DEFENSA_DIRECCION_ACTUAL;
+		ImagenPersonaje* imagenPersonaje = static_cast<ImagenPersonaje*> (this -> imagen);
+		if (imagenPersonaje != NULL){
+			imagenPersonaje -> setAccion(direccionDefensa);
+		}
+	}
+	return retorno;
+}
+
+
+/*
 */
 void Personaje::muerte() {
 	ImagenPersonaje* imagenPersonaje = static_cast<ImagenPersonaje*> (this -> imagen);

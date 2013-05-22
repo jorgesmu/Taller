@@ -244,7 +244,7 @@ int main(int argc, char* argv[]) {
 					// Update para la camara
 					camara.update_speed(makeRect(event.motion.x, event.motion.y));
 				}
-				// Atacar
+				// Atacar Defender Muerte
 				if(event.type == SDL_KEYDOWN) {
 					
 					switch (event.key.keysym.sym) {
@@ -253,7 +253,7 @@ int main(int argc, char* argv[]) {
 							break;
 						}
 						case 'd' : {
-							printf(" Defenza ");
+							pjm.getPjeLocal().defender(NULL , &mapa);
 							break;
 						}
 						case 'k' : {
@@ -405,9 +405,14 @@ int main(int argc, char* argv[]) {
 				}
 			}
 			estadoPersonaje = pjm.getPjeLocal().update(&mapa);
-			if (estadoPersonaje == 1){
+			if ( (estadoPersonaje == Personaje::MOVER_COMPLETADO) || 
+				 (estadoPersonaje == Personaje::ATACAR_COMPLETADO) ||
+				 (estadoPersonaje == Personaje::DEFENDER_COMPLETADO) ||
+				 (estadoPersonaje == Personaje::FREEZAR_COMPLETADO) ||
+				 (estadoPersonaje == Personaje::ESPERANDO_ACCION)){
 				puedeMoverse = true;
-			}else if (estadoPersonaje == 0 || estadoPersonaje == 2){
+			}else if ( (estadoPersonaje == Personaje::MOVER_EN_CURSO) || 
+				(estadoPersonaje == Personaje::MOVER_ERROR)){
 				puedeMoverse = false;
 			}
 			//Piso la señal de estado del personaje

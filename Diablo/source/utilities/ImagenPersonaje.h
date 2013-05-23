@@ -56,8 +56,9 @@ public:
 	const static unsigned int DEFENSA_DIRECCION_ACTUAL = 36;
 	//Freezar accion actual
 	const static unsigned int FREEZAR_ACCION_ACTUAL = 37;
+	const static unsigned int DESFREEZAR_ACCION_ACTUAL = 38;
 	//Continua con la accion actual
-	const static unsigned int CONTINUAR_CON_ACCION_ACTUAL = 38;
+	const static unsigned int CONTINUAR_CON_ACCION_ACTUAL = 39;
 
 private:
 

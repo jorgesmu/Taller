@@ -332,23 +332,15 @@ void ClientSocket::listenDo() {
 				pjm.addPje(new_nick);
 				auto& p = pjm.getPje(new_nick);
 				// Agrega el personaje
-				p.init(new_nick, new_type , 1 , 1 , 50 , 5, 100, 100 ,	configuracion.get_vel_personaje(),	0 , 70 , NULL , resman , Imagen::COLOR_KEY);
+				p.init(new_nick, new_type , 1 , 1 , 50 , 5, 100, 100 ,	configuracion.get_vel_personaje(),	0 , 50 , NULL , resman , Imagen::COLOR_KEY);
 				// Posiciono el personaje
 				mapa.getTile(x, y)->addEntidad(&p);
 				p.setTileActual(mapa.getTile(x, y));
-				if(!is_on) {
-					p.setInactivo();
-				}else{
-					p.setActivo();
-				}
+				p.freezar(!is_on);
 			}else{
 				// Si existe, lo marcamos como color
 				auto& p = pjm.getPje(new_nick);
-				if(!is_on) {
-					p.setInactivo();
-				}else{
-					p.setActivo();
-				}
+				p.freezar(!is_on);
 			}
 		}else if(pt == PROTO::PLAYER_EXIT) {
 			// Esperamos a que cargue el mapa
@@ -364,7 +356,29 @@ void ClientSocket::listenDo() {
 			}else{
 				// Si existe, lo marcamos como desconectado
 				auto& p = pjm.getPje(who_nick);
-				p.setInactivo();
+				p.freezar(true);
+			}
+		}else if(pt == PROTO::ATACAR) {
+			std::string who_nick;
+			bs >> who_nick;
+			// Si no existe el personaje, error
+			if(!pjm.PjeExiste(who_nick)) {
+				std::cerr << "Error @ ATACAR: " << who_nick << " not found\n";
+			}else{
+				// Si existe, lo marcamos como desconectado
+				auto& p = pjm.getPje(who_nick);
+				p.ataque(NULL, &mapa);
+			}
+		}else if(pt == PROTO::DEFENDER) {
+			std::string who_nick;
+			bs >> who_nick;
+			// Si no existe el personaje, error
+			if(!pjm.PjeExiste(who_nick)) {
+				std::cerr << "Error @ ATACAR: " << who_nick << " not found\n";
+			}else{
+				// Si existe, lo marcamos como desconectado
+				auto& p = pjm.getPje(who_nick);
+				p.defender(NULL, &mapa);
 			}
 		}else if(pt == PROTO::POS_REQUEST_REPLY) {
 			bool reply;

@@ -434,3 +434,11 @@ void Entidad::setColor(bool value , int tileX , int tileY, Mapa* mapa, int persX
 		this -> color = value;	
 	}
 }
+
+bool Entidad::isInTile(int x , int y){
+	return ((this -> posX == x) && (this -> posY == y));
+}
+
+bool Entidad::isCompartido(){
+	return this -> compartido;
+}

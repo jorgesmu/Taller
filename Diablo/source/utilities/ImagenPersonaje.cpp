@@ -373,8 +373,13 @@ bool ImagenPersonaje::setAccion(unsigned int accion){
 				}
 				//Freezar / Desfreezar
 				case ImagenPersonaje::FREEZAR_ACCION_ACTUAL : {
-					this -> freezado = ! this -> freezado;
+					this -> freezado = true;
+					break;
 				}	
+				case ImagenPersonaje::DESFREEZAR_ACCION_ACTUAL : {
+					this->freezado = false;
+					break;
+				}
 			}
 		}	
 	} else {

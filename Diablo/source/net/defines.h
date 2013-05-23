@@ -51,6 +51,12 @@ const unsigned char POS_REQUEST_REPLY = 'r';
 
 // <nick:string><x:int><y:int>
 const unsigned char MOVE_PLAYER = 's';
+
+// Acciones
+// <nick:string>
+const unsigned char ATACAR = 't';
+const unsigned char DEFENDER = 'u';
+
 }
 
 // Cosas de movimiento

@@ -79,56 +79,27 @@ entidades:
     caminable: true
 
 escenarios:
-  - nombre: bosque_encantado
-    size_x: 20
-    size_y: 20
+  - nombre: bosque_encantado3
+    size_x: 100
+    size_y: 100
     entidadesDef:
-      - {x: 3, y: 5, entidad: piso}
-      - {x: 3, y: 6, entidad: piso}
-      - {x: 3, y: 7, entidad: piso}
-      - {x: 3, y: 8, entidad: piso}
-      - {x: 4, y: 5, entidad: piso}
-      - {x: 4, y: 6, entidad: piso}
-      - {x: 4, y: 7, entidad: piso}
-      - {x: 4, y: 8, entidad: piso}
-      - {x: 20, y: 20, entidad: piso}
-      - {x: 20, y: 21, entidad: piso}
-      - {x: 20, y: 22, entidad: piso}
-      - {x: 21, y: 20, entidad: piso}
-      - {x: 21, y: 21, entidad: piso}
-      - {x: 21, y: 22, entidad: casa}
-      - {x: 22, y: 20, entidad: piso}
-      - {x: 22, y: 21, entidad: piso}
-      - {x: 6, y: 6, entidad: agua}
-      - {x: 6, y: 7, entidad: agua}
-      - {x: 7, y: 6, entidad: agua}
-      - {x: 7, y: 7, entidad: agua}
-      - {x: 30, y: 10, entidad: agua}
-      - {x: 30, y: 11, entidad: agua}
-      - {x: 30, y: 12, entidad: agua}
-      - {x: 30, y: 13, entidad: agua}
-      - {x: 31, y: 10, entidad: agua}
-      - {x: 31, y: 11, entidad: agua}
-      - {x: 31, y: 12, entidad: agua}
-      - {x: 31, y: 13, entidad: agua}
       - {x: 3, y: 6, entidad: pino}
       - {x: 25, y: 20, entidad: pino}
-      - {x: 60, y: 60, entidad: pino}
-      - {x: 75, y: 60, entidad: pino}
-      - {x: 3, y: 0, entidad: arbol}
-      - {x: 10, y: 70, entidad: arbol}
+      - {x: 60, y: 64, entidad: pino}
+      - {x: 75, y: 82, entidad: pino}
+      - {x: 10, y: 18, entidad: arbol}
+      - {x: 70, y: 29, entidad: arbol}
       - {x: 34, y: 17, entidad: arbol}
       - {x: 22, y: 43, entidad: arbol}
       - {x: 10, y: 10, entidad: casa}
-      - {x: 30, y: 15, entidad: casa}
-      - {x: 50, y: 10, entidad: casa}
+      - {x: 40, y: 15, entidad: casa}
+      - {x: 80, y: 37, entidad: casa}
       - {x: 3, y: 3, entidad: molino}
-      - {x: 7, y: 2, entidad: molino2}
+      - {x: 15, y: 3, entidad: molino2}
       - {x: 80, y: 15, entidad: molino}
-      - {x: 19, y: 19, entidad: agua}
-      - {x: 19, y: 18, entidad: agua}
-      - {x: 18, y: 19, entidad: agua}
-      - {x: 18, y: 18, entidad: agua}
+      - {x: 30, y: 62, entidad: molino}
+      - {x: 7, y: 93, entidad: molino2}
+      - {x: 80, y: 15, entidad: molino}
   - nombre: bosque_encantado2
     size_x: 10
     size_y: 10

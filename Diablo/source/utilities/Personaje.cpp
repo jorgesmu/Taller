@@ -371,6 +371,13 @@ Tile* Personaje::obtenerTileAncla(const int posX , const int posY ,
 				retorno = mapa -> getTilePorPixeles(posImagenX , posImagenY);
 			}
 		}
+	}	
+	if (retorno != NULL) {
+		if (!verificarAncla(retorno)){
+			posImagenX = posX - Tile::TILE_ANCHO;
+			posImagenY = posY + Tile::TILE_ALTO;
+			retorno = mapa -> getTilePorPixeles(posImagenX , posImagenY);
+		}
 	}
 	return retorno;
 }
@@ -650,6 +657,18 @@ void Personaje::freezar(){
 	}
 }
 
+void Personaje::freezar(bool valor){
+	ImagenPersonaje* imagenPersonaje = static_cast<ImagenPersonaje*> (this -> imagen);
+	if (imagenPersonaje != NULL){
+		if(valor) {
+			imagenPersonaje -> setAccion(ImagenPersonaje::FREEZAR_ACCION_ACTUAL);
+		}else{
+			imagenPersonaje -> setAccion(ImagenPersonaje::DESFREEZAR_ACCION_ACTUAL);
+		}
+		this -> entidadDesconectada = valor;
+	}
+}
+
 /*
 */
 void Personaje::muerte() {
@@ -687,4 +706,17 @@ bool Personaje::verificarDestinoCaminable(Mapa* mapa) {
 
 const std::string& Personaje::getNick() const {
 	return this->nickname;
+}
+
+bool Personaje::verificarAncla(Tile* ancla) {
+	bool retorno = true;
+	if (ancla != NULL) {
+		std::vector<Entidad*> entidades = ancla->getEntidades();
+		for(auto it = entidades.begin(); it != entidades.end(); ++it) {
+			if (((*it)->getWidthInTiles() > 1) || ((*it)->getHighInTiles() > 1)){
+				return false;
+			}
+		}
+	}
+	return retorno;
 }

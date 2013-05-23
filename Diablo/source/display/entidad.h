@@ -253,6 +253,11 @@ public:
 
 	virtual void setColor(bool value , int tileX , int tileY, Mapa* mapa, int persX, int persY);
 
+	bool isInTile(int x , int y);
+
+	bool isCompartido();
+
+
 protected:	
 		
 	/*

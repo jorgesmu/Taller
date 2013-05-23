@@ -250,21 +250,27 @@ int main(int argc, char* argv[]) {
 					switch (event.key.keysym.sym) {
 						case 'a' : {
 							pjm.getPjeLocal().ataque(NULL , &mapa);
-							caminoMinimo.clear();
+							BitStream bs;
+							bs << PROTO::ATACAR << pjm.getPjeLocal().getNick();
+							sock.send(bs.str());
+							//caminoMinimo.clear();
 							break;
 						}
 						case 'd' : {
 							pjm.getPjeLocal().defender(NULL , &mapa);
-							caminoMinimo.clear();
+							BitStream bs;
+							bs << PROTO::DEFENDER << pjm.getPjeLocal().getNick();
+							sock.send(bs.str());
+							//caminoMinimo.clear();
 							break;
 						}
 						case 'f' : {
-							pjm.getPjeLocal().freezar();
+							//pjm.getPjeLocal().freezar();
 							break;
 						}
 						case 'k' : {
-							pjm.getPjeLocal().muerte();
-							caminoMinimo.clear();
+							//pjm.getPjeLocal().muerte();
+							//caminoMinimo.clear();
 							break;
 						}
 					}
@@ -345,6 +351,12 @@ int main(int argc, char* argv[]) {
 				if(indice < caminoMinimo.size()){
 					//establezo proximo tile del camino
 					proximoTile = caminoMinimo[indice];
+					//verifico que sea caminable
+					
+					if (mapa.tileExists(proximoTile.first,proximoTile.second) && !(mapa.getTile(proximoTile.first,proximoTile.second)->isCaminable())){
+						caminoMinimo.clear();
+						estadoMovimiento = MOV::ESPERANDO_OK;
+					}
 					if(estadoMovimiento == MOV::OK_RECV) {
 						std::cout << "OK_RECV\n";
 						pjm.getPjeLocal().mover(mapa.getTile(proximoTile.first,proximoTile.second));
@@ -482,7 +494,7 @@ int main(int argc, char* argv[]) {
 		SDL_Flip(screen);
 
 		LeaveCriticalSection(&cs_main);
-		Sleep(50);
+		Sleep(10);
 
 	}
 	

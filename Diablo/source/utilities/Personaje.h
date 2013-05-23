@@ -157,6 +157,9 @@ public:
 	*/
 	virtual void freezar();
 
+	// Valor = true freezea, valor = false; desfreezea
+	virtual void freezar(bool valor);
+
 	/*
 		Pre: Mapa distinto de null. El parametro tileDestino es cualquier tile en la 
 		dirección del ataque.
@@ -287,4 +290,5 @@ protected:
 	*/
 	bool verificarDestinoCaminable(Mapa* mapa);
 
+	bool verificarAncla(Tile* ancla);
 };

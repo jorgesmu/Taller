@@ -538,6 +538,26 @@ void ServerSocket::acceptLastDo() {
 				bs >> new_tile_x >> new_tile_y;
 				pm.getPlayer(new_nick).addTileRecorrido(new_tile_x, new_tile_y);
 				//std::cout << "RECEIVED NIEBLA SYNC: " << new_tile_x << "," << new_tile_y << "\n";
+			}else if(pt == PROTO::ATACAR) {
+				std::string nick_atacante;
+				bs >> nick_atacante;
+				// Avisamos a los otros jugadores del nuevo jugador
+				for(auto it = clients_map.begin();it != clients_map.end();it++) {
+					if(it->second.nick == new_nick) continue; // Salteamos a nuestro jugador
+					BitStream bs;
+					bs << PROTO::ATACAR << nick_atacante;
+					send(it->second.sock, bs.str());
+				}
+			}else if(pt == PROTO::DEFENDER) {
+				std::string nick_atacante;
+				bs >> nick_atacante;
+				// Avisamos a los otros jugadores del nuevo jugador
+				for(auto it = clients_map.begin();it != clients_map.end();it++) {
+					if(it->second.nick == new_nick) continue; // Salteamos a nuestro jugador
+					BitStream bs;
+					bs << PROTO::DEFENDER << nick_atacante;
+					send(it->second.sock, bs.str());
+				}
 			}else if(pt == PROTO::REQUEST_POS) {
 				int x, y;
 				bs >> x >> y;

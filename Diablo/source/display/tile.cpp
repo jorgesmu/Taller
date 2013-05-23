@@ -56,10 +56,21 @@ void Tile::blit(SDL_Surface* pantalla, Camara& cam, Personaje* personaje, Mapa* 
 	if((abs(deltaX) <= Personaje::RADIO_VISION_X) && (abs(deltaY) <= Personaje::RADIO_VISION_Y)){
 		//dibujo en colores normales
 		for(auto it = entidades.begin(); it != entidades.end(); ++it) {
-			(*it)->setColor(true,x,y, mapa, (personaje -> getXAnclajeNiebla()), (personaje -> getYAnclajeNiebla()));
-			(*it)->blit(pantalla, &cam, NULL,x, y,true);
-			(*it)->setDibujada(true, mapa,personaje);
-		}
+			if ( (!(*it)-> isInTile(this->x , this -> y)) && (!(*it)->isCompartido())){
+				// es un ancla
+				deltaX = personaje -> getXAnclajeNiebla() - (*it)->getX();
+				deltaY = personaje -> getYAnclajeNiebla() - (*it)->getY();
+				if((abs(deltaX) <= Personaje::RADIO_VISION_X) && (abs(deltaY) <= Personaje::RADIO_VISION_Y)){
+					(*it)->setColor(true,x,y, mapa, (personaje -> getXAnclajeNiebla()), (personaje -> getYAnclajeNiebla()));
+					(*it)->blit(pantalla, &cam, NULL,x, y,true);
+					(*it)->setDibujada(true, mapa,personaje);				
+				}
+			}else{
+				(*it)->setColor(true,x,y, mapa, (personaje -> getXAnclajeNiebla()), (personaje -> getYAnclajeNiebla()));
+				(*it)->blit(pantalla, &cam, NULL,x, y,true);
+				(*it)->setDibujada(true, mapa,personaje);			
+			}
+		}		
 		personaje->agregarTilesExplorados(this);
 	}else{
 		std::vector<Tile*> tilesExplorados = personaje->getTilesExplorados();

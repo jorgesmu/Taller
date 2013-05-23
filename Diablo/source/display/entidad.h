@@ -31,6 +31,20 @@ class Entidad {
 
 		const static int PIXEL_REF_Y_DEFAULT = 0;
 
+		// Orden de bliteo
+
+		const static unsigned int ORDEN_PISO = 0;
+
+		const static unsigned int ORDEN_AGUA = 1;
+
+		const static unsigned int ORDEN_ARBUSTO = 2;
+
+		const static unsigned int ORDEN_PERSONAJE = 3;
+
+		const static unsigned int ORDEN_ARBOL = 4;
+
+		const static unsigned int ORDEN_EDIFICIO = 5;
+
 	protected:
 		
 		std::string name; // Nombre de la entidad
@@ -60,6 +74,8 @@ class Entidad {
 		bool color;
 
 		bool caminable;
+
+		unsigned int ordenBliteo;
 
 public:
 	
@@ -257,6 +273,9 @@ public:
 
 	bool isCompartido();
 
+	unsigned int getOrdenBliteo();
+
+	void setOrdenBliteo(unsigned int orden);
 
 protected:	
 		

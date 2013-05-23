@@ -98,6 +98,11 @@
 			this -> agregarAnclas(mapa);
 		}
 		this -> caminable = caminable;
+		if ((this -> highInTiles == 1) && (this -> widthInTiles == 1)) {
+			this -> ordenBliteo = Entidad::ORDEN_PISO;
+		} else{
+			this -> ordenBliteo = Entidad::ORDEN_EDIFICIO;	
+		}
 	}
 
 	/*
@@ -140,6 +145,11 @@
 			this -> agregarAnclas(mapa);
 		}
 		this -> caminable = caminable;
+		if ((this -> highInTiles == 1) && (this -> widthInTiles == 1)) {
+			this -> ordenBliteo = Entidad::ORDEN_PISO;
+		} else{
+			this -> ordenBliteo = Entidad::ORDEN_EDIFICIO;	
+		}
 	}
 	
 	EntidadFija::EntidadFija(EntidadFija* entidadFija , Mapa* mapa){
@@ -160,6 +170,11 @@
 		this->compartido = entidadFija->compartido;
 		this->tileAncla=NULL;
 		this->caminable = entidadFija->caminable;
+		if ((this -> highInTiles == 1) && (this -> widthInTiles == 1)) {
+			this -> ordenBliteo = Entidad::ORDEN_PISO;
+		} else{
+			this -> ordenBliteo = Entidad::ORDEN_EDIFICIO;	
+		}
 	}
 
 	/*

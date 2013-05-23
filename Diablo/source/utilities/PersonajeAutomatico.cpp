@@ -92,6 +92,7 @@ void PersonajeAutomatico::init(const std::string& name,
 	//seteo tiempo proximo tiempo de actualizacion direccion
 	this->tiempoProximoUpdateDireccion = clock() + 
 								PersonajeAutomatico::DELTA_TIEMPO_UPDATE_DIRECCION;
+	this -> ordenBliteo = Entidad::ORDEN_PERSONAJE;
 }
 
 // Actualiza las cosas internas, si hubiese

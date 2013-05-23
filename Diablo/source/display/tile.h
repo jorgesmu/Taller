@@ -48,4 +48,8 @@ class Tile {
 	bool force_no_caminable;
 	void setNoCaminable();
 	void setCaminable();
+
+private:
+	
+	void insertarEntidadOrdenada(Entidad* ent);
 };

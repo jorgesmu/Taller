@@ -31,6 +31,11 @@ void Entidad::inicializarAtributosEnValoresDefault() {
 	this -> compartido = true;
 	this -> caminable = true;
 	this -> no_dibujar_fuera_flag = false;
+	if ((this -> highInTiles == 1) && (this -> widthInTiles == 1)) {
+		this -> ordenBliteo = Entidad::ORDEN_PISO;
+	} else{
+		this -> ordenBliteo = Entidad::ORDEN_EDIFICIO;	
+	}
 }
 
 /*
@@ -153,6 +158,11 @@ void Entidad::init(const std::string& name,
 	//seteo como compartido
 	this -> compartido = true;
 	this -> caminable = caminable;
+	if ((this -> highInTiles == 1) && (this -> widthInTiles == 1)) {
+		this -> ordenBliteo = Entidad::ORDEN_PISO;
+	} else{
+		this -> ordenBliteo = Entidad::ORDEN_EDIFICIO;	
+	}
 }
 
 /*
@@ -200,6 +210,11 @@ void Entidad::init(const std::string& name,
 	this -> compartido = true;
 	this -> caminable = caminable;
 	this -> entidadDesconectada = false;
+	if ((this -> highInTiles == 1) && (this -> widthInTiles == 1)) {
+		this -> ordenBliteo = Entidad::ORDEN_PISO;
+	} else{
+		this -> ordenBliteo = Entidad::ORDEN_EDIFICIO;	
+	}
 }
 	
 /*
@@ -441,4 +456,12 @@ bool Entidad::isInTile(int x , int y){
 
 bool Entidad::isCompartido(){
 	return this -> compartido;
+}
+
+unsigned int Entidad::getOrdenBliteo(){
+	return this -> ordenBliteo;
+}
+
+void Entidad::setOrdenBliteo(unsigned int orden){
+	this -> ordenBliteo = orden;
 }

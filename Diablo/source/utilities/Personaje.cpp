@@ -36,6 +36,7 @@ void Personaje::inicializarAtributosEnValoresDefault() {
 	this -> compartido = true;
 	//seteo flag de actualizando posicion
 	this -> actualizandoPosicion = false;
+	this -> ordenBliteo = Entidad::ORDEN_PERSONAJE;
 }
 
 /*
@@ -149,6 +150,7 @@ void Personaje::init(const std::string& nickname, const std::string& name,
 	//seteo flag de actualizando posicion
 	this -> actualizandoPosicion = false;
 	this -> setNoDibujaFueraDelRadio();
+	this -> ordenBliteo = Entidad::ORDEN_PERSONAJE;
 }
 
 /*
@@ -356,6 +358,41 @@ void Personaje::calcularPosicionTentativa(unsigned int direccion ,
 */
 Tile* Personaje::obtenerTileAncla(const int posX , const int posY , 
 												const unsigned int direccion , Mapa* mapa){
+	
+	Tile* retorno = NULL;
+	// Sur
+	int posImagenX = posX;
+	int posImagenY = posY + Tile::TILE_ALTO + Personaje::MARGEN_ANCLA_Y;
+	retorno = mapa -> getTilePorPixeles(posImagenX , posImagenY);
+	if (retorno == NULL){
+		// Sureste
+		posImagenY = posY + Tile::TILE_ALTO;
+		retorno = mapa -> getTilePorPixeles(posImagenX , posImagenY);
+		if (retorno == NULL) {
+			// Este
+			posImagenX = posX - Tile::TILE_ANCHO;
+			posImagenY = posY + Tile::TILE_ALTO/2;
+			if(retorno == NULL) {
+				// tile Suroeste
+				posImagenX = posX - Tile::TILE_ANCHO/2;
+				posImagenY = posY + Tile::TILE_ALTO/2;
+				retorno = mapa -> getTilePorPixeles(posImagenX , posImagenY);
+				if(retorno == NULL) {
+					// tile Actual
+					posImagenX = posX;
+					posImagenY = posY;
+					retorno = mapa -> getTilePorPixeles(posImagenX , posImagenY);
+				}
+			}
+
+		}
+	}
+	return retorno;	
+
+
+
+
+	/*												
 	Tile* retorno = NULL;
 	int posImagenX = posX;
 	int posImagenY = posY + Tile::TILE_ALTO + Personaje::MARGEN_ANCLA_Y;
@@ -379,7 +416,7 @@ Tile* Personaje::obtenerTileAncla(const int posX , const int posY ,
 			retorno = mapa -> getTilePorPixeles(posImagenX , posImagenY);
 		}
 	}
-	return retorno;
+	return retorno;*/
 }
 
 void Personaje::setTileActual(Tile* tile) {

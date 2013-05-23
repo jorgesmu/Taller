@@ -5,14 +5,41 @@ Tile::Tile() {
 	force_no_caminable = false;
 }
 
+void Tile::insertarEntidadOrdenada(Entidad* ent){
+	std::vector<Entidad*> new_ent;
+	new_ent.reserve(entidades.size());
+	bool insertado = false;
+	for(size_t i = 0; i < entidades.size();i++) {
+		// trato de insertar la entidad parametro
+		if(!insertado){
+			if((entidades[i] != ent) && 
+				(entidades[i] -> getOrdenBliteo() >= ent -> getOrdenBliteo())) {
+				new_ent.push_back(ent);
+				insertado = true;
+			}
+		}
+		// inserto la anterior
+		new_ent.push_back(entidades[i]);
+	}
+	// si no se pudo insertar se inserta al final
+	if (!insertado) {
+		new_ent.push_back(ent);
+	}
+	// intercambio la lista
+	entidades.swap(new_ent);
+}
+
 //deprecated
 void Tile::addEntidad(Entidad* ent){
-	entidades.push_back(ent);
+	insertarEntidadOrdenada(ent);
+	//entidades.push_back(ent);
+	
 	//ent->setTileActual(this);
 }
 
 void Tile::addEntidad(Entidad* ent , Mapa* mapa){
-	entidades.push_back(ent);
+	insertarEntidadOrdenada(ent);
+	//entidades.push_back(ent);
 	ent->setTileActual(this , mapa);
 }
 

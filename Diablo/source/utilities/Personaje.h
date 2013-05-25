@@ -43,16 +43,9 @@ public:
 		const static unsigned int ESPERANDO_ACCION = 12;
 
 		//Velocidad por defecto
-		const static int VELOCIDAD_DEFAULT = 5;
+		const static unsigned int VELOCIDAD_DEFAULT = 105; // En pixeles por segundo
 
-		const static int DELTA_AVANCE = 2;
-
-		//Base de tiempo para la velocidad
-		const static int BASE_DE_TIEMPO = 1000;
-
-		const static int BASE_DE_TIEMPO_RAPIDO = 300;
-
-		const static int COTA_VELOCIDAD_BAJA = 50000;
+	//	const static int DELTA_TIEMPO_UPDATE_POSICION = 20; // Tiempo entre cada update en clocks
 
 		const static int MARGEN_ANCLA_X = 10;
 
@@ -62,11 +55,11 @@ protected:
 
 		Tile* tileDestino; // Tile destino
 
-		unsigned int velocidad;
+		double velocidad; // Pixeles por clock del procesador local
 
-		unsigned int deltaUpdatePosicion; // Distancia en tiempo, entre cada actualizacion
-											//de posicion.
-		clock_t tiempoProximoUpdate;
+		clock_t deltaUpdatePosicion; // Distancia en ciclos del procesador local entre cada actualizacion
+
+		clock_t tiempoProximoUpdate; // Tiempo proximo update en ciclos del procesador local
 
 		bool actualizandoPosicion;
 				

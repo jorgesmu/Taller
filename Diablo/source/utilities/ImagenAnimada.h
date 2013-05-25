@@ -25,13 +25,13 @@ protected:
 
 	int columnaActual;
 
-	int fps;
+	double fpc; // frames por ciclo del clock local
 
 	int delay;
 
 	clock_t tiempoProximoFrame;
 
-	clock_t deltaFrame; //distancia en segundos entre cada frame
+	clock_t deltaFrame; // distancia en clocks entre cada frame
 
 	int colorKey;
 
@@ -105,6 +105,13 @@ public:
 	virtual bool isImagenAnimada();
 
 protected:
+	
+	/*
+		Pre: -
+
+		Post: Se ha actualizado surfaceActual
+	*/
+	virtual clock_t calcularDeltaUpdate();
 
 	/*
 		Pre: Se han inicilizado todos los parametros.

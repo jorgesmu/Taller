@@ -20,7 +20,7 @@
 ImagenPersonaje::ImagenPersonaje(const char* name , const int altoSprite , 
 				const int anchoSprite , const int fps , const int delay , ResMan& rm ,
 				const int colorKey) : 
-				ImagenAnimada(name ,altoSprite , anchoSprite , fps , delay , rm , colorKey) {
+				ImagenAnimada(name ,altoSprite , anchoSprite ,/* fps*/5 , delay , rm , colorKey) {
 	this -> accionActual = ImagenPersonaje::EST_SUR;
 	this -> setAccion(ImagenPersonaje::EST_SUR);
 	this -> freezado = false;
@@ -404,8 +404,9 @@ void ImagenPersonaje::nextSprite() {
 						this -> getAncho() , SDL_GetVideoInfo() , colorKey);
 			if ((this -> maxColumnas > 0) && (this -> maxFilas > 0) ) {
 				this -> setAccion(this -> accionSiguiente);
-				this -> columnaActual++;
-				this -> tiempoProximoFrame += this -> deltaFrame;
+				clock_t deltaTiempo = tiempoActual - this -> tiempoProximoFrame + deltaFrame;
+				this -> columnaActual  = columnaActual + ceil((double)deltaTiempo * fpc);
+				this -> tiempoProximoFrame = tiempoActual + this -> deltaFrame;
 				// Ataques o defesas vuelven a su estatico correspondiente
 				if (this -> columnaActual >= this -> maxColumnas) { 
 					if ( (this -> accionActual >= ImagenPersonaje::AT_SUR) &&

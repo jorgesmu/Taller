@@ -1,6 +1,21 @@
 #include "Personaje.h"
 
 /*
+	Pre:- 
+
+	Post: Se calcula el deltaUpdatePosicion adecuado.
+*/
+unsigned int calcularDeltaUptdatePosicionAdecuado(double velocidad){
+	clock_t deltaUpdateCalculado = 0;
+	double deltaPosicion = 0;
+	while (deltaPosicion < 1){
+		deltaPosicion = deltaUpdateCalculado * velocidad;
+		deltaUpdateCalculado++;
+	}
+	return deltaUpdateCalculado;
+}
+
+/*
 	Pre:-
 
 	Post: Inicializa los atributos con los valores por defecto.
@@ -24,9 +39,10 @@ void Personaje::inicializarAtributosEnValoresDefault() {
 	//surf e imagen
 	this -> surf = NULL;
 	this -> imagen = NULL;
+	//seteo de velocidad
+	this -> velocidad = VELOCIDAD_DEFAULT/((double)CLOCKS_PER_SEC);
 	//deltaUpdatePosicion
-	this -> deltaUpdatePosicion = Personaje::BASE_DE_TIEMPO/Personaje::VELOCIDAD_DEFAULT;
-	this -> velocidad = VELOCIDAD_DEFAULT;
+	this -> deltaUpdatePosicion = calcularDeltaUptdatePosicionAdecuado(this -> velocidad);
 	//tiempo siguiente update
 	this -> tiempoProximoUpdate = clock();
 	//seteo posicion
@@ -129,9 +145,6 @@ void Personaje::init(const std::string& nickname, const std::string& name,
 	this -> tileDestino = tile;
 	//tile ancla
 	this -> tileAncla = tile;
-	//deltaUpdatePosicion
-	this -> deltaUpdatePosicion = Personaje::BASE_DE_TIEMPO/velocidad;
-	this -> velocidad = velocidad;
 	//tiempo siguiente update
 	this -> tiempoProximoUpdate = clock();
 	//agrego entidad al tile
@@ -225,7 +238,6 @@ unsigned int Personaje::actualizarPosicion(Mapa* mapa) {
 	if(this -> tileDestino != NULL) {
 		if( (this -> posX != tileDestino -> getX()) || (this -> posY != tileDestino -> getY())){
 			if ( verificarDestinoCaminable(mapa) ){
-
 				retorno = Personaje::MOVER_EN_CURSO;
 				// Calculo posicion siguiente (tomando en cuenta pixel de referencia y la posicion actual)
 				int posPixelSiguienteX = 0;
@@ -308,41 +320,43 @@ void Personaje::calcularPosicionTentativa(unsigned int direccion ,
 								int* offsetTentativoX , int* offsetTentativoY){
 	*offsetTentativoX = posX;
 	*offsetTentativoY = posY;
+	unsigned int avance = ceil((this->velocidad)*(clock() - this->tiempoProximoUpdate + this ->deltaUpdatePosicion)
+							*this->velocidad);
 	switch (direccion){
 			case NORTE :  {
-				(*offsetTentativoY)-=Personaje::DELTA_AVANCE;
+				(*offsetTentativoY)-= avance;
 				break;
 			}
 			case NORESTE : {
-				(*offsetTentativoX)+=(2*Personaje::DELTA_AVANCE);
-				(*offsetTentativoY)-=Personaje::DELTA_AVANCE;
+				(*offsetTentativoX)+= (2*avance);
+				(*offsetTentativoY)-= avance;
 				break;
 			}
 			case ESTE : {
-				(*offsetTentativoX)+=(2*Personaje::DELTA_AVANCE);
+				(*offsetTentativoX)+= (2*avance);
 				break;
 			}
 			case SURESTE : {
-				(*offsetTentativoX)+=(2*Personaje::DELTA_AVANCE);
-				(*offsetTentativoY)+=Personaje::DELTA_AVANCE;
+				(*offsetTentativoX)+= (2*avance);
+				(*offsetTentativoY)+= avance;
 				break;
 			}
 			case SUR : {
-				(*offsetTentativoY)+=Personaje::DELTA_AVANCE;
+				(*offsetTentativoY)+= avance;
 				break;
 			}
 			case SUROESTE : {
-				(*offsetTentativoX)-=(2*Personaje::DELTA_AVANCE);
-				(*offsetTentativoY)+=Personaje::DELTA_AVANCE;
+				(*offsetTentativoX)-= (2*avance);
+				(*offsetTentativoY)+= avance;
 				break;
 			}
 			case OESTE : {
-				(*offsetTentativoX)-=(2*Personaje::DELTA_AVANCE);
+				(*offsetTentativoX)-= (2*avance);
 				break;
 			}
 			case NOROESTE : {
-				(*offsetTentativoX)-=(2*Personaje::DELTA_AVANCE);
-				(*offsetTentativoY)-=Personaje::DELTA_AVANCE;
+				(*offsetTentativoX)-= (2*avance);
+				(*offsetTentativoY)-= avance;
 				break;
 			}
 			case CENTRO : {
@@ -486,7 +500,7 @@ void Personaje::actualizarImagen(const unsigned int direccion){
 			imagenPersonaje -> setAccion(direccion);
 		}
 		// Actualizacion del surface
-		this -> surf = this -> imagen -> getSurface();
+		//this -> surf = this -> imagen -> getSurface();
 	}
 }
 
@@ -534,15 +548,15 @@ unsigned int Personaje::update(Mapa* mapa) {
 						//actualizacion de posicion
 						retorno = this -> actualizarPosicion(mapa);
 					} else {
-						if(this -> imagen != NULL) {
-							this -> surf = this -> imagen -> getSurface();
-							retorno = Personaje::MOVER_COMPLETADO; // ESPERANDO_ACCION
-						}
+						retorno = Personaje::MOVER_COMPLETADO; // ESPERANDO_ACCION
 					}
 					this -> tiempoProximoUpdate = clock() + this -> deltaUpdatePosicion;
 				}
 			}
 		}
+	}
+	if(this -> imagen != NULL) {
+		this -> surf = this -> imagen -> getSurface();
 	}
 	return retorno;
 }

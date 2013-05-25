@@ -11,7 +11,7 @@ entidades:
   
   - nombre: agua
     imagen: ../resources/tileAgua.png
-    fps: 10
+    fps: 11
     delay: 1000
     alto_sprite: 50
     ancho_sprite: 100
@@ -47,7 +47,7 @@ entidades:
     alto_base: 3
     pixel_ref_x: 120
     pixel_ref_y: 100
-    fps: 10
+    fps: 11
     delay: 100
     alto_sprite: 300
     ancho_sprite: 320
@@ -59,7 +59,7 @@ entidades:
     alto_base: 3
     pixel_ref_x: 120
     pixel_ref_y: 100
-    fps: 20
+    fps: 11
     delay: 100
     alto_sprite: 300
     ancho_sprite: 320
@@ -75,7 +75,7 @@ entidades:
 
   - nombre: orco
     imagen: ../resources/Orco.png
-    fps: 10
+    fps: 11
     caminable: true
 
 escenarios:
@@ -100,6 +100,9 @@ escenarios:
       - {x: 30, y: 62, entidad: molino}
       - {x: 7, y: 93, entidad: molino2}
       - {x: 80, y: 15, entidad: molino}
+      - {x: 0, y: 0, entidad: agua}
+      - {x: 0, y: 1, entidad: agua}
+      - {x: 1, y: 0, entidad: agua}
   - nombre: bosque_encantado2
     size_x: 10
     size_y: 10
@@ -142,8 +145,8 @@ escenarios:
       - {x: 22, y: 43, entidad: arbol}
       - {x: 10, y: 10, entidad: casa}
       - {x: 30, y: 15, entidad: casa}
-      - {x: 50, y: 10, entidad: casa}
-      - {x: 19, y: 19, entidad: agua}
-      - {x: 19, y: 18, entidad: agua}
-      - {x: 18, y: 19, entidad: agua}
+      - {x: 10, y: 10, entidad: casa}
+      - {x: 1, y: 1, entidad: agua}
+      - {x: 1, y: 12, entidad: agua}
+      - {x: 2, y: 2, entidad: agua}
       - {x: 18, y: 18, entidad: agua}

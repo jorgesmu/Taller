@@ -14,7 +14,7 @@ ImagenAnimada::ImagenAnimada(ImagenAnimada* imagen){
 		this -> ancho = imagen -> ancho;
 		
 		delay = imagen -> delay;
-		fps = imagen -> fps;
+		fpc = imagen -> fpc;
 
 		//seteo la distancia entre frames
 		this -> deltaFrame = imagen -> deltaFrame;
@@ -77,13 +77,13 @@ ImagenAnimada::ImagenAnimada(const char* path , const int altoSprite , const int
 		this -> delay = ImagenAnimada::DELAY_DEFAULT;
 	}
 	if (fps > 0) {
-		this -> fps = fps;
+		this -> fpc = fps /((double)CLOCKS_PER_SEC);
 	} else {
-		this -> fps = ImagenAnimada::FPS_DEFAULT;
+		this -> fpc = ImagenAnimada::FPS_DEFAULT/((double)CLOCKS_PER_SEC);
 	}
 	
 	//seteo la distancia entre frames
-	this -> deltaFrame = 1000 / this -> fps ;
+	this -> deltaFrame = this -> calcularDeltaUpdate();
 	
 	//calculo de tiempos
 	clock_t tiempoActual = clock();
@@ -159,13 +159,13 @@ ImagenAnimada::ImagenAnimada(const char* name , const int altoSprite ,
 		this -> delay = ImagenAnimada::DELAY_DEFAULT;
 	}
 	if (fps > 0) {
-		this -> fps = fps;
+		this -> fpc = fps/((double)CLOCKS_PER_SEC);
 	} else {
-		this -> fps = ImagenAnimada::FPS_DEFAULT;
+		this -> fpc = ImagenAnimada::FPS_DEFAULT/((double)CLOCKS_PER_SEC);
 	}
 	
 	//seteo la distancia entre frames
-	this -> deltaFrame = 1000 / this -> fps ;
+	this -> deltaFrame = this -> calcularDeltaUpdate();
 	
 	//calculo de tiempos
 	clock_t tiempoActual = clock();
@@ -229,8 +229,9 @@ void ImagenAnimada::nextSprite() {
 		this -> surfaceActual.nuevoSurfaceConfigurado(this -> getAlto() ,
 					this -> getAncho() , SDL_GetVideoInfo() , colorKey);
 		if ((this -> maxColumnas > 0) && (this -> maxFilas > 0) ) {
-			this -> columnaActual++;
-			this -> tiempoProximoFrame += this -> deltaFrame;
+			clock_t deltaTiempo = tiempoActual - this -> tiempoProximoFrame + deltaFrame;
+			this -> columnaActual = this -> columnaActual +  ceil((double)deltaTiempo * fpc);
+			this -> tiempoProximoFrame = tiempoActual + this -> deltaFrame;
 			if (this -> columnaActual >= this -> maxColumnas) {
 				this -> columnaActual = 0;
 				this -> filaActual++;
@@ -274,7 +275,7 @@ Surface* ImagenAnimada::getSurface() {
 		
 **/
 int ImagenAnimada::getFPS() {
-	return this -> fps;
+	return (this -> fpc*((double)CLOCKS_PER_SEC));
 }
 
 /**
@@ -289,4 +290,19 @@ int ImagenAnimada::getDelay() {
 
 bool ImagenAnimada::isImagenAnimada(){
 	return true;
+}
+
+/*
+	Pre: -
+
+	Post: Se ha actualizado surfaceActual
+*/
+clock_t ImagenAnimada::calcularDeltaUpdate(){
+	clock_t deltaUpdateCalculado = 0;
+	double deltaCuadro = 0;
+	while (deltaCuadro < 1){
+		deltaCuadro = deltaUpdateCalculado * fpc;
+		deltaUpdateCalculado++;
+	}
+	return deltaUpdateCalculado;
 }

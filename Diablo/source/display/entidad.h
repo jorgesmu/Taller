@@ -1,6 +1,7 @@
 #pragma	once
 #include <string>
 #include <vector>
+#include <iostream>
 #include "../utilities/surface.h"
 #include "../utilities/Imagen.h"
 #include "../utilities/ImagenEstatica.h"
@@ -276,6 +277,9 @@ public:
 	unsigned int getOrdenBliteo();
 
 	void setOrdenBliteo(unsigned int orden);
+
+	//Un personaje choco contra la entidad
+	void chocarCon(Personaje* personaje);
 
 protected:	
 		

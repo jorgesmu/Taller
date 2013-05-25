@@ -61,6 +61,8 @@ ChatWindow chat_window;
 ResMan resman;
 // Config
 config_general configuracion;
+//Choques
+bool choco;
 
 int main(int argc, char* argv[]) {
 	// Verificamos que se pase el nick y el tipo
@@ -211,6 +213,7 @@ int main(int argc, char* argv[]) {
 	// Para guardar los eventos  de input
 	SDL_Event event;
 
+
 	//variables para el control del movimiento
 	vector< pair<int,int> > caminoMinimo;
 	int indice = 0; //indica que paso del movimiento se encuentra
@@ -345,7 +348,15 @@ int main(int argc, char* argv[]) {
 			// Actualizamos el personaje principal
 			Tile* t = mapa.getTilePorPixeles(pjm.getPjeLocal().getX(),pjm.getPjeLocal().getY());
 			tileActual = make_pair<int,int>(t->getU(), t->getV());
+			
 			if (puedeMoverse) {
+				if (!choco) {
+					std::vector<Entidad*> entidades=pjm.getPjeLocal().getPosicion(&mapa)->getEntidades();
+					for (auto it=entidades.begin();it!=entidades.end();it++) {
+						(*it)->chocarCon(&pjm.getPjeLocal());
+					}
+					choco=true;
+				}
 				//std::cout << puedeMoverse << " " << estadoMovimiento << "\n";
 				//si termino de ir al tile anterior
 				if(indice < caminoMinimo.size()){
@@ -360,6 +371,7 @@ int main(int argc, char* argv[]) {
 					if(estadoMovimiento == MOV::OK_RECV) {
 						std::cout << "OK_RECV\n";
 						pjm.getPjeLocal().mover(mapa.getTile(proximoTile.first,proximoTile.second));
+						choco=false;
 						//actualizo posiciones para calcular correctamente el camino minimo
 						ultimoMovimientoX = proximoTile.first;
 						ultimoMovimientoY = proximoTile.second;

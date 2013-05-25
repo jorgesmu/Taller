@@ -465,3 +465,7 @@ unsigned int Entidad::getOrdenBliteo(){
 void Entidad::setOrdenBliteo(unsigned int orden){
 	this -> ordenBliteo = orden;
 }
+
+void Entidad::chocarCon(Personaje* personaje) {
+	std::cout << "Choco!\n";
+}

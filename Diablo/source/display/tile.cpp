@@ -13,9 +13,17 @@ void Tile::insertarEntidadOrdenada(Entidad* ent){
 		// trato de insertar la entidad parametro
 		if(!insertado){
 			if((entidades[i] != ent) && 
-				(entidades[i] -> getOrdenBliteo() >= ent -> getOrdenBliteo())) {
+				(entidades[i] -> getOrdenBliteo() > ent -> getOrdenBliteo())) {
 				new_ent.push_back(ent);
 				insertado = true;
+			} else {
+				if((entidades[i] != ent) && 
+				   (entidades[i] -> getOrdenBliteo() == ent -> getOrdenBliteo()) && 
+				   (entidades[i] -> getX() >= ent -> getX()) && 
+				   (entidades[i] -> getY() >= ent -> getY())) {
+					new_ent.push_back(ent);
+					insertado = true;
+				}
 			}
 		}
 		// inserto la anterior

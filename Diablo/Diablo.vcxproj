@@ -96,6 +96,7 @@
     <ClInclude Include="source\utilities\timer.h" />
     <ClInclude Include="source\utilities\vec2.h" />
     <ClInclude Include="source\utilities\vertice.h" />
+    <ClInclude Include="source\utilities\zapatos.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{A9A2FD3D-2740-4ADA-8DF2-0E25D8612B48}</ProjectGuid>

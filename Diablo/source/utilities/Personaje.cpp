@@ -781,3 +781,7 @@ void Personaje::chocarConLampara() {
 void Personaje::chocarConMapa() {
 	this->aumentarRadio(100.0);
 }
+
+void Personaje::chocarConZapatos() {
+	this->velocidad*=1.25;
+}

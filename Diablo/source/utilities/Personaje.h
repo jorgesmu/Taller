@@ -227,6 +227,8 @@ public:
 
 	void chocarConMapa();
 
+	void chocarConZapatos();
+
 	//Setea el radio de vision en el eje Y
 	void setRadio(int newRadio) { 
 		radioY=newRadio;

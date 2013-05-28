@@ -776,3 +776,8 @@ bool Personaje::verificarAncla(Tile* ancla) {
 void Personaje::chocarConLampara() {
 	this->aumentarRadio(0.25);
 }
+
+//Mejorar: recorrer todos los tiles y colocarlos como visitados
+void Personaje::chocarConMapa() {
+	this->aumentarRadio(100.0);
+}

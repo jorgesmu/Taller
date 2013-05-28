@@ -29,6 +29,7 @@
 #include "../../source/utilities/chatwindow.h"
 #include "../../source/utilities/item.h"
 #include "../../source/utilities/lampara.h"
+#include "../../source/utilities/mapaItem.h"
 
 using namespace std;
 
@@ -158,8 +159,8 @@ int main(int argc, char* argv[]) {
 			
 	//Prueba de carga items
 	resman.addRes("cofre","../resources/chest.png");
-	Lampara cofre("cofre",1,1,true, 0 ,0,NULL,&mapa,resman,Imagen::COLOR_KEY );
-	mapa.getTile(0,0)->addEntidad(&cofre,&mapa);
+	MapaItem cofre("cofre",1,1,true, 6 ,13,NULL,&mapa,resman,Imagen::COLOR_KEY );
+	mapa.getTile(6,13)->addEntidad(&cofre,&mapa);
 	entidades_cargadas.push_back(&cofre);
 
 	for (auto it = entidades.begin(); it != entidades.end(); ++it){

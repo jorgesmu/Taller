@@ -483,6 +483,6 @@ void EntidadFija::setDibujada(bool seDibujo, Mapa* mapa,Personaje* personaje){
 	}	
 }
 
-void EntidadFija::chocarConPersonaje(Personaje* personaje) {
-	cout << "Choco con entidad fija\n";
+void EntidadFija::chocarCon(Personaje* personaje) {
+	personaje->chocarConEntidadFija();
 }

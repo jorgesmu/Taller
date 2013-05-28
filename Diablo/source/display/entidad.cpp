@@ -466,6 +466,6 @@ void Entidad::setOrdenBliteo(unsigned int orden){
 	this -> ordenBliteo = orden;
 }
 
-void Entidad::chocarConPersonaje(Personaje* personaje) {
-	cout << "Choco con entidad\n";
+void Entidad::chocarCon(Personaje* personaje) {
+	personaje->chocarConEntidad();
 }

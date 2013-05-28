@@ -11,6 +11,6 @@ Item::Item(const std::string& name,
 	::EntidadFija(name,wTiles,hTiles,caminable,pixel_ref_x,pixel_ref_y,tile,mapa,rm,colorKey);
 }
 */
-void Item::chocarConPersonaje(Personaje* personaje) {
-	std::cout << "Agarro item\n";
+void Item::chocarCon(Personaje* personaje) {
+	personaje->chocarConItem();
 }

@@ -364,7 +364,8 @@ int main(int argc, char* argv[]) {
 				if (!choco) {
 					std::vector<Entidad*> entidades=pjm.getPjeLocal().getPosicion(&mapa)->getEntidades();
 					for (auto it=entidades.begin();it!=entidades.end();it++) {
-						(*it)->chocarConPersonaje(&pjm.getPjeLocal());
+						if ((*it)!=&pjm.getPjeLocal()) //sino choca con si mismo
+							(*it)->chocarCon(&pjm.getPjeLocal());
 					}
 					choco=true;
 				}

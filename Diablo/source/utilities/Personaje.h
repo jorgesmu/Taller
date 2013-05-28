@@ -1,4 +1,5 @@
 #pragma once
+#include <iostream>
 #include "../display/entidad.h"
 #include "../utilities/ImagenPersonaje.h"
 #include "../display/tile.h"
@@ -212,6 +213,14 @@ public:
 	// Deprecated
 	virtual bool isCaminable();	
 
+	//Colisiones
+	
+	void chocarConEntidad() {std::cout << "Choco con entidad\n"; }
+
+	void chocarConEntidadFija() {std::cout << "Choco con entidad fija\n"; }
+
+	void chocarConItem() {std::cout << "Agarro item\n"; }
+
 protected:
 
 	// Nombre del chabon
@@ -285,5 +294,4 @@ protected:
 
 	bool verificarAncla(Tile* ancla);
 
-	void chocarConPersonaje(Personaje* personaje) {}
 };

@@ -279,7 +279,7 @@ public:
 	void setOrdenBliteo(unsigned int orden);
 
 	//Colision con personaje
-	virtual void chocarConPersonaje(Personaje* personaje);
+	virtual void chocarCon(Personaje* personaje);
 
 protected:	
 		

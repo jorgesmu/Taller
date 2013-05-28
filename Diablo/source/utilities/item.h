@@ -1,4 +1,5 @@
-#include "Personaje.h"
+#pragma	once
+
 #include "../../source/display/entidadFija.h"
 
 class Item: public EntidadFija {

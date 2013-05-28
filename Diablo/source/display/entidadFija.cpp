@@ -197,7 +197,7 @@
 	//	} 
 	//}
 
-	void EntidadFija::setColor(bool value , int tileX , int tileY, Mapa* mapa, int persX, int persY) {		
+	void EntidadFija::setColor(bool value , int tileX , int tileY, Mapa* mapa, int persX, int persY, Personaje* personaje) {		
 		int contTilesX = 0;
 		int delta = 1;
 		if (this -> tileAncla != NULL){
@@ -212,7 +212,7 @@
 					if (ancla != NULL){
 						int deltaX = persX - ancla->getX();
 						int deltaY = persY - ancla->getY();
-						if((abs(deltaX) <= Personaje::RADIO_VISION_X) && (abs(deltaY) <= Personaje::RADIO_VISION_Y)){
+						if((abs(deltaX) <= personaje->getRadioX()) && (abs(deltaY) <= personaje->getRadioY())){
 							this->color = true;
 							return;
 						}

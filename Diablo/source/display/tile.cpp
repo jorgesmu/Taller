@@ -70,12 +70,12 @@ std::vector<Entidad*> Tile::getEntidades(){
 void Tile::setearExplorados(int tileX, int tileY, Personaje* personaje, Mapa* mapa){
 
 	Tile* tile = mapa->getTile(tileX, tileY);
-	for(int posX = (Tile::TILE_ANCHO/2) + tile->getX()-(Personaje::RADIO_VISION_X); posX < tile->getX()+(Personaje::RADIO_VISION_X); posX+=Tile::TILE_ANCHO/2){
-		for(int posY = (Tile::TILE_ANCHO/2) + tile->getY()-(Personaje::RADIO_VISION_Y); posY < tile->getY()+(Personaje::RADIO_VISION_Y); posY+=Tile::TILE_ALTO/2){
+	for(int posX = (Tile::TILE_ANCHO/2) + tile->getX()-(personaje->getRadioX()); posX < tile->getX()+(personaje->getRadioX()); posX+=Tile::TILE_ANCHO/2){
+		for(int posY = (Tile::TILE_ANCHO/2) + tile->getY()-(personaje->getRadioY()); posY < tile->getY()+(personaje->getRadioY()); posY+=Tile::TILE_ALTO/2){
 			int deltaX = tile->getX() - posX;
 			int deltaY = tile->getY() - posY;
 
-			if((abs(deltaX) <= Personaje::RADIO_VISION_X) && (abs(deltaY) <= Personaje::RADIO_VISION_Y)){
+			if((abs(deltaX) <= personaje->getRadioX()) && (abs(deltaY) <= personaje->getRadioY())){
 				personaje->agregarTilesExplorados(mapa->getTilePorPixeles(posX, posY));
 			}
 
@@ -88,14 +88,14 @@ void Tile::blit(SDL_Surface* pantalla, Camara& cam, Personaje* personaje, Mapa* 
 	Tile* tilePersonaje = mapa->getTilePorPixeles(personaje->getX(), personaje->getY());
 	int deltaX = personaje -> getXAnclajeNiebla() - x;
 	int deltaY = personaje -> getYAnclajeNiebla() - y;
-	if((abs(deltaX) <= Personaje::RADIO_VISION_X) && (abs(deltaY) <= Personaje::RADIO_VISION_Y)){
+	if((abs(deltaX) <= personaje->getRadioX()) && (abs(deltaY) <= personaje->getRadioY())){
 		//dibujo en colores normales
 		for(auto it = entidades.begin(); it != entidades.end(); ++it) {
 			if ( (!(*it)-> isInTile(this->x , this -> y)) && (!(*it)->isCompartido())){
 				// es un ancla
 				deltaX = personaje -> getXAnclajeNiebla() - (*it)->getX();
 				deltaY = personaje -> getYAnclajeNiebla() - (*it)->getY();
-				if((abs(deltaX) <= Personaje::RADIO_VISION_X) && (abs(deltaY) <= Personaje::RADIO_VISION_Y)){
+				if((abs(deltaX) <= personaje->getRadioX()) && (abs(deltaY) <= personaje->getRadioY())){
 					(*it)->setColor(true,x,y, mapa, (personaje -> getXAnclajeNiebla()), (personaje -> getYAnclajeNiebla()));
 					(*it)->blit(pantalla, &cam, NULL,x, y,true);
 					(*it)->setDibujada(true, mapa,personaje);				

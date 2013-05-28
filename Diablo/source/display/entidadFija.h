@@ -80,7 +80,7 @@ class EntidadFija : public Entidad {
 	// Deprecated
 	virtual void setColor(bool value);
 
-	virtual void setColor(bool value , int tileX , int tileY, Mapa* mapa, int persX, int persY);
+	virtual void setColor(bool value , int tileX , int tileY, Mapa* mapa, int persX, int persY, Personaje* personaje);
 
 	/*
 		Pre:-

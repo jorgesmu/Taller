@@ -53,6 +53,7 @@ void Personaje::inicializarAtributosEnValoresDefault() {
 	//seteo flag de actualizando posicion
 	this -> actualizandoPosicion = false;
 	this -> ordenBliteo = Entidad::ORDEN_PERSONAJE;
+	this->setRadio(125);
 }
 
 /*
@@ -770,4 +771,8 @@ bool Personaje::verificarAncla(Tile* ancla) {
 		}
 	}
 	return retorno;
+}
+
+void Personaje::chocarConLampara() {
+	this->aumentarRadio(0.25);
 }

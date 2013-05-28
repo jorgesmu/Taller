@@ -83,6 +83,7 @@
     <ClInclude Include="source\utilities\ImagenPersonaje.h" />
     <ClInclude Include="source\utilities\imagen_error.h" />
     <ClInclude Include="source\utilities\item.h" />
+    <ClInclude Include="source\utilities\lampara.h" />
     <ClInclude Include="source\utilities\logErrores.h" />
     <ClInclude Include="source\utilities\parser.h" />
     <ClInclude Include="source\utilities\Personaje.h" />

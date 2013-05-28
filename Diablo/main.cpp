@@ -28,6 +28,7 @@
 #include "../../source/net/PjeManager.h"
 #include "../../source/utilities/chatwindow.h"
 #include "../../source/utilities/item.h"
+#include "../../source/utilities/lampara.h"
 
 using namespace std;
 
@@ -157,7 +158,7 @@ int main(int argc, char* argv[]) {
 			
 	//Prueba de carga items
 	resman.addRes("cofre","../resources/chest.png");
-	Item cofre("cofre",1,1,true, 0 ,0,NULL,&mapa,resman,Imagen::COLOR_KEY );
+	Lampara cofre("cofre",1,1,true, 0 ,0,NULL,&mapa,resman,Imagen::COLOR_KEY );
 	mapa.getTile(0,0)->addEntidad(&cofre,&mapa);
 	entidades_cargadas.push_back(&cofre);
 

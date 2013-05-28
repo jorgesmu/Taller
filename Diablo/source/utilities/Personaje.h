@@ -8,11 +8,11 @@ class Tile;
 class Mapa;
 class Personaje : public Entidad {
 public:
-
+	/*
 		const static int RADIO_VISION_Y = 125;
 
 		const static int RADIO_VISION_X = 2 * RADIO_VISION_Y; // En pixeles
-
+	*/
 		//Direccion
 		const static unsigned int SUR = 0;
 		const static unsigned int SURESTE = 1;
@@ -63,6 +63,8 @@ protected:
 		clock_t tiempoProximoUpdate; // Tiempo proximo update en ciclos del procesador local
 
 		bool actualizandoPosicion;
+
+		int radioY,radioX;
 				
 public:
 	
@@ -220,6 +222,24 @@ public:
 	void chocarConEntidadFija() {std::cout << "Choco con entidad fija\n"; }
 
 	void chocarConItem() {std::cout << "Agarro item\n"; }
+
+	void chocarConLampara();
+
+	//Setea el radio de vision en el eje Y
+	void setRadio(int newRadio) { 
+		radioY=newRadio;
+		radioX=2*radioY;
+	}
+
+	//Recibe un valor de proporcion (0.25 aumenta 25%) para aumentar el radio de vision
+	void aumentarRadio(double proporcion) {
+		radioY*=(1+proporcion);
+		radioX=2*radioY;
+	}
+
+	int getRadioX() { return radioX; }
+
+	int getRadioY() { return radioY; }
 
 protected:
 

@@ -96,12 +96,12 @@ void Tile::blit(SDL_Surface* pantalla, Camara& cam, Personaje* personaje, Mapa* 
 				deltaX = personaje -> getXAnclajeNiebla() - (*it)->getX();
 				deltaY = personaje -> getYAnclajeNiebla() - (*it)->getY();
 				if((abs(deltaX) <= personaje->getRadioX()) && (abs(deltaY) <= personaje->getRadioY())){
-					(*it)->setColor(true,x,y, mapa, (personaje -> getXAnclajeNiebla()), (personaje -> getYAnclajeNiebla()));
+					(*it)->setColor(true,x,y, mapa, (personaje -> getXAnclajeNiebla()), (personaje -> getYAnclajeNiebla()), personaje);
 					(*it)->blit(pantalla, &cam, NULL,x, y,true);
 					(*it)->setDibujada(true, mapa,personaje);				
 				}
 			}else{
-				(*it)->setColor(true,x,y, mapa, (personaje -> getXAnclajeNiebla()), (personaje -> getYAnclajeNiebla()));
+				(*it)->setColor(true,x,y, mapa, (personaje -> getXAnclajeNiebla()), (personaje -> getYAnclajeNiebla()), personaje);
 				(*it)->blit(pantalla, &cam, NULL,x, y,true);
 				(*it)->setDibujada(true, mapa,personaje);			
 			}
@@ -116,7 +116,7 @@ void Tile::blit(SDL_Surface* pantalla, Camara& cam, Personaje* personaje, Mapa* 
 				if((*it)->noDibujaFueraDelRadio()) continue;
 
 				if((!((*it)->getDibujada())) || ((*it)->get_nombre() == "tierraDefault")){
-					(*it)->setColor(true,x,y, mapa, (personaje -> getXAnclajeNiebla()), (personaje -> getYAnclajeNiebla()));
+					(*it)->setColor(true,x,y, mapa, (personaje -> getXAnclajeNiebla()), (personaje -> getYAnclajeNiebla()), personaje);
 					(*it)->blit(pantalla, &cam, NULL,x, y,false);
 					(*it)->setDibujada(true, mapa,personaje);
 				}else{

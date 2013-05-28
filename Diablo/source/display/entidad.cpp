@@ -444,7 +444,7 @@ void Entidad::setColor(bool value){
 }
 
 
-void Entidad::setColor(bool value , int tileX , int tileY, Mapa* mapa, int persX, int persY) {
+void Entidad::setColor(bool value , int tileX , int tileY, Mapa* mapa, int persX, int persY, Personaje* personaje) {
 	if ( (this -> posX == tileX) && (this -> posY) == tileY) {
 		this -> color = value;	
 	}

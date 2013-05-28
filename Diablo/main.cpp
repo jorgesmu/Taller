@@ -70,17 +70,17 @@ bool choco;
 
 int main(int argc, char* argv[]) {
 	// Verificamos que se pase el nick y el tipo
-	//if(argc != 3) {
-	//	std::cout << "Falta especificar nick:\ncliente.exe <nick> <tipo_personaje>\n";
-	//	return 0;
-	//}else{
-	//	// Cargamos el nick y tipo de la consola
-	//	pje_local_nick = argv[1];
-	//	pje_local_tipo = argv[2];
-	//}
+	if(argc != 3) {
+		std::cout << "Falta especificar nick:\ncliente.exe <nick> <tipo_personaje>\n";
+		return 0;
+	}else{
+		// Cargamos el nick y tipo de la consola
+		pje_local_nick = argv[1];
+		pje_local_tipo = argv[2];
+	}
 	//borrar estas dos lineas
-	pje_local_nick = "jugador";
-	pje_local_tipo = "soldado";
+	//pje_local_nick = "jugador";
+	//pje_local_tipo = "soldado";
 	//escenario_elegido_id = 0;
 
 	InitializeCriticalSection(&cs_main);

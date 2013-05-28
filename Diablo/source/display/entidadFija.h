@@ -202,6 +202,9 @@ class EntidadFija : public Entidad {
 	virtual Tile* getPosicion(Mapa* mapa);
 
 	virtual void setDibujada(bool seDibujo, Mapa* mapa , Personaje* personaje);
+
+	//Choca con un personaje
+	virtual void chocarConPersonaje(Personaje* personaje);
 	
 protected:	
 	

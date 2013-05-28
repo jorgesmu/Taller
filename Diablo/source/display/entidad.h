@@ -278,8 +278,8 @@ public:
 
 	void setOrdenBliteo(unsigned int orden);
 
-	//Un personaje choco contra la entidad
-	void chocarCon(Personaje* personaje);
+	//Colision con personaje
+	virtual void chocarConPersonaje(Personaje* personaje);
 
 protected:	
 		

@@ -27,6 +27,7 @@
 #include "../../source/utilities/config_cliente.h"
 #include "../../source/net/PjeManager.h"
 #include "../../source/utilities/chatwindow.h"
+#include "../../source/utilities/item.h"
 
 using namespace std;
 
@@ -141,7 +142,9 @@ int main(int argc, char* argv[]) {
 	// Cargo la entidad por default
 	resman.addRes("tierraDefault", "../resources/tile.png");
 	Entidad entidadPisoPorDefecto("tierraDefault", 1 , 1 , true , 0 , 0 , NULL, resman , Imagen::COLOR_KEY);
-
+	
+	
+	
 	// Cargamos el tile por defecto
 	for(auto it = mapa.allTiles().begin();it != mapa.allTiles().end(); ++it) {
 		if(it->sinEntidades()) {
@@ -151,6 +154,13 @@ int main(int argc, char* argv[]) {
 
 	// Cargo las entidades en un vector
 	std::vector<EntidadFija*> entidades_cargadas;
+			
+	//Prueba de carga items
+	resman.addRes("cofre","../resources/chest.png");
+	Item cofre("cofre",1,1,true, 0 ,0,NULL,&mapa,resman,Imagen::COLOR_KEY );
+	mapa.getTile(0,0)->addEntidad(&cofre,&mapa);
+	entidades_cargadas.push_back(&cofre);
+
 	for (auto it = entidades.begin(); it != entidades.end(); ++it){
 		resman.addRes(it->get_nombre(), it->get_path_imagen(), Imagen::COLOR_KEY);
 		EntidadFija* entidad;
@@ -188,6 +198,8 @@ int main(int argc, char* argv[]) {
 			err_log.escribir(ss.str());
 		}
 	}
+
+
 	 
 	// Avisamos al otro thread que ya cargo el mapa
 	cargoMapa = true;
@@ -212,7 +224,6 @@ int main(int argc, char* argv[]) {
 
 	// Para guardar los eventos  de input
 	SDL_Event event;
-
 
 	//variables para el control del movimiento
 	vector< pair<int,int> > caminoMinimo;
@@ -353,7 +364,7 @@ int main(int argc, char* argv[]) {
 				if (!choco) {
 					std::vector<Entidad*> entidades=pjm.getPjeLocal().getPosicion(&mapa)->getEntidades();
 					for (auto it=entidades.begin();it!=entidades.end();it++) {
-						(*it)->chocarCon(&pjm.getPjeLocal());
+						(*it)->chocarConPersonaje(&pjm.getPjeLocal());
 					}
 					choco=true;
 				}

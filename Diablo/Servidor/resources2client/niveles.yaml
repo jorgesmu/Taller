@@ -100,9 +100,6 @@ escenarios:
       - {x: 30, y: 62, entidad: molino}
       - {x: 7, y: 93, entidad: molino2}
       - {x: 80, y: 15, entidad: molino}
-      - {x: 0, y: 0, entidad: agua}
-      - {x: 0, y: 1, entidad: agua}
-      - {x: 1, y: 0, entidad: agua}
   - nombre: bosque_encantado2
     size_x: 10
     size_y: 10

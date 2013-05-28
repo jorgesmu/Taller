@@ -284,4 +284,6 @@ protected:
 	bool verificarDestinoCaminable(Mapa* mapa);
 
 	bool verificarAncla(Tile* ancla);
+
+	void chocarConPersonaje(Personaje* personaje) {}
 };

@@ -79,6 +79,7 @@
     <ClInclude Include="source\utilities\config_pantalla.h" />
     <ClInclude Include="source\utilities\coordenadas.h" />
     <ClInclude Include="source\utilities\corazon.h" />
+    <ClInclude Include="source\utilities\escudo.h" />
     <ClInclude Include="source\utilities\flechas.h" />
     <ClInclude Include="source\utilities\grafo.h" />
     <ClInclude Include="source\utilities\granadas.h" />

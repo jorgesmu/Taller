@@ -6,6 +6,7 @@
 #include "bombas.h"
 #include "granadas.h"
 #include "varitas.h"
+#include "escudo.h"
 
 /*
 	Pre:- 
@@ -69,6 +70,7 @@ void Personaje::inicializarAtributosEnValoresDefault() {
 	this->bombas=0;
 	this->granadas=0;
 	this->varita=false;
+	this->energiaEscudo=0;
 }
 
 /*
@@ -788,6 +790,36 @@ bool Personaje::verificarAncla(Tile* ancla) {
 	return retorno;
 }
 
+void Personaje::dañarPersonaje(int daño) {
+	this->energia-=daño;
+	if (this->energia<=0) {
+		this->energia=0;
+		//Muere
+	}
+}
+
+void Personaje::dañar(int daño) {
+	int dañoEscudo=daño/2;
+	int dañoPersonaje=daño-dañoEscudo;
+	//Tiene escudo para defenderse
+	if (this->energiaEscudo>0) {
+		//Veo si puede absorver todo lo que corresponde al escudo
+		if (this->energiaEscudo>=dañoEscudo) {
+			this->energiaEscudo-=dañoEscudo;
+			this->dañarPersonaje(dañoPersonaje);
+		} else {
+			dañoPersonaje+=(dañoEscudo-this->energiaEscudo);
+			this->energiaEscudo=0; 
+			//se destruyo el escudo
+			this->dañarPersonaje(dañoPersonaje);
+		}
+	} else {
+		//No tiene escudo
+		this->dañarPersonaje(daño);
+	}
+}
+		
+
 void Personaje::chocarConLampara() {
 	this->aumentarRadio(0.25);
 	//Falta notificar al servidor
@@ -892,4 +924,8 @@ void Personaje::utilizarHielo(Mapa* mapa, PjeManager* pjm) {
  //Podria no recibir la varita, lo dejamos por si es necesario en un futuro
  void Personaje::chocarConVaritas(Varitas* varitas) {
 	 this->varita=true;
+ }
+
+ void Personaje::chocarConEscudo(Escudo* escudo) {
+	 this->energiaEscudo+=escudo->getEnergiaEscudo();
  }

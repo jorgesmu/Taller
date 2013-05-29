@@ -16,6 +16,7 @@ class Flechas;
 class Bombas;
 class Granadas;
 class Varitas;
+class Escudo;
 class Personaje : public Entidad {
 public:
 	/*
@@ -106,6 +107,7 @@ protected:
 		int bombas;
 		int granadas;
 		bool varita;
+		int energiaEscudo;
 				
 public:
 	
@@ -287,6 +289,8 @@ public:
 	void chocarConGranadas(Granadas* granadas);
 
 	void chocarConVaritas(Varitas* varitas);
+
+	void chocarConEscudo(Escudo* escudo);
 	
 	void utilizarTerremoto(Mapa* mapa, PjeManager* pjm);
 
@@ -312,10 +316,7 @@ public:
 
 	int getMagia() { return magia; }
 
-	void dañar(int daño) {
-		if (daño>=this->energia) energia-=daño;
-		else energia=0;
-	}
+	void dañar(int daño); 
 
 protected:
 
@@ -389,6 +390,9 @@ protected:
 	bool verificarDestinoCaminable(Mapa* mapa);
 
 	bool verificarAncla(Tile* ancla);
+
+	//Sin tener en cuenta al escudo
+	void dañarPersonaje(int daño);
 
 	
 

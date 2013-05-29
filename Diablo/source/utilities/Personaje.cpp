@@ -1,5 +1,7 @@
 #include "Personaje.h"
 #include "../net/PjeManager.h"
+#include "corazon.h"
+#include "botella.h"
 
 /*
 	Pre:- 
@@ -854,3 +856,15 @@ void Personaje::utilizarHielo(Mapa* mapa, PjeManager* pjm) {
 		terremoto=false;
 	}
 }
+
+ void Personaje::chocarConCorazon(Corazon* corazon) {
+		this->energia+=corazon->getEnergiaGanada();
+		if (this->energia>this->ENERGIA_TOTAL)
+			this->energia=this->ENERGIA_TOTAL;
+}
+
+ void Personaje::chocarConBotella(Botella* botella) {
+	 this->magia+=botella->getMagiaGanada();
+	 if (this->magia>this->MAGIA_TOTAL)
+		 this->magia=this->MAGIA_TOTAL;
+ }

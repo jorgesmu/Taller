@@ -6,9 +6,12 @@
 #include "../utilities/ImagenPersonaje.h"
 #include "../display/tile.h"
 #include "../display/mapa.h"
+//#include "../utilities/corazon.h"
 class Tile;
 class Mapa;
 class PjeManager;
+class Corazon;
+class Botella;
 class Personaje : public Entidad {
 public:
 	/*
@@ -262,7 +265,11 @@ public:
 	void chocarConTerremoto() {this->terremoto=true; }
 
 	void chocarConHielo() {this->hielo=true; }
+	
+	void chocarConCorazon(Corazon* corazon);
 
+	void chocarConBotella(Botella* botella);
+	
 	void utilizarTerremoto(Mapa* mapa, PjeManager* pjm);
 
 	void utilizarHielo(Mapa* mapa, PjeManager* pjm);

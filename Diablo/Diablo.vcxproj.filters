@@ -275,5 +275,11 @@
     <ClInclude Include="source\utilities\hielo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="source\utilities\corazon.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\utilities\botella.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

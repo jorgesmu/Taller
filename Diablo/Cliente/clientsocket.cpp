@@ -25,7 +25,7 @@ extern int estadoMovimiento;
 
 bool ClientSocket::WSinit = false;
 size_t ClientSocket::ref_count = 0;
-ClientSocket::ClientSocket(CRITICAL_SECTION* main_cs) : main_cs(main_cs) {
+ClientSocket::ClientSocket() {
 	// Increase ref count
 	ref_count++;
 	// Init status
@@ -41,7 +41,9 @@ ClientSocket::~ClientSocket() {
 	}
 }
 
-bool ClientSocket::init() {
+bool ClientSocket::init(CRITICAL_SECTION* main_cs) {
+	// CS stuff
+	this->main_cs = main_cs;
 	// Primero inicializamos winsock si no fue inicializado
 	if(!WSinit) {
 		WSADATA wsaData;
@@ -428,6 +430,18 @@ void ClientSocket::listenDo() {
 				}
 			}
 			std::cout << nick_who << " dañó en " << int(dmg) << " a " << nick_to << "\n";
+		}else if(pt == PROTO::ADD_VEL) {	
+			std::string nick_who;
+			bs >> nick_who;
+			char porcentaje;
+			bs >> porcentaje;
+			// Buscamos el personaje 
+			for(auto it = pjm.getPjes().begin();it != pjm.getPjes().end();it++) {
+				if(it->first == nick_who) {
+					it->second.aumentarVelocidad(porcentaje);
+					break;
+				}
+			}
 		}else{
 			std::cout << "Unknown packet type " << int(pt) << " received\n";
 		}

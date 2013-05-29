@@ -2,6 +2,7 @@
 #include "../net/PjeManager.h"
 #include "corazon.h"
 #include "botella.h"
+#include "zapatos.h"
 #include "flechas.h"
 #include "bombas.h"
 #include "granadas.h"
@@ -10,6 +11,8 @@
 #include "../net/bitstream.h"
 #include "../net/defines.h"
 #include "../../Cliente/clientsocket.h"
+extern PjeManager pjm;
+extern ClientSocket sock;
 
 /*
 	Pre:- 
@@ -834,8 +837,13 @@ void Personaje::chocarConMapa() {
 	//Falta notificar al servidor
 }
 
-void Personaje::chocarConZapatos() {
-	this->velocidad*=1.25;
+void Personaje::aumentarVelocidad(char porcentaje) {
+	int aumento = porcentaje+100;
+	this->velocidad*=(aumento/100);
+}
+
+void Personaje::chocarConZapatos(Zapatos* zapatos) {
+	this->aumentarVelocidad(zapatos->getAumentoVelocidad());
 	//Falta notificar al servidor
 }
 

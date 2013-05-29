@@ -582,6 +582,18 @@ void ServerSocket::acceptLastDo() {
 					bs << PROTO::DAMAGE << nick_who << nick_to << dmg;
 					send(it->second.sock, bs.str());
 				}
+			}else if(pt == PROTO::ADD_VEL) {	
+				std::string nick_who;
+				bs >> nick_who;
+				char porcentaje;
+				bs >> porcentaje;
+				// Avisamos a los otros jugadores 
+				for(auto it = clients_map.begin();it != clients_map.end();it++) {
+					if(it->second.nick == new_nick) continue; // Salteamos a nuestro jugador
+					BitStream bs;
+					bs << PROTO::ADD_VEL << nick_who << porcentaje;
+					send(it->second.sock, bs.str());
+				}
 			}else if(pt == PROTO::REQUEST_POS) {
 				int x, y;
 				bs >> x >> y;

@@ -28,11 +28,11 @@ class ClientSocket {
 
 	public:
 	// Constructor
-	ClientSocket(CRITICAL_SECTION* main_cs);
+	ClientSocket();
 	// Destructor
 	~ClientSocket();
 	// Funcion de inicializacion
-	bool init();
+	bool init(CRITICAL_SECTION* main_cs);
 	// Funcion de conexion (clientes)
 	bool connect(const std::string& dir, int port);
 	// Funcion bloqueante de recepcion

@@ -63,6 +63,9 @@ const unsigned char DAMAGE = 'v';
 // Usar item
 // <nick:who><char:item>
 const unsigned char USE_ITEM = 'w';
+// Aumentar velocidad
+// <nick:who><double:aumento>
+const unsigned char ADD_VEL = 'x';
 
 }
 
@@ -78,4 +81,5 @@ namespace MOV {
 // Cosas de items
 namespace ITEM {
 	const char TERREMOTO = 0;
+	const char HIELO = 1;
 }

@@ -68,6 +68,8 @@ ResMan resman;
 config_general configuracion;
 //Choques
 bool choco;
+//Socket
+ClientSocket sock;
 
 int main(int argc, char* argv[]) {
 	// Verificamos que se pase el nick y el tipo
@@ -86,8 +88,7 @@ int main(int argc, char* argv[]) {
 
 	InitializeCriticalSection(&cs_main);
 	// Socket de cliente
-	ClientSocket sock(&cs_main);
-	if(!sock.init()) 
+	if(!sock.init(&cs_main)) 
 		return 1;
 
 	//cargo ip servidor y puerto

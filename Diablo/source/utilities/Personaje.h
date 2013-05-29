@@ -12,6 +12,7 @@ class Mapa;
 class PjeManager;
 class Corazon;
 class Botella;
+class Zapatos;
 class Flechas;
 class Bombas;
 class Granadas;
@@ -272,7 +273,9 @@ public:
 
 	void chocarConMapa();
 
-	void chocarConZapatos();
+	void aumentarVelocidad(char porcentaje);
+
+	void chocarConZapatos(Zapatos* zapatos);
 
 	void chocarConHechizo() {std::cout << "Choco con hechizo\n"; }
 

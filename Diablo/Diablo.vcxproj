@@ -92,6 +92,7 @@
     <ClInclude Include="source\utilities\PruebasParser.h" />
     <ClInclude Include="source\utilities\sinput.h" />
     <ClInclude Include="source\utilities\surface.h" />
+    <ClInclude Include="source\utilities\terremoto.h" />
     <ClInclude Include="source\utilities\Test.h" />
     <ClInclude Include="source\utilities\timer.h" />
     <ClInclude Include="source\utilities\vec2.h" />

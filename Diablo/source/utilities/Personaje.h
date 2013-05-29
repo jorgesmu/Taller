@@ -1,11 +1,14 @@
 #pragma once
 #include <iostream>
+#include <stdlib.h> 
+#include <time.h> 
 #include "../display/entidad.h"
 #include "../utilities/ImagenPersonaje.h"
 #include "../display/tile.h"
 #include "../display/mapa.h"
 class Tile;
 class Mapa;
+class PjeManager;
 class Personaje : public Entidad {
 public:
 	/*
@@ -45,6 +48,15 @@ public:
 
 		//Velocidad por defecto
 		const static unsigned int VELOCIDAD_DEFAULT = 105; // En pixeles por segundo
+		
+		//Radio de los hechizos
+		const static unsigned int RADIO_HECHIZO = 4; //en tiles
+
+		//Daño de los hechizos
+		const static int DAÑO_TERREMOTO = 1000;
+
+		//Vida inicial
+		const static int ENERGIA_TOTAL = 1000;
 
 	//	const static int DELTA_TIEMPO_UPDATE_POSICION = 20; // Tiempo entre cada update en clocks
 
@@ -65,6 +77,12 @@ protected:
 		bool actualizandoPosicion;
 
 		int radioY,radioX;
+
+		//Tiene o no los hechizos
+		bool terremoto;
+
+		//Vida restante
+		int energia;
 				
 public:
 	
@@ -229,6 +247,12 @@ public:
 
 	void chocarConZapatos();
 
+	void chocarConHechizo() {std::cout << "Choco con hechizo\n"; }
+
+	void chocarConTerremoto() {this->terremoto=true; }
+
+	void utilizarTerremoto(Mapa* mapa, PjeManager* pjm);
+
 	//Setea el radio de vision en el eje Y
 	void setRadio(int newRadio) { 
 		radioY=newRadio;
@@ -244,6 +268,13 @@ public:
 	int getRadioX() { return radioX; }
 
 	int getRadioY() { return radioY; }
+
+	int getEnergia() { return energia; }
+
+	void dañar(int daño) {
+		if (daño>=this->energia) energia-=daño;
+		else energia=0;
+	}
 
 protected:
 
@@ -317,5 +348,7 @@ protected:
 	bool verificarDestinoCaminable(Mapa* mapa);
 
 	bool verificarAncla(Tile* ancla);
+
+	
 
 };

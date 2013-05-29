@@ -1,4 +1,5 @@
 #include "Personaje.h"
+#include "../net/PjeManager.h"
 
 /*
 	Pre:- 
@@ -54,6 +55,8 @@ void Personaje::inicializarAtributosEnValoresDefault() {
 	this -> actualizandoPosicion = false;
 	this -> ordenBliteo = Entidad::ORDEN_PERSONAJE;
 	this->setRadio(125);
+	this->terremoto=false;
+	this->energia=this->ENERGIA_TOTAL;
 }
 
 /*
@@ -775,13 +778,47 @@ bool Personaje::verificarAncla(Tile* ancla) {
 
 void Personaje::chocarConLampara() {
 	this->aumentarRadio(0.25);
+	//Falta notificar al servidor
 }
 
 //Mejorar: recorrer todos los tiles y colocarlos como visitados
 void Personaje::chocarConMapa() {
 	this->aumentarRadio(100.0);
+	//Falta notificar al servidor
 }
 
 void Personaje::chocarConZapatos() {
 	this->velocidad*=1.25;
+	//Falta notificar al servidor
+}
+
+void Personaje::utilizarTerremoto(Mapa* mapa, PjeManager* pjm) {
+	int radio=this->RADIO_HECHIZO;
+	int dañoRealizado;
+	Tile* tilePersonaje;
+	int xPersonaje,yPersonaje;
+	//this->terremoto=true; //hardcodeo para no tener que agarrar item primero
+	if (terremoto) {
+		std::cout << "Uso terremoto\n";
+		int xActual = this->getPosicion(mapa)->getU();
+		int yActual = this->getPosicion(mapa)->getV();
+		for (int i=xActual-radio;i<=xActual+radio;i++) {
+			for (int j=yActual-radio;j<=yActual+radio;j++) {
+				//Veo si algun personaje se encuentra en el radio
+				for (auto it=pjm->getPjes().begin();it!=pjm->getPjes().end();it++) {
+					tilePersonaje=it->second.getPosicion(mapa);
+					xPersonaje=tilePersonaje->getU();
+					yPersonaje=tilePersonaje->getV();
+					if ((i==xPersonaje) && (j==yPersonaje)) {
+						srand (time(NULL));
+						dañoRealizado=rand()%this->ENERGIA_TOTAL+1;
+						std::cout << "se danio a " << it->first << " con el terremoto, total de " << dañoRealizado << endl;
+						it->second.dañar(dañoRealizado);
+						//Falta notificar al servidor
+					}
+				}
+			}
+		}
+		terremoto=false;
+	}
 }

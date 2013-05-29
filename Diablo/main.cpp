@@ -31,6 +31,7 @@
 #include "../../source/utilities/lampara.h"
 #include "../../source/utilities/mapaItem.h"
 #include "../../source/utilities/zapatos.h"
+#include "../../source/utilities/terremoto.h"
 
 using namespace std;
 
@@ -160,7 +161,7 @@ int main(int argc, char* argv[]) {
 			
 	//Prueba de carga items
 	resman.addRes("cofre","../resources/chest.png");
-	Zapatos cofre("cofre",1,1,true, 6 ,13,NULL,&mapa,resman,Imagen::COLOR_KEY );
+	Lampara cofre("cofre",1,1,true, 6 ,13,NULL,&mapa,resman,Imagen::COLOR_KEY );
 	mapa.getTile(6,13)->addEntidad(&cofre,&mapa);
 	entidades_cargadas.push_back(&cofre);
 
@@ -290,12 +291,50 @@ int main(int argc, char* argv[]) {
 							//caminoMinimo.clear();
 							break;
 						}
+						case 't' : {
+							pjm.getPjeLocal().utilizarTerremoto(&mapa,&pjm);
+							break;
+						}
 					}
 					
 				}
 				// Mouse clicks
 				if(event.type == SDL_MOUSEBUTTONDOWN) {
 					if(event.button.button == SDL_BUTTON_LEFT) {
+						vec2<int> tile_res = MouseCoords2Tile(vec2<int>(event.button.x, event.button.y), camara);
+						if(mapa.tileExists(tile_res.x, tile_res.y)) {
+
+							Tile* tilePersonaje; 
+							//chequeo sicronizacion para que calcule el camino minimo desde el tile al que se esta moviendo al destino
+							if (ultimoMovimientoX == NOSEMOVIO && ultimoMovimientoY == NOSEMOVIO){
+								tilePersonaje = mapa.getTilePorPixeles(pjm.getPjeLocal().getX(), pjm.getPjeLocal().getY());
+							}else{
+								tilePersonaje = mapa.getTile(ultimoMovimientoX,ultimoMovimientoY);
+							}
+							Tile* tileDestino = mapa.getTile(tile_res.x, tile_res.y);
+							//guardo el destino
+							ultimoDestinoX = tile_res.x;
+							ultimoDestinoY = tile_res.y;
+							// Verificamos si hay un personaje para activar el chat
+							bool found_pje = false;
+							//std::cout << "CLICK @ " << tile_res.x << ";" << tile_res.y << "\n";
+							for(auto it = pjm.getPjes().begin();it != pjm.getPjes().end();it++) {
+								if(tileDestino == mapa.getTilePorPixeles(it->second.getX(), it->second.getY())) {
+									found_pje = true;
+									break;
+								}
+							}
+
+							if(!found_pje) {
+								caminoMinimo = mapa.getCaminoMinimo(tilePersonaje, tileDestino);
+								indice = 1;
+								estadoMovimiento = MOV::MANDAR_POS;
+							}
+
+						}
+					}
+
+					if(event.button.button == SDL_BUTTON_RIGHT) {
 						vec2<int> tile_res = MouseCoords2Tile(vec2<int>(event.button.x, event.button.y), camara);
 						if(mapa.tileExists(tile_res.x, tile_res.y)) {
 
@@ -323,14 +362,10 @@ int main(int argc, char* argv[]) {
 								}
 							}
 
-							if(!found_pje) {
-								caminoMinimo = mapa.getCaminoMinimo(tilePersonaje, tileDestino);
-								indice = 1;
-								estadoMovimiento = MOV::MANDAR_POS;
-							}
-
 						}
 					}
+
+
 				}
 
 			}
@@ -363,8 +398,9 @@ int main(int argc, char* argv[]) {
 			Tile* t = mapa.getTilePorPixeles(pjm.getPjeLocal().getX(),pjm.getPjeLocal().getY());
 			tileActual = make_pair<int,int>(t->getU(), t->getV());
 			
-			if (puedeMoverse) {
+			if (puedeMoverse) {				
 				if (!choco) {
+					std::cout << "Energia: " << pjm.getPjeLocal().getEnergia() << endl;
 					std::vector<Entidad*> entidades=pjm.getPjeLocal().getPosicion(&mapa)->getEntidades();
 					for (auto it=entidades.begin();it!=entidades.end();it++) {
 						if ((*it)!=&pjm.getPjeLocal()) //sino choca con si mismo
@@ -383,6 +419,7 @@ int main(int argc, char* argv[]) {
 						caminoMinimo.clear();
 						estadoMovimiento = MOV::ESPERANDO_OK;
 					}
+					
 					if(estadoMovimiento == MOV::OK_RECV) {
 						std::cout << "OK_RECV\n";
 						pjm.getPjeLocal().mover(mapa.getTile(proximoTile.first,proximoTile.second));

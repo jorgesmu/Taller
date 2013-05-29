@@ -405,6 +405,29 @@ void ClientSocket::listenDo() {
 				p.mover(mapa.getTile(x, y));
 				std::cout << "Server requested move of <" << nick << "> to " << x << ";" << y << "\n";
 			}
+		}else if(pt == PROTO::USE_ITEM) {
+			std::string nick_who;
+			bs >> nick_who;
+			char item;
+			bs >> item;
+			// Hacemos algo, animaciones or something
+		}else if(pt == PROTO::DAMAGE) {	
+			std::string nick_who, nick_to;
+			bs >> nick_who >> nick_to;
+			char dmg;
+			bs >> dmg;
+			// Buscamos el personaje 
+			if(nick_to == pjm.getPjeLocal().getNick()) {
+				pjm.getPjeLocal().dañar(dmg);
+			}else{
+				for(auto it = pjm.getPjes().begin();it != pjm.getPjes().end();it++) {
+					if(it->first == nick_to) {
+						it->second.dañar(dmg);
+						break;
+					}
+				}
+			}
+			std::cout << nick_who << " dañó en " << int(dmg) << " a " << nick_to << "\n";
 		}else{
 			std::cout << "Unknown packet type " << int(pt) << " received\n";
 		}

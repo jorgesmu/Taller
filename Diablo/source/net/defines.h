@@ -57,6 +57,13 @@ const unsigned char MOVE_PLAYER = 's';
 const unsigned char ATACAR = 't';
 const unsigned char DEFENDER = 'u';
 
+// Dañar
+// <string:nick_who><string:nick_to><char:dmg>
+const unsigned char DAMAGE = 'v';
+// Usar item
+// <nick:who><char:item>
+const unsigned char USE_ITEM = 'w';
+
 }
 
 // Cosas de movimiento
@@ -66,4 +73,9 @@ namespace MOV {
 	const int OK_RECV = 2;
 	const int FAIL_RECV = 3;
 	const int MANDAR_POS = 4;
+}
+
+// Cosas de items
+namespace ITEM {
+	const char TERREMOTO = 0;
 }

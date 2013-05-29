@@ -292,7 +292,7 @@ int main(int argc, char* argv[]) {
 							break;
 						}
 						case 't' : {
-							pjm.getPjeLocal().utilizarTerremoto(&mapa,&pjm);
+							pjm.getPjeLocal().utilizarTerremoto(&mapa,&pjm, &sock);
 							break;
 						}
 						case 'h' : {

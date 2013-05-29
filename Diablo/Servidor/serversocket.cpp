@@ -558,6 +558,30 @@ void ServerSocket::acceptLastDo() {
 					bs << PROTO::DEFENDER << nick_atacante;
 					send(it->second.sock, bs.str());
 				}
+			}else if(pt == PROTO::USE_ITEM) {
+				std::string nick_who;
+				bs >> nick_who;
+				char item;
+				bs >> item;
+				// Avisamos a los otros jugadores 
+				for(auto it = clients_map.begin();it != clients_map.end();it++) {
+					if(it->second.nick == new_nick) continue; // Salteamos a nuestro jugador
+					BitStream bs;
+					bs << PROTO::USE_ITEM << nick_who << item;
+					send(it->second.sock, bs.str());
+				}
+			}else if(pt == PROTO::DAMAGE) {	
+				std::string nick_who, nick_to;
+				bs >> nick_who >> nick_to;
+				char dmg;
+				bs >> dmg;
+				// Avisamos a los otros jugadores 
+				for(auto it = clients_map.begin();it != clients_map.end();it++) {
+					if(it->second.nick == new_nick) continue; // Salteamos a nuestro jugador
+					BitStream bs;
+					bs << PROTO::DAMAGE << nick_who << nick_to << dmg;
+					send(it->second.sock, bs.str());
+				}
 			}else if(pt == PROTO::REQUEST_POS) {
 				int x, y;
 				bs >> x >> y;

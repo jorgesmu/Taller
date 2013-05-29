@@ -17,6 +17,8 @@ class Bombas;
 class Granadas;
 class Varitas;
 class Escudo;
+class ClientSocket;
+
 class Personaje : public Entidad {
 public:
 	/*
@@ -61,13 +63,13 @@ public:
 		const static unsigned int RADIO_HECHIZO = 4; //en tiles
 
 		//Daño de los hechizos
-		const static int DAÑO_TERREMOTO = 1000;
+		const static int DAÑO_TERREMOTO = 100;
 
 		//Magia necesaria para un hechizo
 		const static int MAGIA_HECHIZO = 50;
 
 		//Vida inicial
-		const static int ENERGIA_TOTAL = 1000;
+		const static char ENERGIA_TOTAL = 100;
 
 		//Magia inicial
 		const static int MAGIA_TOTAL = 100;
@@ -97,7 +99,7 @@ protected:
 		bool hielo;
 
 		//Vida restante
-		int energia;
+		char energia;
 
 		//Magia
 		int magia;
@@ -292,7 +294,7 @@ public:
 
 	void chocarConEscudo(Escudo* escudo);
 	
-	void utilizarTerremoto(Mapa* mapa, PjeManager* pjm);
+	void utilizarTerremoto(Mapa* mapa, PjeManager* pjm, ClientSocket* sock);
 
 	void utilizarHielo(Mapa* mapa, PjeManager* pjm);
 
@@ -316,7 +318,7 @@ public:
 
 	int getMagia() { return magia; }
 
-	void dañar(int daño); 
+	void dañar(char daño); 
 
 protected:
 
@@ -392,7 +394,7 @@ protected:
 	bool verificarAncla(Tile* ancla);
 
 	//Sin tener en cuenta al escudo
-	void dañarPersonaje(int daño);
+	void dañarPersonaje(char daño);
 
 	
 

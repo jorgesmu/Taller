@@ -7,6 +7,9 @@
 #include "granadas.h"
 #include "varitas.h"
 #include "escudo.h"
+#include "../net/bitstream.h"
+#include "../net/defines.h"
+#include "../../Cliente/clientsocket.h"
 
 /*
 	Pre:- 
@@ -790,7 +793,7 @@ bool Personaje::verificarAncla(Tile* ancla) {
 	return retorno;
 }
 
-void Personaje::dañarPersonaje(int daño) {
+void Personaje::dañarPersonaje(char daño) {
 	this->energia-=daño;
 	if (this->energia<=0) {
 		this->energia=0;
@@ -798,7 +801,7 @@ void Personaje::dañarPersonaje(int daño) {
 	}
 }
 
-void Personaje::dañar(int daño) {
+void Personaje::dañar(char daño) {
 	int dañoEscudo=daño/2;
 	int dañoPersonaje=daño-dañoEscudo;
 	//Tiene escudo para defenderse
@@ -836,14 +839,17 @@ void Personaje::chocarConZapatos() {
 	//Falta notificar al servidor
 }
 
-void Personaje::utilizarTerremoto(Mapa* mapa, PjeManager* pjm) {
+void Personaje::utilizarTerremoto(Mapa* mapa, PjeManager* pjm, ClientSocket* sock) {
 	int radio=this->RADIO_HECHIZO;
-	int dañoRealizado;
+	char dañoRealizado;
 	Tile* tilePersonaje;
 	int xPersonaje,yPersonaje;
 	this->terremoto=true; //hardcodeo para no tener que agarrar item primero
 	if ((terremoto) && (this->magia>=this->MAGIA_HECHIZO)) {
 		std::cout << "Uso terremoto\n";
+		BitStream bs;
+		bs << PROTO::USE_ITEM << this->nickname << ITEM::TERREMOTO;
+		sock->send(bs.str());
 		this->magia-=this->MAGIA_HECHIZO;
 		int xActual = this->getPosicion(mapa)->getU();
 		int yActual = this->getPosicion(mapa)->getV();
@@ -857,9 +863,11 @@ void Personaje::utilizarTerremoto(Mapa* mapa, PjeManager* pjm) {
 					if ((i==xPersonaje) && (j==yPersonaje)) {
 						srand (time(NULL));
 						dañoRealizado=rand()%(this->ENERGIA_TOTAL+1);
-						std::cout << "se danio a " << it->first << " con el terremoto, total de " << dañoRealizado << endl;
+						std::cout << "se danio a " << it->first << " con el terremoto, total de " << (int)dañoRealizado << endl;
 						it->second.dañar(dañoRealizado);
-						//Falta notificar al servidor
+						bs.clear();
+						bs << PROTO::DAMAGE << this->nickname << it->first << dañoRealizado;
+						sock->send(bs.str());
 					}
 				}
 			}

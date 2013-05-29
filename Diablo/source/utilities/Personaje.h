@@ -12,6 +12,10 @@ class Mapa;
 class PjeManager;
 class Corazon;
 class Botella;
+class Flechas;
+class Bombas;
+class Granadas;
+class Varitas;
 class Personaje : public Entidad {
 public:
 	/*
@@ -96,6 +100,12 @@ protected:
 
 		//Magia
 		int magia;
+
+		//Armas
+		int flechas;
+		int bombas;
+		int granadas;
+		bool varita;
 				
 public:
 	
@@ -269,6 +279,14 @@ public:
 	void chocarConCorazon(Corazon* corazon);
 
 	void chocarConBotella(Botella* botella);
+
+	void chocarConFlechas(Flechas* flechas);
+
+	void chocarConBombas(Bombas* bombas);
+
+	void chocarConGranadas(Granadas* granadas);
+
+	void chocarConVaritas(Varitas* varitas);
 	
 	void utilizarTerremoto(Mapa* mapa, PjeManager* pjm);
 

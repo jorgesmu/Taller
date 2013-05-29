@@ -281,5 +281,17 @@
     <ClInclude Include="source\utilities\botella.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="source\utilities\flechas.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\utilities\bombas.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\utilities\granadas.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\utilities\varitas.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

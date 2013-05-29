@@ -2,6 +2,10 @@
 #include "../net/PjeManager.h"
 #include "corazon.h"
 #include "botella.h"
+#include "flechas.h"
+#include "bombas.h"
+#include "granadas.h"
+#include "varitas.h"
 
 /*
 	Pre:- 
@@ -61,6 +65,10 @@ void Personaje::inicializarAtributosEnValoresDefault() {
 	this->hielo=false;
 	this->energia=this->ENERGIA_TOTAL;
 	this->magia=this->MAGIA_TOTAL;
+	this->flechas=0;
+	this->bombas=0;
+	this->granadas=0;
+	this->varita=false;
 }
 
 /*
@@ -867,4 +875,21 @@ void Personaje::utilizarHielo(Mapa* mapa, PjeManager* pjm) {
 	 this->magia+=botella->getMagiaGanada();
 	 if (this->magia>this->MAGIA_TOTAL)
 		 this->magia=this->MAGIA_TOTAL;
+ }
+
+ void Personaje::chocarConFlechas(Flechas* flechas) {
+	 this->flechas+=flechas->getCantFlechas();
+ }
+
+ void Personaje::chocarConBombas(Bombas* bombas) {
+	 this->bombas+=bombas->getCantBombas();
+ }
+
+ void Personaje::chocarConGranadas(Granadas* granadas) {
+	 this->granadas+=granadas->getCantGranadas();
+ }
+
+ //Podria no recibir la varita, lo dejamos por si es necesario en un futuro
+ void Personaje::chocarConVaritas(Varitas* varitas) {
+	 this->varita=true;
  }

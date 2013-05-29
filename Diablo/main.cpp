@@ -295,6 +295,10 @@ int main(int argc, char* argv[]) {
 							pjm.getPjeLocal().utilizarTerremoto(&mapa,&pjm);
 							break;
 						}
+						case 'h' : {
+							pjm.getPjeLocal().utilizarHielo(&mapa,&pjm);
+							break;
+						}
 					}
 					
 				}
@@ -401,6 +405,7 @@ int main(int argc, char* argv[]) {
 			if (puedeMoverse) {				
 				if (!choco) {
 					std::cout << "Energia: " << pjm.getPjeLocal().getEnergia() << endl;
+					std::cout << "Magia: " << pjm.getPjeLocal().getMagia() << endl;
 					std::vector<Entidad*> entidades=pjm.getPjeLocal().getPosicion(&mapa)->getEntidades();
 					for (auto it=entidades.begin();it!=entidades.end();it++) {
 						if ((*it)!=&pjm.getPjeLocal()) //sino choca con si mismo

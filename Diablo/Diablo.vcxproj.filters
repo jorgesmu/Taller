@@ -272,5 +272,8 @@
     <ClInclude Include="source\utilities\terremoto.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="source\utilities\hielo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

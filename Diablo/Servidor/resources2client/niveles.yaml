@@ -101,8 +101,8 @@ entidades:
 
 escenarios:
   - nombre: bosque_encantado3
-    size_x: 30
-    size_y: 30
+    size_x: 15
+    size_y: 15
     entidadesDef:
       - {x: 0, y: 3, entidad: rioPeces}
       - {x: 0, y: 6, entidad: rioPeces}

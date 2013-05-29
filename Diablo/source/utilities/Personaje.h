@@ -55,8 +55,14 @@ public:
 		//Daño de los hechizos
 		const static int DAÑO_TERREMOTO = 1000;
 
+		//Magia necesaria para un hechizo
+		const static int MAGIA_HECHIZO = 50;
+
 		//Vida inicial
 		const static int ENERGIA_TOTAL = 1000;
+
+		//Magia inicial
+		const static int MAGIA_TOTAL = 100;
 
 	//	const static int DELTA_TIEMPO_UPDATE_POSICION = 20; // Tiempo entre cada update en clocks
 
@@ -80,9 +86,13 @@ protected:
 
 		//Tiene o no los hechizos
 		bool terremoto;
+		bool hielo;
 
 		//Vida restante
 		int energia;
+
+		//Magia
+		int magia;
 				
 public:
 	
@@ -251,7 +261,11 @@ public:
 
 	void chocarConTerremoto() {this->terremoto=true; }
 
+	void chocarConHielo() {this->hielo=true; }
+
 	void utilizarTerremoto(Mapa* mapa, PjeManager* pjm);
+
+	void utilizarHielo(Mapa* mapa, PjeManager* pjm);
 
 	//Setea el radio de vision en el eje Y
 	void setRadio(int newRadio) { 
@@ -270,6 +284,8 @@ public:
 	int getRadioY() { return radioY; }
 
 	int getEnergia() { return energia; }
+
+	int getMagia() { return magia; }
 
 	void dañar(int daño) {
 		if (daño>=this->energia) energia-=daño;

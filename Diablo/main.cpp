@@ -51,6 +51,7 @@ std::string pje_local_nick;
 std::string pje_local_tipo;
 int start_pos_x, start_pos_y;
 int escenario_elegido_id;
+double init_vel;
 // Cosas para mantener al server actualizado sobre los tiles que recorrimos
 struct {
 	vec2<int> tile_actual, tile_anterior;
@@ -209,8 +210,17 @@ int main(int argc, char* argv[]) {
 	// Avisamos al otro thread que ya cargo el mapa
 	cargoMapa = true;
 
-	// Agrega el personaje
+
+	pjm.getPjeLocal().setVelocidad(init_vel);
+	// Agrega el personaje(no esta tomando velocidad del YAML!!!)
 	pjm.getPjeLocal().init(pje_local_nick, pje_local_tipo , 1 , 1 , 50 , 5, 100, 100 ,	configuracion.get_vel_personaje(),	0 , 50 , NULL , resman , Imagen::COLOR_KEY);
+	//Si no me conecto por primera vez al servidor
+	if (init_vel!=0) {
+		pjm.getPjeLocal().setVelocidad(init_vel);
+	}
+	
+	std::cout << "Velocidad seteada: " << pjm.getPjeLocal().getVelocidad() << "\n";
+	
 	// Posiciono el personaje
 	mapa.getTile(start_pos_x, start_pos_y)->addEntidad(&(pjm.getPjeLocal()));
 	pjm.getPjeLocal().setTileActual(mapa.getTile(start_pos_x, start_pos_y));

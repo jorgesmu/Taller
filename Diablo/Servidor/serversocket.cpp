@@ -460,6 +460,12 @@ void ServerSocket::acceptLastDo() {
 		//std::cout << "SEND INIT POS (" << pm.getPlayer(new_nick).getX() << "," << pm.getPlayer(new_nick).getY() << ")\n";
 		send(cid, bs.str());
 
+		//Le mandamos la velocidad que tenia		
+		bs.clear();
+		bs << PROTO::INITVEL << (float)pm.getPlayer(new_nick).getVelocidad(); 
+		std::cout << "Recuperando velocidad: " << pm.getPlayer(new_nick).getVelocidad() <<endl;
+		send(cid, bs.str());
+
 		// Le mandamos el id escenario
 		bs.clear();
 		bs << PROTO::ESC_ID << escenario_elegido_id;
@@ -475,6 +481,8 @@ void ServerSocket::acceptLastDo() {
 			}
 			send(cid, bs.str());
 		}
+
+		
 
 		// Para tipear menos, p_local = referencia al player de este thread
 		const auto p_local = pm.getPlayer(new_nick);
@@ -587,9 +595,16 @@ void ServerSocket::acceptLastDo() {
 				bs >> nick_who;
 				char porcentaje;
 				bs >> porcentaje;
+				float nuevaVel;
+				bs >> nuevaVel;
 				// Avisamos a los otros jugadores 
 				for(auto it = clients_map.begin();it != clients_map.end();it++) {
-					if(it->second.nick == new_nick) continue; // Salteamos a nuestro jugador
+					if(it->second.nick == new_nick) {
+						//Actualizamos en el server la velocidad
+						pm.getPlayer(new_nick).setVelocidad((double)nuevaVel);
+						std::cout << "Velocidad actualizada de " << new_nick << " a " << (double)nuevaVel << " con un porcentaje de aumento " << (int)porcentaje << endl;
+						continue; // Salteamos a nuestro jugador de avisarle
+					}
 					BitStream bs;
 					bs << PROTO::ADD_VEL << nick_who << porcentaje;
 					send(it->second.sock, bs.str());

@@ -17,6 +17,7 @@ class Player {
 	bool isOnline;
 	int x, y; // Pos en tiles logicos en el mapa
 	TilesRecorridos tiles_recorridos;
+	double velocidad;
 	
 	public:
 	Player();
@@ -30,6 +31,8 @@ class Player {
 	void setOffline();
 	void setOnline();
 	std::string getNick() const;
+	double getVelocidad() { return velocidad; }
+	void setVelocidad(double newVel) { velocidad=newVel; }
 
 	void addTileRecorrido(short x, short y);
 	TilesRecorridos& getTilesRecorridos();

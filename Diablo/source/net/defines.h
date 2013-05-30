@@ -64,8 +64,10 @@ const unsigned char DAMAGE = 'v';
 // <nick:who><char:item>
 const unsigned char USE_ITEM = 'w';
 // Aumentar velocidad
-// <nick:who><double:aumento>
+// <nick:who><char:aumento><float:nuevaVel>
 const unsigned char ADD_VEL = 'x';
+// Velocidad que manda cuando se conecta un usuario existente
+const unsigned char INITVEL = 'y';
 
 }
 

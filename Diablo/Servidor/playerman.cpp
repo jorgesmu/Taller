@@ -11,6 +11,7 @@ Player::Player() {
 	tipo_personaje = "uninit-pje";
 	isOnline = false;
 	x = y = 0;
+	velocidad = 0;
 }
 
 Player::~Player() {

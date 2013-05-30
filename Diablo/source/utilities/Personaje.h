@@ -324,6 +324,8 @@ public:
 
 	double getVelocidad() { return velocidad; }
 
+	void setVelocidad(double velocidad) { this->velocidad=velocidad; }
+
 	void dañar(char daño); 
 
 protected:

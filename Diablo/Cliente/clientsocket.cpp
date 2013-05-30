@@ -18,6 +18,7 @@ extern PjeManager pjm;
 extern std::string pje_local_tipo;
 extern int start_pos_x, start_pos_y;
 extern int escenario_elegido_id;
+extern double init_vel;
 extern config_general configuracion;
 extern ResMan resman;
 extern ChatWindow chat_window;
@@ -301,6 +302,11 @@ void ClientSocket::listenDo() {
 			bs >> start_pos_x;
 			bs >> start_pos_y;
 			//std::cout << "RECEIVED INIT POS: (" << start_pos_x << "," << start_pos_y << ")\n";
+		}else if(pt == PROTO::INITVEL) {
+			float recv_vel;
+			bs >> recv_vel;
+			init_vel=(double)recv_vel;
+			//std::cout << "RECEIVED INIT VEL: " << init_vel << "\n";
 		}else if(pt == PROTO::ESC_ID) {
 			bs >> escenario_elegido_id;
 			//std::cout << "RECEIVED ESC ID: (" << escenario_elegido_id << ")\n";

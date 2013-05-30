@@ -21,7 +21,7 @@ class Zapatos: public Item {
 			personaje->chocarConZapatos(this);
 		}
 
-		int getAumentoVelocidad() {
+		char getAumentoVelocidad() {
 			return this->aumentoVelocidad;
 		}
 };

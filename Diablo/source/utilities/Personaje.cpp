@@ -821,12 +821,12 @@ void Personaje::aumentarVelocidad(char porcentaje) {
 }
 
 void Personaje::chocarConZapatos(Zapatos* zapatos) {
-	std::cout << "Aumento la velocidad un " << zapatos->getAumentoVelocidad() << "%\n";
+	std::cout << "Aumento la velocidad un " << (int)zapatos->getAumentoVelocidad() << "%\n";
 	this->aumentarVelocidad(zapatos->getAumentoVelocidad());
 	BitStream bs;
-	bs << PROTO::ADD_VEL << pjm.getPjeLocal().getNick() << zapatos->getAumentoVelocidad();
+	bs << PROTO::ADD_VEL << pjm.getPjeLocal().getNick() << zapatos->getAumentoVelocidad() << (float)pjm.getPjeLocal().getVelocidad();
 	sock.send(bs.str());
-	//Todavia no anda
+	//Todavia no anda, sync cuando entra el personaje al juego
 }
 
 void Personaje::utilizarTerremoto(Mapa* mapa, PjeManager* pjm, ClientSocket* sock) {

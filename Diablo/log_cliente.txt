@@ -1,2 +1,0 @@
--ERROR: No se ingreso la ip destino del servidor, se selecciona valor por defecto.
--ERROR: No se ingreso el puerto, se selecciona valor por defecto.

@@ -838,13 +838,17 @@ void Personaje::chocarConMapa() {
 }
 
 void Personaje::aumentarVelocidad(char porcentaje) {
-	int aumento = porcentaje+100;
+	double aumento = porcentaje+100;
 	this->velocidad*=(aumento/100);
 }
 
 void Personaje::chocarConZapatos(Zapatos* zapatos) {
+	std::cout << "Aumento la velocidad un " << zapatos->getAumentoVelocidad() << "%\n";
 	this->aumentarVelocidad(zapatos->getAumentoVelocidad());
-	//Falta notificar al servidor
+	BitStream bs;
+	bs << PROTO::ADD_VEL << pjm.getPjeLocal().getNick() << zapatos->getAumentoVelocidad();
+	sock.send(bs.str());
+	//Todavia no anda
 }
 
 void Personaje::utilizarTerremoto(Mapa* mapa, PjeManager* pjm, ClientSocket* sock) {

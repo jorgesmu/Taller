@@ -245,7 +245,6 @@ public:
 
 	// Retorna el ancla de niebla Y adecuada
 	virtual int getYAnclajeNiebla();
-
 	/*
 		Pre: La instancia ha sido creada.
 		Post: Se retorna verdadero si se puede ocupar el tile donde se encuentra la
@@ -320,6 +319,8 @@ public:
 	int getEnergia() { return energia; }
 
 	int getMagia() { return magia; }
+
+	double getVelocidad() { return velocidad; }
 
 	void dañar(char daño); 
 

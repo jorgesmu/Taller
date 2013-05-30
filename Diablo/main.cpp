@@ -162,7 +162,7 @@ int main(int argc, char* argv[]) {
 			
 	//Prueba de carga items
 	resman.addRes("cofre","../resources/chest.png");
-	Lampara cofre("cofre",1,1,true, 6 ,13,NULL,&mapa,resman,Imagen::COLOR_KEY );
+	Zapatos cofre("cofre",1,1,true, 6 ,13,NULL,&mapa,resman,Imagen::COLOR_KEY );
 	mapa.getTile(6,13)->addEntidad(&cofre,&mapa);
 	entidades_cargadas.push_back(&cofre);
 
@@ -407,6 +407,7 @@ int main(int argc, char* argv[]) {
 				if (!choco) {
 					std::cout << "Energia: " << pjm.getPjeLocal().getEnergia() << endl;
 					std::cout << "Magia: " << pjm.getPjeLocal().getMagia() << endl;
+					std::cout << "Velocidad: " << pjm.getPjeLocal().getVelocidad() << endl;
 					std::vector<Entidad*> entidades=pjm.getPjeLocal().getPosicion(&mapa)->getEntidades();
 					for (auto it=entidades.begin();it!=entidades.end();it++) {
 						if ((*it)!=&pjm.getPjeLocal()) //sino choca con si mismo

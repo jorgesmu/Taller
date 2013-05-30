@@ -93,6 +93,8 @@ protected:
 
 		bool actualizandoPosicion;
 
+		bool cambioDireccionHabilitado;
+
 		int radioY,radioX;
 
 		//Tiene o no los hechizos

@@ -96,13 +96,16 @@ entidades:
 
   - nombre: orco
     imagen: ../resources/Orco.png
-    fps: 11
+    fps: 10
+    pixel_ref_x: 20
+    pixel_ref_y: 20
+    esDefault: true
     caminable: true
 
 escenarios:
   - nombre: bosque_encantado3
-    size_x: 15
-    size_y: 15
+    size_x: 30
+    size_y: 30
     entidadesDef:
       - {x: 0, y: 3, entidad: rioPeces}
       - {x: 0, y: 6, entidad: rioPeces}

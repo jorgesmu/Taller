@@ -77,6 +77,7 @@ void Personaje::inicializarAtributosEnValoresDefault() {
 	this->granadas=0;
 	this->varita=false;
 	this->energiaEscudo=0;
+	this -> cambioDireccionHabilitado = true;
 }
 
 /*
@@ -209,47 +210,48 @@ void Personaje::init(const std::string& nickname, const std::string& name,
 	aproximadamente al centro del mismo.
 */
 unsigned int Personaje::calcularDireccion(Mapa* mapa){
-	const int TOLERANCIA_SUPERIOR = 3;
+	const int TOLERANCIA_SUPERIOR = 4;
 	const int TOLERANCIA_INFERIOR = -3;
+	unsigned int retorno;
 	if (tileDestino != NULL) {
 		int deltaX = this -> tileDestino -> getX() - posX;
 		int deltaY = this -> tileDestino -> getY() - posY;
 		//calculo de direccion
 		if (deltaX > TOLERANCIA_SUPERIOR){
 			if(deltaY < TOLERANCIA_INFERIOR){
-				return Personaje::NORESTE;
+				retorno = Personaje::NORESTE;
 			} else{
 				if((deltaY >= TOLERANCIA_INFERIOR) &&(deltaY <= TOLERANCIA_SUPERIOR)){
-					return Personaje::ESTE;
+					retorno = Personaje::ESTE;
 				} else {
-					return Personaje::SURESTE;
+					retorno = Personaje::SURESTE;
 				}
 			}
 		}else {
 			if (deltaX < TOLERANCIA_INFERIOR) {
 				if (deltaY < TOLERANCIA_INFERIOR){
-					return Personaje::NOROESTE;
+					retorno = Personaje::NOROESTE;
 				}else{
 					if ((deltaY >= TOLERANCIA_INFERIOR) &&(deltaY <= TOLERANCIA_SUPERIOR)) {
-						return Personaje::OESTE;
+						retorno = Personaje::OESTE;
 					}else {
-						return Personaje::SUROESTE;
+						retorno = Personaje::SUROESTE;
 					}
 				}
 			}else{
 				if (deltaY < TOLERANCIA_INFERIOR){
-					return Personaje::NORTE;
+					retorno = Personaje::NORTE;
 				} else{
 					if((deltaY >= TOLERANCIA_INFERIOR) && (deltaY <= TOLERANCIA_SUPERIOR)){
-						return Personaje::CENTRO;
+						retorno = Personaje::CENTRO;
 					}else{
-						return Personaje::SUR;
+						retorno = Personaje::SUR;
 					}
 				}
 			}
 		}
 	}
-	return CENTRO;
+	return retorno;
 }
 
 unsigned int Personaje::actualizarPosicion(Mapa* mapa) {
@@ -260,80 +262,82 @@ unsigned int Personaje::actualizarPosicion(Mapa* mapa) {
 	unsigned int direccion = this -> calcularDireccion(mapa);
 	// Si la direccion llego al tile
 	if(this -> tileDestino != NULL) {
+		// tileDestino distinto a la posicion exacta del tileActual
 		if( (this -> posX != tileDestino -> getX()) || (this -> posY != tileDestino -> getY())){
-			if ( verificarDestinoCaminable(mapa) ){
-				retorno = Personaje::MOVER_EN_CURSO;
-				// Calculo posicion siguiente (tomando en cuenta pixel de referencia y la posicion actual)
-				int posPixelSiguienteX = 0;
-				int posPixelSiguienteY = 0;
-				this -> calcularPosicionTentativa(direccion , &posPixelSiguienteX , &posPixelSiguienteY);
-				// Obtengo el tile siguiente
-				Tile* tileSiguiente = mapa -> getTilePorPixeles(posPixelSiguienteX , posPixelSiguienteY);
-				// Si el tileSiguiente es no nulo continua, sino no hace nada
-				if (tileSiguiente != NULL){
-					// Obtengo el tile del ancla nueva
-					Tile* tileAnclaSiguiente = this -> obtenerTileAncla(
-									posPixelSiguienteX , posPixelSiguienteY , 
-									direccion , mapa);
-					if (tileAnclaSiguiente != NULL) {
-						Tile* tileActual = mapa -> getTilePorPixeles(this -> posX , this -> posY);
-						// seteo de la posicion siguiente
-						this -> posX = posPixelSiguienteX;
-						this -> posY = posPixelSiguienteY;
-						// agrego la entidad al ancla siguiente
-						if (tileAnclaSiguiente != this -> tileAncla ) {
-							if (tileAncla != NULL) {
-								this -> tileAncla -> deleteEntidad(this);
-							}
-							this -> tileAncla = tileAnclaSiguiente;
-							this -> tileAncla -> addEntidad(this);	
-						} 
-						// agregado de entidad al tile nuevo
-						if (tileSiguiente != tileActual) {	
-							if (tileActual != NULL) {
-								if (this -> tileAncla != tileActual){
-									tileActual -> deleteEntidad(this);
-								} 
-								if (this -> tileAncla != tileSiguiente){
-									tileSiguiente -> addEntidad(this);
-								}
-							} else {
-								if (this -> tileAncla != tileSiguiente){
-									tileSiguiente -> addEntidad(this);
-								}
-							}	
-						}
-					} else{
-						Tile* tileActual = mapa -> getTilePorPixeles(this -> posX , this -> posY);
-						// seteo de la posicion siguiente
-						this -> posX = posPixelSiguienteX;
-						this -> posY = posPixelSiguienteY;
-						// agrego la entidad al ancla siguiente
+			retorno = Personaje::MOVER_EN_CURSO;
+			// Calculo posicion siguiente (tomando en cuenta pixel de referencia y la posicion actual)
+			int posPixelSiguienteX = 0;
+			int posPixelSiguienteY = 0;
+			this -> calcularPosicionTentativa(direccion , &posPixelSiguienteX , &posPixelSiguienteY);
+			// Obtengo el tile siguiente
+			Tile* tileSiguiente = mapa -> getTilePorPixeles(posPixelSiguienteX , posPixelSiguienteY);
+			// Si el tileSiguiente es no nulo continua, sino no hace nada
+			if (tileSiguiente != NULL){
+				// Obtengo el tile del ancla nueva
+				Tile* tileAnclaSiguiente = this -> obtenerTileAncla(
+								posPixelSiguienteX , posPixelSiguienteY , 
+								direccion , mapa);
+				if (tileAnclaSiguiente != NULL) {
+					Tile* tileActual = mapa -> getTilePorPixeles(this -> posX , this -> posY);
+					// seteo de la posicion siguiente
+					this -> posX = posPixelSiguienteX;
+					this -> posY = posPixelSiguienteY;
+					// agrego la entidad al ancla siguiente
+					if (tileAnclaSiguiente != this -> tileAncla ) {
 						if (tileAncla != NULL) {
 							this -> tileAncla -> deleteEntidad(this);
 						}
-						// seteo como tileAncla el tileSiguiente
-						this -> tileAncla = tileSiguiente;
-						this -> tileAncla -> addEntidad(this);
-						// agregado de entidad al tile nuevo
-						if (tileSiguiente != tileActual) {	
-							if (tileActual != NULL) {
+						this -> tileAncla = tileAnclaSiguiente;
+						this -> tileAncla -> addEntidad(this);	
+					} 
+					// agregado de entidad al tile nuevo
+					if (tileSiguiente != tileActual) {	
+						if (tileActual != NULL) {
+							if (this -> tileAncla != tileActual){
 								tileActual -> deleteEntidad(this);
-							} 		
-						}
+							} 
+							if (this -> tileAncla != tileSiguiente){
+								tileSiguiente -> addEntidad(this);
+							}
+						} else {
+							if (this -> tileAncla != tileSiguiente){
+								tileSiguiente -> addEntidad(this);
+							}
+						}	
+					}
+				} else{
+					Tile* tileActual = mapa -> getTilePorPixeles(this -> posX , this -> posY);
+					// seteo de la posicion siguiente
+					this -> posX = posPixelSiguienteX;
+					this -> posY = posPixelSiguienteY;
+					// agrego la entidad al ancla siguiente
+					if (tileAncla != NULL) {
+						this -> tileAncla -> deleteEntidad(this);
+					}
+					// seteo como tileAncla el tileSiguiente
+					this -> tileAncla = tileSiguiente;
+					this -> tileAncla -> addEntidad(this);
+					// agregado de entidad al tile nuevo
+					if (tileSiguiente != tileActual) {	
+						if (tileActual != NULL) {
+							tileActual -> deleteEntidad(this);
+						} 		
 					}
 				}
-			} else {
-				retorno = Personaje::MOVER_ERROR;
 			}
 		}
-		if ((this -> posX == tileDestino -> getX()) && (this -> posY == tileDestino -> getY()) && (direccion == CENTRO)) {
+		if ((direccion == CENTRO) || 
+			((this -> posX == tileDestino -> getX()) && 
+			(this -> posY == tileDestino -> getY()))) {
 			retorno = Personaje::MOVER_COMPLETADO;
 			this -> tileDestino = NULL;
+			// Se pasa centro para que se ponga estatico en la direccion actual
+			this -> actualizarImagen(Personaje::CENTRO);
+		} else {
+			this -> actualizarImagen(direccion);
 		}
 	}
-	this -> actualizandoPosicion = false;
-	this -> actualizarImagen(direccion);
+	this -> actualizandoPosicion = false;	
 	return retorno;
 }
 	
@@ -426,35 +430,6 @@ Tile* Personaje::obtenerTileAncla(const int posX , const int posY ,
 		}
 	}
 	return retorno;	
-
-
-
-
-	/*												
-	Tile* retorno = NULL;
-	int posImagenX = posX;
-	int posImagenY = posY + Tile::TILE_ALTO + Personaje::MARGEN_ANCLA_Y;
-	retorno = mapa -> getTilePorPixeles(posImagenX , posImagenY);
-	if (retorno == NULL){
-		posImagenY = posY + Tile::TILE_ALTO;
-		retorno = mapa -> getTilePorPixeles(posImagenX , posImagenY);
-		if (retorno == NULL) {
-			posImagenX = posX - Tile::TILE_ANCHO;
-			posImagenY = posY + Tile::TILE_ALTO/2;
-			if(retorno == NULL) {
-				posImagenX = posX - this -> pixel_ref_x;
-				retorno = mapa -> getTilePorPixeles(posImagenX , posImagenY);
-			}
-		}
-	}	
-	if (retorno != NULL) {
-		if (!verificarAncla(retorno)){
-			posImagenX = posX - Tile::TILE_ANCHO;
-			posImagenY = posY + Tile::TILE_ALTO;
-			retorno = mapa -> getTilePorPixeles(posImagenX , posImagenY);
-		}
-	}
-	return retorno;*/
 }
 
 void Personaje::setTileActual(Tile* tile) {
@@ -492,6 +467,7 @@ void Personaje::setTileDestino(Tile* tile){
 void Personaje::mover(Tile* tileDestino) {
 	if (tileDestino != NULL) {
 		this -> tileDestino = tileDestino;
+		this -> cambioDireccionHabilitado = true;
 	}
 }
 
@@ -512,6 +488,7 @@ void Personaje::mover(Tile* tileDestino) {
 void Personaje::mover(Tile* tileDestino , Mapa* mapa) {
 	if (tileDestino != NULL) {
 		this -> tileDestino = tileDestino;
+		this -> cambioDireccionHabilitado = true;
 	}
 }
 
@@ -521,10 +498,11 @@ void Personaje::actualizarImagen(const unsigned int direccion){
 		if (direccion == CENTRO) {
 			imagenPersonaje -> setAccion(ImagenPersonaje::ESTATICO_DIRECCION_ACTUAL);
 		} else {
-			imagenPersonaje -> setAccion(direccion);
+			if (this -> cambioDireccionHabilitado) {
+				imagenPersonaje -> setAccion(direccion);
+				this -> cambioDireccionHabilitado = false;
+			}
 		}
-		// Actualizacion del surface
-		//this -> surf = this -> imagen -> getSurface();
 	}
 }
 

@@ -783,8 +783,8 @@ void Personaje::dañarPersonaje(char daño) {
 }
 
 void Personaje::dañar(char daño) {
-	int dañoEscudo=daño/2;
-	int dañoPersonaje=daño-dañoEscudo;
+	char dañoEscudo=daño/2;
+	char dañoPersonaje=daño-dañoEscudo;
 	//Tiene escudo para defenderse
 	if (this->energiaEscudo>0) {
 		//Veo si puede absorver todo lo que corresponde al escudo
@@ -824,7 +824,7 @@ void Personaje::chocarConZapatos(Zapatos* zapatos) {
 	std::cout << "Aumento la velocidad un " << (int)zapatos->getAumentoVelocidad() << "%\n";
 	this->aumentarVelocidad(zapatos->getAumentoVelocidad());
 	BitStream bs;
-	bs << PROTO::UPDATE_VEL << (float)pjm.getPjeLocal().getVelocidad();
+	bs << PROTO::UPDATE_ATT << ATT::VEL << (float)pjm.getPjeLocal().getVelocidad();
 	sock.send(bs.str());
 }
 
@@ -834,12 +834,15 @@ void Personaje::utilizarTerremoto(Mapa* mapa, PjeManager* pjm, ClientSocket* soc
 	Tile* tilePersonaje;
 	int xPersonaje,yPersonaje;
 	this->terremoto=true; //hardcodeo para no tener que agarrar item primero
-	if ((terremoto) && (this->magia>=this->MAGIA_HECHIZO)) {
+	if ((terremoto) && (this->getMagia()>=this->MAGIA_HECHIZO)) {
 		std::cout << "Uso terremoto\n";
 		BitStream bs;
 		bs << PROTO::USE_ITEM << this->nickname << ITEM::TERREMOTO;
 		sock->send(bs.str());
 		this->magia-=this->MAGIA_HECHIZO;
+		bs.clear();
+		bs << PROTO::UPDATE_ATT << ATT::MAGIA << this->getMagia();
+		sock->send(bs.str());
 		int xActual = this->getPosicion(mapa)->getU();
 		int yActual = this->getPosicion(mapa)->getV();
 		for (int i=xActual-radio;i<=xActual+radio;i++) {
@@ -851,11 +854,11 @@ void Personaje::utilizarTerremoto(Mapa* mapa, PjeManager* pjm, ClientSocket* soc
 					yPersonaje=tilePersonaje->getV();
 					if ((i==xPersonaje) && (j==yPersonaje)) {
 						srand (time(NULL));
-						dañoRealizado=rand()%(this->ENERGIA_TOTAL+1);
-						std::cout << "se danio a " << it->first << " con el terremoto, total de " << (int)dañoRealizado << endl;
+						dañoRealizado=rand()%(this->ENERGIA_TOTAL+1);						
 						it->second.dañar(dañoRealizado);
+						std::cout << "Se danio a " << it->first << " con terremoto, total de " << (int)dañoRealizado << endl;
 						bs.clear();
-						bs << PROTO::DAMAGE << this->nickname << it->first << dañoRealizado;
+						bs << PROTO::DAMAGE << this->getNick() << it->first << dañoRealizado;
 						sock->send(bs.str());
 					}
 				}
@@ -895,15 +898,21 @@ void Personaje::utilizarHielo(Mapa* mapa, PjeManager* pjm) {
 }
 
  void Personaje::chocarConCorazon(Corazon* corazon) {
-		this->energia+=corazon->getEnergiaGanada();
-		if (this->energia>this->ENERGIA_TOTAL)
-			this->energia=this->ENERGIA_TOTAL;
+	this->energia+=corazon->getEnergiaGanada();
+	if (this->energia>this->ENERGIA_TOTAL)
+		this->energia=this->ENERGIA_TOTAL;
+	BitStream bs;
+	bs << PROTO::UPDATE_ATT << ATT::ENERGIA << pjm.getPjeLocal().getEnergia();
+	sock.send(bs.str());
 }
 
  void Personaje::chocarConBotella(Botella* botella) {
 	 this->magia+=botella->getMagiaGanada();
 	 if (this->magia>this->MAGIA_TOTAL)
 		 this->magia=this->MAGIA_TOTAL;
+	BitStream bs;
+	bs << PROTO::UPDATE_ATT << ATT::MAGIA << pjm.getPjeLocal().getMagia();
+	sock.send(bs.str());
  }
 
  void Personaje::chocarConFlechas(Flechas* flechas) {

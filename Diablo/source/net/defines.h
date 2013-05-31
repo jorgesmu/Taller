@@ -64,9 +64,9 @@ const unsigned char DAMAGE = 'v';
 // <nick:who><char:item>
 const unsigned char USE_ITEM = 'w';
 //Actualizacion de la velocidad
-const unsigned char UPDATE_VEL = 'x';
+const unsigned char UPDATE_ATT = 'x';
 // Velocidad que manda cuando se conecta un usuario existente
-const unsigned char INITVEL = 'y';
+const unsigned char OLD_ATT = 'y';
 // Atributos del jugador que se acaba de conectar para el resto de los clientes
 const unsigned char INIT_ATT = 'z';
 
@@ -86,4 +86,11 @@ namespace MOV {
 namespace ITEM {
 	const char TERREMOTO = 0;
 	const char HIELO = 1;
+}
+
+// Cosas de atributos
+namespace ATT {
+	const char VEL = 0;
+	const char ENERGIA = 1;
+	const char MAGIA = 2;
 }

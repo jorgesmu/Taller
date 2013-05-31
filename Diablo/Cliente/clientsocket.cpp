@@ -19,6 +19,7 @@ extern std::string pje_local_tipo;
 extern int start_pos_x, start_pos_y;
 extern int escenario_elegido_id;
 extern double init_vel;
+extern char init_energia,init_magia;
 extern config_general configuracion;
 extern ResMan resman;
 extern ChatWindow chat_window;
@@ -302,11 +303,13 @@ void ClientSocket::listenDo() {
 			bs >> start_pos_x;
 			bs >> start_pos_y;
 			//std::cout << "RECEIVED INIT POS: (" << start_pos_x << "," << start_pos_y << ")\n";
-		}else if(pt == PROTO::INITVEL) {
+		}else if(pt == PROTO::OLD_ATT) {
 			float recv_vel;
-			bs >> recv_vel;
+			char energia,magia;
+			bs >> recv_vel >> energia >> magia;
 			init_vel=(double)recv_vel;
-			//std::cout << "RECEIVED INIT VEL: " << init_vel << "\n";
+			init_energia=energia;
+			init_magia=magia;
 		}else if(pt == PROTO::ESC_ID) {
 			bs >> escenario_elegido_id;
 			//std::cout << "RECEIVED ESC ID: (" << escenario_elegido_id << ")\n";
@@ -355,12 +358,15 @@ void ClientSocket::listenDo() {
 			while(!cargoMapa) {
 				Sleep(10);
 			}
-			std::string new_nick;
+			std::string nick_who;
 			float vel_recv;
-			bs >> new_nick >> vel_recv;
+			char energia,magia;
+			bs >> nick_who >> vel_recv >> energia >> magia;
 			double vel=(double)vel_recv;
-			//Seteamos los atributos
-			pjm.getPje(new_nick).setVelocidad(vel);
+			//Seteamos los atributos del jugador
+			pjm.getPje(nick_who).setVelocidad(vel);
+			pjm.getPje(nick_who).setEnergia(energia);
+			pjm.getPje(nick_who).setMagia(magia);
 		}else if(pt == PROTO::PLAYER_EXIT) {
 			// Esperamos a que cargue el mapa
 			while(!cargoMapa) {
@@ -438,6 +444,9 @@ void ClientSocket::listenDo() {
 			// Buscamos el personaje 
 			if(nick_to == pjm.getPjeLocal().getNick()) {
 				pjm.getPjeLocal().dañar(dmg);
+				bs.clear();
+				bs << PROTO::UPDATE_ATT << ATT::ENERGIA << pjm.getPjeLocal().getEnergia();
+				this->send(bs.str());
 			}else{
 				for(auto it = pjm.getPjes().begin();it != pjm.getPjes().end();it++) {
 					if(it->first == nick_to) {
@@ -446,17 +455,30 @@ void ClientSocket::listenDo() {
 					}
 				}
 			}
-			std::cout << nick_who << " dañó en " << int(dmg) << " a " << nick_to << "\n";
-		}else if(pt == PROTO::UPDATE_VEL) {	
+		}else if(pt == PROTO::UPDATE_ATT) {	
+			char tipoAtt;
+			bs >> tipoAtt;
 			std::string nick_who;
-			bs >> nick_who;
+			bs >> nick_who;			
 			float nuevaVel;
-			bs >> nuevaVel;
+			char nuevoValor;
+			if (tipoAtt==ATT::VEL) {
+				// Valor float: velocidad
+				bs >> nuevaVel;
+			} else {
+				// Valor char: energia/magia
+				bs >> nuevoValor;
+			}
 			// Buscamos el personaje 
 			for(auto it = pjm.getPjes().begin();it != pjm.getPjes().end();it++) {
 				if(it->first == nick_who) {
-					it->second.setVelocidad((double)nuevaVel);
-					std::cout << "Update de " << nick_who << " VEL=" << nuevaVel << endl;
+					if (tipoAtt==ATT::VEL) {
+						it->second.setVelocidad((double)nuevaVel);
+					} else if (tipoAtt==ATT::ENERGIA) {
+						it->second.setEnergia(nuevoValor);
+					} else if (tipoAtt==ATT::MAGIA) {
+						it->second.setMagia(nuevoValor);
+					}
 					break;
 				}
 			}

@@ -52,6 +52,7 @@ std::string pje_local_tipo;
 int start_pos_x, start_pos_y;
 int escenario_elegido_id;
 double init_vel;
+char init_energia,init_magia;
 // Cosas para mantener al server actualizado sobre los tiles que recorrimos
 struct {
 	vec2<int> tile_actual, tile_anterior;
@@ -210,21 +211,26 @@ int main(int argc, char* argv[]) {
 	// Avisamos al otro thread que ya cargo el mapa
 	cargoMapa = true;
 
-	//pjm.getPjeLocal().setVelocidad(init_vel);
 	// Agrega el personaje(no esta tomando velocidad del YAML!!!)
 	pjm.getPjeLocal().init(pje_local_nick, pje_local_tipo , 1 , 1 , 50 , 5, 100, 100 ,	configuracion.get_vel_personaje(),	0 , 50 , NULL , resman , Imagen::COLOR_KEY);
 	//Si no me conecto por primera vez al servidor
 	if (init_vel!=0) {
+		// El server me paso atributos para cargar
 		pjm.getPjeLocal().setVelocidad(init_vel);
+		pjm.getPjeLocal().setEnergia(init_energia);
+		pjm.getPjeLocal().setMagia(init_magia);
 	} else {
-		//Aviso al server la que cargue
+		//Aviso al server mis valores por defecto de atributos
 		bs.clear();
-		bs << PROTO::UPDATE_VEL << (float)pjm.getPjeLocal().getVelocidad();
+		bs << PROTO::UPDATE_ATT << ATT::VEL << (float)pjm.getPjeLocal().getVelocidad();
 		sock.send(bs.str());
-		std::cout << "Msj a server: VEL=" << pjm.getPjeLocal().getVelocidad() << endl;
+		bs.clear();
+		bs << PROTO::UPDATE_ATT << ATT::ENERGIA << pjm.getPjeLocal().getEnergia();
+		sock.send(bs.str());
+		bs.clear();
+		bs << PROTO::UPDATE_ATT << ATT::MAGIA << pjm.getPjeLocal().getEnergia();
+		sock.send(bs.str());
 	}
-	
-	std::cout << "Velocidad seteada: " << pjm.getPjeLocal().getVelocidad() << "\n";
 	
 	// Posiciono el personaje
 	mapa.getTile(start_pos_x, start_pos_y)->addEntidad(&(pjm.getPjeLocal()));
@@ -420,8 +426,8 @@ int main(int argc, char* argv[]) {
 			
 			if (puedeMoverse) {				
 				if (!choco) {
-					std::cout << "Energia: " << pjm.getPjeLocal().getEnergia() << endl;
-					std::cout << "Magia: " << pjm.getPjeLocal().getMagia() << endl;
+					std::cout << "Energia: " << (int)pjm.getPjeLocal().getEnergia() << endl;
+					std::cout << "Magia: " << (int)pjm.getPjeLocal().getMagia() << endl;
 					std::cout << "Velocidad: " << pjm.getPjeLocal().getVelocidad() << endl;
 					std::vector<Entidad*> entidades=pjm.getPjeLocal().getPosicion(&mapa)->getEntidades();
 					for (auto it=entidades.begin();it!=entidades.end();it++) {

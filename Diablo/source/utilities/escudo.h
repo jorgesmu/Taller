@@ -4,7 +4,7 @@
 
 class Escudo: public Item {
 	private:
-		int energiaEscudo;
+		char energiaEscudo;
 	public:
 		//Constructor
 		Escudo();
@@ -13,12 +13,14 @@ class Escudo: public Item {
 			const unsigned int wTiles , const unsigned int hTiles , bool caminable,
 			const int pixel_ref_x , const int pixel_ref_y,
 			Tile* tile , Mapa* mapa,
-			ResMan& rm , const int colorKey):Item(name,wTiles,hTiles,caminable,pixel_ref_x,pixel_ref_y,tile,mapa,rm,colorKey) {}
+			ResMan& rm , const int colorKey):Item(name,wTiles,hTiles,caminable,pixel_ref_x,pixel_ref_y,tile,mapa,rm,colorKey) {
+				energiaEscudo=20;
+		}
 
 		void chocarCon(Personaje* personaje) {
 			personaje->chocarConEscudo(this);
 		}
 
-		int getEnergiaEscudo() { return this->energiaEscudo; }
+		char getEnergiaEscudo() { return this->energiaEscudo; }
 
 };

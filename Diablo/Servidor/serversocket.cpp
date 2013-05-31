@@ -462,8 +462,7 @@ void ServerSocket::acceptLastDo() {
 
 		//Le mandamos la velocidad que tenia		
 		bs.clear();
-		bs << PROTO::INITVEL << (float)pm.getPlayer(new_nick).getVelocidad(); 
-		std::cout << "Recuperando velocidad: " << pm.getPlayer(new_nick).getVelocidad() <<endl;
+		bs << PROTO::OLD_ATT << (float)pm.getPlayer(new_nick).getVelocidad() << pm.getPlayer(new_nick).getEnergia() << pm.getPlayer(new_nick).getMagia(); 
 		send(cid, bs.str());
 
 		// Le mandamos el id escenario
@@ -496,9 +495,8 @@ void ServerSocket::acceptLastDo() {
 			send(it->second.sock, bs.str());
 			//Mando los atributos principales del jugador
 			bs.clear();
-			bs << PROTO::INIT_ATT << new_nick << (float)pm.getPlayer(new_nick).getVelocidad();
+			bs << PROTO::INIT_ATT << new_nick << (float)pm.getPlayer(new_nick).getVelocidad() << pm.getPlayer(new_nick).getEnergia() << pm.getPlayer(new_nick).getMagia();
 			send(it->second.sock,bs.str());
-			std::cout << "Mensaje a " << it->second.nick << ": " << new_nick << " tiene VEL=" << pm.getPlayer(new_nick).getVelocidad() << endl; 
 		}
 
 		// Mandamos todos los otros players al que se unio
@@ -512,7 +510,6 @@ void ServerSocket::acceptLastDo() {
 			bs.clear();
 			bs << PROTO::INIT_ATT << it->second.getNick() << (float)pm.getPlayer(it->second.getNick()).getVelocidad();
 			send(cid,bs.str());
-			std::cout << "Mensaje a " << new_nick << ": " << it->second.getNick() << " tiene VEL=" << pm.getPlayer(it->second.getNick()).getVelocidad() << endl; 
 		}
 		
 
@@ -595,26 +592,43 @@ void ServerSocket::acceptLastDo() {
 				bs >> dmg;
 				// Avisamos a los otros jugadores 
 				for(auto it = clients_map.begin();it != clients_map.end();it++) {
-					if(it->second.nick == new_nick) continue; // Salteamos a nuestro jugador
-					BitStream bs;
+					if(it->second.nick == new_nick) continue; // Salteamos a nuestro jugador de avisarle
+					bs.clear();
 					bs << PROTO::DAMAGE << nick_who << nick_to << dmg;
 					send(it->second.sock, bs.str());
 				}
-			}else if(pt == PROTO::UPDATE_VEL) {	
+			}else if(pt == PROTO::UPDATE_ATT) {	
+				char tipoAtt;
+				bs >> tipoAtt;
 				float nuevaVel;
-				bs >> nuevaVel;
+				char nuevoValor;
+				if (tipoAtt==ATT::VEL) {
+					// Valor float: velocidad
+					bs >> nuevaVel;
+				} else {
+					// Valor char: energia/magia
+					bs >> nuevoValor;
+				}
 				// Avisamos a los otros jugadores 
 				for(auto it = clients_map.begin();it != clients_map.end();it++) {
 					if(it->second.nick == new_nick) {
-						//Actualizamos en el server la velocidad
-						pm.getPlayer(new_nick).setVelocidad((double)nuevaVel);
-						std::cout << "Update de velocidad de " << new_nick << " a " << (double)nuevaVel << endl;
+						if (tipoAtt==ATT::VEL) {
+							pm.getPlayer(new_nick).setVelocidad((double)nuevaVel);
+						} else if (tipoAtt==ATT::ENERGIA) {
+							pm.getPlayer(new_nick).setEnergia(nuevoValor);
+						} else if (tipoAtt==ATT::MAGIA) {
+							pm.getPlayer(new_nick).setMagia(nuevoValor);
+						}
 						continue; // Salteamos a nuestro jugador de avisarle
 					}
-					BitStream bs;
-					bs << PROTO::UPDATE_VEL << new_nick << nuevaVel;
+					bs.clear();
+					if (tipoAtt==ATT::VEL) {
+						bs << PROTO::UPDATE_ATT << tipoAtt << new_nick << nuevaVel;
+					} else {
+						bs << PROTO::UPDATE_ATT << tipoAtt << new_nick << nuevoValor;
+					}
 					send(it->second.sock, bs.str());
-					std::cout << "Msj a " << it->second.nick << ": " << new_nick << "tiene VEL=" << nuevaVel << endl;
+					
 				}
 			}else if(pt == PROTO::REQUEST_POS) {
 				int x, y;

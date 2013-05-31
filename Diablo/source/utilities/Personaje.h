@@ -63,17 +63,17 @@ public:
 		//Radio de los hechizos
 		const static unsigned int RADIO_HECHIZO = 4; //en tiles
 
-		//Daño de los hechizos
-		const static int DAÑO_TERREMOTO = 100;
+		//Daño maximo de los hechizos
+		const static char DAÑO_TERREMOTO = 100;
 
 		//Magia necesaria para un hechizo
-		const static int MAGIA_HECHIZO = 50;
+		const static char MAGIA_HECHIZO = 50;
 
 		//Vida inicial
 		const static char ENERGIA_TOTAL = 100;
 
 		//Magia inicial
-		const static int MAGIA_TOTAL = 100;
+		const static char MAGIA_TOTAL = 100;
 
 	//	const static int DELTA_TIEMPO_UPDATE_POSICION = 20; // Tiempo entre cada update en clocks
 
@@ -105,14 +105,14 @@ protected:
 		char energia;
 
 		//Magia
-		int magia;
+		char magia;
 
 		//Armas
 		int flechas;
 		int bombas;
 		int granadas;
 		bool varita;
-		int energiaEscudo;
+		char energiaEscudo;
 				
 public:
 	
@@ -318,9 +318,13 @@ public:
 
 	int getRadioY() { return radioY; }
 
-	int getEnergia() { return energia; }
+	char getEnergia() { return energia; }
 
-	int getMagia() { return magia; }
+	void setEnergia(char newEnergia) { energia=newEnergia; }
+
+	char getMagia() { return magia; }
+
+	void setMagia(char newMagia) { magia=newMagia; }
 
 	double getVelocidad() { return velocidad; }
 

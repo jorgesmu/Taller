@@ -18,6 +18,7 @@ class Player {
 	int x, y; // Pos en tiles logicos en el mapa
 	TilesRecorridos tiles_recorridos;
 	double velocidad;
+	char energia,magia;
 	
 	public:
 	Player();
@@ -33,6 +34,10 @@ class Player {
 	std::string getNick() const;
 	double getVelocidad() { return velocidad; }
 	void setVelocidad(double newVel) { velocidad=newVel; }
+	char getEnergia() { return energia; }
+	void setEnergia(char newEnergia) { energia=newEnergia; }
+	char getMagia() { return magia; }
+	void setMagia(char newMagia) { magia=newMagia; }
 
 	void addTileRecorrido(short x, short y);
 	TilesRecorridos& getTilesRecorridos();

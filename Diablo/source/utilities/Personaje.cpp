@@ -934,4 +934,7 @@ void Personaje::utilizarHielo(Mapa* mapa, PjeManager* pjm) {
 
  void Personaje::chocarConEscudo(Escudo* escudo) {
 	 this->energiaEscudo+=escudo->getEnergiaEscudo();
+	 BitStream bs;
+	 bs << PROTO::UPDATE_ATT << ATT::ENERGIA_ESCUDO << pjm.getPjeLocal().getEnergiaEscudo();
+	 sock.send(bs.str());
  }

@@ -326,6 +326,10 @@ public:
 
 	void setMagia(char newMagia) { magia=newMagia; }
 
+	char getEnergiaEscudo() { return energiaEscudo; }
+
+	void setEnergiaEscudo(char energia) { energiaEscudo=energia; }
+
 	double getVelocidad() { return velocidad; }
 
 	void setVelocidad(double velocidad) { this->velocidad=velocidad; }

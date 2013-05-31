@@ -93,4 +93,5 @@ namespace ATT {
 	const char VEL = 0;
 	const char ENERGIA = 1;
 	const char MAGIA = 2;
+	const char ENERGIA_ESCUDO = 3;
 }

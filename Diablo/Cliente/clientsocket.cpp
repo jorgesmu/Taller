@@ -19,7 +19,7 @@ extern std::string pje_local_tipo;
 extern int start_pos_x, start_pos_y;
 extern int escenario_elegido_id;
 extern double init_vel;
-extern char init_energia,init_magia;
+extern char init_energia,init_magia,init_escudo;
 extern config_general configuracion;
 extern ResMan resman;
 extern ChatWindow chat_window;
@@ -305,11 +305,12 @@ void ClientSocket::listenDo() {
 			//std::cout << "RECEIVED INIT POS: (" << start_pos_x << "," << start_pos_y << ")\n";
 		}else if(pt == PROTO::OLD_ATT) {
 			float recv_vel;
-			char energia,magia;
-			bs >> recv_vel >> energia >> magia;
+			char energia,magia,energiaEscudo;
+			bs >> recv_vel >> energia >> magia >> energiaEscudo;
 			init_vel=(double)recv_vel;
 			init_energia=energia;
 			init_magia=magia;
+			init_escudo=energiaEscudo;
 		}else if(pt == PROTO::ESC_ID) {
 			bs >> escenario_elegido_id;
 			//std::cout << "RECEIVED ESC ID: (" << escenario_elegido_id << ")\n";
@@ -360,13 +361,14 @@ void ClientSocket::listenDo() {
 			}
 			std::string nick_who;
 			float vel_recv;
-			char energia,magia;
-			bs >> nick_who >> vel_recv >> energia >> magia;
+			char energia,magia,energiaEscudo;
+			bs >> nick_who >> vel_recv >> energia >> magia >> energiaEscudo;
 			double vel=(double)vel_recv;
 			//Seteamos los atributos del jugador
 			pjm.getPje(nick_who).setVelocidad(vel);
 			pjm.getPje(nick_who).setEnergia(energia);
 			pjm.getPje(nick_who).setMagia(magia);
+			pjm.getPje(nick_who).setEnergiaEscudo(energiaEscudo);
 		}else if(pt == PROTO::PLAYER_EXIT) {
 			// Esperamos a que cargue el mapa
 			while(!cargoMapa) {
@@ -447,6 +449,9 @@ void ClientSocket::listenDo() {
 				bs.clear();
 				bs << PROTO::UPDATE_ATT << ATT::ENERGIA << pjm.getPjeLocal().getEnergia();
 				this->send(bs.str());
+				bs.clear();
+				bs << PROTO::UPDATE_ATT << ATT::ENERGIA_ESCUDO << pjm.getPjeLocal().getEnergiaEscudo();
+				this->send(bs.str());
 			}else{
 				for(auto it = pjm.getPjes().begin();it != pjm.getPjes().end();it++) {
 					if(it->first == nick_to) {
@@ -478,6 +483,8 @@ void ClientSocket::listenDo() {
 						it->second.setEnergia(nuevoValor);
 					} else if (tipoAtt==ATT::MAGIA) {
 						it->second.setMagia(nuevoValor);
+					} else if (tipoAtt==ATT::ENERGIA_ESCUDO) {
+						it->second.setEnergiaEscudo(nuevoValor);
 					}
 					break;
 				}

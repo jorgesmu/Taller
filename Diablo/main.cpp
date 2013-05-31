@@ -32,6 +32,7 @@
 #include "../../source/utilities/mapaItem.h"
 #include "../../source/utilities/zapatos.h"
 #include "../../source/utilities/terremoto.h"
+#include "../../source/utilities/escudo.h"
 
 using namespace std;
 
@@ -52,7 +53,7 @@ std::string pje_local_tipo;
 int start_pos_x, start_pos_y;
 int escenario_elegido_id;
 double init_vel;
-char init_energia,init_magia;
+char init_energia,init_magia,init_escudo;
 // Cosas para mantener al server actualizado sobre los tiles que recorrimos
 struct {
 	vec2<int> tile_actual, tile_anterior;
@@ -164,7 +165,7 @@ int main(int argc, char* argv[]) {
 			
 	//Prueba de carga items
 	resman.addRes("cofre","../resources/chest.png");
-	Zapatos cofre("cofre",1,1,true, 6 ,13,NULL,&mapa,resman,Imagen::COLOR_KEY );
+	Escudo cofre("cofre",1,1,true, 6 ,13,NULL,&mapa,resman,Imagen::COLOR_KEY );
 	mapa.getTile(6,13)->addEntidad(&cofre,&mapa);
 	entidades_cargadas.push_back(&cofre);
 
@@ -219,6 +220,7 @@ int main(int argc, char* argv[]) {
 		pjm.getPjeLocal().setVelocidad(init_vel);
 		pjm.getPjeLocal().setEnergia(init_energia);
 		pjm.getPjeLocal().setMagia(init_magia);
+		pjm.getPjeLocal().setEnergiaEscudo(init_escudo);
 	} else {
 		//Aviso al server mis valores por defecto de atributos
 		bs.clear();
@@ -229,6 +231,9 @@ int main(int argc, char* argv[]) {
 		sock.send(bs.str());
 		bs.clear();
 		bs << PROTO::UPDATE_ATT << ATT::MAGIA << pjm.getPjeLocal().getEnergia();
+		sock.send(bs.str());
+		bs.clear();
+		bs << PROTO::UPDATE_ATT << ATT::ENERGIA_ESCUDO << pjm.getPjeLocal().getEnergiaEscudo();
 		sock.send(bs.str());
 	}
 	
@@ -427,6 +432,7 @@ int main(int argc, char* argv[]) {
 			if (puedeMoverse) {				
 				if (!choco) {
 					std::cout << "Energia: " << (int)pjm.getPjeLocal().getEnergia() << endl;
+					std::cout << "Escudo: " << (int)pjm.getPjeLocal().getEnergiaEscudo() << endl;
 					std::cout << "Magia: " << (int)pjm.getPjeLocal().getMagia() << endl;
 					std::cout << "Velocidad: " << pjm.getPjeLocal().getVelocidad() << endl;
 					std::vector<Entidad*> entidades=pjm.getPjeLocal().getPosicion(&mapa)->getEntidades();

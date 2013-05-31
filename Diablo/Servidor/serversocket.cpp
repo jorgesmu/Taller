@@ -462,7 +462,7 @@ void ServerSocket::acceptLastDo() {
 
 		//Le mandamos la velocidad que tenia		
 		bs.clear();
-		bs << PROTO::OLD_ATT << (float)pm.getPlayer(new_nick).getVelocidad() << pm.getPlayer(new_nick).getEnergia() << pm.getPlayer(new_nick).getMagia(); 
+		bs << PROTO::OLD_ATT << (float)pm.getPlayer(new_nick).getVelocidad() << pm.getPlayer(new_nick).getEnergia() << pm.getPlayer(new_nick).getMagia() << pm.getPlayer(new_nick).getEnergiaEscudo(); 
 		send(cid, bs.str());
 
 		// Le mandamos el id escenario
@@ -495,7 +495,7 @@ void ServerSocket::acceptLastDo() {
 			send(it->second.sock, bs.str());
 			//Mando los atributos principales del jugador
 			bs.clear();
-			bs << PROTO::INIT_ATT << new_nick << (float)pm.getPlayer(new_nick).getVelocidad() << pm.getPlayer(new_nick).getEnergia() << pm.getPlayer(new_nick).getMagia();
+			bs << PROTO::INIT_ATT << new_nick << (float)pm.getPlayer(new_nick).getVelocidad() << pm.getPlayer(new_nick).getEnergia() << pm.getPlayer(new_nick).getMagia() << pm.getPlayer(new_nick).getEnergiaEscudo();
 			send(it->second.sock,bs.str());
 		}
 
@@ -606,7 +606,7 @@ void ServerSocket::acceptLastDo() {
 					// Valor float: velocidad
 					bs >> nuevaVel;
 				} else {
-					// Valor char: energia/magia
+					// Valor char: energia/magia/escudo
 					bs >> nuevoValor;
 				}
 				// Avisamos a los otros jugadores 
@@ -618,6 +618,8 @@ void ServerSocket::acceptLastDo() {
 							pm.getPlayer(new_nick).setEnergia(nuevoValor);
 						} else if (tipoAtt==ATT::MAGIA) {
 							pm.getPlayer(new_nick).setMagia(nuevoValor);
+						} else if (tipoAtt==ATT::ENERGIA_ESCUDO) {
+							pm.getPlayer(new_nick).setEnergiaEscudo(nuevoValor);
 						}
 						continue; // Salteamos a nuestro jugador de avisarle
 					}

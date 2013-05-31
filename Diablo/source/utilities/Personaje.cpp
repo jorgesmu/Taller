@@ -824,9 +824,8 @@ void Personaje::chocarConZapatos(Zapatos* zapatos) {
 	std::cout << "Aumento la velocidad un " << (int)zapatos->getAumentoVelocidad() << "%\n";
 	this->aumentarVelocidad(zapatos->getAumentoVelocidad());
 	BitStream bs;
-	bs << PROTO::ADD_VEL << pjm.getPjeLocal().getNick() << zapatos->getAumentoVelocidad() << (float)pjm.getPjeLocal().getVelocidad();
+	bs << PROTO::UPDATE_VEL << (float)pjm.getPjeLocal().getVelocidad();
 	sock.send(bs.str());
-	//Todavia no anda, sync cuando entra el personaje al juego
 }
 
 void Personaje::utilizarTerremoto(Mapa* mapa, PjeManager* pjm, ClientSocket* sock) {

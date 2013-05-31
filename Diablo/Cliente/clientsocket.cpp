@@ -350,6 +350,17 @@ void ClientSocket::listenDo() {
 				auto& p = pjm.getPje(new_nick);
 				p.freezar(!is_on);
 			}
+		}else if(pt == PROTO::INIT_ATT) {
+			// Esperamos a que cargue el mapa
+			while(!cargoMapa) {
+				Sleep(10);
+			}
+			std::string new_nick;
+			float vel_recv;
+			bs >> new_nick >> vel_recv;
+			double vel=(double)vel_recv;
+			//Seteamos los atributos
+			pjm.getPje(new_nick).setVelocidad(vel);
 		}else if(pt == PROTO::PLAYER_EXIT) {
 			// Esperamos a que cargue el mapa
 			while(!cargoMapa) {
@@ -436,15 +447,16 @@ void ClientSocket::listenDo() {
 				}
 			}
 			std::cout << nick_who << " dañó en " << int(dmg) << " a " << nick_to << "\n";
-		}else if(pt == PROTO::ADD_VEL) {	
+		}else if(pt == PROTO::UPDATE_VEL) {	
 			std::string nick_who;
 			bs >> nick_who;
-			char porcentaje;
-			bs >> porcentaje;
+			float nuevaVel;
+			bs >> nuevaVel;
 			// Buscamos el personaje 
 			for(auto it = pjm.getPjes().begin();it != pjm.getPjes().end();it++) {
 				if(it->first == nick_who) {
-					it->second.aumentarVelocidad(porcentaje);
+					it->second.setVelocidad((double)nuevaVel);
+					std::cout << "Update de " << nick_who << " VEL=" << nuevaVel << endl;
 					break;
 				}
 			}

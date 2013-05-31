@@ -494,6 +494,11 @@ void ServerSocket::acceptLastDo() {
 			
 			bs << PROTO::NEW_PLAYER << new_nick << p_local.getTipo() << p_local.getX() << p_local.getY() << p_local.isOn();
 			send(it->second.sock, bs.str());
+			//Mando los atributos principales del jugador
+			bs.clear();
+			bs << PROTO::INIT_ATT << new_nick << (float)pm.getPlayer(new_nick).getVelocidad();
+			send(it->second.sock,bs.str());
+			std::cout << "Mensaje a " << it->second.nick << ": " << new_nick << " tiene VEL=" << pm.getPlayer(new_nick).getVelocidad() << endl; 
 		}
 
 		// Mandamos todos los otros players al que se unio
@@ -503,6 +508,11 @@ void ServerSocket::acceptLastDo() {
 			bs.clear();
 			bs << PROTO::NEW_PLAYER << it->second.getNick() << p.getTipo() << p.getX() << p.getY() << p.isOn();
 			send(cid, bs.str());
+			//Mando los atributos principales del jugador
+			bs.clear();
+			bs << PROTO::INIT_ATT << it->second.getNick() << (float)pm.getPlayer(it->second.getNick()).getVelocidad();
+			send(cid,bs.str());
+			std::cout << "Mensaje a " << new_nick << ": " << it->second.getNick() << " tiene VEL=" << pm.getPlayer(it->second.getNick()).getVelocidad() << endl; 
 		}
 		
 
@@ -590,11 +600,7 @@ void ServerSocket::acceptLastDo() {
 					bs << PROTO::DAMAGE << nick_who << nick_to << dmg;
 					send(it->second.sock, bs.str());
 				}
-			}else if(pt == PROTO::ADD_VEL) {	
-				std::string nick_who;
-				bs >> nick_who;
-				char porcentaje;
-				bs >> porcentaje;
+			}else if(pt == PROTO::UPDATE_VEL) {	
 				float nuevaVel;
 				bs >> nuevaVel;
 				// Avisamos a los otros jugadores 
@@ -602,12 +608,13 @@ void ServerSocket::acceptLastDo() {
 					if(it->second.nick == new_nick) {
 						//Actualizamos en el server la velocidad
 						pm.getPlayer(new_nick).setVelocidad((double)nuevaVel);
-						std::cout << "Velocidad actualizada de " << new_nick << " a " << (double)nuevaVel << " con un porcentaje de aumento " << (int)porcentaje << endl;
+						std::cout << "Update de velocidad de " << new_nick << " a " << (double)nuevaVel << endl;
 						continue; // Salteamos a nuestro jugador de avisarle
 					}
 					BitStream bs;
-					bs << PROTO::ADD_VEL << nick_who << porcentaje;
+					bs << PROTO::UPDATE_VEL << new_nick << nuevaVel;
 					send(it->second.sock, bs.str());
+					std::cout << "Msj a " << it->second.nick << ": " << new_nick << "tiene VEL=" << nuevaVel << endl;
 				}
 			}else if(pt == PROTO::REQUEST_POS) {
 				int x, y;

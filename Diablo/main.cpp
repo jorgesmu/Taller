@@ -210,13 +210,18 @@ int main(int argc, char* argv[]) {
 	// Avisamos al otro thread que ya cargo el mapa
 	cargoMapa = true;
 
-
-	pjm.getPjeLocal().setVelocidad(init_vel);
+	//pjm.getPjeLocal().setVelocidad(init_vel);
 	// Agrega el personaje(no esta tomando velocidad del YAML!!!)
 	pjm.getPjeLocal().init(pje_local_nick, pje_local_tipo , 1 , 1 , 50 , 5, 100, 100 ,	configuracion.get_vel_personaje(),	0 , 50 , NULL , resman , Imagen::COLOR_KEY);
 	//Si no me conecto por primera vez al servidor
 	if (init_vel!=0) {
 		pjm.getPjeLocal().setVelocidad(init_vel);
+	} else {
+		//Aviso al server la que cargue
+		bs.clear();
+		bs << PROTO::UPDATE_VEL << (float)pjm.getPjeLocal().getVelocidad();
+		sock.send(bs.str());
+		std::cout << "Msj a server: VEL=" << pjm.getPjeLocal().getVelocidad() << endl;
 	}
 	
 	std::cout << "Velocidad seteada: " << pjm.getPjeLocal().getVelocidad() << "\n";

@@ -63,11 +63,13 @@ const unsigned char DAMAGE = 'v';
 // Usar item
 // <nick:who><char:item>
 const unsigned char USE_ITEM = 'w';
-// Aumentar velocidad
-// <nick:who><char:aumento><float:nuevaVel>
-const unsigned char ADD_VEL = 'x';
+//Actualizacion de la velocidad
+const unsigned char UPDATE_VEL = 'x';
 // Velocidad que manda cuando se conecta un usuario existente
 const unsigned char INITVEL = 'y';
+// Atributos del jugador que se acaba de conectar para el resto de los clientes
+const unsigned char INIT_ATT = 'z';
+
 
 }
 

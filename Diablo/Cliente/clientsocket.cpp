@@ -19,7 +19,7 @@ extern std::string pje_local_tipo;
 extern int start_pos_x, start_pos_y;
 extern int escenario_elegido_id;
 extern double init_vel;
-extern char init_energia,init_magia,init_escudo;
+extern char init_energia,init_magia,init_escudo,init_terremoto,init_hielo;
 extern config_general configuracion;
 extern ResMan resman;
 extern ChatWindow chat_window;
@@ -305,12 +305,14 @@ void ClientSocket::listenDo() {
 			//std::cout << "RECEIVED INIT POS: (" << start_pos_x << "," << start_pos_y << ")\n";
 		}else if(pt == PROTO::OLD_ATT) {
 			float recv_vel;
-			char energia,magia,energiaEscudo;
-			bs >> recv_vel >> energia >> magia >> energiaEscudo;
+			char energia,magia,energiaEscudo,cantTerremoto,cantHielo;
+			bs >> recv_vel >> energia >> magia >> energiaEscudo >> cantTerremoto >> cantHielo;
 			init_vel=(double)recv_vel;
 			init_energia=energia;
 			init_magia=magia;
 			init_escudo=energiaEscudo;
+			init_terremoto=cantTerremoto;
+			init_hielo=cantHielo;
 		}else if(pt == PROTO::ESC_ID) {
 			bs >> escenario_elegido_id;
 			//std::cout << "RECEIVED ESC ID: (" << escenario_elegido_id << ")\n";
@@ -361,14 +363,16 @@ void ClientSocket::listenDo() {
 			}
 			std::string nick_who;
 			float vel_recv;
-			char energia,magia,energiaEscudo;
-			bs >> nick_who >> vel_recv >> energia >> magia >> energiaEscudo;
+			char energia,magia,energiaEscudo,cantTerremoto,cantHielo;
+			bs >> nick_who >> vel_recv >> energia >> magia >> energiaEscudo >> cantTerremoto >> cantHielo;
 			double vel=(double)vel_recv;
 			//Seteamos los atributos del jugador
 			pjm.getPje(nick_who).setVelocidad(vel);
 			pjm.getPje(nick_who).setEnergia(energia);
 			pjm.getPje(nick_who).setMagia(magia);
 			pjm.getPje(nick_who).setEnergiaEscudo(energiaEscudo);
+			pjm.getPje(nick_who).setTerremoto(cantTerremoto);
+			pjm.getPje(nick_who).setHielo(cantHielo);
 		}else if(pt == PROTO::PLAYER_EXIT) {
 			// Esperamos a que cargue el mapa
 			while(!cargoMapa) {
@@ -460,6 +464,20 @@ void ClientSocket::listenDo() {
 					}
 				}
 			}
+		}else if(pt == PROTO::CONGELAR) {	
+			std::string nick_who, nick_to;
+			bs >> nick_who >> nick_to;
+			// Buscamos el personaje 
+			if(nick_to == pjm.getPjeLocal().getNick()) {
+				pjm.getPjeLocal().freezar();
+			}else{
+				for(auto it = pjm.getPjes().begin();it != pjm.getPjes().end();it++) {
+					if(it->first == nick_to) {
+						it->second.freezar();
+						break;
+					}
+				}
+			}
 		}else if(pt == PROTO::UPDATE_ATT) {	
 			char tipoAtt;
 			bs >> tipoAtt;
@@ -471,7 +489,7 @@ void ClientSocket::listenDo() {
 				// Valor float: velocidad
 				bs >> nuevaVel;
 			} else {
-				// Valor char: energia/magia
+				// Valor char: energia/magia/escudo/terremoto/hielo
 				bs >> nuevoValor;
 			}
 			// Buscamos el personaje 
@@ -485,6 +503,10 @@ void ClientSocket::listenDo() {
 						it->second.setMagia(nuevoValor);
 					} else if (tipoAtt==ATT::ENERGIA_ESCUDO) {
 						it->second.setEnergiaEscudo(nuevoValor);
+					} else if (tipoAtt==ATT::CANT_TERREMOTO) {
+						it->second.setTerremoto(nuevoValor);
+					} else if (tipoAtt==ATT::CANT_HIELO) {
+						it->second.setHielo(nuevoValor);
 					}
 					break;
 				}

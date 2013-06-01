@@ -53,7 +53,7 @@ std::string pje_local_tipo;
 int start_pos_x, start_pos_y;
 int escenario_elegido_id;
 double init_vel;
-char init_energia,init_magia,init_escudo;
+char init_energia,init_magia,init_escudo,init_terremoto,init_hielo;
 // Cosas para mantener al server actualizado sobre los tiles que recorrimos
 struct {
 	vec2<int> tile_actual, tile_anterior;
@@ -221,6 +221,8 @@ int main(int argc, char* argv[]) {
 		pjm.getPjeLocal().setEnergia(init_energia);
 		pjm.getPjeLocal().setMagia(init_magia);
 		pjm.getPjeLocal().setEnergiaEscudo(init_escudo);
+		pjm.getPjeLocal().setTerremoto(init_terremoto);
+		pjm.getPjeLocal().setHielo(init_hielo);
 	} else {
 		//Aviso al server mis valores por defecto de atributos
 		bs.clear();
@@ -234,6 +236,12 @@ int main(int argc, char* argv[]) {
 		sock.send(bs.str());
 		bs.clear();
 		bs << PROTO::UPDATE_ATT << ATT::ENERGIA_ESCUDO << pjm.getPjeLocal().getEnergiaEscudo();
+		sock.send(bs.str());
+		bs.clear();
+		bs << PROTO::UPDATE_ATT << ATT::CANT_TERREMOTO << pjm.getPjeLocal().getTerremoto();
+		sock.send(bs.str());
+		bs.clear();
+		bs << PROTO::UPDATE_ATT << ATT::CANT_HIELO << pjm.getPjeLocal().getHielo();
 		sock.send(bs.str());
 	}
 	
@@ -435,6 +443,8 @@ int main(int argc, char* argv[]) {
 					std::cout << "Escudo: " << (int)pjm.getPjeLocal().getEnergiaEscudo() << endl;
 					std::cout << "Magia: " << (int)pjm.getPjeLocal().getMagia() << endl;
 					std::cout << "Velocidad: " << pjm.getPjeLocal().getVelocidad() << endl;
+					std::cout << "Terremotos: " << (int)pjm.getPjeLocal().getTerremoto() << endl;
+					std::cout << "Hielos: " << (int)pjm.getPjeLocal().getHielo() << endl;
 					std::vector<Entidad*> entidades=pjm.getPjeLocal().getPosicion(&mapa)->getEntidades();
 					for (auto it=entidades.begin();it!=entidades.end();it++) {
 						if ((*it)!=&pjm.getPjeLocal()) //sino choca con si mismo

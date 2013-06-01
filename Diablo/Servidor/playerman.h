@@ -19,7 +19,9 @@ class Player {
 	TilesRecorridos tiles_recorridos;
 	double velocidad;
 	char energia,magia,energiaEscudo;
-	
+	char congelado; //1=congelado,0=no congelado
+	char terremoto,hielo; //cant de hechizos de cada tipo
+
 	public:
 	Player();
 	~Player();
@@ -40,6 +42,17 @@ class Player {
 	void setMagia(char newMagia) { magia=newMagia; }
 	char getEnergiaEscudo() { return energiaEscudo; }
 	void setEnergiaEscudo(char energia) { energiaEscudo=energia; }
+	void congelar() { congelado=1; }
+	void descongelar() {congelado=0; }
+	bool isCongelado() { return congelado==1; }
+	void sumarTerremoto() { terremoto++; }
+	void restarTerremoto() { terremoto--; }
+	char getTerremoto() { return terremoto; }
+	void setTerremoto(char valor) { terremoto=valor; }
+	void sumarHielo() { hielo++; }
+	void restarHielo() { hielo--; }
+	char getHielo() { return hielo; }
+	void setHielo(char valor) { hielo=valor; }
 
 	void addTileRecorrido(short x, short y);
 	TilesRecorridos& getTilesRecorridos();

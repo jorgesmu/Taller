@@ -69,6 +69,8 @@ const unsigned char UPDATE_ATT = 'x';
 const unsigned char OLD_ATT = 'y';
 // Atributos del jugador que se acaba de conectar para el resto de los clientes
 const unsigned char INIT_ATT = 'z';
+// Congela a un personaje
+const unsigned char CONGELAR = 'A';
 
 
 }
@@ -94,4 +96,7 @@ namespace ATT {
 	const char ENERGIA = 1;
 	const char MAGIA = 2;
 	const char ENERGIA_ESCUDO = 3;
+	const char CONGELADO = 4;
+	const char CANT_TERREMOTO = 5;
+	const char CANT_HIELO = 6;
 }

@@ -68,8 +68,8 @@ void Personaje::inicializarAtributosEnValoresDefault() {
 	this -> actualizandoPosicion = false;
 	this -> ordenBliteo = Entidad::ORDEN_PERSONAJE;
 	this->setRadio(125);
-	this->terremoto=false;
-	this->hielo=false;
+	this->terremoto=0;
+	this->hielo=0; 
 	this->energia=this->ENERGIA_TOTAL;
 	this->magia=this->MAGIA_TOTAL;
 	this->flechas=0;
@@ -828,13 +828,26 @@ void Personaje::chocarConZapatos(Zapatos* zapatos) {
 	sock.send(bs.str());
 }
 
+void Personaje::chocarConTerremoto() {
+	this->terremoto++;
+	BitStream bs;
+	bs << PROTO::UPDATE_ATT << ATT::CANT_TERREMOTO << this->getTerremoto();
+	sock.send(bs.str());
+}
+
+void Personaje::chocarConHielo() {
+	this->hielo++;
+	BitStream bs;
+	bs << PROTO::UPDATE_ATT << ATT::CANT_HIELO << this->getHielo();
+	sock.send(bs.str());
+}
+
 void Personaje::utilizarTerremoto(Mapa* mapa, PjeManager* pjm, ClientSocket* sock) {
 	int radio=this->RADIO_HECHIZO;
 	char dañoRealizado;
 	Tile* tilePersonaje;
 	int xPersonaje,yPersonaje;
-	this->terremoto=true; //hardcodeo para no tener que agarrar item primero
-	if ((terremoto) && (this->getMagia()>=this->MAGIA_HECHIZO)) {
+	if ((this->tieneTerremoto()) && (this->getMagia()>=this->MAGIA_HECHIZO)) {
 		std::cout << "Uso terremoto\n";
 		BitStream bs;
 		bs << PROTO::USE_ITEM << this->nickname << ITEM::TERREMOTO;
@@ -864,7 +877,7 @@ void Personaje::utilizarTerremoto(Mapa* mapa, PjeManager* pjm, ClientSocket* soc
 				}
 			}
 		}
-		terremoto=false;
+		this->terremoto--; 
 	}
 }
 
@@ -872,10 +885,15 @@ void Personaje::utilizarHielo(Mapa* mapa, PjeManager* pjm) {
 	int radio=this->RADIO_HECHIZO;
 	Tile* tilePersonaje;
 	int xPersonaje,yPersonaje;
-	this->hielo=true; //hardcodeo para no tener que agarrar item primero
-	if ((hielo) && (this->magia>=this->MAGIA_HECHIZO)) {
+	if ((this->tieneHielo()) && (this->magia>=this->MAGIA_HECHIZO)) {
 		std::cout << "Uso hechizo hielo\n";
+		BitStream bs;
+		bs << PROTO::USE_ITEM << this->nickname << ITEM::HIELO;
+		sock.send(bs.str());
 		this->magia-=this->MAGIA_HECHIZO;
+		bs.clear();
+		bs << PROTO::UPDATE_ATT << ATT::MAGIA << this->getMagia();
+		sock.send(bs.str());
 		int xActual = this->getPosicion(mapa)->getU();
 		int yActual = this->getPosicion(mapa)->getV();
 		for (int i=xActual-radio;i<=xActual+radio;i++) {
@@ -887,13 +905,15 @@ void Personaje::utilizarHielo(Mapa* mapa, PjeManager* pjm) {
 					yPersonaje=tilePersonaje->getV();
 					if ((i==xPersonaje) && (j==yPersonaje)) {
 						it->second.freezar();
-						std::cout << "Se congelo a " << it->first << " con el hechizo hielo" << endl;
-						//Falta notificar al servidor
+						std::cout << "Se congelo a " << it->first << endl;
+						bs.clear();
+						bs << PROTO::CONGELAR << this->getNick() << it->first;
+						sock.send(bs.str());
 					}
 				}
 			}
 		}
-		terremoto=false;
+		this->hielo--;
 	}
 }
 

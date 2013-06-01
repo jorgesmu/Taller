@@ -462,7 +462,8 @@ void ServerSocket::acceptLastDo() {
 
 		//Le mandamos la velocidad que tenia		
 		bs.clear();
-		bs << PROTO::OLD_ATT << (float)pm.getPlayer(new_nick).getVelocidad() << pm.getPlayer(new_nick).getEnergia() << pm.getPlayer(new_nick).getMagia() << pm.getPlayer(new_nick).getEnergiaEscudo(); 
+		auto p=pm.getPlayer(new_nick); //alias shortcut
+		bs << PROTO::OLD_ATT << (float)p.getVelocidad() << p.getEnergia() << p.getMagia() << p.getEnergiaEscudo() << p.getTerremoto() << p.getHielo(); 
 		send(cid, bs.str());
 
 		// Le mandamos el id escenario
@@ -495,8 +496,15 @@ void ServerSocket::acceptLastDo() {
 			send(it->second.sock, bs.str());
 			//Mando los atributos principales del jugador
 			bs.clear();
-			bs << PROTO::INIT_ATT << new_nick << (float)pm.getPlayer(new_nick).getVelocidad() << pm.getPlayer(new_nick).getEnergia() << pm.getPlayer(new_nick).getMagia() << pm.getPlayer(new_nick).getEnergiaEscudo();
+			auto p=pm.getPlayer(new_nick);
+			bs << PROTO::INIT_ATT << new_nick << (float)p.getVelocidad() << p.getEnergia() << p.getMagia() << p.getEnergiaEscudo() << p.getTerremoto() << p.getHielo();
 			send(it->second.sock,bs.str());
+			if (pm.getPlayer(new_nick).isCongelado()) {
+				bs.clear();
+				bs << PROTO::CONGELAR << std::string("RESTORE") << new_nick;
+				send(it->second.sock,bs.str());
+			}
+
 		}
 
 		// Mandamos todos los otros players al que se unio
@@ -508,11 +516,18 @@ void ServerSocket::acceptLastDo() {
 			send(cid, bs.str());
 			//Mando los atributos principales del jugador
 			bs.clear();
-			bs << PROTO::INIT_ATT << it->second.getNick() << (float)pm.getPlayer(it->second.getNick()).getVelocidad();
+			bs << PROTO::INIT_ATT << it->first << (float)p.getVelocidad() << p.getEnergia() << p.getMagia() << p.getEnergiaEscudo() << p.getTerremoto() << p.getHielo();
 			send(cid,bs.str());
 		}
-		
 
+		//Le aviso todos los que estaban congelados
+		for (auto it = pm.getPlayers().begin();it != pm.getPlayers().end();it++) {
+			if (it->second.isCongelado()) {
+				bs.clear();
+				bs << PROTO::CONGELAR << std::string("RESTORE") << it->first;
+				send(cid,bs.str());
+			}
+		}
 
 		LeaveCriticalSection(&critSect);
 		// Receive loop
@@ -578,6 +593,8 @@ void ServerSocket::acceptLastDo() {
 				bs >> nick_who;
 				char item;
 				bs >> item;
+				if (item==ITEM::TERREMOTO) pm.getPlayer(nick_who).restarTerremoto();
+				if (item==ITEM::HIELO) pm.getPlayer(nick_who).restarHielo();
 				// Avisamos a los otros jugadores 
 				for(auto it = clients_map.begin();it != clients_map.end();it++) {
 					if(it->second.nick == new_nick) continue; // Salteamos a nuestro jugador
@@ -597,6 +614,18 @@ void ServerSocket::acceptLastDo() {
 					bs << PROTO::DAMAGE << nick_who << nick_to << dmg;
 					send(it->second.sock, bs.str());
 				}
+			}else if(pt == PROTO::CONGELAR) {	
+				std::string nick_who, nick_to;
+				bs >> nick_who >> nick_to;
+				// Actualizamos el estado del congelado
+				pm.getPlayer(nick_to).congelar();
+				// Avisamos a los otros jugadores 
+				for(auto it = clients_map.begin();it != clients_map.end();it++) {
+					if(it->second.nick == new_nick) continue; // Salteamos a nuestro jugador de avisarle
+					bs.clear();
+					bs << PROTO::CONGELAR << nick_who << nick_to;
+					send(it->second.sock, bs.str());
+				}
 			}else if(pt == PROTO::UPDATE_ATT) {	
 				char tipoAtt;
 				bs >> tipoAtt;
@@ -606,7 +635,7 @@ void ServerSocket::acceptLastDo() {
 					// Valor float: velocidad
 					bs >> nuevaVel;
 				} else {
-					// Valor char: energia/magia/escudo
+					// Valor char: energia/magia/escudo/terremoto/hielo
 					bs >> nuevoValor;
 				}
 				// Avisamos a los otros jugadores 
@@ -620,7 +649,12 @@ void ServerSocket::acceptLastDo() {
 							pm.getPlayer(new_nick).setMagia(nuevoValor);
 						} else if (tipoAtt==ATT::ENERGIA_ESCUDO) {
 							pm.getPlayer(new_nick).setEnergiaEscudo(nuevoValor);
+						} else if (tipoAtt==ATT::CANT_TERREMOTO) {
+							pm.getPlayer(new_nick).setTerremoto(nuevoValor);
+						} else if (tipoAtt==ATT::CANT_HIELO) {
+							pm.getPlayer(new_nick).setHielo(nuevoValor);
 						}
+
 						continue; // Salteamos a nuestro jugador de avisarle
 					}
 					bs.clear();

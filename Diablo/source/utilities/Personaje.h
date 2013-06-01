@@ -97,9 +97,9 @@ protected:
 
 		int radioY,radioX;
 
-		//Tiene o no los hechizos
-		bool terremoto;
-		bool hielo;
+		//Tiene o no los hechizos(podria tener mas de uno quizas?, por eso un char)
+		char terremoto;
+		char hielo;
 
 		//Vida restante
 		char energia;
@@ -280,9 +280,9 @@ public:
 
 	void chocarConHechizo() {std::cout << "Choco con hechizo\n"; }
 
-	void chocarConTerremoto() {this->terremoto=true; }
+	void chocarConTerremoto();
 
-	void chocarConHielo() {this->hielo=true; }
+	void chocarConHielo();
 	
 	void chocarConCorazon(Corazon* corazon);
 
@@ -297,8 +297,20 @@ public:
 	void chocarConVaritas(Varitas* varitas);
 
 	void chocarConEscudo(Escudo* escudo);
+
+	void setTerremoto(char valor) { this->terremoto=valor; }
+
+	char getTerremoto() { return this->terremoto; }
+
+	bool tieneTerremoto() { return this->terremoto>0; }
 	
 	void utilizarTerremoto(Mapa* mapa, PjeManager* pjm, ClientSocket* sock);
+
+	void setHielo(char valor) { this->hielo=valor; }
+
+	char getHielo() { return this->hielo; }
+
+	bool tieneHielo() { return this->hielo>0; }
 
 	void utilizarHielo(Mapa* mapa, PjeManager* pjm);
 

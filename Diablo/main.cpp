@@ -302,7 +302,16 @@ int main(int argc, char* argv[]) {
 					
 					switch (event.key.keysym.sym) {
 						case 'a' : {
-							pjm.getPjeLocal().ataque(NULL , &mapa);
+							int posX = -1;	
+							int posY = -1;
+							SDL_GetMouseState(&posX, &posY);
+							vec2<int> tile_res = MouseCoords2Tile(vec2<int>(posX,  posY), camara);
+							if(mapa.tileExists(tile_res.x, tile_res.y)) {
+								Tile* tileDestino = mapa.getTile(tile_res.x, tile_res.y);
+								pjm.getPjeLocal().ataque(tileDestino , &mapa);
+							} else {
+								pjm.getPjeLocal().ataque(NULL , &mapa);
+							}
 							BitStream bs;
 							bs << PROTO::ATACAR << pjm.getPjeLocal().getNick();
 							sock.send(bs.str());

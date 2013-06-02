@@ -83,7 +83,7 @@ entidades:
     pixel_ref_x: 20
     pixel_ref_y: 20
     esDefault: true
-    caminable: true
+    caminable: false
 
 
   - nombre: caballeroRojo
@@ -100,56 +100,13 @@ entidades:
     pixel_ref_x: 20
     pixel_ref_y: 20
     esDefault: true
-    caminable: true
+    caminable: false
 
 escenarios:
   - nombre: bosque_encantado3
     size_x: 15
     size_y: 15
     entidadesDef:
-      - {x: 0, y: 3, entidad: rioPeces}
-      - {x: 0, y: 6, entidad: rioPeces}
-      - {x: 0, y: 9, entidad: rioPeces}
-      - {x: 0, y: 12, entidad: rioPeces}
-      - {x: 0, y: 15, entidad: rioPeces}
-      - {x: 0, y: 18, entidad: rioPeces}
-      - {x: 0, y: 21, entidad: rioPeces}
-      - {x: 0, y: 24, entidad: rioPeces}
-      - {x: 0, y: 27, entidad: rioPeces}
-      - {x: 3, y: 7, entidad: pino}
-      - {x: 3, y: 10, entidad: pino}
-      - {x: 3, y: 13, entidad: pino}
-      - {x: 3, y: 16, entidad: pino}
-      - {x: 3, y: 19, entidad: pino}
-      - {x: 3, y: 22, entidad: pino}
-      - {x: 3, y: 25, entidad: pino}
-      - {x: 3, y: 28, entidad: pino}
-      - {x: 7, y: 5, entidad: molino}
-      - {x: 10, y: 10, entidad: casa}
-      - {x: 7, y: 20, entidad: molino}
-      - {x: 7, y: 25, entidad: molino}
-      - {x: 10, y: 17, entidad: molino}
-      - {x: 15, y: 0, entidad: rioPeces}
-      - {x: 15, y: 3, entidad: rioPeces}
-      - {x: 15, y: 9, entidad: rioPeces}
-      - {x: 15, y: 12, entidad: rioPeces}
-      - {x: 15, y: 15, entidad: rioPeces}
-      - {x: 15, y: 21, entidad: rioPeces}
-      - {x: 15, y: 24, entidad: rioPeces}
-      - {x: 15, y: 27, entidad: rioPeces}
-      - {x: 18, y: 7, entidad: pino}
-      - {x: 18, y: 10, entidad: pino}
-      - {x: 18, y: 13, entidad: pino}
-      - {x: 18, y: 16, entidad: pino}
-      - {x: 18, y: 19, entidad: pino}
-      - {x: 18, y: 22, entidad: pino}
-      - {x: 18, y: 25, entidad: pino}
-      - {x: 18, y: 28, entidad: pino}      
-      - {x: 25, y: 5, entidad: molino}
-      - {x: 25, y: 20, entidad: molino}
-      - {x: 25, y: 26, entidad: molino}
-      - {x: 25, y: 15, entidad: molino}
-      - {x: 21, y: 7, entidad: casa}
       
   - nombre: bosque_encantado2
     size_x: 100

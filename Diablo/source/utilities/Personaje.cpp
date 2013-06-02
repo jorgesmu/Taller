@@ -69,8 +69,8 @@ void Personaje::inicializarAtributosEnValoresDefault() {
 	this -> actualizandoPosicion = false;
 	this -> ordenBliteo = Entidad::ORDEN_PERSONAJE;
 	this->setRadio(125);
-	this->terremoto=0;
-	this->hielo=0; 
+	this->terremoto=10;
+	this->hielo=10; 
 	this->energia=this->ENERGIA_TOTAL;
 	this->magia=this->MAGIA_TOTAL;
 	this->flechas=0;
@@ -78,6 +78,7 @@ void Personaje::inicializarAtributosEnValoresDefault() {
 	this->granadas=0;
 	this->varita=false;
 	this->energiaEscudo=0;
+	this->vivo=true;
 	this -> cambioDireccionHabilitado = true;
 }
 
@@ -725,7 +726,7 @@ void Personaje::freezar(bool valor){
 
 /*
 */
-void Personaje::muerte() {
+void Personaje::animacionMuerte() {
 	ImagenPersonaje* imagenPersonaje = static_cast<ImagenPersonaje*> (this -> imagen);
 	this -> tileDestino = NULL;
 	if (imagenPersonaje != NULL){
@@ -779,7 +780,6 @@ void Personaje::dañarPersonaje(char daño) {
 	this->energia-=daño;
 	if (this->energia<=0) {
 		this->energia=0;
-		//Muere
 	}
 }
 
@@ -801,6 +801,9 @@ void Personaje::dañar(char daño) {
 	} else {
 		//No tiene escudo
 		this->dañarPersonaje(daño);
+	}
+	if (this->energia==0) {
+		this->muere();
 	}
 }
 		
@@ -875,7 +878,8 @@ void Personaje::utilizarTerremoto(Mapa* mapa, PjeManager* pjm, ClientSocket* soc
 					yPersonaje=tilePersonaje->getV();
 					if ((i==xPersonaje) && (j==yPersonaje)) {
 						srand (time(NULL));
-						dañoRealizado=rand()%(this->ENERGIA_TOTAL+1);						
+						//dañoRealizado=rand()%(this->ENERGIA_TOTAL+1);	
+						dañoRealizado=100;
 						it->second.dañar(dañoRealizado);
 						std::cout << "Se danio a " << it->first << " con terremoto, total de " << (int)dañoRealizado << endl;
 						bs.clear();
@@ -977,3 +981,10 @@ void Personaje::aumentarRadio(double proporcion) {
 	bs << PROTO::UPDATE_ATT << ATT::RADIO << radioY;
 	sock.send(bs.str());
 }
+
+void Personaje::muere() {
+	this->animacionMuerte();
+	std::cout << "Fui asesinado" << endl;
+	//Redirecciono a la posicion inicial nuevamente
+	this->vivo=false;
+ }

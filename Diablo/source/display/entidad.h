@@ -253,9 +253,9 @@ public:
 	*/
 	virtual Tile* getPosicion(Mapa* mapa);
 
-	unsigned int getX();
+	int getX();
 
-	unsigned int getY();
+	int getY();
 
 	bool getDibujada();
 

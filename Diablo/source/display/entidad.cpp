@@ -250,11 +250,11 @@ unsigned int Entidad::getWidthInTiles() {
 }
 
 	
-unsigned int Entidad::getX(){
+int Entidad::getX(){
 	return this -> posX;
 }
 
-unsigned int Entidad::getY(){
+int Entidad::getY(){
 	return this -> posY;
 }
 

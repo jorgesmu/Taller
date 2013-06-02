@@ -21,6 +21,7 @@
 #include "../../source/display/camara.h"
 #include "../../source/display/mapa.h"
 #include "../../source/display/resman.h"
+#include "../../source/utilities/soundman.h"
 #include "../../source/constants/model.h"
 #include "../../source/utilities/Test.h"
 #include "../../source/utilities/coordenadas.h"
@@ -33,6 +34,7 @@
 #include "../../source/utilities/zapatos.h"
 #include "../../source/utilities/terremoto.h"
 #include "../../source/utilities/escudo.h"
+#include "../../source/utilities/interface.h"
 
 using namespace std;
 
@@ -65,12 +67,18 @@ pair <int,int> tileActual, proximoTile;
 int estadoMovimiento;
 // Ventana de chat
 ChatWindow chat_window;
+// User Interface
+Interface ui;
 // ResMan
 ResMan resman;
+// Sound manager
+SoundMan soundman;
 // Config
 config_general configuracion;
 //Choques
 bool choco;
+//Muerte que llega desde el personaje como aviso
+bool murio;
 //Socket
 ClientSocket sock;
 
@@ -143,6 +151,10 @@ int main(int argc, char* argv[]) {
 	// Resman
 	if(!resman.init()) return -2;
 	
+	// SoundMan
+	if(!soundman.init(&camara, &pjm.getPjeLocal())) return -3;
+	soundman.addSound("sword", "../resources/static/sounds/sword.wav");
+
 	// Ventana de chat
 	chat_window.init(&resman, 40, 40, Font::SIZE_NORMAL, 250, 500, COLOR::WHITE);
 	chat_window.setNickLocal(pje_local_nick);
@@ -215,8 +227,6 @@ int main(int argc, char* argv[]) {
 
 	// Agrega el personaje(no esta tomando velocidad del YAML!!!)
 	pjm.getPjeLocal().init(pje_local_nick, pje_local_tipo , 1 , 1 , 50 , 5, 100, 100 ,	configuracion.get_vel_personaje(),	0 , 50 , NULL , resman , Imagen::COLOR_KEY);
-	//enemigo
-	pjm.getEnemigoLocal().init_Enemy("enemigo", "soldado" , 1 , 1 , 50 , 5, 100, 100 ,	configuracion.get_vel_personaje(),	0 , 50 , NULL , resman , Imagen::COLOR_KEY,3,3);
 
 	//Si no me conecto por primera vez al servidor
 	if (init_vel!=0) {
@@ -252,9 +262,6 @@ int main(int argc, char* argv[]) {
 	// Posiciono el personaje
 	mapa.getTile(start_pos_x, start_pos_y)->addEntidad(&(pjm.getPjeLocal()));
 	pjm.getPjeLocal().setTileActual(mapa.getTile(start_pos_x, start_pos_y));
-	//posiciono el enemigo
-	mapa.getTile(5, 5)->addEntidad(&(pjm.getEnemigoLocal()));
-	pjm.getEnemigoLocal().setTileActual(mapa.getTile(5, 5));
 	
 	// Inicializo el recorridor
 	update_recorrido.tile_anterior = update_recorrido.tile_actual = vec2<int>(start_pos_x, start_pos_y);
@@ -283,13 +290,35 @@ int main(int argc, char* argv[]) {
 	int ultimoDestinoX = NOSEMOVIO;//guarda el destino actual
 	int ultimoDestinoY = NOSEMOVIO;//guarda el destino actual
 	
-	//enemigo
-	int estadoEnemigo=-1;
-	bool puedeMoverseEnemigo = false;
 	while((!quit ) && (sock.isOpen()) ) {
 
 		// Sync stuff
 		EnterCriticalSection(&cs_main);
+
+		//Veo si algun personaje esta muerto
+		if (!pjm.getPjeLocal().estaVivo()) {
+			//Veo si me puedo mover al lugar de inicio
+			bs.clear();
+			bs << PROTO::REQUEST_POS << start_pos_x << start_pos_y;
+			sock.send(bs.str());
+			estadoMovimiento=MOV::ESPERANDO_OK;
+			if (estadoMovimiento==MOV::OK_RECV) {
+				// Lo elimino de la posicion donde murio
+				mapa.getTile(start_pos_x, start_pos_y)->deleteEntidad(&(pjm.getPjeLocal()));
+				// Posiciono el personaje
+				mapa.getTile(start_pos_x, start_pos_y)->addEntidad(&(pjm.getPjeLocal()));
+				pjm.getPjeLocal().setTileActual(mapa.getTile(start_pos_x, start_pos_y));
+				// Inicializo el recorridor
+				update_recorrido.tile_anterior = update_recorrido.tile_actual = vec2<int>(start_pos_x, start_pos_y);
+				//update_recorrido.timer.start();
+				// Cosas del movimiento
+				estadoMovimiento = MOV::IDLE;
+				// Centro la camara
+				camara.center(mapa.getTile(start_pos_x, start_pos_y)->getX(), mapa.getTile(start_pos_x, start_pos_y)->getY());
+				pjm.getPjeLocal().revivir();
+			}
+			//Ver que hago sino
+		}
 
 		// Input handling (esto despues se movera a donde corresponda)
 		while(SDL_PollEvent(&event)) {
@@ -323,6 +352,7 @@ int main(int argc, char* argv[]) {
 							} else {
 								pjm.getPjeLocal().ataque(NULL , &mapa);
 							}
+							soundman.playSound("sword", 0, 0);
 							BitStream bs;
 							bs << PROTO::ATACAR << pjm.getPjeLocal().getNick();
 							sock.send(bs.str());
@@ -551,19 +581,7 @@ int main(int argc, char* argv[]) {
 				}
 			}
 			estadoPersonaje = pjm.getPjeLocal().update(&mapa);
-			//enemigo
-			estadoEnemigo= pjm.getEnemigoLocal().update(&mapa);
-			if ((estadoEnemigo == Personaje::MOVER_COMPLETADO)) 
-			{
-				puedeMoverseEnemigo = true;
-				Enemigo& unEnemigo = pjm.getEnemigoLocal();
-				Tile* proximotileEnemigo = unEnemigo.get_proximo_tile_enemigo(mapa,pjm);
-				unEnemigo.mover(proximotileEnemigo);
 
-			}else if ( (estadoEnemigo == Personaje::MOVER_EN_CURSO) || 
-				(estadoEnemigo == Personaje::MOVER_ERROR)){
-					puedeMoverseEnemigo = false;
- 			}
 			/*
 			if ( (estadoPersonaje == Personaje::MOVER_COMPLETADO) || 
 				 (estadoPersonaje == Personaje::ATACAR_COMPLETADO) ||
@@ -631,6 +649,9 @@ int main(int argc, char* argv[]) {
 		mapa.setEntidadesDibujadasFalse(&pjm.getPjeLocal());
 		// Dibujamos la ventana de chat
 		chat_window.show(screen);
+
+		ui.blitInterface(screen);
+
 		// Actualizar la pantalla
 		SDL_Flip(screen);
 
@@ -641,6 +662,7 @@ int main(int argc, char* argv[]) {
 	
 	mapa.clean();
 	resman.clean();
+	soundman.clean();
 	err_log.cerrarConexion();
     //Test::test();
 	TTF_Quit();

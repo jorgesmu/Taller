@@ -113,6 +113,9 @@ protected:
 		int granadas;
 		bool varita;
 		char energiaEscudo;
+
+		//Muerte
+		bool vivo;
 				
 public:
 	
@@ -214,7 +217,7 @@ public:
 	virtual unsigned int defender(Tile* tileDestino , Mapa* mapa);
 	
 
-	void muerte();
+	void animacionMuerte();
 
 	/*
 		Pre: La instancia ha sido creada.
@@ -313,6 +316,10 @@ public:
 	bool tieneHielo() { return this->hielo>0; }
 
 	void utilizarHielo(Mapa* mapa, PjeManager* pjm);
+
+	bool estaVivo() {return vivo; }
+
+	void revivir() { this->vivo=true; }
 
 	//Setea el radio de vision en el eje Y
 	void setRadio(int newRadio) { 
@@ -423,6 +430,9 @@ protected:
 
 	//Sin tener en cuenta al escudo
 	void dañarPersonaje(char daño);
+
+	//Muerte del personaje
+	void muere();
 
 	
 

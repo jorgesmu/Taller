@@ -32,3 +32,8 @@ namespace COLOR {
 	const SDL_Color WHITE = {255,255,255};
 	const SDL_Color GRAY = {180,180,180};
 }
+
+template <typename T>
+float distance(const T& x1, const T& y1, const T& x2, const T& y2) {
+	return std::sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2));
+}

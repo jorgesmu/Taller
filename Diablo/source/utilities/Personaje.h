@@ -95,11 +95,11 @@ protected:
 
 		bool cambioDireccionHabilitado;
 
-		int radioY,radioX;
+		float radioY,radioX;
 
-		//Tiene o no los hechizos
-		bool terremoto;
-		bool hielo;
+		//Tiene o no los hechizos(podria tener mas de uno quizas?, por eso un char)
+		char terremoto;
+		char hielo;
 
 		//Vida restante
 		char energia;
@@ -280,9 +280,9 @@ public:
 
 	void chocarConHechizo() {std::cout << "Choco con hechizo\n"; }
 
-	void chocarConTerremoto() {this->terremoto=true; }
+	void chocarConTerremoto();
 
-	void chocarConHielo() {this->hielo=true; }
+	void chocarConHielo();
 	
 	void chocarConCorazon(Corazon* corazon);
 
@@ -297,31 +297,35 @@ public:
 	void chocarConVaritas(Varitas* varitas);
 
 	void chocarConEscudo(Escudo* escudo);
+
+	void setTerremoto(char valor) { this->terremoto=valor; }
+
+	char getTerremoto() { return this->terremoto; }
+
+	bool tieneTerremoto() { return this->terremoto>0; }
 	
 	void utilizarTerremoto(Mapa* mapa, PjeManager* pjm, ClientSocket* sock);
+
+	void setHielo(char valor) { this->hielo=valor; }
+
+	char getHielo() { return this->hielo; }
+
+	bool tieneHielo() { return this->hielo>0; }
 
 	void utilizarHielo(Mapa* mapa, PjeManager* pjm);
 
 	//Setea el radio de vision en el eje Y
-	void setRadio(int newRadio) { 
+	void setRadio(float newRadio) { 
 		radioY=newRadio;
 		radioX=2*radioY;
 	}
 
 	//Recibe un valor de proporcion (0.25 aumenta 25%) para aumentar el radio de vision
-	void aumentarRadio(double proporcion) {
-		radioY*=(1+proporcion);
-		radioX=2*radioY;
+	void aumentarRadio(double proporcion);
 
-		//notifico al servidor
-		BitStream bs;
-		bs << PROTO::UPDATE_ATT << ATT::RADIO << radioY;
-		sock.send(bs.str());
-	}
+	float getRadioX() { return radioX; }
 
-	int getRadioX() { return radioX; }
-
-	int getRadioY() { return radioY; }
+	float getRadioY() { return radioY; }
 
 	char getEnergia() { return energia; }
 

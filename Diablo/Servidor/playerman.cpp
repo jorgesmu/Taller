@@ -12,6 +12,7 @@ Player::Player() {
 	isOnline = false;
 	x = y = 0;
 	velocidad = 0;
+	congelado = 0; //descongelado
 }
 
 Player::~Player() {

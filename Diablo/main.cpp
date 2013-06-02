@@ -53,7 +53,8 @@ std::string pje_local_tipo;
 int start_pos_x, start_pos_y;
 int escenario_elegido_id;
 double init_vel;
-char init_energia,init_magia,init_escudo,init_radio;
+float init_radio;
+char init_energia,init_magia,init_escudo,init_terremoto,init_hielo;
 // Cosas para mantener al server actualizado sobre los tiles que recorrimos
 struct {
 	vec2<int> tile_actual, tile_anterior;
@@ -76,17 +77,17 @@ ClientSocket sock;
 
 int main(int argc, char* argv[]) {
 	// Verificamos que se pase el nick y el tipo
-	if(argc != 3) {
-		std::cout << "Falta especificar nick:\ncliente.exe <nick> <tipo_personaje>\n";
-		return 0;
-	}else{
-		// Cargamos el nick y tipo de la consola
-		pje_local_nick = argv[1];
-		pje_local_tipo = argv[2];
-	}
+	//if(argc != 3) {
+	//	std::cout << "Falta especificar nick:\ncliente.exe <nick> <tipo_personaje>\n";
+	//	return 0;
+	//}else{
+	//	// Cargamos el nick y tipo de la consola
+	//	pje_local_nick = argv[1];
+	//	pje_local_tipo = argv[2];
+	//}
 	//borrar estas dos lineas
-	//pje_local_nick = "jugador";
-	//pje_local_tipo = "soldado";
+	pje_local_nick = "jugador";
+	pje_local_tipo = "soldado";
 	//escenario_elegido_id = 0;
 
 	InitializeCriticalSection(&cs_main);
@@ -165,7 +166,7 @@ int main(int argc, char* argv[]) {
 			
 	//Prueba de carga items
 	resman.addRes("cofre","../resources/chest.png");
-	Escudo cofre("cofre",1,1,true, 6 ,13,NULL,&mapa,resman,Imagen::COLOR_KEY );
+	MapaItem cofre("cofre",1,1,true, 6 ,13,NULL,&mapa,resman,Imagen::COLOR_KEY );
 	mapa.getTile(6,13)->addEntidad(&cofre,&mapa);
 	entidades_cargadas.push_back(&cofre);
 
@@ -221,6 +222,8 @@ int main(int argc, char* argv[]) {
 		pjm.getPjeLocal().setEnergia(init_energia);
 		pjm.getPjeLocal().setMagia(init_magia);
 		pjm.getPjeLocal().setEnergiaEscudo(init_escudo);
+		pjm.getPjeLocal().setTerremoto(init_terremoto);
+		pjm.getPjeLocal().setHielo(init_hielo);
 		pjm.getPjeLocal().setRadio(init_radio);
 	} else {
 		//Aviso al server mis valores por defecto de atributos
@@ -235,6 +238,12 @@ int main(int argc, char* argv[]) {
 		sock.send(bs.str());
 		bs.clear();
 		bs << PROTO::UPDATE_ATT << ATT::ENERGIA_ESCUDO << pjm.getPjeLocal().getEnergiaEscudo();
+		sock.send(bs.str());
+		bs.clear();
+		bs << PROTO::UPDATE_ATT << ATT::CANT_TERREMOTO << pjm.getPjeLocal().getTerremoto();
+		sock.send(bs.str());
+		bs.clear();
+		bs << PROTO::UPDATE_ATT << ATT::CANT_HIELO << pjm.getPjeLocal().getHielo();
 		sock.send(bs.str());
 		bs.clear();
 		bs << PROTO::UPDATE_ATT << ATT::RADIO << pjm.getPjeLocal().getRadioY();
@@ -298,7 +307,16 @@ int main(int argc, char* argv[]) {
 					
 					switch (event.key.keysym.sym) {
 						case 'a' : {
-							pjm.getPjeLocal().ataque(NULL , &mapa);
+							int posX = -1;	
+							int posY = -1;
+							SDL_GetMouseState(&posX, &posY);
+							vec2<int> tile_res = MouseCoords2Tile(vec2<int>(posX,  posY), camara);
+							if(mapa.tileExists(tile_res.x, tile_res.y)) {
+								Tile* tileDestino = mapa.getTile(tile_res.x, tile_res.y);
+								pjm.getPjeLocal().ataque(tileDestino , &mapa);
+							} else {
+								pjm.getPjeLocal().ataque(NULL , &mapa);
+							}
 							BitStream bs;
 							bs << PROTO::ATACAR << pjm.getPjeLocal().getNick();
 							sock.send(bs.str());
@@ -439,6 +457,9 @@ int main(int argc, char* argv[]) {
 					std::cout << "Escudo: " << (int)pjm.getPjeLocal().getEnergiaEscudo() << endl;
 					std::cout << "Magia: " << (int)pjm.getPjeLocal().getMagia() << endl;
 					std::cout << "Velocidad: " << pjm.getPjeLocal().getVelocidad() << endl;
+					std::cout << "Terremotos: " << (int)pjm.getPjeLocal().getTerremoto() << endl;
+					std::cout << "Hielos: " << (int)pjm.getPjeLocal().getHielo() << endl;
+					std::cout << "Radio: " << (int)pjm.getPjeLocal().getRadioY() << endl;
 					std::vector<Entidad*> entidades=pjm.getPjeLocal().getPosicion(&mapa)->getEntidades();
 					for (auto it=entidades.begin();it!=entidades.end();it++) {
 						if ((*it)!=&pjm.getPjeLocal()) //sino choca con si mismo

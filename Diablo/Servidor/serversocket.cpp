@@ -361,6 +361,7 @@ unsigned int __stdcall ServerSocket::acceptLastEntry(void* pthis) {
 
 void ServerSocket::acceptLastDo() {
 
+
 	// Iniciamos el seed de srand
 	std::srand(std::time(NULL));
 
@@ -462,7 +463,8 @@ void ServerSocket::acceptLastDo() {
 
 		//Le mandamos la velocidad que tenia		
 		bs.clear();
-		bs << PROTO::OLD_ATT << (float)pm.getPlayer(new_nick).getVelocidad() << pm.getPlayer(new_nick).getEnergia() << pm.getPlayer(new_nick).getMagia() << pm.getPlayer(new_nick).getEnergiaEscudo(); 
+		auto p=pm.getPlayer(new_nick); //alias shortcut
+		bs << PROTO::OLD_ATT << (float)p.getVelocidad() << p.getEnergia() << p.getMagia() << p.getEnergiaEscudo() << p.getTerremoto() << p.getHielo() << p.getRadio(); 
 		send(cid, bs.str());
 
 		// Le mandamos el id escenario
@@ -495,8 +497,15 @@ void ServerSocket::acceptLastDo() {
 			send(it->second.sock, bs.str());
 			//Mando los atributos principales del jugador
 			bs.clear();
-			bs << PROTO::INIT_ATT << new_nick << (float)pm.getPlayer(new_nick).getVelocidad() << pm.getPlayer(new_nick).getEnergia() << pm.getPlayer(new_nick).getMagia() << pm.getPlayer(new_nick).getEnergiaEscudo();
+			auto p=pm.getPlayer(new_nick);
+			bs << PROTO::INIT_ATT << new_nick << (float)p.getVelocidad() << p.getEnergia() << p.getMagia() << p.getEnergiaEscudo() << p.getTerremoto() << p.getHielo() << (float)p.getRadio();
 			send(it->second.sock,bs.str());
+			if (pm.getPlayer(new_nick).isCongelado()) {
+				bs.clear();
+				bs << PROTO::CONGELAR << std::string("RESTORE") << new_nick;
+				send(it->second.sock,bs.str());
+			}
+
 		}
 
 		// Mandamos todos los otros players al que se unio
@@ -508,11 +517,18 @@ void ServerSocket::acceptLastDo() {
 			send(cid, bs.str());
 			//Mando los atributos principales del jugador
 			bs.clear();
-			bs << PROTO::INIT_ATT << it->second.getNick() << (float)pm.getPlayer(it->second.getNick()).getVelocidad();
+			bs << PROTO::INIT_ATT << it->first << (float)p.getVelocidad() << p.getEnergia() << p.getMagia() << p.getEnergiaEscudo() << p.getTerremoto() << p.getHielo() << (float)p.getRadio();
 			send(cid,bs.str());
 		}
-		
 
+		//Le aviso todos los que estaban congelados
+		for (auto it = pm.getPlayers().begin();it != pm.getPlayers().end();it++) {
+			if (it->second.isCongelado()) {
+				bs.clear();
+				bs << PROTO::CONGELAR << std::string("RESTORE") << it->first;
+				send(cid,bs.str());
+			}
+		}
 
 		LeaveCriticalSection(&critSect);
 		// Receive loop
@@ -528,7 +544,7 @@ void ServerSocket::acceptLastDo() {
 			// Branch based on packet type
 			unsigned char pt;
 			bs >> pt;
-
+		
 			if(pt == PROTO::CHAT) {
 				// Leemos para saber a quien mandar
 				std::string nick_destino, nick_source, mensaje;
@@ -578,6 +594,8 @@ void ServerSocket::acceptLastDo() {
 				bs >> nick_who;
 				char item;
 				bs >> item;
+				if (item==ITEM::TERREMOTO) pm.getPlayer(nick_who).restarTerremoto();
+				if (item==ITEM::HIELO) pm.getPlayer(nick_who).restarHielo();
 				// Avisamos a los otros jugadores 
 				for(auto it = clients_map.begin();it != clients_map.end();it++) {
 					if(it->second.nick == new_nick) continue; // Salteamos a nuestro jugador
@@ -597,37 +615,56 @@ void ServerSocket::acceptLastDo() {
 					bs << PROTO::DAMAGE << nick_who << nick_to << dmg;
 					send(it->second.sock, bs.str());
 				}
+			}else if(pt == PROTO::CONGELAR) {	
+				std::string nick_who, nick_to;
+				bs >> nick_who >> nick_to;
+				// Actualizamos el estado del congelado
+				pm.getPlayer(nick_to).congelar();
+				// Avisamos a los otros jugadores 
+				for(auto it = clients_map.begin();it != clients_map.end();it++) {
+					if(it->second.nick == new_nick) continue; // Salteamos a nuestro jugador de avisarle
+					bs.clear();
+					bs << PROTO::CONGELAR << nick_who << nick_to;
+					send(it->second.sock, bs.str());
+				}
 			}else if(pt == PROTO::UPDATE_ATT) {	
 				char tipoAtt;
 				bs >> tipoAtt;
-				float nuevaVel;
+				float nuevoVal;
 				char nuevoValor;
-				if (tipoAtt==ATT::VEL) {
+				if ((tipoAtt==ATT::VEL) || (tipoAtt==ATT::RADIO)) {
 					// Valor float: velocidad
-					bs >> nuevaVel;
+					bs >> nuevoVal;
 				} else {
-					// Valor char: energia/magia/escudo/radio
+					// Valor char: energia/magia/escudo/terremoto/hielo/radio
 					bs >> nuevoValor;
 				}
 				// Avisamos a los otros jugadores 
 				for(auto it = clients_map.begin();it != clients_map.end();it++) {
 					if(it->second.nick == new_nick) {
 						if (tipoAtt==ATT::VEL) {
-							pm.getPlayer(new_nick).setVelocidad((double)nuevaVel);
+							pm.getPlayer(new_nick).setVelocidad((double)nuevoVal);
 						} else if (tipoAtt==ATT::ENERGIA) {
 							pm.getPlayer(new_nick).setEnergia(nuevoValor);
 						} else if (tipoAtt==ATT::MAGIA) {
 							pm.getPlayer(new_nick).setMagia(nuevoValor);
 						} else if (tipoAtt==ATT::ENERGIA_ESCUDO) {
 							pm.getPlayer(new_nick).setEnergiaEscudo(nuevoValor);
+						} else if (tipoAtt==ATT::CANT_TERREMOTO) {
+							pm.getPlayer(new_nick).setTerremoto(nuevoValor);
+						} else if (tipoAtt==ATT::CANT_HIELO) {
+							pm.getPlayer(new_nick).setHielo(nuevoValor);
 						} else if (tipoAtt==ATT::RADIO) {
-							pm.getPlayer(new_nick).setRadio(nuevoValor);
+							std::cout << "SERVER SOCKET UPDATE_ATT RADIO: " << nuevoVal << "\n";
+							pm.getPlayer(new_nick).setRadio(nuevoVal);
 						}
+
 						continue; // Salteamos a nuestro jugador de avisarle
 					}
 					bs.clear();
-					if (tipoAtt==ATT::VEL) {
-						bs << PROTO::UPDATE_ATT << tipoAtt << new_nick << nuevaVel;
+					if ((tipoAtt==ATT::VEL) || (tipoAtt==ATT::RADIO)) {
+						std::cout << "SERVER SOCKET UPDATE_ATT NUEVO RADIO: " << nuevoVal << "\n";
+						bs << PROTO::UPDATE_ATT << tipoAtt << new_nick << nuevoVal;
 					} else {
 						bs << PROTO::UPDATE_ATT << tipoAtt << new_nick << nuevoValor;
 					}

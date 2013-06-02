@@ -53,7 +53,7 @@ std::string pje_local_tipo;
 int start_pos_x, start_pos_y;
 int escenario_elegido_id;
 double init_vel;
-char init_energia,init_magia,init_escudo;
+char init_energia,init_magia,init_escudo,init_radio;
 // Cosas para mantener al server actualizado sobre los tiles que recorrimos
 struct {
 	vec2<int> tile_actual, tile_anterior;
@@ -221,6 +221,7 @@ int main(int argc, char* argv[]) {
 		pjm.getPjeLocal().setEnergia(init_energia);
 		pjm.getPjeLocal().setMagia(init_magia);
 		pjm.getPjeLocal().setEnergiaEscudo(init_escudo);
+		pjm.getPjeLocal().setRadio(init_radio);
 	} else {
 		//Aviso al server mis valores por defecto de atributos
 		bs.clear();
@@ -234,6 +235,9 @@ int main(int argc, char* argv[]) {
 		sock.send(bs.str());
 		bs.clear();
 		bs << PROTO::UPDATE_ATT << ATT::ENERGIA_ESCUDO << pjm.getPjeLocal().getEnergiaEscudo();
+		sock.send(bs.str());
+		bs.clear();
+		bs << PROTO::UPDATE_ATT << ATT::RADIO << pjm.getPjeLocal().getRadioY();
 		sock.send(bs.str());
 	}
 	

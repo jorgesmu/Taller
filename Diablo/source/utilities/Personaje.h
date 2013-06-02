@@ -312,6 +312,11 @@ public:
 	void aumentarRadio(double proporcion) {
 		radioY*=(1+proporcion);
 		radioX=2*radioY;
+
+		//notifico al servidor
+		BitStream bs;
+		bs << PROTO::UPDATE_ATT << ATT::RADIO << radioY;
+		sock.send(bs.str());
 	}
 
 	int getRadioX() { return radioX; }

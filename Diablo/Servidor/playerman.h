@@ -18,7 +18,7 @@ class Player {
 	int x, y; // Pos en tiles logicos en el mapa
 	TilesRecorridos tiles_recorridos;
 	double velocidad;
-	char energia,magia,energiaEscudo;
+	char energia,magia,energiaEscudo,radio;
 	
 	public:
 	Player();
@@ -40,6 +40,8 @@ class Player {
 	void setMagia(char newMagia) { magia=newMagia; }
 	char getEnergiaEscudo() { return energiaEscudo; }
 	void setEnergiaEscudo(char energia) { energiaEscudo=energia; }
+	char getRadio() { return radio; }
+	void setRadio(char newRadio) { radio=newRadio; }
 
 	void addTileRecorrido(short x, short y);
 	TilesRecorridos& getTilesRecorridos();

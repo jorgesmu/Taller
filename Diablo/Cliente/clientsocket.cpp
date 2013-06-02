@@ -305,12 +305,13 @@ void ClientSocket::listenDo() {
 			//std::cout << "RECEIVED INIT POS: (" << start_pos_x << "," << start_pos_y << ")\n";
 		}else if(pt == PROTO::OLD_ATT) {
 			float recv_vel;
-			char energia,magia,energiaEscudo;
-			bs >> recv_vel >> energia >> magia >> energiaEscudo;
+			char energia,magia,energiaEscudo,radio;
+			bs >> recv_vel >> energia >> magia >> energiaEscudo >> radio;
 			init_vel=(double)recv_vel;
 			init_energia=energia;
 			init_magia=magia;
 			init_escudo=energiaEscudo;
+			init_radio=radio;
 		}else if(pt == PROTO::ESC_ID) {
 			bs >> escenario_elegido_id;
 			//std::cout << "RECEIVED ESC ID: (" << escenario_elegido_id << ")\n";
@@ -361,14 +362,15 @@ void ClientSocket::listenDo() {
 			}
 			std::string nick_who;
 			float vel_recv;
-			char energia,magia,energiaEscudo;
-			bs >> nick_who >> vel_recv >> energia >> magia >> energiaEscudo;
+			char energia,magia,energiaEscudo,radio;
+			bs >> nick_who >> vel_recv >> energia >> magia >> energiaEscudo >> radio;
 			double vel=(double)vel_recv;
 			//Seteamos los atributos del jugador
 			pjm.getPje(nick_who).setVelocidad(vel);
 			pjm.getPje(nick_who).setEnergia(energia);
 			pjm.getPje(nick_who).setMagia(magia);
 			pjm.getPje(nick_who).setEnergiaEscudo(energiaEscudo);
+			pjm.getPje(nick_who).setRadio(energiaEscudo);
 		}else if(pt == PROTO::PLAYER_EXIT) {
 			// Esperamos a que cargue el mapa
 			while(!cargoMapa) {

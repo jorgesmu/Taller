@@ -606,7 +606,7 @@ void ServerSocket::acceptLastDo() {
 					// Valor float: velocidad
 					bs >> nuevaVel;
 				} else {
-					// Valor char: energia/magia/escudo
+					// Valor char: energia/magia/escudo/radio
 					bs >> nuevoValor;
 				}
 				// Avisamos a los otros jugadores 
@@ -620,6 +620,8 @@ void ServerSocket::acceptLastDo() {
 							pm.getPlayer(new_nick).setMagia(nuevoValor);
 						} else if (tipoAtt==ATT::ENERGIA_ESCUDO) {
 							pm.getPlayer(new_nick).setEnergiaEscudo(nuevoValor);
+						} else if (tipoAtt==ATT::RADIO) {
+							pm.getPlayer(new_nick).setRadio(nuevoValor);
 						}
 						continue; // Salteamos a nuestro jugador de avisarle
 					}

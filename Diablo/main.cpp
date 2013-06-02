@@ -76,18 +76,18 @@ ClientSocket sock;
 
 int main(int argc, char* argv[]) {
 	// Verificamos que se pase el nick y el tipo
-	if(argc != 3) {
+	/*if(argc != 3) {
 		std::cout << "Falta especificar nick:\ncliente.exe <nick> <tipo_personaje>\n";
 		return 0;
 	}else{
 		// Cargamos el nick y tipo de la consola
 		pje_local_nick = argv[1];
 		pje_local_tipo = argv[2];
-	}
+	}*/
 	//borrar estas dos lineas
-	//pje_local_nick = "jugador";
-	//pje_local_tipo = "soldado";
-	//escenario_elegido_id = 0;
+	pje_local_nick = "jugador";
+	pje_local_tipo = "soldado";
+	escenario_elegido_id = 0;
 
 	InitializeCriticalSection(&cs_main);
 	// Socket de cliente
@@ -160,6 +160,7 @@ int main(int argc, char* argv[]) {
 		}
 	}
 
+
 	// Cargo las entidades en un vector
 	std::vector<EntidadFija*> entidades_cargadas;
 			
@@ -214,6 +215,9 @@ int main(int argc, char* argv[]) {
 
 	// Agrega el personaje(no esta tomando velocidad del YAML!!!)
 	pjm.getPjeLocal().init(pje_local_nick, pje_local_tipo , 1 , 1 , 50 , 5, 100, 100 ,	configuracion.get_vel_personaje(),	0 , 50 , NULL , resman , Imagen::COLOR_KEY);
+	//enemigo
+	pjm.getEnemigoLocal().init_Enemy("enemigo", "soldado" , 1 , 1 , 50 , 5, 100, 100 ,	configuracion.get_vel_personaje(),	0 , 50 , NULL , resman , Imagen::COLOR_KEY,3,3);
+
 	//Si no me conecto por primera vez al servidor
 	if (init_vel!=0) {
 		// El server me paso atributos para cargar
@@ -248,6 +252,10 @@ int main(int argc, char* argv[]) {
 	// Posiciono el personaje
 	mapa.getTile(start_pos_x, start_pos_y)->addEntidad(&(pjm.getPjeLocal()));
 	pjm.getPjeLocal().setTileActual(mapa.getTile(start_pos_x, start_pos_y));
+	//posiciono el enemigo
+	mapa.getTile(5, 5)->addEntidad(&(pjm.getEnemigoLocal()));
+	pjm.getEnemigoLocal().setTileActual(mapa.getTile(5, 5));
+	
 	// Inicializo el recorridor
 	update_recorrido.tile_anterior = update_recorrido.tile_actual = vec2<int>(start_pos_x, start_pos_y);
 	update_recorrido.timer.start();
@@ -275,6 +283,9 @@ int main(int argc, char* argv[]) {
 	int ultimoDestinoX = NOSEMOVIO;//guarda el destino actual
 	int ultimoDestinoY = NOSEMOVIO;//guarda el destino actual
 	
+	//enemigo
+	int estadoEnemigo=-1;
+	bool puedeMoverseEnemigo = false;
 	while((!quit ) && (sock.isOpen()) ) {
 
 		// Sync stuff
@@ -540,7 +551,19 @@ int main(int argc, char* argv[]) {
 				}
 			}
 			estadoPersonaje = pjm.getPjeLocal().update(&mapa);
-			
+			//enemigo
+			estadoEnemigo= pjm.getEnemigoLocal().update(&mapa);
+			if ((estadoEnemigo == Personaje::MOVER_COMPLETADO)) 
+			{
+				puedeMoverseEnemigo = true;
+				Enemigo& unEnemigo = pjm.getEnemigoLocal();
+				Tile* proximotileEnemigo = unEnemigo.get_proximo_tile_enemigo(mapa,pjm);
+				unEnemigo.mover(proximotileEnemigo);
+
+			}else if ( (estadoEnemigo == Personaje::MOVER_EN_CURSO) || 
+				(estadoEnemigo == Personaje::MOVER_ERROR)){
+					puedeMoverseEnemigo = false;
+ 			}
 			/*
 			if ( (estadoPersonaje == Personaje::MOVER_COMPLETADO) || 
 				 (estadoPersonaje == Personaje::ATACAR_COMPLETADO) ||
@@ -557,6 +580,7 @@ int main(int argc, char* argv[]) {
 			if ((estadoPersonaje == Personaje::MOVER_COMPLETADO)) 
 				 {
 				puedeMoverse = true;
+
 			}else if ( (estadoPersonaje == Personaje::MOVER_EN_CURSO) || 
 				(estadoPersonaje == Personaje::MOVER_ERROR)){
  				puedeMoverse = false;

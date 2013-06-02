@@ -33,6 +33,7 @@
 #include "../../source/utilities/zapatos.h"
 #include "../../source/utilities/terremoto.h"
 #include "../../source/utilities/escudo.h"
+#include "../../source/utilities/interface.h"
 
 using namespace std;
 
@@ -65,12 +66,16 @@ pair <int,int> tileActual, proximoTile;
 int estadoMovimiento;
 // Ventana de chat
 ChatWindow chat_window;
+// User Interface
+Interface ui;
 // ResMan
 ResMan resman;
 // Config
 config_general configuracion;
 //Choques
 bool choco;
+//Muerte que llega desde el personaje como aviso
+bool murio;
 //Socket
 ClientSocket sock;
 
@@ -279,6 +284,31 @@ int main(int argc, char* argv[]) {
 
 		// Sync stuff
 		EnterCriticalSection(&cs_main);
+
+		//Veo si algun personaje esta muerto
+		if (!pjm.getPjeLocal().estaVivo()) {
+			//Veo si me puedo mover al lugar de inicio
+			bs.clear();
+			bs << PROTO::REQUEST_POS << start_pos_x << start_pos_y;
+			sock.send(bs.str());
+			estadoMovimiento=MOV::ESPERANDO_OK;
+			if (estadoMovimiento==MOV::OK_RECV) {
+				// Lo elimino de la posicion donde murio
+				mapa.getTile(start_pos_x, start_pos_y)->deleteEntidad(&(pjm.getPjeLocal()));
+				// Posiciono el personaje
+				mapa.getTile(start_pos_x, start_pos_y)->addEntidad(&(pjm.getPjeLocal()));
+				pjm.getPjeLocal().setTileActual(mapa.getTile(start_pos_x, start_pos_y));
+				// Inicializo el recorridor
+				update_recorrido.tile_anterior = update_recorrido.tile_actual = vec2<int>(start_pos_x, start_pos_y);
+				//update_recorrido.timer.start();
+				// Cosas del movimiento
+				estadoMovimiento = MOV::IDLE;
+				// Centro la camara
+				camara.center(mapa.getTile(start_pos_x, start_pos_y)->getX(), mapa.getTile(start_pos_x, start_pos_y)->getY());
+				pjm.getPjeLocal().revivir();
+			}
+			//Ver que hago sino
+		}
 
 		// Input handling (esto despues se movera a donde corresponda)
 		while(SDL_PollEvent(&event)) {
@@ -598,6 +628,9 @@ int main(int argc, char* argv[]) {
 		mapa.setEntidadesDibujadasFalse(&pjm.getPjeLocal());
 		// Dibujamos la ventana de chat
 		chat_window.show(screen);
+
+		ui.blitInterface(screen);
+
 		// Actualizar la pantalla
 		SDL_Flip(screen);
 

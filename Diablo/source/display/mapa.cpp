@@ -345,10 +345,6 @@ vector <pair<int,int> > Mapa::getCaminoMinimo(Tile* tileOrigen, Tile* tileDestin
 		return vacio;
 	}
 
-	if(!tileDestino->isCaminable()){
-		std::vector<pair<int, int>> vacio;
-		return vacio;
-	}
 
 	int tileOrigenX = tileOrigen->getU();
 	int tileOrigenY = tileOrigen->getV();

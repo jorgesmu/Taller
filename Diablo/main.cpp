@@ -21,6 +21,7 @@
 #include "../../source/display/camara.h"
 #include "../../source/display/mapa.h"
 #include "../../source/display/resman.h"
+#include "../../source/utilities/soundman.h"
 #include "../../source/constants/model.h"
 #include "../../source/utilities/Test.h"
 #include "../../source/utilities/coordenadas.h"
@@ -65,8 +66,10 @@ pair <int,int> tileActual, proximoTile;
 int estadoMovimiento;
 // Ventana de chat
 ChatWindow chat_window;
-// ResMan
+// Resource manager
 ResMan resman;
+// Sound manager
+SoundMan soundman;
 // Config
 config_general configuracion;
 //Choques
@@ -143,6 +146,10 @@ int main(int argc, char* argv[]) {
 	// Resman
 	if(!resman.init()) return -2;
 	
+	// SoundMan
+	if(!soundman.init(&camara, &pjm.getPjeLocal())) return -3;
+	soundman.addSound("sword", "../resources/static/sounds/sword.wav");
+
 	// Ventana de chat
 	chat_window.init(&resman, 40, 40, Font::SIZE_NORMAL, 250, 500, COLOR::WHITE);
 	chat_window.setNickLocal(pje_local_nick);
@@ -312,6 +319,7 @@ int main(int argc, char* argv[]) {
 							} else {
 								pjm.getPjeLocal().ataque(NULL , &mapa);
 							}
+							soundman.playSound("sword", 0, 0);
 							BitStream bs;
 							bs << PROTO::ATACAR << pjm.getPjeLocal().getNick();
 							sock.send(bs.str());
@@ -617,6 +625,7 @@ int main(int argc, char* argv[]) {
 	
 	mapa.clean();
 	resman.clean();
+	soundman.clean();
 	err_log.cerrarConexion();
     //Test::test();
 	TTF_Quit();

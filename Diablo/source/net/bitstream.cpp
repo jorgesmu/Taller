@@ -7,9 +7,6 @@
 #include <algorithm>
 #include <string>
 
-// Numero de posiciones decimales que se transmiten en los float
-const int PRECISION = 1000;
-
 BitStream::BitStream() {
     cpos = 0;
     buffer.clear();
@@ -120,18 +117,16 @@ BitStream &BitStream::operator >>(bool &val){
 }
 
 BitStream &BitStream::operator <<(const float &val){
-    Sint32 tmp = Sint32( val * float(PRECISION) );
-	const char* c = reinterpret_cast<char*>(&tmp);
-    buffer.insert(buffer.end(), c, c+sizeof(Sint32));
+	const char* c = reinterpret_cast<const char*>(&val);
+    buffer.insert(buffer.end(), c, c+sizeof(float));
     return *this;
 }
 
 BitStream &BitStream::operator >>(float &val){
-    static unsigned char buf[sizeof(Sint32)];
-    std::copy(buffer.begin()+cpos, buffer.begin()+cpos+sizeof(Sint32), buf);
-	Sint32 tmp = *(reinterpret_cast<Sint32*>(&buf));
-    val = float(Sint32(tmp)) / float(PRECISION);
-    cpos += sizeof(Sint32);
+    static unsigned char buf[sizeof(float)];
+    std::copy(buffer.begin()+cpos, buffer.begin()+cpos+sizeof(float), buf);
+    val = *(reinterpret_cast<float*>(&buf));
+    cpos += sizeof(float);
     return *this;
 }
 

@@ -39,6 +39,7 @@
     <ClCompile Include="source\utilities\ImagenAnimada.cpp" />
     <ClCompile Include="source\utilities\ImagenEstatica.cpp" />
     <ClCompile Include="source\utilities\ImagenPersonaje.cpp" />
+    <ClCompile Include="source\utilities\interface.cpp" />
     <ClCompile Include="source\utilities\item.cpp" />
     <ClCompile Include="source\utilities\logErrores.cpp" />
     <ClCompile Include="source\utilities\parser.cpp" />
@@ -90,6 +91,7 @@
     <ClInclude Include="source\utilities\ImagenEstatica.h" />
     <ClInclude Include="source\utilities\ImagenPersonaje.h" />
     <ClInclude Include="source\utilities\imagen_error.h" />
+    <ClInclude Include="source\utilities\interface.h" />
     <ClInclude Include="source\utilities\item.h" />
     <ClInclude Include="source\utilities\lampara.h" />
     <ClInclude Include="source\utilities\logErrores.h" />

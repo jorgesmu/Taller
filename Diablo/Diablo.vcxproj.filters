@@ -133,6 +133,7 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\utilities\soundman.cpp">
+    <ClCompile Include="source\utilities\interface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -300,6 +301,7 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="source\utilities\soundman.h">
+    <ClInclude Include="source\utilities\interface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

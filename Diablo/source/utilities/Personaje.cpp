@@ -15,6 +15,7 @@ extern PjeManager pjm;
 extern ClientSocket sock;
 extern int start_pos_x,start_pos_y;
 extern int estadoMovimiento;
+extern Mapa mapa;
 
 /*
 	Pre:- 
@@ -822,13 +823,20 @@ void Personaje::dañar(char daño) {
 
 void Personaje::chocarConLampara() {
 	this->aumentarRadio(0.25);
-	//Falta notificar al servidor
 }
 
 //Mejorar: recorrer todos los tiles y colocarlos como visitados
 void Personaje::chocarConMapa() {
-	this->aumentarRadio(100.0);
-	//Falta notificar al servidor
+	std::vector<Tile> tiles = mapa.allTiles();
+	for(auto it = tiles.begin(); it != tiles.end(); ++it){
+		Tile* tileExplorado = mapa.getTile(it->getU(), it->getV());
+		agregarTilesExplorados(tileExplorado);
+
+		BitStream bs;
+		bs << PROTO::NIEBLA_SYNC << it->getU() << it->getV();
+		sock.send(bs.str());
+	}
+	std::vector<Tile*> tileExplorados = tilesExplorados;	
 }
 
 void Personaje::aumentarVelocidad(char porcentaje) {
@@ -976,7 +984,18 @@ void Personaje::utilizarHielo(Mapa* mapa, PjeManager* pjm) {
 	 sock.send(bs.str());
  }
 
- void Personaje::muere() {
+void Personaje::aumentarRadio(double proporcion) {
+	radioY*=(1+proporcion);
+	radioX=2*radioY;
+
+	std::cout << "RADIO AUMENTADO: " << radioY << "\n";
+	//notifico al servidor
+	BitStream bs;
+	bs << PROTO::UPDATE_ATT << ATT::RADIO << radioY;
+	sock.send(bs.str());
+}
+
+void Personaje::muere() {
 	this->animacionMuerte();
 	std::cout << "Fui asesinado" << endl;
 	//Redirecciono a la posicion inicial nuevamente
@@ -988,4 +1007,3 @@ void Personaje::utilizarHielo(Mapa* mapa, PjeManager* pjm) {
 	 this->vivo=true;
 	 this->energia=this->ENERGIA_TOTAL;
  }
-

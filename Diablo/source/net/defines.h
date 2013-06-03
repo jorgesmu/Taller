@@ -106,4 +106,5 @@ namespace ATT {
 	const char CONGELADO = 4;
 	const char CANT_TERREMOTO = 5;
 	const char CANT_HIELO = 6;
+	const char RADIO = 7;
 }

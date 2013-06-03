@@ -18,6 +18,7 @@ class Player {
 	int x, y; // Pos en tiles logicos en el mapa
 	TilesRecorridos tiles_recorridos;
 	double velocidad;
+	float radio;
 	char energia,magia,energiaEscudo;
 	char congelado; //1=congelado,0=no congelado
 	char terremoto,hielo; //cant de hechizos de cada tipo
@@ -53,6 +54,8 @@ class Player {
 	void restarHielo() { hielo--; }
 	char getHielo() { return hielo; }
 	void setHielo(char valor) { hielo=valor; }
+	float getRadio() { return radio; }
+	void setRadio(float newRadio) { radio=newRadio; }
 
 	void addTileRecorrido(short x, short y);
 	TilesRecorridos& getTilesRecorridos();

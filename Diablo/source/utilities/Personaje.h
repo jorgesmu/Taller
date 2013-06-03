@@ -99,7 +99,7 @@ protected:
 
 		bool cambioDireccionHabilitado;
 
-		int radioY,radioX;
+		float radioY,radioX;
 
 		//Tiene o no los hechizos(podria tener mas de uno quizas?, por eso un char)
 		char terremoto;
@@ -332,20 +332,17 @@ public:
 	void revivir();
 
 	//Setea el radio de vision en el eje Y
-	void setRadio(int newRadio) { 
+	void setRadio(float newRadio) { 
 		radioY=newRadio;
 		radioX=2*radioY;
 	}
 
 	//Recibe un valor de proporcion (0.25 aumenta 25%) para aumentar el radio de vision
-	void aumentarRadio(double proporcion) {
-		radioY*=(1+proporcion);
-		radioX=2*radioY;
-	}
+	void aumentarRadio(double proporcion);
 
-	int getRadioX() { return radioX; }
+	float getRadioX() { return radioX; }
 
-	int getRadioY() { return radioY; }
+	float getRadioY() { return radioY; }
 
 	char getEnergia() { return energia; }
 

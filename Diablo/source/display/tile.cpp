@@ -1,5 +1,10 @@
 #include "tile.h"
 #include "mapa.h"
+#include "../net/bitstream.h"
+#include "../net/defines.h"
+#include "../../Cliente/clientsocket.h"
+extern PjeManager pjm;
+extern ClientSocket sock;
 
 Tile::Tile() {
 	force_no_caminable = false;
@@ -68,19 +73,7 @@ std::vector<Entidad*> Tile::getEntidades(){
 }
 
 void Tile::setearExplorados(int tileX, int tileY, Personaje* personaje, Mapa* mapa){
-
-	Tile* tile = mapa->getTile(tileX, tileY);
-	for(int posX = (Tile::TILE_ANCHO/2) + tile->getX()-(personaje->getRadioX()); posX < tile->getX()+(personaje->getRadioX()); posX+=Tile::TILE_ANCHO/2){
-		for(int posY = (Tile::TILE_ANCHO/2) + tile->getY()-(personaje->getRadioY()); posY < tile->getY()+(personaje->getRadioY()); posY+=Tile::TILE_ALTO/2){
-			int deltaX = tile->getX() - posX;
-			int deltaY = tile->getY() - posY;
-
-			if((abs(deltaX) <= personaje->getRadioX()) && (abs(deltaY) <= personaje->getRadioY())){
-				personaje->agregarTilesExplorados(mapa->getTilePorPixeles(posX, posY));
-			}
-
-		}
-	}
+	personaje->agregarTilesExplorados(mapa->getTile(tileX, tileY));
 }
 
 void Tile::blit(SDL_Surface* pantalla, Camara& cam, Personaje* personaje, Mapa* mapa){
@@ -105,7 +98,12 @@ void Tile::blit(SDL_Surface* pantalla, Camara& cam, Personaje* personaje, Mapa* 
 				(*it)->blit(pantalla, &cam, NULL,x, y,true);
 				(*it)->setDibujada(true, mapa,personaje);			
 			}
-		}		
+		}
+
+		BitStream bs;
+		bs << PROTO::NIEBLA_SYNC << this->u << this->v;
+		sock.send(bs.str());
+
 		personaje->agregarTilesExplorados(this);
 	}else{
 		std::vector<Tile*> tilesExplorados = personaje->getTilesExplorados();

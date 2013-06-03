@@ -21,6 +21,7 @@
 #include "../../source/display/camara.h"
 #include "../../source/display/mapa.h"
 #include "../../source/display/resman.h"
+#include "../../source/utilities/soundman.h"
 #include "../../source/constants/model.h"
 #include "../../source/utilities/Test.h"
 #include "../../source/utilities/coordenadas.h"
@@ -54,6 +55,7 @@ std::string pje_local_tipo;
 int start_pos_x, start_pos_y;
 int escenario_elegido_id;
 double init_vel;
+float init_radio;
 char init_energia,init_magia,init_escudo,init_terremoto,init_hielo;
 // Cosas para mantener al server actualizado sobre los tiles que recorrimos
 struct {
@@ -70,6 +72,8 @@ ChatWindow chat_window;
 Interface ui;
 // ResMan
 ResMan resman;
+// Sound manager
+SoundMan soundman;
 // Config
 config_general configuracion;
 //Choques
@@ -148,6 +152,10 @@ int main(int argc, char* argv[]) {
 	// Resman
 	if(!resman.init()) return -2;
 	
+	// SoundMan
+	if(!soundman.init(&camara, &pjm.getPjeLocal())) return -3;
+	soundman.addSound("sword", "../resources/static/sounds/sword.wav");
+
 	// Ventana de chat
 	chat_window.init(&resman, 40, 40, Font::SIZE_NORMAL, 250, 500, COLOR::WHITE);
 	chat_window.setNickLocal(pje_local_nick);
@@ -165,12 +173,13 @@ int main(int argc, char* argv[]) {
 		}
 	}
 
+
 	// Cargo las entidades en un vector
 	std::vector<EntidadFija*> entidades_cargadas;
 			
 	//Prueba de carga items
 	resman.addRes("cofre","../resources/chest.png");
-	Escudo cofre("cofre",1,1,true, 6 ,13,NULL,&mapa,resman,Imagen::COLOR_KEY );
+	MapaItem cofre("cofre",1,1,true, 6 ,13,NULL,&mapa,resman,Imagen::COLOR_KEY );
 	mapa.getTile(6,13)->addEntidad(&cofre,&mapa);
 	entidades_cargadas.push_back(&cofre);
 
@@ -219,6 +228,7 @@ int main(int argc, char* argv[]) {
 
 	// Agrega el personaje(no esta tomando velocidad del YAML!!!)
 	pjm.getPjeLocal().init(pje_local_nick, pje_local_tipo , 1 , 1 , 50 , 5, 100, 100 ,	configuracion.get_vel_personaje(),	0 , 50 , NULL , resman , Imagen::COLOR_KEY);
+
 	//Si no me conecto por primera vez al servidor
 	if (init_vel!=0) {
 		// El server me paso atributos para cargar
@@ -228,6 +238,7 @@ int main(int argc, char* argv[]) {
 		pjm.getPjeLocal().setEnergiaEscudo(init_escudo);
 		pjm.getPjeLocal().setTerremoto(init_terremoto);
 		pjm.getPjeLocal().setHielo(init_hielo);
+		pjm.getPjeLocal().setRadio(init_radio);
 	} else {
 		//Aviso al server mis valores por defecto de atributos
 		bs.clear();
@@ -248,11 +259,15 @@ int main(int argc, char* argv[]) {
 		bs.clear();
 		bs << PROTO::UPDATE_ATT << ATT::CANT_HIELO << pjm.getPjeLocal().getHielo();
 		sock.send(bs.str());
+		bs.clear();
+		bs << PROTO::UPDATE_ATT << ATT::RADIO << pjm.getPjeLocal().getRadioY();
+		sock.send(bs.str());
 	}
 	
 	// Posiciono el personaje
 	mapa.getTile(start_pos_x, start_pos_y)->addEntidad(&(pjm.getPjeLocal()));
 	pjm.getPjeLocal().setTileActual(mapa.getTile(start_pos_x, start_pos_y));
+	
 	// Inicializo el recorridor
 	update_recorrido.tile_anterior = update_recorrido.tile_actual = vec2<int>(start_pos_x, start_pos_y);
 	update_recorrido.timer.start();
@@ -284,28 +299,7 @@ int main(int argc, char* argv[]) {
 
 		// Sync stuff
 		EnterCriticalSection(&cs_main);
-		/*
-		//Veo si algun personaje esta muerto
-		if (!pjm.getPjeLocal().estaVivo()) {
-			//Si me puedo mover al lugar de inicio
-			if (estadoMovimiento==MOV::OK_RECV) {
-				// Lo elimino de la posicion donde murio
-				mapa.getTile(start_pos_x, start_pos_y)->deleteEntidad(&(pjm.getPjeLocal()));
-				// Posiciono el personaje
-				mapa.getTile(start_pos_x, start_pos_y)->addEntidad(&(pjm.getPjeLocal()));
-				pjm.getPjeLocal().setTileActual(mapa.getTile(start_pos_x, start_pos_y));
-				// Inicializo el recorridor
-				update_recorrido.tile_anterior = update_recorrido.tile_actual = vec2<int>(start_pos_x, start_pos_y);
-				//update_recorrido.timer.start();
-				// Cosas del movimiento
-				estadoMovimiento = MOV::IDLE;
-				// Centro la camara
-				camara.center(mapa.getTile(start_pos_x, start_pos_y)->getX(), mapa.getTile(start_pos_x, start_pos_y)->getY());
-				pjm.getPjeLocal().revivir();
-			}
-			//Ver que hago sino
-		}
-		*/
+
 		// Input handling (esto despues se movera a donde corresponda)
 		while(SDL_PollEvent(&event)) {
 
@@ -338,6 +332,7 @@ int main(int argc, char* argv[]) {
 							} else {
 								pjm.getPjeLocal().ataque(NULL , &mapa);
 							}
+							soundman.playSound("sword", 0, 0);
 							BitStream bs;
 							bs << PROTO::ATACAR << pjm.getPjeLocal().getNick();
 							sock.send(bs.str());
@@ -382,10 +377,14 @@ int main(int argc, char* argv[]) {
 							//chequeo sicronizacion para que calcule el camino minimo desde el tile al que se esta moviendo al destino
 							if (ultimoMovimientoX == NOSEMOVIO && ultimoMovimientoY == NOSEMOVIO){
 								tilePersonaje = mapa.getTilePorPixeles(pjm.getPjeLocal().getX(), pjm.getPjeLocal().getY());
+								std::cout << "Obtiene pos normal" << endl;
 							}else{
 								tilePersonaje = mapa.getTile(ultimoMovimientoX,ultimoMovimientoY);
+								std::cout << "Obtiene pos rara" << endl;
 							}
 							Tile* tileDestino = mapa.getTile(tile_res.x, tile_res.y);
+							std::cout << "tilePersonaje(" << tilePersonaje->getU() << "," << tilePersonaje->getV() << endl;
+							std::cout << "tileDestino(" << tileDestino->getU() << "," << tileDestino->getV() << endl;
 							//guardo el destino
 							ultimoDestinoX = tile_res.x;
 							ultimoDestinoY = tile_res.y;
@@ -415,7 +414,7 @@ int main(int argc, char* argv[]) {
 							Tile* tilePersonaje; 
 							//chequeo sicronizacion para que calcule el camino minimo desde el tile al que se esta moviendo al destino
 							if (ultimoMovimientoX == NOSEMOVIO && ultimoMovimientoY == NOSEMOVIO){
-								tilePersonaje = mapa.getTilePorPixeles(pjm.getPjeLocal().getX(), pjm.getPjeLocal().getY());
+								tilePersonaje = mapa.getTile(pjm.getPjeLocal().getX(), pjm.getPjeLocal().getY());
 							}else{
 								tilePersonaje = mapa.getTile(ultimoMovimientoX,ultimoMovimientoY);
 							}
@@ -457,7 +456,7 @@ int main(int argc, char* argv[]) {
 		accum += frame_time;
 
 		// Aca se hace el timestep, aka avanzar la fisica usando Euler en un delta t fijo
-		while(accum >= CONST_DT) {
+		while(accum >= CONST_DT) {			
 			// Veo si me tengo que relocalizar en el mapa
 			if (estadoMovimiento == MOV::OK_REV_RECV) {
 				std::cout << "Relocalizando al jugador..." << endl;
@@ -467,14 +466,18 @@ int main(int argc, char* argv[]) {
 				mapa.getTile(start_pos_x, start_pos_y)->addEntidad(&(pjm.getPjeLocal()));
 				pjm.getPjeLocal().setTileActual(mapa.getTile(start_pos_x, start_pos_y));
 				// Inicializo el recorridor
-				update_recorrido.tile_anterior = update_recorrido.tile_actual = vec2<int>(start_pos_x, start_pos_y);
+				update_recorrido.tile_anterior = vec2<int>(start_pos_x, start_pos_y);
+				update_recorrido.tile_actual = vec2<int>(start_pos_x, start_pos_y); 
 				update_recorrido.timer.start();
 				// Cosas del movimiento
 				estadoMovimiento = MOV::IDLE;
 				// Centro la camara
 				camara.center(mapa.getTile(start_pos_x, start_pos_y)->getX(), mapa.getTile(start_pos_x, start_pos_y)->getY());
 				pjm.getPjeLocal().revivir();
+				ultimoMovimientoX=NOSEMOVIO;
+				ultimoMovimientoY=NOSEMOVIO;
 			}
+
 			// Actualiza la camara
 			camara.update();
 			// Actualiza las entidades
@@ -504,6 +507,7 @@ int main(int argc, char* argv[]) {
 				//std::cout << puedeMoverse << " " << estadoMovimiento << "\n";
 				//si termino de ir al tile anterior
 				if(indice < caminoMinimo.size()){
+					std::cout << "Indice: " << indice << " - Size camino: " << caminoMinimo.size() << endl;
 					//establezo proximo tile del camino
 					proximoTile = caminoMinimo[indice];
 					//verifico que sea caminable
@@ -580,7 +584,7 @@ int main(int argc, char* argv[]) {
 				}
 			}
 			estadoPersonaje = pjm.getPjeLocal().update(&mapa);
-			
+
 			/*
 			if ( (estadoPersonaje == Personaje::MOVER_COMPLETADO) || 
 				 (estadoPersonaje == Personaje::ATACAR_COMPLETADO) ||
@@ -597,11 +601,11 @@ int main(int argc, char* argv[]) {
 			if ((estadoPersonaje == Personaje::MOVER_COMPLETADO)) 
 				 {
 				puedeMoverse = true;
+
 			}else if ( (estadoPersonaje == Personaje::MOVER_EN_CURSO) || 
 				(estadoPersonaje == Personaje::MOVER_ERROR)){
  				puedeMoverse = false;
  			}
-
 
 			//Piso la señal de estado del personaje
 			/*
@@ -660,6 +664,7 @@ int main(int argc, char* argv[]) {
 	
 	mapa.clean();
 	resman.clean();
+	soundman.clean();
 	err_log.cerrarConexion();
     //Test::test();
 	TTF_Quit();

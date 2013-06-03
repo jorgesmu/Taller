@@ -132,7 +132,19 @@
     <ClCompile Include="source\utilities\item.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="source\utilities\enemigo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\utilities\soundman.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="source\utilities\interface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\utilities\ImagenArma.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\utilities\arma.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -299,7 +311,19 @@
     <ClInclude Include="source\utilities\escudo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="source\utilities\enemigo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\utilities\soundman.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="source\utilities\interface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\utilities\arma.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\utilities\ImagenArma.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -13,7 +13,8 @@
 #include "../../Cliente/clientsocket.h"
 extern PjeManager pjm;
 extern ClientSocket sock;
-extern bool murio;
+extern int start_pos_x,start_pos_y;
+extern int estadoMovimiento;
 
 /*
 	Pre:- 
@@ -565,6 +566,17 @@ unsigned int Personaje::update(Mapa* mapa) {
 	return retorno;
 }
 
+void Personaje::updateRevivir() {
+	//Logica de revivir
+	if ((this->timerRevivir.isStarted()) && (this->timerRevivir.getTicks()>this->TIEMPO_REVIVIR)) {
+		BitStream bs;
+		bs << PROTO::REQUEST_REV_POS << start_pos_x << start_pos_y;
+		sock.send(bs.str());
+		estadoMovimiento=MOV::ESPERANDO_OK;
+		this->timerRevivir.stop();
+	}
+}
+
 /*
 	Pre: Mapa distinto de null. El parametro tileDestino es cualquier tile en la 
 	dirección del ataque.
@@ -969,4 +981,11 @@ void Personaje::utilizarHielo(Mapa* mapa, PjeManager* pjm) {
 	std::cout << "Fui asesinado" << endl;
 	//Redirecciono a la posicion inicial nuevamente
 	this->vivo=false;
+	this->timerRevivir.start();
  }
+
+ void Personaje::revivir() {
+	 this->vivo=true;
+	 this->energia=this->ENERGIA_TOTAL;
+ }
+

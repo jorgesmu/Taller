@@ -6,6 +6,7 @@
 #include "../utilities/ImagenPersonaje.h"
 #include "../display/tile.h"
 #include "../display/mapa.h"
+#include "timer.h"
 //#include "../utilities/corazon.h"
 class Tile;
 class Mapa;
@@ -63,6 +64,9 @@ public:
 		//Radio de los hechizos
 		const static unsigned int RADIO_HECHIZO = 4; //en tiles
 
+		//Revivir tiempo
+		const static unsigned int TIEMPO_REVIVIR = 3000;
+
 		//Daño maximo de los hechizos
 		const static char DAÑO_TERREMOTO = 100;
 
@@ -116,6 +120,9 @@ protected:
 
 		//Muerte
 		bool vivo;
+
+		//Timer para revivir
+		Timer timerRevivir;
 				
 public:
 	
@@ -245,6 +252,9 @@ public:
 	*/
 	virtual unsigned int update(Mapa* mapa);
 
+	//Con logica de timer revivir
+	void updateRevivir();
+
 	// Retorna el ancla de niebla X adecuada
 	virtual int getXAnclajeNiebla();
 
@@ -319,7 +329,7 @@ public:
 
 	bool estaVivo() {return vivo; }
 
-	void revivir() { this->vivo=true; }
+	void revivir();
 
 	//Setea el radio de vision en el eje Y
 	void setRadio(int newRadio) { 

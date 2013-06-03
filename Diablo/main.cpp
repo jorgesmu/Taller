@@ -75,7 +75,7 @@ config_general configuracion;
 //Choques
 bool choco;
 //Muerte que llega desde el personaje como aviso
-bool murio;
+//bool murio;
 //Socket
 ClientSocket sock;
 
@@ -284,14 +284,10 @@ int main(int argc, char* argv[]) {
 
 		// Sync stuff
 		EnterCriticalSection(&cs_main);
-
+		/*
 		//Veo si algun personaje esta muerto
 		if (!pjm.getPjeLocal().estaVivo()) {
-			//Veo si me puedo mover al lugar de inicio
-			bs.clear();
-			bs << PROTO::REQUEST_POS << start_pos_x << start_pos_y;
-			sock.send(bs.str());
-			estadoMovimiento=MOV::ESPERANDO_OK;
+			//Si me puedo mover al lugar de inicio
 			if (estadoMovimiento==MOV::OK_RECV) {
 				// Lo elimino de la posicion donde murio
 				mapa.getTile(start_pos_x, start_pos_y)->deleteEntidad(&(pjm.getPjeLocal()));
@@ -309,7 +305,7 @@ int main(int argc, char* argv[]) {
 			}
 			//Ver que hago sino
 		}
-
+		*/
 		// Input handling (esto despues se movera a donde corresponda)
 		while(SDL_PollEvent(&event)) {
 
@@ -462,6 +458,23 @@ int main(int argc, char* argv[]) {
 
 		// Aca se hace el timestep, aka avanzar la fisica usando Euler en un delta t fijo
 		while(accum >= CONST_DT) {
+			// Veo si me tengo que relocalizar en el mapa
+			if (estadoMovimiento == MOV::OK_REV_RECV) {
+				std::cout << "Relocalizando al jugador..." << endl;
+				// Lo elimino de la posicion donde murio
+				mapa.getTile(pjm.getPjeLocal().getPosicion(&mapa)->getU(), pjm.getPjeLocal().getPosicion(&mapa)->getV())->deleteEntidad(&(pjm.getPjeLocal()));
+				// Posiciono el personaje
+				mapa.getTile(start_pos_x, start_pos_y)->addEntidad(&(pjm.getPjeLocal()));
+				pjm.getPjeLocal().setTileActual(mapa.getTile(start_pos_x, start_pos_y));
+				// Inicializo el recorridor
+				update_recorrido.tile_anterior = update_recorrido.tile_actual = vec2<int>(start_pos_x, start_pos_y);
+				update_recorrido.timer.start();
+				// Cosas del movimiento
+				estadoMovimiento = MOV::IDLE;
+				// Centro la camara
+				camara.center(mapa.getTile(start_pos_x, start_pos_y)->getX(), mapa.getTile(start_pos_x, start_pos_y)->getY());
+				pjm.getPjeLocal().revivir();
+			}
 			// Actualiza la camara
 			camara.update();
 			// Actualiza las entidades
@@ -475,15 +488,12 @@ int main(int argc, char* argv[]) {
 			// Actualizamos el personaje principal
 			Tile* t = mapa.getTilePorPixeles(pjm.getPjeLocal().getX(),pjm.getPjeLocal().getY());
 			tileActual = make_pair<int,int>(t->getU(), t->getV());
+
+			//Para revivir
+			pjm.getPjeLocal().updateRevivir();
 			
 			if (puedeMoverse) {				
 				if (!choco) {
-					std::cout << "Energia: " << (int)pjm.getPjeLocal().getEnergia() << endl;
-					std::cout << "Escudo: " << (int)pjm.getPjeLocal().getEnergiaEscudo() << endl;
-					std::cout << "Magia: " << (int)pjm.getPjeLocal().getMagia() << endl;
-					std::cout << "Velocidad: " << pjm.getPjeLocal().getVelocidad() << endl;
-					std::cout << "Terremotos: " << (int)pjm.getPjeLocal().getTerremoto() << endl;
-					std::cout << "Hielos: " << (int)pjm.getPjeLocal().getHielo() << endl;
 					std::vector<Entidad*> entidades=pjm.getPjeLocal().getPosicion(&mapa)->getEntidades();
 					for (auto it=entidades.begin();it!=entidades.end();it++) {
 						if ((*it)!=&pjm.getPjeLocal()) //sino choca con si mismo
@@ -556,7 +566,7 @@ int main(int argc, char* argv[]) {
 						BitStream bs;
 						bs << PROTO::REQUEST_POS << proximoTile.first << proximoTile.second;
 						sock.send(bs.str());
-					}
+					} 
 					//std::cout << "TILE ACTUAL: " << tileActual.first << ";" << tileActual.second << "\n";
 					//std::cout << "PROX TILE: " << proximoTile.first << ";" << proximoTile.second << "\n";
 

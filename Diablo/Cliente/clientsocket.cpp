@@ -425,6 +425,21 @@ void ClientSocket::listenDo() {
 					std::cout << "GOT FAIL FROM SERVER\n";
 				}
 			}
+		}else if(pt == PROTO::POS_REQUEST_REV_REPLY) {
+			bool reply;
+			bs >> reply;
+			if(estadoMovimiento != MOV::ESPERANDO_OK) {
+				std::cout << "Received POS_REQUEST_REV_REPLY without MOV::ESPERANDO_OK\n";
+			}else{
+				if(reply) {
+					pjm.getPjeLocal().revivir();
+					estadoMovimiento = MOV::OK_REV_RECV;
+					std::cout << "GOT OK REV FROM SERVER\n";					
+				}else{
+					estadoMovimiento = MOV::FAIL_RECV;
+					std::cout << "GOT FAIL REV FROM SERVER\n";
+				}
+			}
 		}else if(pt == PROTO::MOVE_PLAYER) {
 			std::string nick;
 			int x, y;
@@ -435,6 +450,19 @@ void ClientSocket::listenDo() {
 				auto& p = pjm.getPje(nick);
 				p.mover(mapa.getTile(x, y));
 				std::cout << "Server requested move of <" << nick << "> to " << x << ";" << y << "\n";
+			}
+		}else if(pt == PROTO::REV_PLAYER) {
+			std::string nick;
+			int x, y;
+			bs >> nick >> x >> y;
+			if(!pjm.PjeExiste(nick)) {
+				std::cout << "Server requested move of invalid PJ: " << nick << "\n";
+			}else{
+				auto& p = pjm.getPje(nick);
+				mapa.getTile(p.getPosicion(&mapa)->getU(), p.getPosicion(&mapa)->getV())->deleteEntidad(&p);
+				mapa.getTile(x, y)->addEntidad(&p);
+				p.setTileActual(mapa.getTile(x, y));
+				std::cout << "Server requested revival of <" << nick << "> to " << x << ";" << y << "\n";
 			}
 		}else if(pt == PROTO::USE_ITEM) {
 			std::string nick_who;

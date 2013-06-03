@@ -71,7 +71,12 @@ const unsigned char OLD_ATT = 'y';
 const unsigned char INIT_ATT = 'z';
 // Congela a un personaje
 const unsigned char CONGELAR = 'A';
-
+// Revive posicion
+const unsigned char REQUEST_REV_POS = 'B';
+// Revive posicion OK
+const unsigned char POS_REQUEST_REV_REPLY = 'C';
+// Transportar player a revive posicion
+const unsigned char REV_PLAYER = 'D';
 
 }
 
@@ -82,6 +87,8 @@ namespace MOV {
 	const int OK_RECV = 2;
 	const int FAIL_RECV = 3;
 	const int MANDAR_POS = 4;
+	const int MUERTO = 5;
+	const int OK_REV_RECV = 6;
 }
 
 // Cosas de items

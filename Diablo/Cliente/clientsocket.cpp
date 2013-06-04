@@ -564,11 +564,12 @@ void ClientSocket::listenDo() {
 			bs >> x >> y;
 			//Agrego bandera
 			std::cout << "Adding flag in pos (" << x << "," << y << ")" << endl;
-			/*
-			Bandera bandera("bandera",1,1,true, x ,y,NULL,&mapa,resman,Imagen::COLOR_KEY );
-			mapa.getTile(x,y)->addEntidad(&bandera,&mapa);
-			entidades_cargadas.push_back(&bandera);
-			*/			
+			/*Bandera* bandera;
+			bandera = new Bandera("bandera",1,1,true, x ,y,NULL,&mapa,resman,Imagen::COLOR_KEY );
+			mapa.getTile(x,y)->addEntidad(bandera,&mapa);
+			entidades_cargadas.push_back(bandera);
+			*/
+					
 		}else{
 			std::cout << "Unknown packet type " << int(pt) << " received\n";
 		}

@@ -175,16 +175,16 @@ int main(int argc, char* argv[]) {
 			it->addEntidad((Entidad*)&entidadPisoPorDefecto);
 		}
 	}
-
+	/*
 	//Agrego recurso para banderas
 	resman.addRes("bandera","../resources/bandera.png");
-	/*		
+	*/	
 	//Prueba de carga items
 	resman.addRes("cofre","../resources/bandera.png");
 	Bandera cofre("cofre",1,1,true, 6 ,13,NULL,&mapa,resman,Imagen::COLOR_KEY );
 	mapa.getTile(6,13)->addEntidad(&cofre,&mapa);
 	entidades_cargadas.push_back(&cofre);
-	*/
+	
 	for (auto it = entidades.begin(); it != entidades.end(); ++it){
 		resman.addRes(it->get_nombre(), it->get_path_imagen(), Imagen::COLOR_KEY);
 		EntidadFija* entidad;

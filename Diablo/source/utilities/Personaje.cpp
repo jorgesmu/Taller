@@ -1010,8 +1010,13 @@ void Personaje::utilizarHielo(Mapa* mapa, PjeManager* pjm) {
  }
 
  void Personaje::chocarConBandera(Bandera* bandera) {
-	 std::cout << "Atrape la bandera" << endl;
-	 //Aviso al server que atrape una bandera
+	 BitStream bs;
+	 Tile* tilePersonaje = pjm.getPjeLocal().getPosicion(&mapa);
+	 int x = tilePersonaje->getU();
+	 int y = tilePersonaje->getV();
+	 std::cout << "Atrape bandera en pos (" << x << "," << y << ")" << endl;
+	 bs << PROTO::CATCH_FLAG << x << y;
+	 sock.send(bs.str());
  }
 
 void Personaje::aumentarRadio(float proporcion) {

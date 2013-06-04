@@ -757,6 +757,10 @@ void ServerSocket::acceptLastDo() {
 					std::cout << "REPLY: FAIL\n";
 					this->send(cid, bs.str());
 				}
+			}else if(pt == PROTO::CATCH_FLAG) {
+				int x,y;
+				bs >> x >> y;
+				std::cout << new_nick << " atrapo bandera en pos (" << x << "," << y << ")" << endl;
 			}else{
 				bs.clear();
 				bs << PROTO::TEXTMSG << std::string("Unknown packet type");

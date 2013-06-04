@@ -79,6 +79,8 @@ const unsigned char POS_REQUEST_REV_REPLY = 'C';
 const unsigned char REV_PLAYER = 'D';
 // Colocar bandera en una posicion del mapa
 const unsigned char NEW_FLAG = 'E';
+// Atrape una bandera
+const unsigned char CATCH_FLAG = 'F';
 
 }
 

@@ -326,5 +326,8 @@
     <ClInclude Include="source\utilities\ImagenArma.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="source\utilities\bandera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

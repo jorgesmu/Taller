@@ -77,6 +77,8 @@ const unsigned char REQUEST_REV_POS = 'B';
 const unsigned char POS_REQUEST_REV_REPLY = 'C';
 // Transportar player a revive posicion
 const unsigned char REV_PLAYER = 'D';
+// Colocar bandera en una posicion del mapa
+const unsigned char NEW_FLAG = 'E';
 
 }
 

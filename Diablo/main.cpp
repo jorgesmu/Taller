@@ -35,6 +35,7 @@
 #include "../../source/utilities/terremoto.h"
 #include "../../source/utilities/escudo.h"
 #include "../../source/utilities/interface.h"
+#include "../../source/utilities/bandera.h"
 
 using namespace std;
 
@@ -82,6 +83,8 @@ bool choco;
 //bool murio;
 //Socket
 ClientSocket sock;
+// Cargo las entidades en un vector
+std::vector<EntidadFija*> entidades_cargadas;
 
 int main(int argc, char* argv[]) {
 	// Verificamos que se pase el nick y el tipo
@@ -173,16 +176,15 @@ int main(int argc, char* argv[]) {
 		}
 	}
 
-
-	// Cargo las entidades en un vector
-	std::vector<EntidadFija*> entidades_cargadas;
-			
+	//Agrego recurso para banderas
+	resman.addRes("bandera","../resources/bandera.png");
+	/*		
 	//Prueba de carga items
-	resman.addRes("cofre","../resources/chest.png");
-	Lampara cofre("cofre",1,1,true, 6 ,13,NULL,&mapa,resman,Imagen::COLOR_KEY );
+	resman.addRes("cofre","../resources/bandera.png");
+	Bandera cofre("cofre",1,1,true, 6 ,13,NULL,&mapa,resman,Imagen::COLOR_KEY );
 	mapa.getTile(6,13)->addEntidad(&cofre,&mapa);
 	entidades_cargadas.push_back(&cofre);
-
+	*/
 	for (auto it = entidades.begin(); it != entidades.end(); ++it){
 		resman.addRes(it->get_nombre(), it->get_path_imagen(), Imagen::COLOR_KEY);
 		EntidadFija* entidad;

@@ -2,6 +2,7 @@
 
 #include "../source/utilities/aux_func.h"
 #include "parserServer.h"
+#include "misiones.h"
 
 #include <iostream>
 #include <sstream>
@@ -22,6 +23,7 @@ extern int escenario_elegido_id;
 
 bool ServerSocket::WSinit = false;
 size_t ServerSocket::ref_count = 0;
+extern Misiones mision;
 
 ServerSocket::ServerSocket() {
 	// Increase ref count
@@ -483,6 +485,18 @@ void ServerSocket::acceptLastDo() {
 			send(cid, bs.str());
 		}
 
+		//Mandamos las banderas si correponde la mision
+		if (mision.getTipo()==Misiones::MISION_BANDERAS) {
+			int contBanderas=0;
+			std::list<std::pair<int,int>> banderas=mision.getBanderas();
+			for (auto it=banderas.begin(); it != banderas.end(); it++) {
+				bs.clear();
+				bs << PROTO::NEW_FLAG << it->first << it->second;
+				send(cid,bs.str());
+				std::cout << "Sending flag " << contBanderas+1 << " pos (" << it->first << "," << it->second << ")" << endl;
+				contBanderas++;
+			}			
+		}
 		
 
 		// Para tipear menos, p_local = referencia al player de este thread

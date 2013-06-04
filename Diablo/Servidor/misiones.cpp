@@ -1,6 +1,8 @@
 #include "misiones.h"
 #include "../source/utilities/aux_func.h"
 
+#include <iostream>
+
 extern MapaServidor mapa;
 
 void Misiones::agregarBandera() {
@@ -12,7 +14,7 @@ void Misiones::agregarBandera() {
 	while (!done && cont<999) {
 		x=intRand(0,w-1);
 		y=intRand(0,h-1);
-		if(mapa.getTile(x, y)->isCaminable()) {
+		if(mapa.getTile(x, y)->isCaminable() && !this->hayBandera(x,y)) {
 			done = true;
 		}
 		cont++;

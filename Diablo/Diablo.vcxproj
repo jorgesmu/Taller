@@ -73,6 +73,7 @@
     <ClInclude Include="source\utilities\arista.h" />
     <ClInclude Include="source\utilities\arma.h" />
     <ClInclude Include="source\utilities\aux_func.h" />
+    <ClInclude Include="source\utilities\bandera.h" />
     <ClInclude Include="source\utilities\bombas.h" />
     <ClInclude Include="source\utilities\botella.h" />
     <ClInclude Include="source\utilities\chatwindow.h" />

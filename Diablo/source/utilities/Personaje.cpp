@@ -12,6 +12,7 @@
 #include "mapaItem.h"
 #include "terremoto.h"
 #include "hielo.h"
+#include "bandera.h"
 #include "../net/bitstream.h"
 #include "../net/defines.h"
 #include "../../Cliente/clientsocket.h"
@@ -1006,6 +1007,11 @@ void Personaje::utilizarHielo(Mapa* mapa, PjeManager* pjm) {
 	 BitStream bs;
 	 bs << PROTO::UPDATE_ATT << ATT::ENERGIA_ESCUDO << pjm.getPjeLocal().getEnergiaEscudo();
 	 sock.send(bs.str());
+ }
+
+ void Personaje::chocarConBandera(Bandera* bandera) {
+	 std::cout << "Atrape la bandera" << endl;
+	 //Aviso al server que atrape una bandera
  }
 
 void Personaje::aumentarRadio(float proporcion) {

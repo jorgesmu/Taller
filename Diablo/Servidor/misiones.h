@@ -31,4 +31,5 @@ class Misiones{
 		//Cantidad de banderas a atrapar
 		int cantBanderas();
 
+		std::list<std::pair<int,int>> getBanderas() { return banderas; }
 };

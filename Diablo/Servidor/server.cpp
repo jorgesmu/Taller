@@ -16,6 +16,7 @@
 #include "../source/utilities/aux_func.h"
 #pragma comment(lib, "Ws2_32.lib")
 #include "config_servidor.h"
+#include "misiones.h"
 //#include "../source/utilities/config_juego.h"
 #include "parserServer.h"
 #include "playerman.h"
@@ -26,6 +27,7 @@
 logErrores err_log("log_parser.txt");
 PlayerManager pm;
 MapaServidor mapa;
+Misiones mision;
 std::string escenario_elegido;
 int escenario_elegido_id;
 
@@ -118,6 +120,9 @@ int main(int argc, char* argv[]) {
 			}
 		}
 	}
+	//Creacion de misiones()logica random entre los distintos tipos)
+	mision.crearMisionBanderas(2);
+	std::cout << "Se creo mision de " << mision.cantBanderas() << " banderas" << endl;
 
 	// Spawneamos el thread de listen
 	_beginthreadex(NULL, 0, ServerSocket::listenLoopEntry, (void*)&sock, 0, NULL);

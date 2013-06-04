@@ -6,6 +6,7 @@
 #include "../../source/utilities/parser.h"
 #include "clientsocket.h"
 #include "../../source/utilities/chatwindow.h"
+#include "../source/utilities/bandera.h"
 #include <iostream>
 #include <fstream>
 
@@ -25,6 +26,7 @@ extern config_general configuracion;
 extern ResMan resman;
 extern ChatWindow chat_window;
 extern int estadoMovimiento;
+extern std::vector<EntidadFija*> entidades_cargadas;
 
 bool ClientSocket::WSinit = false;
 size_t ClientSocket::ref_count = 0;
@@ -557,6 +559,16 @@ void ClientSocket::listenDo() {
 					break;
 				}
 			}
+		}else if(pt == PROTO::NEW_FLAG) {	
+			int x,y;
+			bs >> x >> y;
+			//Agrego bandera
+			std::cout << "Adding flag in pos (" << x << "," << y << ")" << endl;
+			/*
+			Bandera bandera("bandera",1,1,true, x ,y,NULL,&mapa,resman,Imagen::COLOR_KEY );
+			mapa.getTile(x,y)->addEntidad(&bandera,&mapa);
+			entidades_cargadas.push_back(&bandera);
+			*/			
 		}else{
 			std::cout << "Unknown packet type " << int(pt) << " received\n";
 		}

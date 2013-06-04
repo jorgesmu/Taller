@@ -23,6 +23,7 @@ class Lampara;
 class MapaItem;
 class Terremoto;
 class Hielo;
+class Bandera;
 class ClientSocket;
 
 class Personaje : public Entidad {
@@ -316,6 +317,8 @@ public:
 	void chocarConVaritas(Varitas* varitas);
 
 	void chocarConEscudo(Escudo* escudo);
+
+	void chocarConBandera(Bandera* bandera);
 
 	void setTerremoto(char valor) { this->terremoto=valor; }
 

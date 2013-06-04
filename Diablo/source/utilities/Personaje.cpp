@@ -8,6 +8,10 @@
 #include "granadas.h"
 #include "varitas.h"
 #include "escudo.h"
+#include "lampara.h"
+#include "mapaItem.h"
+#include "terremoto.h"
+#include "hielo.h"
 #include "../net/bitstream.h"
 #include "../net/defines.h"
 #include "../../Cliente/clientsocket.h"
@@ -829,13 +833,15 @@ void Personaje::dañar(char daño) {
 }
 		
 
-void Personaje::chocarConLampara() {
-	this->aumentarRadio(0.25);
+void Personaje::chocarConLampara(Lampara* lampara) {
+	this->getPosicion(&mapa)->deleteEntidad(lampara);
+	this->aumentarRadio(lampara->getProporcionAumento());
 }
 
 //Mejorar: recorrer todos los tiles y colocarlos como visitados
-void Personaje::chocarConMapa() {
+void Personaje::chocarConMapa(MapaItem* mapaItem) {
 	std::cout << "Se descubre todo el mapa" << endl; 
+	this->getPosicion(&mapa)->deleteEntidad(mapaItem);
 	std::vector<Tile> tiles = mapa.allTiles();
 	for(auto it = tiles.begin(); it != tiles.end(); ++it){
 		Tile* tileExplorado = mapa.getTile(it->getU(), it->getV());
@@ -855,20 +861,23 @@ void Personaje::aumentarVelocidad(char porcentaje) {
 
 void Personaje::chocarConZapatos(Zapatos* zapatos) {
 	std::cout << "Aumento la velocidad un " << (int)zapatos->getAumentoVelocidad() << "%\n";
+	this->getPosicion(&mapa)->deleteEntidad(zapatos);
 	this->aumentarVelocidad(zapatos->getAumentoVelocidad());
 	BitStream bs;
 	bs << PROTO::UPDATE_ATT << ATT::VEL << (float)pjm.getPjeLocal().getVelocidad();
 	sock.send(bs.str());
 }
 
-void Personaje::chocarConTerremoto() {
+void Personaje::chocarConTerremoto(Terremoto* terremoto) {
+	this->getPosicion(&mapa)->deleteEntidad(terremoto);
 	this->terremoto++;
 	BitStream bs;
 	bs << PROTO::UPDATE_ATT << ATT::CANT_TERREMOTO << this->getTerremoto();
 	sock.send(bs.str());
 }
 
-void Personaje::chocarConHielo() {
+void Personaje::chocarConHielo(Hielo* hielo) {
+	this->getPosicion(&mapa)->deleteEntidad(hielo);
 	this->hielo++;
 	BitStream bs;
 	bs << PROTO::UPDATE_ATT << ATT::CANT_HIELO << this->getHielo();
@@ -900,8 +909,7 @@ void Personaje::utilizarTerremoto(Mapa* mapa, PjeManager* pjm, ClientSocket* soc
 					yPersonaje=tilePersonaje->getV();
 					if ((i==xPersonaje) && (j==yPersonaje)) {
 						srand (time(NULL));
-						//dañoRealizado=rand()%(this->ENERGIA_TOTAL+1);	
-						dañoRealizado=100;
+						dañoRealizado=rand()%(this->ENERGIA_TOTAL+1);	
 						it->second.dañar(dañoRealizado);
 						std::cout << "Se danio a " << it->first << " con terremoto, total de " << (int)dañoRealizado << endl;
 						bs.clear();
@@ -952,6 +960,7 @@ void Personaje::utilizarHielo(Mapa* mapa, PjeManager* pjm) {
 }
 
  void Personaje::chocarConCorazon(Corazon* corazon) {
+	this->getPosicion(&mapa)->deleteEntidad(corazon);
 	this->energia+=corazon->getEnergiaGanada();
 	if (this->energia>this->ENERGIA_TOTAL)
 		this->energia=this->ENERGIA_TOTAL;
@@ -961,6 +970,7 @@ void Personaje::utilizarHielo(Mapa* mapa, PjeManager* pjm) {
 }
 
  void Personaje::chocarConBotella(Botella* botella) {
+	 this->getPosicion(&mapa)->deleteEntidad(botella);
 	 this->magia+=botella->getMagiaGanada();
 	 if (this->magia>this->MAGIA_TOTAL)
 		 this->magia=this->MAGIA_TOTAL;
@@ -970,30 +980,35 @@ void Personaje::utilizarHielo(Mapa* mapa, PjeManager* pjm) {
  }
 
  void Personaje::chocarConFlechas(Flechas* flechas) {
+	 this->getPosicion(&mapa)->deleteEntidad(flechas);
 	 this->flechas+=flechas->getCantFlechas();
  }
 
  void Personaje::chocarConBombas(Bombas* bombas) {
+	 this->getPosicion(&mapa)->deleteEntidad(bombas);
 	 this->bombas+=bombas->getCantBombas();
  }
 
  void Personaje::chocarConGranadas(Granadas* granadas) {
+	 this->getPosicion(&mapa)->deleteEntidad(granadas);
 	 this->granadas+=granadas->getCantGranadas();
  }
 
  //Podria no recibir la varita, lo dejamos por si es necesario en un futuro
  void Personaje::chocarConVaritas(Varitas* varitas) {
+	 this->getPosicion(&mapa)->deleteEntidad(varitas);
 	 this->varita=true;
  }
 
  void Personaje::chocarConEscudo(Escudo* escudo) {
+	 this->getPosicion(&mapa)->deleteEntidad(escudo);
 	 this->energiaEscudo+=escudo->getEnergiaEscudo();
 	 BitStream bs;
 	 bs << PROTO::UPDATE_ATT << ATT::ENERGIA_ESCUDO << pjm.getPjeLocal().getEnergiaEscudo();
 	 sock.send(bs.str());
  }
 
-void Personaje::aumentarRadio(double proporcion) {
+void Personaje::aumentarRadio(float proporcion) {
 	radioY*=(1+proporcion);
 	radioX=2*radioY;
 

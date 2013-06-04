@@ -19,6 +19,10 @@ class Bombas;
 class Granadas;
 class Varitas;
 class Escudo;
+class Lampara;
+class MapaItem;
+class Terremoto;
+class Hielo;
 class ClientSocket;
 
 class Personaje : public Entidad {
@@ -285,9 +289,9 @@ public:
 
 	void chocarConItem() {std::cout << "Agarro item\n"; }
 
-	void chocarConLampara();
+	void chocarConLampara(Lampara * lampara);
 
-	void chocarConMapa();
+	void chocarConMapa(MapaItem* mapaItem);
 
 	void aumentarVelocidad(char porcentaje);
 
@@ -295,9 +299,9 @@ public:
 
 	void chocarConHechizo() {std::cout << "Choco con hechizo\n"; }
 
-	void chocarConTerremoto();
+	void chocarConTerremoto(Terremoto* terremoto);
 
-	void chocarConHielo();
+	void chocarConHielo(Hielo* hielo);
 	
 	void chocarConCorazon(Corazon* corazon);
 
@@ -340,7 +344,7 @@ public:
 	}
 
 	//Recibe un valor de proporcion (0.25 aumenta 25%) para aumentar el radio de vision
-	void aumentarRadio(double proporcion);
+	void aumentarRadio(float proporcion);
 
 	float getRadioX() { return radioX; }
 

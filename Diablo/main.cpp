@@ -377,14 +377,10 @@ int main(int argc, char* argv[]) {
 							//chequeo sicronizacion para que calcule el camino minimo desde el tile al que se esta moviendo al destino
 							if (ultimoMovimientoX == NOSEMOVIO && ultimoMovimientoY == NOSEMOVIO){
 								tilePersonaje = mapa.getTilePorPixeles(pjm.getPjeLocal().getX(), pjm.getPjeLocal().getY());
-								std::cout << "Obtiene pos normal" << endl;
 							}else{
 								tilePersonaje = mapa.getTile(ultimoMovimientoX,ultimoMovimientoY);
-								std::cout << "Obtiene pos rara" << endl;
 							}
 							Tile* tileDestino = mapa.getTile(tile_res.x, tile_res.y);
-							std::cout << "tilePersonaje(" << tilePersonaje->getU() << "," << tilePersonaje->getV() << endl;
-							std::cout << "tileDestino(" << tileDestino->getU() << "," << tileDestino->getV() << endl;
 							//guardo el destino
 							ultimoDestinoX = tile_res.x;
 							ultimoDestinoY = tile_res.y;
@@ -498,20 +494,27 @@ int main(int argc, char* argv[]) {
 			if (puedeMoverse) {				
 				if (!choco) {
 					std::vector<Entidad*> entidades=pjm.getPjeLocal().getPosicion(&mapa)->getEntidades();
+					std::list<Entidad*> entidadesChocadas; //asi evito chocar dos veces, con la entidad y con el ancla
+					bool yaChoco=false;
+					entidadesChocadas.push_back(&pjm.getPjeLocal()); //sino choca con si mismo
 					for (auto it=entidades.begin();it!=entidades.end();it++) {
-						if ((*it)!=&pjm.getPjeLocal()) //sino choca con si mismo
+						//Veo si ya choque con esta entidad
+						for (auto it2=entidadesChocadas.begin(); it2!=entidadesChocadas.end(); it2++) {
+							if ((*it2)==(*it)) yaChoco=true;
+						}
+						if (!yaChoco) {
 							(*it)->chocarCon(&pjm.getPjeLocal());
+							entidadesChocadas.push_back(*it);
+						}
 					}
-					choco=true;
 				}
+				choco=true;
 				//std::cout << puedeMoverse << " " << estadoMovimiento << "\n";
 				//si termino de ir al tile anterior
 				if(indice < caminoMinimo.size()){
-					std::cout << "Indice: " << indice << " - Size camino: " << caminoMinimo.size() << endl;
 					//establezo proximo tile del camino
 					proximoTile = caminoMinimo[indice];
-					//verifico que sea caminable
-					
+					//verifico que sea caminable					
 					if (mapa.tileExists(proximoTile.first,proximoTile.second) && !(mapa.getTile(proximoTile.first,proximoTile.second)->isCaminable())){
 						caminoMinimo.clear();
 						estadoMovimiento = MOV::ESPERANDO_OK;

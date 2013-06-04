@@ -475,6 +475,7 @@ void ClientSocket::listenDo() {
 				mapa.getTile(p.getPosicion(&mapa)->getU(), p.getPosicion(&mapa)->getV())->deleteEntidad(&p);
 				mapa.getTile(x, y)->addEntidad(&p);
 				p.setTileActual(mapa.getTile(x, y));
+				p.revivir();
 				std::cout << "Server requested revival of <" << nick << "> to " << x << ";" << y << "\n";
 			}
 		}else if(pt == PROTO::USE_ITEM) {

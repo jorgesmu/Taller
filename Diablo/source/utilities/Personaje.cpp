@@ -747,6 +747,14 @@ void Personaje::animacionMuerte() {
 	}
 }
 
+void Personaje::animacionRevivir() {
+	ImagenPersonaje* imagenPersonaje = static_cast<ImagenPersonaje*> (this -> imagen);
+	this -> tileDestino = NULL;
+	if (imagenPersonaje != NULL){
+		imagenPersonaje -> setAccion(ImagenPersonaje::EST_SUR);
+	}
+}
+
 // Por ahora retorna trivialmente la posicion en X
 int Personaje::getXAnclajeNiebla(){
 	return this -> getX();
@@ -827,6 +835,7 @@ void Personaje::chocarConLampara() {
 
 //Mejorar: recorrer todos los tiles y colocarlos como visitados
 void Personaje::chocarConMapa() {
+	std::cout << "Se descubre todo el mapa" << endl; 
 	std::vector<Tile> tiles = mapa.allTiles();
 	for(auto it = tiles.begin(); it != tiles.end(); ++it){
 		Tile* tileExplorado = mapa.getTile(it->getU(), it->getV());
@@ -1005,5 +1014,6 @@ void Personaje::muere() {
 
  void Personaje::revivir() {
 	 this->vivo=true;
+	 this->animacionRevivir();
 	 this->energia=this->ENERGIA_TOTAL;
  }

@@ -226,6 +226,8 @@ public:
 
 	void animacionMuerte();
 
+	void animacionRevivir();
+
 	/*
 		Pre: La instancia ha sido creada.
 		Post: Se setea el Tile destino.

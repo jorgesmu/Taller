@@ -498,7 +498,7 @@ void ServerSocket::acceptLastDo() {
 			//Mando los atributos principales del jugador
 			bs.clear();
 			auto p=pm.getPlayer(new_nick);
-			bs << PROTO::INIT_ATT << new_nick << (float)p.getVelocidad() << p.getEnergia() << p.getMagia() << p.getEnergiaEscudo() << p.getTerremoto() << p.getHielo() << (float)p.getRadio();
+			bs << PROTO::INIT_ATT << new_nick << (float)p.getVelocidad() << p.getEnergia() << p.getMagia() << p.getEnergiaEscudo() << p.getTerremoto() << p.getHielo() << p.getRadio();
 			send(it->second.sock,bs.str());
 			if (pm.getPlayer(new_nick).isCongelado()) {
 				bs.clear();

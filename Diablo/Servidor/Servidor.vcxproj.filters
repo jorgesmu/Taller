@@ -72,6 +72,9 @@
     <ClCompile Include="mapaservidor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="misiones.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="serversocket.h">
@@ -135,6 +138,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="mapaservidor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="misiones.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

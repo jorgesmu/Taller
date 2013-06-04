@@ -26,6 +26,7 @@
     <ClCompile Include="config_servidor.cpp" />
     <ClCompile Include="logErroresServer.cpp" />
     <ClCompile Include="mapaservidor.cpp" />
+    <ClCompile Include="misiones.cpp" />
     <ClCompile Include="parserServer.cpp" />
     <ClCompile Include="playerman.cpp" />
     <ClCompile Include="server.cpp" />
@@ -50,6 +51,7 @@
     <ClInclude Include="config_servidor.h" />
     <ClInclude Include="logErroresServer.h" />
     <ClInclude Include="mapaservidor.h" />
+    <ClInclude Include="misiones.h" />
     <ClInclude Include="parserServer.h" />
     <ClInclude Include="playerman.h" />
     <ClInclude Include="serversocket.h" />

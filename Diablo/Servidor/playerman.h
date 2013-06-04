@@ -3,6 +3,8 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <utility>
+#include <list>
 #include <algorithm>
 
 #include "mapaservidor.h"
@@ -22,6 +24,7 @@ class Player {
 	char energia,magia,energiaEscudo;
 	char congelado; //1=congelado,0=no congelado
 	char terremoto,hielo; //cant de hechizos de cada tipo
+	std::list<std::pair<int,int>> banderasAtrapadas; //para la mision de atrapar banderas
 
 	public:
 	Player();
@@ -56,6 +59,12 @@ class Player {
 	void setHielo(char valor) { hielo=valor; }
 	float getRadio() { return radio; }
 	void setRadio(float newRadio) { radio=newRadio; }
+	//Agrega una nueva bandera atrapada por el jugador
+	void atrapoBandera(int x, int y);
+	//Se fija si ya atrapo la bandera dada
+	bool tieneBandera(int x, int y);
+	//Cantidad de banderas atrapadas
+	int cantBanderas();
 
 	void addTileRecorrido(short x, short y);
 	TilesRecorridos& getTilesRecorridos();

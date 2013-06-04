@@ -69,6 +69,26 @@ TilesRecorridos& Player::getTilesRecorridos() {
 	return tiles_recorridos;
 }
 
+//Cosas de misiones
+void Player::atrapoBandera(int x, int y) {
+	banderasAtrapadas.push_back(std::make_pair(x,y));
+}
+
+int Player::cantBanderas() {
+	return banderasAtrapadas.size();
+}
+
+bool Player::tieneBandera(int x, int y) {
+	bool found = false;
+	for (auto it = banderasAtrapadas.begin(); it != banderasAtrapadas.end(); it++) {
+		if (it->first == x && it->second == y) {
+			found = true;
+			break;
+		}
+	}
+	return found;
+}
+
 //////////////
 
 

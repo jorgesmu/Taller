@@ -36,7 +36,7 @@
 #include "../../source/utilities/escudo.h"
 #include "../../source/utilities/interface.h"
 #include "../../source/utilities/bandera.h"
-
+#include "../../source/utilities/arma.h"
 using namespace std;
 
 logErrores err_log("log_cliente.txt");
@@ -167,8 +167,6 @@ int main(int argc, char* argv[]) {
 	resman.addRes("tierraDefault", "../resources/tile.png");
 	Entidad entidadPisoPorDefecto("tierraDefault", 1 , 1 , true , 0 , 0 , NULL, resman , Imagen::COLOR_KEY);
 	
-	
-	
 	// Cargamos el tile por defecto
 	for(auto it = mapa.allTiles().begin();it != mapa.allTiles().end(); ++it) {
 		if(it->sinEntidades()) {
@@ -197,6 +195,20 @@ int main(int argc, char* argv[]) {
 		}
 		entidades_cargadas.push_back(entidad);
 	}
+		
+	//--------------------------------------------------------------------------------------------------
+	// Arma
+	resman.addRes("espada","../resources/espada.png");
+	Arma espada("espada",
+		       2,500,
+			   11,
+			   0,70,
+			   20,20,
+			   mapa.getTile(3,3),
+			   resman,Imagen::COLOR_KEY,
+			   100,NULL);
+	entidades_cargadas.push_back(&espada);
+	//--------------------------------------------------------------------------------------------------
 
 	// Vector de entidades en este mapa
 	vector<config_entidad_en_juego> entidades_en_juego = escenarios[escenario_elegido_id].get_entidades();

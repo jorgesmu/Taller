@@ -86,6 +86,7 @@ void Personaje::inicializarAtributosEnValoresDefault() {
 	this->varita=false;
 	this->energiaEscudo=0;
 	this->vivo=true;
+	this->precision=this->PRECISION_PERSONAJE;
 	this -> cambioDireccionHabilitado = true;
 }
 

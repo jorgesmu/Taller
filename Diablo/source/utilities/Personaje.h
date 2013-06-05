@@ -84,6 +84,9 @@ public:
 		//Magia inicial
 		const static char MAGIA_TOTAL = 100;
 
+		//Precision
+		const static char PRECISION_PERSONAJE = 30;
+
 	//	const static int DELTA_TIEMPO_UPDATE_POSICION = 20; // Tiempo entre cada update en clocks
 
 		const static int MARGEN_ANCLA_X = 10;
@@ -115,6 +118,9 @@ protected:
 
 		//Magia
 		char magia;
+
+		//Para ataques
+		char precision;
 
 		//Armas
 		int flechas;
@@ -284,11 +290,11 @@ public:
 
 	//Colisiones
 	
-	void chocarConEntidad() {std::cout << "Choco con entidad\n"; }
+	void chocarConEntidad() { }
 
-	void chocarConEntidadFija() {std::cout << "Choco con entidad fija\n"; }
+	void chocarConEntidadFija() { }
 
-	void chocarConItem() {std::cout << "Agarro item\n"; }
+	void chocarConItem() { }
 
 	void chocarConLampara(Lampara * lampara);
 
@@ -298,7 +304,7 @@ public:
 
 	void chocarConZapatos(Zapatos* zapatos);
 
-	void chocarConHechizo() {std::cout << "Choco con hechizo\n"; }
+	void chocarConHechizo() { }
 
 	void chocarConTerremoto(Terremoto* terremoto);
 
@@ -339,6 +345,10 @@ public:
 	bool estaVivo() {return vivo; }
 
 	void revivir();
+
+	void setPrecision(char new_precision) { precision=new_precision; }
+
+	char getPrecision() { return precision; }
 
 	//Setea el radio de vision en el eje Y
 	void setRadio(float newRadio) { 

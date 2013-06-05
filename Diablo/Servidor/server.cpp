@@ -120,9 +120,10 @@ int main(int argc, char* argv[]) {
 			}
 		}
 	}
-	//Creacion de misiones()logica random entre los distintos tipos)
-	mision.crearMisionBanderas(2);
-	std::cout << "Se creo mision de " << mision.cantBanderas() << " banderas" << endl;
+	//Creacion de misiones(TODO:logica random entre los distintos tipos)
+	//mision.crearMisionBanderas(2);
+	//std::cout << "Se creo mision de " << mision.cantBanderas() << " banderas" << endl;
+	mision.crearMisionEnemigo("derecha");
 
 	// Spawneamos el thread de listen
 	_beginthreadex(NULL, 0, ServerSocket::listenLoopEntry, (void*)&sock, 0, NULL);

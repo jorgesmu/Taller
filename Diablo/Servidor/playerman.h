@@ -25,6 +25,7 @@ class Player {
 	char congelado; //1=congelado,0=no congelado
 	char terremoto,hielo; //cant de hechizos de cada tipo
 	std::list<std::pair<int,int>> banderasAtrapadas; //para la mision de atrapar banderas
+	std::string lastDamagedBy;
 
 	public:
 	Player();
@@ -65,6 +66,9 @@ class Player {
 	bool tieneBandera(int x, int y);
 	//Cantidad de banderas atrapadas
 	int cantBanderas();
+	//Para saber el ultimo que me ataco por si cumple mision
+	void atacadoPor(std::string atacker) { lastDamagedBy=atacker; }
+	std::string ultimoAtacante() { return lastDamagedBy; }
 
 	void addTileRecorrido(short x, short y);
 	TilesRecorridos& getTilesRecorridos();

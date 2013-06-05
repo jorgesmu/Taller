@@ -577,9 +577,9 @@ void ClientSocket::listenDo() {
 			bs >> nick_winner;
 			// Veo si soy yo
 			if (pjm.getPjeLocal().getNick()==nick_winner) {
-				std::cout << "Felicitaciones! Atrapaste todas las banderas y ganaste la mision!" << endl;
+				std::cout << "Felicitaciones! Ganaste la mision!" << endl;
 			} else {
-				std::cout << nick_winner << " atrapo todas las banderas y gano esta partida, jugale una revancha!" << endl;
+				std::cout << nick_winner << " gano esta partida, jugale una revancha!" << endl;
 			}
 		}else{
 			std::cout << "Unknown packet type " << int(pt) << " received\n";

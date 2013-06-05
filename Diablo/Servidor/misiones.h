@@ -6,6 +6,7 @@ class Misiones{
 	private:
 		char tipo; //0=atrapar banderas, 1=matar enemigo
 		std::list<std::pair<int,int>> banderas; //lista de banderas en mapa(solo interesan sus posiciones)
+		std::string nick_enemy; // nick del enemigo a vencer para ganar la mision(solo se usa si el tipo de mision es 1)
 
 	public:
 		//Constantes
@@ -32,4 +33,11 @@ class Misiones{
 		int cantBanderas();
 
 		std::list<std::pair<int,int>> getBanderas() { return banderas; }
+
+		//Para la mision tipo 1
+		std::string enemigoMision() { return nick_enemy; }
+
+		void setEnemigoMision(std::string nick) { nick_enemy=nick; }
+
+		void crearMisionEnemigo(std::string nick_enemigo);
 };

@@ -621,6 +621,8 @@ void ServerSocket::acceptLastDo() {
 				bs >> nick_who >> nick_to;
 				char dmg;
 				bs >> dmg;
+				//Actualizamos datos locales para la mision de matar un enemigo
+				pm.getPlayer(nick_to).atacadoPor(nick_who);
 				// Avisamos a los otros jugadores 
 				for(auto it = clients_map.begin();it != clients_map.end();it++) {
 					if(it->second.nick == new_nick) continue; // Salteamos a nuestro jugador de avisarle
@@ -724,9 +726,20 @@ void ServerSocket::acceptLastDo() {
 				bs >> x >> y;
 				bool ok = true;
 				std::cout << "GOT REQUEST_REV_POS <" << new_nick << ">: " << x << ";" << y << "\n";
+				//Veo si era el enemigo a matar
+				bool terminoPartida=false;
+				if (new_nick==mision.enemigoMision()) {
+					terminoPartida=true;
+					bs.clear();
+					bs << PROTO::WINNER << pm.getPlayer(new_nick).ultimoAtacante();
+					for(auto it = clients_map.begin();it != clients_map.end();it++) {
+						send(it->second.sock, bs.str());
+						std::cout << "Mandando ganador de la mision a " << it->second.nick << "\n";
+					}
+				}
+				//if (terminoPartida) break; //salteamos lo que queda
 				// Iteramos para ver si hay algun personaje
 				for(auto it = pm.getPlayers().begin();it != pm.getPlayers().end();it++) {
-					// FIX: no deberia devolver FAIL si soy yo el que esta ahi(ver error de cambiar animacion)
 					if (it->first == new_nick) continue;
 					if(it->second.getX() == x && it->second.getY() == y) {
 						ok = false;

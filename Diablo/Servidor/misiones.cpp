@@ -48,3 +48,8 @@ void Misiones::crearMisionBanderas(int n) {
 int Misiones::cantBanderas() {
 	return banderas.size();
 }
+
+void Misiones::crearMisionEnemigo(std::string nick_enemigo) {
+	this->tipo=this->MISION_ENEMIGO;
+	this->nick_enemy=nick_enemigo;
+}

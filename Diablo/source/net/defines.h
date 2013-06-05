@@ -81,7 +81,8 @@ const unsigned char REV_PLAYER = 'D';
 const unsigned char NEW_FLAG = 'E';
 // Atrape una bandera
 const unsigned char CATCH_FLAG = 'F';
-
+// Aviso al clliente que gano la mision
+const unsigned char WINNER = 'G';
 }
 
 // Cosas de movimiento

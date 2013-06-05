@@ -483,21 +483,7 @@ void ServerSocket::acceptLastDo() {
 				bs << it->first << it->second;
 			}
 			send(cid, bs.str());
-		}
-
-		//Mandamos las banderas si correponde la mision
-		if (mision.getTipo()==Misiones::MISION_BANDERAS) {
-			int contBanderas=0;
-			std::list<std::pair<int,int>> banderas=mision.getBanderas();
-			for (auto it=banderas.begin(); it != banderas.end(); it++) {
-				bs.clear();
-				bs << PROTO::NEW_FLAG << it->first << it->second;
-				send(cid,bs.str());
-				std::cout << "Sending flag " << contBanderas+1 << " pos (" << it->first << "," << it->second << ")" << endl;
-				contBanderas++;
-			}			
-		}
-		
+		}		
 
 		// Para tipear menos, p_local = referencia al player de este thread
 		const auto p_local = pm.getPlayer(new_nick);
@@ -542,6 +528,19 @@ void ServerSocket::acceptLastDo() {
 				bs << PROTO::CONGELAR << std::string("RESTORE") << it->first;
 				send(cid,bs.str());
 			}
+		}
+
+		//Mandamos las banderas si correponde la mision
+		if (mision.getTipo()==Misiones::MISION_BANDERAS) {
+			int contBanderas=0;
+			std::list<std::pair<int,int>> banderas=mision.getBanderas();
+			for (auto it=banderas.begin(); it != banderas.end(); it++) {
+				bs.clear();
+				bs << PROTO::NEW_FLAG << it->first << it->second;
+				send(cid,bs.str());
+				std::cout << "Sending flag " << contBanderas+1 << " pos (" << it->first << "," << it->second << ")" << endl;
+				contBanderas++;
+			}			
 		}
 
 		LeaveCriticalSection(&critSect);
@@ -761,6 +760,18 @@ void ServerSocket::acceptLastDo() {
 				int x,y;
 				bs >> x >> y;
 				std::cout << new_nick << " atrapo bandera en pos (" << x << "," << y << ")" << endl;
+				if (mision.hayBandera(x,y) && !pm.getPlayer(new_nick).tieneBandera(x,y)) {
+					pm.getPlayer(new_nick).atrapoBandera(x,y);
+					//Veo si gano la mision
+					if (pm.getPlayer(new_nick).cantBanderas()==mision.cantBanderas()) {
+						bs.clear();
+						bs << PROTO::WINNER << new_nick;
+						for(auto it = clients_map.begin();it != clients_map.end();it++) {
+							send(it->second.sock, bs.str());
+							std::cout << "Mandando ganador de la mision a " << it->second.nick << "\n";
+						}
+					}
+				}				
 			}else{
 				bs.clear();
 				bs << PROTO::TEXTMSG << std::string("Unknown packet type");

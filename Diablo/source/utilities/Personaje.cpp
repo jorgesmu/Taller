@@ -8,11 +8,19 @@
 #include "granadas.h"
 #include "varitas.h"
 #include "escudo.h"
+#include "lampara.h"
+#include "mapaItem.h"
+#include "terremoto.h"
+#include "hielo.h"
+#include "bandera.h"
 #include "../net/bitstream.h"
 #include "../net/defines.h"
 #include "../../Cliente/clientsocket.h"
+#include "../utilities/Arma.h"
 extern PjeManager pjm;
 extern ClientSocket sock;
+extern int start_pos_x,start_pos_y;
+extern int estadoMovimiento;
 extern Mapa mapa;
 
 /*
@@ -79,7 +87,9 @@ void Personaje::inicializarAtributosEnValoresDefault() {
 	this->varita=false;
 	this->energiaEscudo=0;
 	this->vivo=true;
+	this->precision=this->PRECISION_PERSONAJE;
 	this -> cambioDireccionHabilitado = true;
+	this -> espada = NULL;
 }
 
 /*
@@ -131,6 +141,11 @@ Personaje::~Personaje() {
 	}
 	this -> surf = NULL;
 	this -> tileAncla = NULL;
+	// Se elimina la espada
+	if (this -> espada != NULL) {
+		delete(this -> espada);
+		this -> espada = NULL;
+	}
 }
 
 /*
@@ -191,6 +206,11 @@ void Personaje::init(const std::string& nickname, const std::string& name,
 	this -> actualizandoPosicion = false;
 	this -> setNoDibujaFueraDelRadio();
 	this -> ordenBliteo = Entidad::ORDEN_PERSONAJE;
+	// Se inicializa el arma default que es la espada
+	this -> espada = new Arma("espada" , 2 , 500 , 11,
+		Arma::PIXEL_REF_SPRITES_PRIMARIO_X , Arma::PIXEL_REF_SPRITES_PRIMARIO_Y,
+		Arma::PIXEL_REF_SPRITES_ACCION_ESPECIAL_X , Arma::PIXEL_REF_SPRITES_ACCION_ESPECIAL_Y ,
+		tile , rm , Imagen::COLOR_KEY , Arma::DANIO_MAXIMO_DEFAULT , this);
 }
 
 /*
@@ -481,6 +501,9 @@ void Personaje::mover(Tile* tileDestino) {
 	if (tileDestino != NULL) {
 		this -> tileDestino = tileDestino;
 		this -> cambioDireccionHabilitado = true;
+		if (this -> getArmaActiva() != NULL){
+			this -> getArmaActiva() -> mover(tileDestino);
+		}
 	}
 }
 
@@ -502,6 +525,9 @@ void Personaje::mover(Tile* tileDestino , Mapa* mapa) {
 	if (tileDestino != NULL) {
 		this -> tileDestino = tileDestino;
 		this -> cambioDireccionHabilitado = true;
+		if (this -> getArmaActiva() != NULL){
+			this -> getArmaActiva() -> mover(tileDestino);
+		}
 	}
 }
 
@@ -573,7 +599,21 @@ unsigned int Personaje::update(Mapa* mapa) {
 	if(this -> imagen != NULL) {
 		this -> surf = this -> imagen -> getSurface();
 	}
+	if(this -> espada != NULL){
+		this -> espada -> update(mapa);
+	}
 	return retorno;
+}
+
+void Personaje::updateRevivir() {
+	//Logica de revivir
+	if ((this->timerRevivir.isStarted()) && (this->timerRevivir.getTicks()>this->TIEMPO_REVIVIR)) {
+		BitStream bs;
+		bs << PROTO::REQUEST_REV_POS << start_pos_x << start_pos_y;
+		sock.send(bs.str());
+		estadoMovimiento=MOV::ESPERANDO_OK;
+		this->timerRevivir.stop();
+	}
 }
 
 /*
@@ -584,6 +624,18 @@ unsigned int Personaje::update(Mapa* mapa) {
 
 */
 unsigned int Personaje::ataque(Tile* tileDestino , Mapa* mapa) {
+	return this -> ataque(tileDestino , mapa, NULL);
+}
+
+
+/*
+	Pre: Mapa distinto de null. El parametro tileDestino es cualquier tile en la 
+	dirección del ataque.
+
+	Post: Se ha realizado un ataque en la direccion correspondiente del tile parametro.
+
+*/
+unsigned int Personaje::ataque(Tile* tileDestino , Mapa* mapa , Personaje* personajeObjetivo) {
 	unsigned int retorno = Personaje::ATACAR_COMPLETADO;
 	// chequeo que el tileDestino y el mapa sean diferentes de null
 	if ( (tileDestino != NULL) && (mapa != NULL)) {
@@ -603,6 +655,7 @@ unsigned int Personaje::ataque(Tile* tileDestino , Mapa* mapa) {
 				}
 			}
 			ImagenPersonaje* imagenPersonaje = static_cast<ImagenPersonaje*> (this -> imagen);
+			// seteo accion imagen personaje
 			if (imagenPersonaje != NULL){
 				imagenPersonaje -> setAccion(direccionAtaque);
 			}
@@ -638,6 +691,11 @@ unsigned int Personaje::ataque(Tile* tileDestino , Mapa* mapa) {
 		if (imagenPersonaje != NULL){
 			imagenPersonaje -> setAccion(direccionAtaque);
 		}
+	}
+	// Ataque al personaje
+	if (this -> getArmaActiva()){
+		// pone en ejecucion la animacion y quita energia al personaje de acuerdo al arma
+		this -> getArmaActiva() -> atacar(mapa,tileDestino,personajeObjetivo);
 	}
 	return retorno;
 }
@@ -745,6 +803,14 @@ void Personaje::animacionMuerte() {
 	}
 }
 
+void Personaje::animacionRevivir() {
+	ImagenPersonaje* imagenPersonaje = static_cast<ImagenPersonaje*> (this -> imagen);
+	this -> tileDestino = NULL;
+	if (imagenPersonaje != NULL){
+		imagenPersonaje -> setAccion(ImagenPersonaje::EST_SUR);
+	}
+}
+
 // Por ahora retorna trivialmente la posicion en X
 int Personaje::getXAnclajeNiebla(){
 	return this -> getX();
@@ -819,12 +885,15 @@ void Personaje::dañar(char daño) {
 }
 		
 
-void Personaje::chocarConLampara() {
-	this->aumentarRadio(0.25);
+void Personaje::chocarConLampara(Lampara* lampara) {
+	this->getPosicion(&mapa)->deleteEntidad(lampara);
+	this->aumentarRadio(lampara->getProporcionAumento());
 }
 
 //Mejorar: recorrer todos los tiles y colocarlos como visitados
-void Personaje::chocarConMapa() {
+void Personaje::chocarConMapa(MapaItem* mapaItem) {
+	std::cout << "Se descubre todo el mapa" << endl; 
+	this->getPosicion(&mapa)->deleteEntidad(mapaItem);
 	std::vector<Tile> tiles = mapa.allTiles();
 	for(auto it = tiles.begin(); it != tiles.end(); ++it){
 		Tile* tileExplorado = mapa.getTile(it->getU(), it->getV());
@@ -844,20 +913,23 @@ void Personaje::aumentarVelocidad(char porcentaje) {
 
 void Personaje::chocarConZapatos(Zapatos* zapatos) {
 	std::cout << "Aumento la velocidad un " << (int)zapatos->getAumentoVelocidad() << "%\n";
+	this->getPosicion(&mapa)->deleteEntidad(zapatos);
 	this->aumentarVelocidad(zapatos->getAumentoVelocidad());
 	BitStream bs;
 	bs << PROTO::UPDATE_ATT << ATT::VEL << (float)pjm.getPjeLocal().getVelocidad();
 	sock.send(bs.str());
 }
 
-void Personaje::chocarConTerremoto() {
+void Personaje::chocarConTerremoto(Terremoto* terremoto) {
+	this->getPosicion(&mapa)->deleteEntidad(terremoto);
 	this->terremoto++;
 	BitStream bs;
 	bs << PROTO::UPDATE_ATT << ATT::CANT_TERREMOTO << this->getTerremoto();
 	sock.send(bs.str());
 }
 
-void Personaje::chocarConHielo() {
+void Personaje::chocarConHielo(Hielo* hielo) {
+	this->getPosicion(&mapa)->deleteEntidad(hielo);
 	this->hielo++;
 	BitStream bs;
 	bs << PROTO::UPDATE_ATT << ATT::CANT_HIELO << this->getHielo();
@@ -889,8 +961,7 @@ void Personaje::utilizarTerremoto(Mapa* mapa, PjeManager* pjm, ClientSocket* soc
 					yPersonaje=tilePersonaje->getV();
 					if ((i==xPersonaje) && (j==yPersonaje)) {
 						srand (time(NULL));
-						//dañoRealizado=rand()%(this->ENERGIA_TOTAL+1);	
-						dañoRealizado=100;
+						dañoRealizado=rand()%(this->ENERGIA_TOTAL+1);	
 						it->second.dañar(dañoRealizado);
 						std::cout << "Se danio a " << it->first << " con terremoto, total de " << (int)dañoRealizado << endl;
 						bs.clear();
@@ -941,6 +1012,7 @@ void Personaje::utilizarHielo(Mapa* mapa, PjeManager* pjm) {
 }
 
  void Personaje::chocarConCorazon(Corazon* corazon) {
+	this->getPosicion(&mapa)->deleteEntidad(corazon);
 	this->energia+=corazon->getEnergiaGanada();
 	if (this->energia>this->ENERGIA_TOTAL)
 		this->energia=this->ENERGIA_TOTAL;
@@ -950,6 +1022,7 @@ void Personaje::utilizarHielo(Mapa* mapa, PjeManager* pjm) {
 }
 
  void Personaje::chocarConBotella(Botella* botella) {
+	 this->getPosicion(&mapa)->deleteEntidad(botella);
 	 this->magia+=botella->getMagiaGanada();
 	 if (this->magia>this->MAGIA_TOTAL)
 		 this->magia=this->MAGIA_TOTAL;
@@ -959,30 +1032,45 @@ void Personaje::utilizarHielo(Mapa* mapa, PjeManager* pjm) {
  }
 
  void Personaje::chocarConFlechas(Flechas* flechas) {
+	 this->getPosicion(&mapa)->deleteEntidad(flechas);
 	 this->flechas+=flechas->getCantFlechas();
  }
 
  void Personaje::chocarConBombas(Bombas* bombas) {
+	 this->getPosicion(&mapa)->deleteEntidad(bombas);
 	 this->bombas+=bombas->getCantBombas();
  }
 
  void Personaje::chocarConGranadas(Granadas* granadas) {
+	 this->getPosicion(&mapa)->deleteEntidad(granadas);
 	 this->granadas+=granadas->getCantGranadas();
  }
 
  //Podria no recibir la varita, lo dejamos por si es necesario en un futuro
  void Personaje::chocarConVaritas(Varitas* varitas) {
+	 this->getPosicion(&mapa)->deleteEntidad(varitas);
 	 this->varita=true;
  }
 
  void Personaje::chocarConEscudo(Escudo* escudo) {
+	 this->getPosicion(&mapa)->deleteEntidad(escudo);
 	 this->energiaEscudo+=escudo->getEnergiaEscudo();
 	 BitStream bs;
 	 bs << PROTO::UPDATE_ATT << ATT::ENERGIA_ESCUDO << pjm.getPjeLocal().getEnergiaEscudo();
 	 sock.send(bs.str());
  }
 
-void Personaje::aumentarRadio(double proporcion) {
+ void Personaje::chocarConBandera(Bandera* bandera) {
+	 BitStream bs;
+	 Tile* tilePersonaje = pjm.getPjeLocal().getPosicion(&mapa);
+	 int x = tilePersonaje->getU();
+	 int y = tilePersonaje->getV();
+	 std::cout << "Atrape bandera en pos (" << x << "," << y << ")" << endl;
+	 bs << PROTO::CATCH_FLAG << x << y;
+	 sock.send(bs.str());
+ }
+
+void Personaje::aumentarRadio(float proporcion) {
 	radioY*=(1+proporcion);
 	radioX=2*radioY;
 
@@ -998,4 +1086,121 @@ void Personaje::muere() {
 	std::cout << "Fui asesinado" << endl;
 	//Redirecciono a la posicion inicial nuevamente
 	this->vivo=false;
+	this->timerRevivir.start();
  }
+
+ void Personaje::revivir() {
+	 this->vivo=true;
+	 this->animacionRevivir();
+	 this->energia=this->ENERGIA_TOTAL;
+ }
+
+ 
+ 	
+/*
+	Pre: Los parámetros cumplen las siguiente condiciones:
+
+		dest: Surface sobre el que se quiere pintar.
+
+		camara: Camara correspondiente.
+
+		mapa: mapa correspondiente
+
+		tileX , tileY : Tile sobre el 
+
+		NOTA: Cuidado al momento de hacer updates, ya que hay entidades que 
+		ocupan varios Tiles. En sintesis, un update por entidad al momento
+		de pintar toda la pantalla.
+
+	Post: Se ha pintado la entidad en el surface dest según la camara y el mapa.
+	Si la entidad tiene una base rectangular de un sólo Tile se pinta sin mayores 
+	cuidados.
+	En cambio si la entidad tiene una base superior a un tile se realiza un tratamiento
+	especial.
+
+*/
+void Personaje::blit(SDL_Surface* dest , Camara* camara , Mapa* mapa,
+					const unsigned int tileX ,	const unsigned int tileY){	
+	if ( (this -> imagen != NULL) && (this -> surf != NULL) &&
+		(camara != NULL) ) {
+		if(this -> surf -> getSDL_Surface() != NULL){
+			int posX;
+			int posY;
+			if (compartido){
+				posX = tileX - (int)(camara -> getX()) - this -> pixel_ref_x;
+				posY = tileY - (int)(camara -> getY()) - this -> pixel_ref_y;
+			} else {
+				posX = this -> posX - (int)(camara -> getX()) - this -> pixel_ref_x;
+				posY = this -> posY - (int)(camara -> getY()) - this -> pixel_ref_y;
+			}
+			if (!this->color || entidadDesconectada) {
+				// bliteo del personaje
+				this -> surf -> blitGris(dest , posX ,posY);	
+			} else {
+				this -> surf -> blit(dest , posX ,posY);		
+			}
+			// bliteo de la espada
+			if (this -> getArmaActiva() != NULL) {
+				this -> getArmaActiva() -> blit(dest,camara,mapa,posX,posY,this -> color);
+			}
+		}
+	}
+}
+
+/*
+	Pre: Los parámetros cumplen las siguiente condiciones:
+
+		dest: Surface sobre el que se quiere pintar.
+
+		camara: Camara correspondiente.
+
+		mapa: mapa correspondiente
+
+		tileX , tileY : Tile sobre el 
+
+		NOTA: Cuidado al momento de hacer updates, ya que hay entidades que 
+		ocupan varios Tiles. En sintesis, un update por entidad al momento
+		de pintar toda la pantalla.
+
+	Post: Se ha pintado la entidad en el surface dest según la camara y el mapa.
+	Si la entidad tiene una base rectangular de un sólo Tile se pinta sin mayores 
+	cuidados.
+	En cambio si la entidad tiene una base superior a un tile se realiza un tratamiento
+	especial.
+
+*/
+void Personaje::blit(SDL_Surface* dest , Camara* camara , Mapa* mapa,
+					const unsigned int tileX ,	const unsigned int tileY , 
+					bool color){	
+	if ( (this -> imagen != NULL) && (this -> surf != NULL) &&
+		(camara != NULL) ) {
+		bool colorAux = this -> color;
+		if ( (this ->highInTiles == 1) && (this -> widthInTiles == 1) ){
+			colorAux = color;
+		}
+		if(this -> surf -> getSDL_Surface() != NULL){
+			int posX;
+			int posY;
+			if (compartido){
+				posX = tileX - (int)(camara -> getX()) - this -> pixel_ref_x;
+				posY = tileY - (int)(camara -> getY()) - this -> pixel_ref_y;
+			} else {
+				posX = this -> posX - (int)(camara -> getX()) - this -> pixel_ref_x;
+				posY = this -> posY - (int)(camara -> getY()) - this -> pixel_ref_y;
+			}
+			if (!colorAux || entidadDesconectada) {
+				this -> surf -> blitGris(dest , posX ,posY);	
+			} else {
+				this -> surf -> blit(dest , posX ,posY);		
+			}
+			// bliteo de la espada
+			if (this -> getArmaActiva() != NULL) {
+				this -> getArmaActiva() -> blit(dest,camara,mapa,tileX,tileY,colorAux);
+			}
+		}
+	}
+}
+
+Arma* Personaje::getArmaActiva(){
+	return this -> espada;
+}

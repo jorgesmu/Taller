@@ -139,6 +139,13 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\utilities\interface.cpp">
+
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\utilities\ImagenArma.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\utilities\arma.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -312,6 +319,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="source\display\mapa.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\utilities\arma.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\utilities\ImagenArma.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\utilities\bandera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

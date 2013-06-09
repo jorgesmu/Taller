@@ -1,6 +1,8 @@
 #pragma once
 #include "enemigoServer.h"
 
+#include <string>
+using namespace std;
 class Golem:public Enemigo{
 	private:
 		string duenio;

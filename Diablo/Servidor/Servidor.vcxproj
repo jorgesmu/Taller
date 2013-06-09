@@ -31,6 +31,7 @@
     <ClCompile Include="golem.cpp" />
     <ClCompile Include="logErroresServer.cpp" />
     <ClCompile Include="mapaservidor.cpp" />
+    <ClCompile Include="misiones.cpp" />
     <ClCompile Include="parserServer.cpp" />
     <ClCompile Include="playerman.cpp" />
     <ClCompile Include="server.cpp" />
@@ -60,6 +61,7 @@
     <ClInclude Include="golem.h" />
     <ClInclude Include="logErroresServer.h" />
     <ClInclude Include="mapaservidor.h" />
+    <ClInclude Include="misiones.h" />
     <ClInclude Include="parserServer.h" />
     <ClInclude Include="playerman.h" />
     <ClInclude Include="serversocket.h" />

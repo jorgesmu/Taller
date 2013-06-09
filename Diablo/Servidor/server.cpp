@@ -16,6 +16,7 @@
 #include "../source/utilities/aux_func.h"
 #pragma comment(lib, "Ws2_32.lib")
 #include "config_servidor.h"
+#include "misiones.h"
 //#include "../source/utilities/config_juego.h"
 #include "parserServer.h"
 #include "playerman.h"
@@ -27,6 +28,7 @@
 logErrores err_log("log_parser.txt");
 PlayerManager pm;
 MapaServidor mapa;
+Misiones mision;
 std::string escenario_elegido;
 int escenario_elegido_id;
 
@@ -128,6 +130,10 @@ int main(int argc, char* argv[]) {
 	pm.addEnemy("Enemigo1","soldado",mapa);
 //	pm.addEnemy("Enemigo2","soldado",mapa);	
 	//pm.addEnemy("Enemigo3","soldado",mapa);
+	//Creacion de misiones(TODO:logica random entre los distintos tipos)
+	//mision.crearMisionBanderas(2);
+	//std::cout << "Se creo mision de " << mision.cantBanderas() << " banderas" << endl;
+	mision.crearMisionEnemigo("derecha");
 
 	Enemigo* unEnemigo = pm.getEnemy("Enemigo1");
 

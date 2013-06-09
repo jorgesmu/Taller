@@ -1,0 +1,17 @@
+-ERROR: No se ingreso el ancho de una entidad piso, se selecciona valor por defecto.
+-ERROR: No se ingreso el alto de una entidad piso, se selecciona valor por defecto.
+-ERROR: No se ingreso el pixel de referencia X de una entidad piso, se selecciona valor por defecto.
+-ERROR: No se ingreso el pixel de referencia Y de una entidad piso, se selecciona valor por defecto.
+-ERROR: No se ingreso el ancho de una entidad agua, se selecciona valor por defecto.
+-ERROR: No se ingreso el alto de una entidad agua, se selecciona valor por defecto.
+-ERROR: No se ingreso el pixel de referencia X de una entidad agua, se selecciona valor por defecto.
+-ERROR: No se ingreso el pixel de referencia Y de una entidad agua, se selecciona valor por defecto.
+-ERROR: No se ingreso el ancho de una entidad soldado, se selecciona valor por defecto.
+-ERROR: No se ingreso el alto de una entidad soldado, se selecciona valor por defecto.
+-ERROR: No se ingreso el ancho de una entidad caballeroRojo, se selecciona valor por defecto.
+-ERROR: No se ingreso el alto de una entidad caballeroRojo, se selecciona valor por defecto.
+-ERROR: No se ingreso el ancho de una entidad orco, se selecciona valor por defecto.
+-ERROR: No se ingreso el alto de una entidad orco, se selecciona valor por defecto.
+-ERROR: No se ingreso ningun protagonista en un escenariobosque_encantado3, se selecciona uno por defecto.
+-ERROR: No se ingreso ningun protagonista en un escenariobosque_encantado2, se selecciona uno por defecto.
+-ERROR: Se entontraron entidades con el mismo nombre entidad desconocida se borra una.

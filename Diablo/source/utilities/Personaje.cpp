@@ -80,6 +80,7 @@ void Personaje::inicializarAtributosEnValoresDefault() {
 	this->energiaEscudo=0;
 	this->vivo=true;
 	this -> cambioDireccionHabilitado = true;
+	this -> bolaDeCristal = false;
 }
 
 /*
@@ -191,6 +192,7 @@ void Personaje::init(const std::string& nickname, const std::string& name,
 	this -> actualizandoPosicion = false;
 	this -> setNoDibujaFueraDelRadio();
 	this -> ordenBliteo = Entidad::ORDEN_PERSONAJE;
+	this -> bolaDeCristal = false;
 }
 
 /*
@@ -526,6 +528,17 @@ bool Personaje::isCaminable(Tile* tile){
 	return ( (tile != NULL) && (this -> tileAncla != NULL) && (tile == this -> tileAncla) );
 }
 
+bool Personaje::getBolaDeCristal(){
+	return this->bolaDeCristal;
+}
+
+void Personaje::setBolaDeCristal(bool bolaDeCristal){
+	if(bolaDeCristal){
+		int a = 0;
+	}
+	this->bolaDeCristal = bolaDeCristal;
+}
+
 /*
 	Pre: La instancia ha sido creada.
 	Post: Se retorna el tile donde se encuentra la instancia.
@@ -837,6 +850,26 @@ void Personaje::chocarConZapatos(Zapatos* zapatos) {
 	BitStream bs;
 	bs << PROTO::UPDATE_ATT << ATT::VEL << (float)pjm.getPjeLocal().getVelocidad();
 	sock.send(bs.str());
+}
+
+void Personaje::chocarConBolaDeCristal() {
+
+	if(this->magia >= MAGIA_HECHIZO){
+		std::cout << "veo niebla de los enemigos \n";
+
+		BitStream bs;
+		this->magia-=this->MAGIA_HECHIZO;
+		bs << PROTO::UPDATE_ATT << ATT::MAGIA << this->getMagia();
+		sock.send(bs.str());
+
+		this->bolaDeCristal = true;
+		bs.clear();
+		bs << PROTO::UPDATE_ATT << ATT::BOLA_DE_CRISTAL << true;
+		sock.send(bs.str());
+	}else{
+		std::cout << "magia insuficiente para bola de cristal \n";	
+	}
+
 }
 
 void Personaje::chocarConTerremoto() {

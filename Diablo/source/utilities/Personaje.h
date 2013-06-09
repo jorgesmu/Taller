@@ -18,6 +18,7 @@ class Bombas;
 class Granadas;
 class Varitas;
 class Escudo;
+class BolaDeCristal;
 class ClientSocket;
 
 class Personaje : public Entidad {
@@ -116,6 +117,9 @@ protected:
 
 		//Muerte
 		bool vivo;
+
+		//si tiene la bola de cristal
+		bool bolaDeCristal;
 				
 public:
 	
@@ -265,6 +269,10 @@ public:
 	// Deprecated
 	virtual bool isCaminable();	
 
+	virtual bool getBolaDeCristal();
+
+	virtual void setBolaDeCristal(bool bolaDeCristal);
+
 	//Colisiones
 	
 	void chocarConEntidad() {std::cout << "Choco con entidad\n"; }
@@ -280,6 +288,8 @@ public:
 	void aumentarVelocidad(char porcentaje);
 
 	void chocarConZapatos(Zapatos* zapatos);
+
+	void chocarConBolaDeCristal();
 
 	void chocarConHechizo() {std::cout << "Choco con hechizo\n"; }
 

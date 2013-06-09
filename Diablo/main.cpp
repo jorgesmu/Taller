@@ -35,6 +35,7 @@
 #include "../../source/utilities/terremoto.h"
 #include "../../source/utilities/escudo.h"
 #include "../../source/utilities/interface.h"
+#include "../../source/utilities/bolaDeCristal.h"
 
 using namespace std;
 
@@ -56,6 +57,7 @@ int start_pos_x, start_pos_y;
 int escenario_elegido_id;
 double init_vel;
 float init_radio;
+bool init_bolaDeCristal;
 char init_energia,init_magia,init_escudo,init_terremoto,init_hielo;
 // Cosas para mantener al server actualizado sobre los tiles que recorrimos
 struct {
@@ -87,15 +89,15 @@ int main(int argc, char* argv[]) {
 	// Verificamos que se pase el nick y el tipo
 	if(argc != 3) {
 		std::cout << "Falta especificar nick:\ncliente.exe <nick> <tipo_personaje>\n";
-		return 0;
+		pje_local_nick = "jugador";
+		pje_local_tipo = "soldado";
+		//return 0;
 	}else{
 		// Cargamos el nick y tipo de la consola
 		pje_local_nick = argv[1];
 		pje_local_tipo = argv[2];
 	}
 	//borrar estas dos lineas
-	//pje_local_nick = "jugador";
-	//pje_local_tipo = "soldado";
 	//escenario_elegido_id = 0;
 
 	InitializeCriticalSection(&cs_main);
@@ -179,7 +181,7 @@ int main(int argc, char* argv[]) {
 			
 	//Prueba de carga items
 	resman.addRes("cofre","../resources/chest.png");
-	MapaItem cofre("cofre",1,1,true, 6 ,13,NULL,&mapa,resman,Imagen::COLOR_KEY );
+	BolaDeCristal cofre("cofre",1,1,true, 6 ,13,NULL,&mapa,resman,Imagen::COLOR_KEY );
 	mapa.getTile(6,13)->addEntidad(&cofre,&mapa);
 	entidades_cargadas.push_back(&cofre);
 
@@ -239,6 +241,7 @@ int main(int argc, char* argv[]) {
 		pjm.getPjeLocal().setTerremoto(init_terremoto);
 		pjm.getPjeLocal().setHielo(init_hielo);
 		pjm.getPjeLocal().setRadio(init_radio);
+		pjm.getPjeLocal().setBolaDeCristal(init_bolaDeCristal);
 	} else {
 		//Aviso al server mis valores por defecto de atributos
 		bs.clear();
@@ -261,6 +264,9 @@ int main(int argc, char* argv[]) {
 		sock.send(bs.str());
 		bs.clear();
 		bs << PROTO::UPDATE_ATT << ATT::RADIO << pjm.getPjeLocal().getRadioY();
+		sock.send(bs.str());
+		bs.clear();
+		bs << PROTO::UPDATE_ATT << ATT::BOLA_DE_CRISTAL << pjm.getPjeLocal().getBolaDeCristal();
 		sock.send(bs.str());
 	}
 	

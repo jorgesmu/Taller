@@ -21,7 +21,7 @@ ImagenArma::ImagenArma(const char* name , const int fps , const int delay , ResM
 				const int colorKey) : ImagenAnimada(name , ImagenArma::ALTO_DEFAULT , 
 				ImagenArma::ANCHO_DEFAULT , fps , delay , rm , colorKey) {
 	this -> accionActual = ImagenArma::EST_SUR;
-	this -> setAccion(ImagenArma::EST_SUR);
+	this -> setAccion(ImagenArma::INVISIBLE);
 }
 
 /**
@@ -178,12 +178,22 @@ void ImagenArma::setAccionEfectiva(unsigned int accion) {
 							}
 						}
 					} else {
-						this -> accionActual = ImagenArma::ACCION_ESPECIAL;
-						this -> columnaActual = 0;
+						if (this -> accionActual == ImagenArma::ACCION_ESPECIAL) {
+							this -> accionActual = ImagenArma::ACCION_ESPECIAL;
+							this -> columnaActual = 0;
+						} else {
+							this -> accionActual = accion;
+							this -> filaActual = accion;
+						}
 					}
 				}
 			}
 		}
+		//seteo de fila
+		this -> filaActual = this -> accionActual;
+	} else {
+		this -> accionSiguiente = ImagenArma::INVISIBLE;
+		this -> accionActual = ImagenArma::INVISIBLE;
 		//seteo de fila
 		this -> filaActual = this -> accionActual;
 	}
@@ -196,7 +206,7 @@ void ImagenArma::setAccionEfectiva(unsigned int accion) {
 */
 bool ImagenArma::setAccion(unsigned int accion){
 	bool retorno = false;
-	if (accion > ImagenArma::ACCION_ESPECIAL) {
+	if (accion > ImagenArma::INVISIBLE) {
 		if (accion < ImagenArma::CONTINUAR_CON_ACCION_ACTUAL) {
 			switch (accion) {
 				case ImagenArma::AVANCE_DIRECCION_ACTUAL : {
@@ -279,7 +289,7 @@ void ImagenArma::nextSprite() {
 			if (this -> columnaActual >= this -> maxColumnas) { 
 				if ( (this -> accionActual >= ImagenArma::AT_SUR) &&
 						(this -> accionActual <= ImagenArma::AT_SUROESTE) ){
-							this -> accionSiguiente = this -> accionActual + 8;
+							this -> accionSiguiente = INVISIBLE;
 				}
 				this -> columnaActual = 0;
 				this -> tiempoProximoFrame += this -> delay;

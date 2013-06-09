@@ -45,14 +45,16 @@ public:
 
 	//Defender
 	const static unsigned int ACCION_ESPECIAL = 24;
+	//Invisible
+	const static unsigned int INVISIBLE = 25;
 	//Avanzar direccion actual
-	const static unsigned int AVANCE_DIRECCION_ACTUAL = 25;
+	const static unsigned int AVANCE_DIRECCION_ACTUAL = 26;
 	//Atacar en direccion actual
-	const static unsigned int ATAQUE_DIRECCION_ACTUAL = 26;
+	const static unsigned int ATAQUE_DIRECCION_ACTUAL = 27;
 	//Quieto en direccion actual
-	const static unsigned int ESTATICO_DIRECCION_ACTUAL = 27;
+	const static unsigned int ESTATICO_DIRECCION_ACTUAL = 28;
 	//Continua con la accion actual
-	const static unsigned int CONTINUAR_CON_ACCION_ACTUAL = 28;
+	const static unsigned int CONTINUAR_CON_ACCION_ACTUAL = 29;
 
 private:
 

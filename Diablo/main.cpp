@@ -198,15 +198,7 @@ int main(int argc, char* argv[]) {
 	//--------------------------------------------------------------------------------------------------
 	// Arma
 	resman.addRes("espada","../resources/espada.png");
-	Arma espada("espada",
-		       2,500,
-			   11,
-			   0,70,
-			   20,20,
-			   mapa.getTile(3,3),
-			   resman,Imagen::COLOR_KEY,
-			   100,NULL);
-	entidades_cargadas.push_back(&espada);
+
 	//--------------------------------------------------------------------------------------------------
 
 	// Vector de entidades en este mapa

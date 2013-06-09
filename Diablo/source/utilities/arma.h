@@ -4,7 +4,9 @@
 #include "../../source/utilities/ImagenArma.h"
 
 class Personaje;
-
+class Item;
+class Mapa;
+class Tile;
 class Arma: public Item {
 
 public:
@@ -19,7 +21,7 @@ public:
 	const static unsigned int OESTE = 6;
 	const static unsigned int SUROESTE = 7;	
 	const static unsigned int CENTRO = 8;
-
+	
 	//Informacion de acciones
 	const static unsigned int MOVER_EN_CURSO = 0;
 	const static unsigned int MOVER_COMPLETADO = 1;
@@ -64,7 +66,7 @@ protected:
 	
 	Personaje* propietario;
 	
-	unsigned int danio_maximo; // energia que quita el arma
+	char danio_maximo; // energia que quita el arma
 
 public:
 
@@ -76,7 +78,7 @@ public:
 		const int pixel_ref_sprites_accion_especial_x , const int pixel_ref_sprites_accion_especial_y ,
 		Tile* tile, 
 		ResMan& rm , const int colorKey , 
-		unsigned int danio_maximo , Personaje* propietario);
+		char danio_maximo , Personaje* propietario);
 
 	//Toma el item
 	virtual void chocarCon(Personaje* personaje);
@@ -84,8 +86,6 @@ public:
 	unsigned int getDanioMaximo();
 
 	Personaje* getPropietario();
-	
-	virtual unsigned int atacar(Mapa* mapa, Tile* tile , Personaje* personaje);
 
 	unsigned int calcularDeltaUptdatePosicionAdecuado(double velocidad);
 
@@ -109,7 +109,7 @@ public:
 					const int pixel_ref_sprites_primario_x , const int pixel_ref_sprites_primario_y,
 					const int pixel_ref_sprites_accion_especial_x , const int pixel_ref_sprites_accion_especial_y ,
 					Tile* tile, 
-					ResMan& rm , const int colorKey , unsigned int danio_maximo , Personaje* propietario);
+					ResMan& rm , const int colorKey , char danio_maximo , Personaje* propietario);
 	
 	/*
 		Pre: Mapa distinto de null
@@ -120,7 +120,26 @@ public:
 		en algun Tile en el que no estaba, y se de de baja en alguno en cual estaba.
 	*/
 	virtual void mover(Tile* tileDestino , Mapa* mapa);
+
+	/*
+		Pre: Mapa distinto de null
+
+		Post: Se ha encaminado el movimiento de la entidad al Tile correspondiente.
+
+		Nota: Puede suceder que si una entidad ocupa varios Tiles la entidad se de de alta
+		en algun Tile en el que no estaba, y se de de baja en alguno en cual estaba.
+	*/
+	virtual void mover(Tile* tileDestino);
 	
+	/*
+		Pre: Mapa distinto de null. El parametro tileDestino es cualquier tile en la 
+		dirección del ataque.
+
+		Post: Se ha realizado un ataque en la direccion correspondiente del tile parametro.
+
+	*/
+	virtual unsigned int atacar(Mapa* mapa, Tile* tileDestino,Personaje* personaje);		 
+
 	void accionEspecial();
 
 	/*
@@ -165,6 +184,46 @@ public:
 	*/
 	// Deprecated
 	virtual bool isCaminable();	
+
+	/*
+		Pre: Los parámetros cumplen las siguiente condiciones:
+
+			dest: Surface sobre el que se quiere pintar.
+
+			camara: Camara correspondiente.
+
+			mapa: mapa correspondiente
+
+			tileX , tileY : Tile sobre el que se trata de dibujar la entidad.
+			NOTA: Cuidado al momento de hacer updates, ya que hay entidades que 
+			ocupan varios Tiles. En sintesis, un update por entidad al momento
+			de pintar toda la pantalla.
+
+		Post: Se ha pintado la entidad en el surface dest según la camara y el mapa.
+
+	*/
+	virtual void blit(SDL_Surface* dest, Camara* camara , Mapa* mapa,
+					const unsigned int tileX ,	const unsigned int tileY);
+
+	/*
+		Pre: Los parámetros cumplen las siguiente condiciones:
+
+			dest: Surface sobre el que se quiere pintar.
+
+			camara: Camara correspondiente.
+
+			mapa: mapa correspondiente
+
+			tileX , tileY : Tile sobre el que se trata de dibujar la entidad.
+			NOTA: Cuidado al momento de hacer updates, ya que hay entidades que 
+			ocupan varios Tiles. En sintesis, un update por entidad al momento
+			de pintar toda la pantalla.
+
+		Post: Se ha pintado la entidad en el surface dest según la camara y el mapa.
+
+	*/
+	virtual void blit(SDL_Surface* dest, Camara* camara , Mapa* mapa,
+					const unsigned int tileX ,	const unsigned int tileY , bool color);
 
 protected:
 
@@ -238,5 +297,5 @@ protected:
 
 	//Sin tener en cuenta al escudo
 	void dañarPersonaje(char daño);
-
+	
 };

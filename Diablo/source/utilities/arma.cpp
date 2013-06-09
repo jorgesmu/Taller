@@ -11,7 +11,7 @@ Arma::Arma(const std::string& name,
 		const int pixel_ref_sprites_accion_especial_x , const int pixel_ref_sprites_accion_especial_y ,
 		Tile* tile, 
 		ResMan& rm , const int colorKey , 
-		unsigned int danio_maximo , Personaje* propietario){
+		char danio_maximo , Personaje* propietario){
 	
 	// seteo del puntero a imagen
 	this -> imagen = NULL;
@@ -96,6 +96,13 @@ void Arma::inicializarAtributosEnValoresDefault() {
 	// propietario y daño
 	this -> propietario = propietario;
 	this -> danio_maximo = danio_maximo; // energia que quita el arma
+	if (this -> propietario != NULL){
+		ImagenArma* imagenArma = static_cast<ImagenArma*> (this -> imagen);
+		this -> tileDestino = NULL;
+		if (imagenArma != NULL){
+			imagenArma -> setAccion(ImagenArma::INVISIBLE);
+		}
+	}
 }
 
 /*
@@ -124,7 +131,7 @@ void Arma::init(const std::string& name,
 				const int pixel_ref_sprites_primario_x , const int pixel_ref_sprites_primario_y,
 				const int pixel_ref_sprites_accion_especial_x , const int pixel_ref_sprites_accion_especial_y ,
 				Tile* tile, 
-				ResMan& rm , const int colorKey , unsigned int danio_maximo , Personaje* propietario) {
+				ResMan& rm , const int colorKey , char danio_maximo , Personaje* propietario) {
 	// Se destruyen imagenes previas
 	if (this -> imagen != NULL) {
 		delete(this -> imagen);
@@ -133,7 +140,7 @@ void Arma::init(const std::string& name,
 	// Se setean los atributos a sus valores por defecto.
 	this -> inicializarAtributosEnValoresDefault();
 	// Se carga la nueva imagen
-	this -> imagen	= new ImagenArma(name.c_str() , fps , delay , rm ,colorKey);
+	this -> imagen	= new ImagenArma(name.c_str() , 5 , delay , rm ,colorKey);
 	this -> name = name;
 	// Seteo del Surface
 	this -> surf = this -> imagen -> getSurface();
@@ -384,7 +391,6 @@ void Arma::calcularPosicionTentativa(unsigned int direccion ,
 */
 Tile* Arma::obtenerTileAncla(const int posX , const int posY , 
 												const unsigned int direccion , Mapa* mapa){
-	
 	Tile* retorno = NULL;
 	// Sur
 	int posImagenX = posX;
@@ -455,9 +461,30 @@ void Arma::mover(Tile* tileDestino , Mapa* mapa) {
 	}
 }
 
+
+/*
+	Pre: Los parámetros respetan la siguiente convención:
+
+	"x" e "y": Coordenadas del Tile destino
+
+	Post: Se ha encaminado el movimiento de la entidad al Tile correspondiente.
+
+	Nota: Puede suceder que si una entidad ocupa varios Tiles la entidad se de de alta
+	en algun Tile en el que no estaba, y se de de baja en alguno en cual estaba.
+		
+	Nota2: Los destinos no validos no traeran problemas al algoritmo, es decir que
+	le podes pasar cualquier destino aunque supere las dimensiones del mapa.
+*/
+void Arma::mover(Tile* tileDestino) {
+	if (tileDestino != NULL) {
+		this -> tileDestino = tileDestino;
+		this -> cambioDireccionHabilitado = true;
+	}
+}
+
 void Arma::actualizarImagen(const unsigned int direccion){
 	ImagenPersonaje* imagenPersonaje = static_cast<ImagenPersonaje*> (this -> imagen);
-	if (imagenPersonaje != NULL){
+	if ((imagenPersonaje != NULL) && (this -> propietario == NULL)){
 		if (direccion == CENTRO) {
 			imagenPersonaje -> setAccion(ImagenPersonaje::ESTATICO_DIRECCION_ACTUAL);
 		} else {
@@ -502,9 +529,13 @@ Tile* Arma::getPosicion(Mapa* mapa){
 // Actualiza las cosas internas, si hubiese
 unsigned int Arma::update(Mapa* mapa) {
 	unsigned int retorno = Arma::MOVER_EN_CURSO;
+	if (this -> propietario != NULL) {
+		this -> posX = this -> propietario -> getX();
+		this -> posY = this -> propietario -> getY();
+	}
 	if (this -> imagen != NULL) {		
-		ImagenArma* imagenPersonaje = static_cast<ImagenArma*> (this -> imagen);
-		if (imagenPersonaje != NULL){
+		ImagenArma* imagenArma = static_cast<ImagenArma*> (this -> imagen);
+		if (imagenArma != NULL){
 			if (this -> tiempoProximoUpdate <= clock()){	
 				if (this -> tileDestino != NULL) {
 					//actualizacion de posicion
@@ -530,7 +561,7 @@ unsigned int Arma::update(Mapa* mapa) {
 
 */
 
-unsigned int Arma::atacar(Mapa* mapa, Tile* tile , Personaje* personaje) {
+unsigned int Arma::atacar(Mapa* mapa, Tile* tileDestino , Personaje* personaje) {
 	unsigned int retorno = Personaje::ATACAR_COMPLETADO;
 	// chequeo que el tileDestino y el mapa sean diferentes de null
 	if ( (tileDestino != NULL) && (mapa != NULL)) {
@@ -552,6 +583,13 @@ unsigned int Arma::atacar(Mapa* mapa, Tile* tile , Personaje* personaje) {
 			 ImagenArma* imagenArma = static_cast< ImagenArma*> (this -> imagen);
 			if (imagenArma != NULL){
 				imagenArma -> setAccion(direccionAtaque);
+				/**
+					NOTA: Agregar la parte de la precision del personaje.
+				**/
+				//ataque a personaje
+				if (personaje != NULL) {
+					personaje->dañar(this->danio_maximo);
+				}
 			}
 		}else {
 			if (deltaX < 0) {
@@ -577,6 +615,7 @@ unsigned int Arma::atacar(Mapa* mapa, Tile* tile , Personaje* personaje) {
 			if (imagenArma != NULL){
 				imagenArma -> setAccion(direccionAtaque);
 			}
+			
 		}
 	} else {
 		this -> tileDestino = NULL;
@@ -635,4 +674,99 @@ bool Arma::verificarAncla(Tile* ancla) {
 		}
 	}
 	return retorno;
+}
+	
+/*
+	Pre: Los parámetros cumplen las siguiente condiciones:
+
+		dest: Surface sobre el que se quiere pintar.
+
+		camara: Camara correspondiente.
+
+		mapa: mapa correspondiente
+
+		tileX , tileY : Tile sobre el 
+
+		NOTA: Cuidado al momento de hacer updates, ya que hay entidades que 
+		ocupan varios Tiles. En sintesis, un update por entidad al momento
+		de pintar toda la pantalla.
+
+	Post: Se ha pintado la entidad en el surface dest según la camara y el mapa.
+	Si la entidad tiene una base rectangular de un sólo Tile se pinta sin mayores 
+	cuidados.
+	En cambio si la entidad tiene una base superior a un tile se realiza un tratamiento
+	especial.
+
+*/
+void Arma::blit(SDL_Surface* dest , Camara* camara , Mapa* mapa,
+					const unsigned int tileX ,	const unsigned int tileY){	
+	if ( (this -> imagen != NULL) && (this -> surf != NULL) &&
+		(camara != NULL)) {
+		if(this -> surf -> getSDL_Surface() != NULL){
+			int posX;
+			int posY;
+			if (compartido){
+				posX = tileX - (int)(camara -> getX()) - this -> pixel_ref_x;
+				posY = tileY - (int)(camara -> getY()) - this -> pixel_ref_y;
+			} else {
+				posX = this -> posX - (int)(camara -> getX()) - this -> pixel_ref_x;
+				posY = this -> posY - (int)(camara -> getY()) - this -> pixel_ref_y;
+			}
+			if (!this->color) {
+				this -> surf -> blitGris(dest , posX ,posY);	
+			} else {
+				this -> surf -> blit(dest , posX ,posY);		
+			}
+		}
+	}
+}
+
+/*
+	Pre: Los parámetros cumplen las siguiente condiciones:
+
+		dest: Surface sobre el que se quiere pintar.
+
+		camara: Camara correspondiente.
+
+		mapa: mapa correspondiente
+
+		tileX , tileY : Tile sobre el 
+
+		NOTA: Cuidado al momento de hacer updates, ya que hay entidades que 
+		ocupan varios Tiles. En sintesis, un update por entidad al momento
+		de pintar toda la pantalla.
+
+	Post: Se ha pintado la entidad en el surface dest según la camara y el mapa.
+	Si la entidad tiene una base rectangular de un sólo Tile se pinta sin mayores 
+	cuidados.
+	En cambio si la entidad tiene una base superior a un tile se realiza un tratamiento
+	especial.
+
+*/
+void Arma::blit(SDL_Surface* dest , Camara* camara , Mapa* mapa,
+					const unsigned int tileX ,	const unsigned int tileY , 
+					bool color){	
+	if ( (this -> imagen != NULL) && (this -> surf != NULL) &&
+		(camara != NULL)) {
+		bool colorAux = this -> color;
+		if ( (this -> highInTiles == 1) && (this -> widthInTiles == 1) ){
+			colorAux = color;
+		}
+		if(this -> surf -> getSDL_Surface() != NULL){
+			int posX;
+			int posY;
+			if (compartido){
+				posX = tileX - (int)(camara -> getX()) - this -> pixel_ref_x;
+				posY = tileY - (int)(camara -> getY()) - this -> pixel_ref_y;
+			} else {
+				posX = this -> posX - (int)(camara -> getX()) - this -> pixel_ref_x;
+				posY = this -> posY - (int)(camara -> getY()) - this -> pixel_ref_y;
+			}
+			if (!colorAux) {
+				this -> surf -> blitGris(dest , posX ,posY);	
+			} else {
+				this -> surf -> blit(dest , posX ,posY);		
+			}
+		}
+	}
 }

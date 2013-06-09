@@ -25,6 +25,7 @@ class Terremoto;
 class Hielo;
 class Bandera;
 class ClientSocket;
+class Arma;
 
 class Personaje : public Entidad {
 public:
@@ -134,6 +135,9 @@ protected:
 
 		//Timer para revivir
 		Timer timerRevivir;
+								
+		// Arma default
+		Arma* espada;
 				
 public:
 	
@@ -220,6 +224,15 @@ public:
 		Post: Se ha realizado un ataque en la direccion correspondiente del tile parametro.
 
 	*/
+	virtual unsigned int ataque(Tile* tileDestino , Mapa* mapa , Personaje* personajeObjetivo);
+
+	/*
+		Pre: Mapa distinto de null. El parametro tileDestino es cualquier tile en la 
+		dirección del ataque.
+
+		Post: Se ha realizado un ataque en la direccion correspondiente del tile parametro.
+
+	*/
 	virtual void freezar();
 
 	// Valor = true freezea, valor = false; desfreezea
@@ -288,6 +301,46 @@ public:
 	// Deprecated
 	virtual bool isCaminable();	
 
+	/*
+		Pre: Los parámetros cumplen las siguiente condiciones:
+
+			dest: Surface sobre el que se quiere pintar.
+
+			camara: Camara correspondiente.
+
+			mapa: mapa correspondiente
+
+			tileX , tileY : Tile sobre el que se trata de dibujar la entidad.
+			NOTA: Cuidado al momento de hacer updates, ya que hay entidades que 
+			ocupan varios Tiles. En sintesis, un update por entidad al momento
+			de pintar toda la pantalla.
+
+		Post: Se ha pintado la entidad en el surface dest según la camara y el mapa.
+
+	*/
+	virtual void blit(SDL_Surface* dest, Camara* camara , Mapa* mapa,
+					const unsigned int tileX ,	const unsigned int tileY);
+
+	/*
+		Pre: Los parámetros cumplen las siguiente condiciones:
+
+			dest: Surface sobre el que se quiere pintar.
+
+			camara: Camara correspondiente.
+
+			mapa: mapa correspondiente
+
+			tileX , tileY : Tile sobre el que se trata de dibujar la entidad.
+			NOTA: Cuidado al momento de hacer updates, ya que hay entidades que 
+			ocupan varios Tiles. En sintesis, un update por entidad al momento
+			de pintar toda la pantalla.
+
+		Post: Se ha pintado la entidad en el surface dest según la camara y el mapa.
+
+	*/
+	virtual void blit(SDL_Surface* dest, Camara* camara , Mapa* mapa,
+					const unsigned int tileX ,	const unsigned int tileY , bool color);
+	
 	//Colisiones
 	
 	void chocarConEntidad() { }
@@ -380,6 +433,8 @@ public:
 	void setVelocidad(double velocidad) { this->velocidad=velocidad; }
 
 	void dañar(char daño); 
+
+	Arma* getArmaActiva();
 
 protected:
 

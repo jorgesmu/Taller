@@ -16,6 +16,7 @@
 #include "../net/bitstream.h"
 #include "../net/defines.h"
 #include "../../Cliente/clientsocket.h"
+#include "../utilities/Arma.h"
 extern PjeManager pjm;
 extern ClientSocket sock;
 extern int start_pos_x,start_pos_y;
@@ -88,6 +89,7 @@ void Personaje::inicializarAtributosEnValoresDefault() {
 	this->vivo=true;
 	this->precision=this->PRECISION_PERSONAJE;
 	this -> cambioDireccionHabilitado = true;
+	this -> espada = NULL;
 }
 
 /*
@@ -139,6 +141,11 @@ Personaje::~Personaje() {
 	}
 	this -> surf = NULL;
 	this -> tileAncla = NULL;
+	// Se elimina la espada
+	if (this -> espada != NULL) {
+		delete(this -> espada);
+		this -> espada = NULL;
+	}
 }
 
 /*
@@ -199,6 +206,13 @@ void Personaje::init(const std::string& nickname, const std::string& name,
 	this -> actualizandoPosicion = false;
 	this -> setNoDibujaFueraDelRadio();
 	this -> ordenBliteo = Entidad::ORDEN_PERSONAJE;
+	// Se inicializa el arma default que es la espada
+	this -> espada = new Arma("espada", 2 , 500 , 11,
+			   0,70,
+			   20,20,
+			   tile,
+			   rm,Imagen::COLOR_KEY,
+			   100,this);
 }
 
 /*
@@ -478,6 +492,9 @@ void Personaje::mover(Tile* tileDestino) {
 	if (tileDestino != NULL) {
 		this -> tileDestino = tileDestino;
 		this -> cambioDireccionHabilitado = true;
+		if (this -> getArmaActiva() != NULL){
+			this -> getArmaActiva() -> mover(tileDestino);
+		}
 	}
 }
 
@@ -499,6 +516,9 @@ void Personaje::mover(Tile* tileDestino , Mapa* mapa) {
 	if (tileDestino != NULL) {
 		this -> tileDestino = tileDestino;
 		this -> cambioDireccionHabilitado = true;
+		if (this -> getArmaActiva() != NULL){
+			this -> getArmaActiva() -> mover(tileDestino);
+		}
 	}
 }
 
@@ -570,6 +590,9 @@ unsigned int Personaje::update(Mapa* mapa) {
 	if(this -> imagen != NULL) {
 		this -> surf = this -> imagen -> getSurface();
 	}
+	if(this -> espada != NULL){
+		this -> espada -> update(mapa);
+	}
 	return retorno;
 }
 
@@ -592,6 +615,18 @@ void Personaje::updateRevivir() {
 
 */
 unsigned int Personaje::ataque(Tile* tileDestino , Mapa* mapa) {
+	return this -> ataque(tileDestino , mapa, NULL);
+}
+
+
+/*
+	Pre: Mapa distinto de null. El parametro tileDestino es cualquier tile en la 
+	dirección del ataque.
+
+	Post: Se ha realizado un ataque en la direccion correspondiente del tile parametro.
+
+*/
+unsigned int Personaje::ataque(Tile* tileDestino , Mapa* mapa , Personaje* personajeObjetivo) {
 	unsigned int retorno = Personaje::ATACAR_COMPLETADO;
 	// chequeo que el tileDestino y el mapa sean diferentes de null
 	if ( (tileDestino != NULL) && (mapa != NULL)) {
@@ -611,6 +646,7 @@ unsigned int Personaje::ataque(Tile* tileDestino , Mapa* mapa) {
 				}
 			}
 			ImagenPersonaje* imagenPersonaje = static_cast<ImagenPersonaje*> (this -> imagen);
+			// seteo accion imagen personaje
 			if (imagenPersonaje != NULL){
 				imagenPersonaje -> setAccion(direccionAtaque);
 			}
@@ -646,6 +682,11 @@ unsigned int Personaje::ataque(Tile* tileDestino , Mapa* mapa) {
 		if (imagenPersonaje != NULL){
 			imagenPersonaje -> setAccion(direccionAtaque);
 		}
+	}
+	// Ataque al personaje
+	if (this -> getArmaActiva()){
+		// pone en ejecucion la animacion y quita energia al personaje de acuerdo al arma
+		this -> getArmaActiva() -> atacar(mapa,tileDestino,personajeObjetivo);
 	}
 	return retorno;
 }
@@ -1044,3 +1085,113 @@ void Personaje::muere() {
 	 this->animacionRevivir();
 	 this->energia=this->ENERGIA_TOTAL;
  }
+
+ 
+ 	
+/*
+	Pre: Los parámetros cumplen las siguiente condiciones:
+
+		dest: Surface sobre el que se quiere pintar.
+
+		camara: Camara correspondiente.
+
+		mapa: mapa correspondiente
+
+		tileX , tileY : Tile sobre el 
+
+		NOTA: Cuidado al momento de hacer updates, ya que hay entidades que 
+		ocupan varios Tiles. En sintesis, un update por entidad al momento
+		de pintar toda la pantalla.
+
+	Post: Se ha pintado la entidad en el surface dest según la camara y el mapa.
+	Si la entidad tiene una base rectangular de un sólo Tile se pinta sin mayores 
+	cuidados.
+	En cambio si la entidad tiene una base superior a un tile se realiza un tratamiento
+	especial.
+
+*/
+void Personaje::blit(SDL_Surface* dest , Camara* camara , Mapa* mapa,
+					const unsigned int tileX ,	const unsigned int tileY){	
+	if ( (this -> imagen != NULL) && (this -> surf != NULL) &&
+		(camara != NULL) ) {
+		if(this -> surf -> getSDL_Surface() != NULL){
+			int posX;
+			int posY;
+			if (compartido){
+				posX = tileX - (int)(camara -> getX()) - this -> pixel_ref_x;
+				posY = tileY - (int)(camara -> getY()) - this -> pixel_ref_y;
+			} else {
+				posX = this -> posX - (int)(camara -> getX()) - this -> pixel_ref_x;
+				posY = this -> posY - (int)(camara -> getY()) - this -> pixel_ref_y;
+			}
+			if (!this->color || entidadDesconectada) {
+				// bliteo del personaje
+				this -> surf -> blitGris(dest , posX ,posY);	
+			} else {
+				this -> surf -> blit(dest , posX ,posY);		
+			}
+			// bliteo de la espada
+			if (this -> getArmaActiva() != NULL) {
+				this -> getArmaActiva() -> blit(dest,camara,mapa,posX,posY,this -> color);
+			}
+		}
+	}
+}
+
+/*
+	Pre: Los parámetros cumplen las siguiente condiciones:
+
+		dest: Surface sobre el que se quiere pintar.
+
+		camara: Camara correspondiente.
+
+		mapa: mapa correspondiente
+
+		tileX , tileY : Tile sobre el 
+
+		NOTA: Cuidado al momento de hacer updates, ya que hay entidades que 
+		ocupan varios Tiles. En sintesis, un update por entidad al momento
+		de pintar toda la pantalla.
+
+	Post: Se ha pintado la entidad en el surface dest según la camara y el mapa.
+	Si la entidad tiene una base rectangular de un sólo Tile se pinta sin mayores 
+	cuidados.
+	En cambio si la entidad tiene una base superior a un tile se realiza un tratamiento
+	especial.
+
+*/
+void Personaje::blit(SDL_Surface* dest , Camara* camara , Mapa* mapa,
+					const unsigned int tileX ,	const unsigned int tileY , 
+					bool color){	
+	if ( (this -> imagen != NULL) && (this -> surf != NULL) &&
+		(camara != NULL) ) {
+		bool colorAux = this -> color;
+		if ( (this ->highInTiles == 1) && (this -> widthInTiles == 1) ){
+			colorAux = color;
+		}
+		if(this -> surf -> getSDL_Surface() != NULL){
+			int posX;
+			int posY;
+			if (compartido){
+				posX = tileX - (int)(camara -> getX()) - this -> pixel_ref_x;
+				posY = tileY - (int)(camara -> getY()) - this -> pixel_ref_y;
+			} else {
+				posX = this -> posX - (int)(camara -> getX()) - this -> pixel_ref_x;
+				posY = this -> posY - (int)(camara -> getY()) - this -> pixel_ref_y;
+			}
+			if (!colorAux || entidadDesconectada) {
+				this -> surf -> blitGris(dest , posX ,posY);	
+			} else {
+				this -> surf -> blit(dest , posX ,posY);		
+			}
+			// bliteo de la espada
+			if (this -> getArmaActiva() != NULL) {
+				this -> getArmaActiva() -> blit(dest,camara,mapa,tileX,tileY,colorAux);
+			}
+		}
+	}
+}
+
+Arma* Personaje::getArmaActiva(){
+	return this -> espada;
+}

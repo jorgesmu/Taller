@@ -28,6 +28,7 @@ class Font {
 	void clean();
 	// Se entiende
 	void blit(SDL_Surface* dest, int x, int y, const std::string& msg, const SDL_Color& color);
+	void blitCentered(SDL_Surface* dest, int x, int y, const std::string& msg, const SDL_Color& color);
 	// Esta funcion hace el blit pero guarda una copia del surface la primera vez
 	// Si ese surface ya existe, se lo reutiliza
 	void buffBlit(SDL_Surface* dest, int x, int y, const std::string& msg, const SDL_Color& color);
@@ -35,6 +36,7 @@ class Font {
 	// Getters para ancho y alto de un mensaje
 	// Sirve para formattear antes de imprimir
 	void calcSize(const std::string& msg, int* w, int* h) const;
-
+	// Calcula el alto maximo
+	int getH() const;
 
 };

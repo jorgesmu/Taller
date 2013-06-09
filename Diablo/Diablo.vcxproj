@@ -13,6 +13,7 @@
   <ItemGroup>
     <ClCompile Include="Cliente\clientsocket.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="source\display\boton.cpp" />
     <ClCompile Include="source\display\camara.cpp" />
     <ClCompile Include="source\display\entidad.cpp" />
     <ClCompile Include="source\display\entidadFija.cpp" />
@@ -60,6 +61,7 @@
   <ItemGroup>
     <ClInclude Include="Cliente\clientsocket.h" />
     <ClInclude Include="source\constants\model.h" />
+    <ClInclude Include="source\display\boton.h" />
     <ClInclude Include="source\display\camara.h" />
     <ClInclude Include="source\display\entidad.h" />
     <ClInclude Include="source\display\entidadFija.h" />

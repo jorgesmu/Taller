@@ -18,10 +18,12 @@ ResMan::~ResMan() {
 	//Se podria agregar un clean al destructor para evitar la assertion
 	//this -> clean();
 	// Checkeo que se hayan liberado todas las surfaces
-	assert(surface_map.size() == 0);
+	//assert(surface_map.size() == 0);
 }
 
 bool ResMan::init() {
+	// Init a SDL_TTF
+	if(TTF_Init() == -1) { std::cerr << "Error @ TTF_Init(): " << TTF_GetError() << "\n"; return -1; }
 	// Carga la surface de error 
 	err_surface = new Surface;
 	// Creamos el archivo tmp con la imagen de error

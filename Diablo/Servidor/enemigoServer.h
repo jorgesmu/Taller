@@ -16,6 +16,6 @@ class Enemigo:public Player{
 		TileServidor* Enemigo::get_proximo_tile_recta_vertical(MapaServidor& Mapa);
 		TileServidor* Enemigo::get_proximo_tile_circular(MapaServidor& Mapa);
 		TileServidor* get_proximo_tile_enemigo(MapaServidor& Mapa,PlayerManager& pm);
-		virtual bool personaje_en_radio(MapaServidor& mapa,PlayerManager& pm);
+		virtual bool personaje_en_radio(MapaServidor& mapa,PlayerManager& pm, TileServidor*& tilePersonajes);
 
 };

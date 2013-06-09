@@ -13,6 +13,7 @@ Player::Player() {
 	x = y = 0;
 	velocidad = 105/1000;
 	congelado = 0; //descongelado
+	xSiguiente = ySiguiente = -1;
 }
 
 Player::~Player() {
@@ -36,9 +37,19 @@ int Player::getX() const {
 int Player::getY() const {
 	return y;
 }
+int Player::getXSiguiente() const {
+	return xSiguiente;
+}
 
+int Player::getYSiguiente() const {
+	return ySiguiente;
+}
 std::string Player::getTipo() const {
 	return tipo_personaje;
+}
+void Player::setPosSiguiente( int XNuevo,int YNuevo)  {
+	xSiguiente = XNuevo;
+	ySiguiente = YNuevo;
 }
 
 std::string Player::getNick() const {
@@ -124,7 +135,9 @@ void PlayerManager::addPlayer(const std::string& nick, const std::string& tipo_p
 		throw std::runtime_error("No se pudo ubicar el personaje\n");
 	}else{
 		p.setOnline();
-		p.setPos(rand_x, rand_y);
+		//p.setPos(rand_x, rand_y);
+		p.setPos(10,10);
+
 	}
 }
 
@@ -144,12 +157,12 @@ bool PlayerManager::enemyExists(const std::string& nick) const {
 }
 
 // Agrega un jugador
-void PlayerManager::addEnemy(const std::string& nick, const std::string& tipo_pje, MapaServidor& mapa) {
+void PlayerManager::addEnemy(const std::string& nick, const std::string& tipo_pje, MapaServidor& mapa,int estrategiaElegida) {
 	// Chequeo de sanidad
-	assert(!playerExists(nick));
+	assert(!enemyExists(nick));
 	Enemigo*& p = enemy_map[nick];
 	p = new Enemigo();
-	p->init_Enemy(nick, tipo_pje,1); //DESCOMENTAR!
+	p->init_Enemy(nick, tipo_pje,estrategiaElegida); 
 	// Buscar posicion en el mapa
 	bool found = false;
 	int x = 0; // Contador de iteraciones
@@ -170,9 +183,10 @@ void PlayerManager::addEnemy(const std::string& nick, const std::string& tipo_pj
 	if(!found) {
 		throw std::runtime_error("No se pudo ubicar el personaje\n");
 	}else{
-		//Descomentar
 		p->setOnline();
 		p->setPos(rand_x, rand_y);
+		//cargo pos
+		p->setPosSiguiente(rand_x,rand_y);
 	}
 }
 

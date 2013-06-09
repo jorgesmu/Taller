@@ -127,7 +127,7 @@ int main(int argc, char* argv[]) {
 	}
 	
 	//Agregar enemigos automaticos
-//	pm.addEnemy("Enemigo1","soldado",mapa);
+	pm.addEnemy("Enemigo1","soldado",mapa,1);
 //	pm.addEnemy("Enemigo2","soldado",mapa);	
 	//pm.addEnemy("Enemigo3","soldado",mapa);
 	//Creacion de misiones(TODO:logica random entre los distintos tipos)
@@ -137,7 +137,8 @@ int main(int argc, char* argv[]) {
 
 	Enemigo* unEnemigo = pm.getEnemy("Enemigo1");
 
-	unEnemigo->setPos(1,1);
+	mapa.cargarGrafo(pm);
+	mapa.actualizarGrafoPersonajes(pm);
 	// Spawneamos el thread de listen
 	_beginthreadex(NULL, 0, ServerSocket::listenLoopEntry, (void*)&sock, 0, NULL);
 	bool mando = false;
@@ -162,6 +163,10 @@ int main(int argc, char* argv[]) {
 			}
 		}*/
 		Sleep(100);
+	}
+	//destruyo enemigos y golem 
+	for(auto it = pm.getEnemies().begin();it != pm.getEnemies().end();it++) {
+		delete(it->second);
 	}
 
 	// Close

@@ -365,19 +365,6 @@ unsigned int __stdcall ServerSocket::acceptLastEntry(void* pthis) {
 }
 
 void ServerSocket::acceptLastDo() {
-	//creo vector de posiciones y de control de si se completo
-	vector< pair<int , int> > ultimaPosicionEnemigo;
-	ultimaPosicionEnemigo.resize(pm.getEnemies().size());
-	//inicializo vector
-	for (int i=0; i<ultimaPosicionEnemigo.size();i++){
-		pair<int,int>& unPar = ultimaPosicionEnemigo[i];
-		unPar.first = -1;
-		unPar.second= -1;
-	}
-	pair<int,int>& unpar=ultimaPosicionEnemigo[0];
-	unpar.first = 1;
-	unpar.second = 1;
-
 	//bloqueo el loop ppal
 	conectandose=true;
 	// Iniciamos el seed de srand
@@ -730,9 +717,17 @@ void ServerSocket::acceptLastDo() {
 						break;
 					}
 				}				
+				for(auto it = pm.getEnemies().begin();it != pm.getEnemies().end();it++) {
+					if(it->second->getX() == x && it->second->getY() == y) {
+						ok = false;
+						break;
+					}
+				}
 				if(ok) {
 					// Si el movimiento esta ok, actualizamos la posicion
+					mapa.actualizarGrafo(pm.getPlayer(new_nick).getX(),pm.getPlayer(new_nick).getY());// actualizo la posicion vieja
 					pm.getPlayer(new_nick).setPos(x, y);
+					mapa.actualizarGrafoPersonajes(pm); //actualizo la nueva posicion
 					// Informamos al jugador que esta ok
 					bs.clear();
 					bs << PROTO::POS_REQUEST_REPLY << true;
@@ -763,31 +758,32 @@ void ServerSocket::acceptLastDo() {
 				Enemigo* unEnemigo = NULL;
 				int pos = 0;
 				//cout << "termino " << nickPersonajeActualizado << endl;
-				for(auto it = pm.getEnemies().begin();it != pm.getEnemies().end();it++) {\
-					string nickEnemy = it->first;
-					if (strcmp(nickPersonajeActualizado.c_str(),nickEnemy.c_str()) == 0){
-						unEnemigo = it->second;
-						break;
-					}
-					pos++;
-				}
+				if(pm.enemyExists(nickPersonajeActualizado)){
+					unEnemigo = pm.getEnemy(nickPersonajeActualizado);
+				} 
 				//cout << "pos " <<pos<<endl;
 
 				if(unEnemigo != NULL){
-					pair<int,int>& unaPosicion = ultimaPosicionEnemigo[pos];
+					int XSiguiente = unEnemigo->getXSiguiente();
+					int YSiguiente = unEnemigo->getYSiguiente();
 
-					//verifico si era una posicion vieja
-					//cout << "unaPoscion " << unaPosicion.first << "," <<unaPosicion.second <<endl;
-					//cout << "pos xy " << posX << "," <<posY <<endl;
-						//			system("PAUSE");
-					if (unaPosicion.first == posX && unaPosicion.second == posY){
-					
+					if (XSiguiente == posX && YSiguiente == posY){
+						mapa.actualizarGrafo(unEnemigo->getX(),unEnemigo->getY());//actuzliazo grafo pos vieja
+						unEnemigo->setPos(posX,posY);					
+						mapa.actualizarGrafoPersonajes(pm);//actuzliazo grafo nueva
 						//si es un enemigo actualizo su posicion
 						TileServidor* proxTile = unEnemigo->get_proximo_tile_enemigo(mapa,pm);
-						if (proxTile != NULL){
+						
+						if (proxTile != NULL && !mapa.tile_esta_ocupado(proxTile->get_x(),proxTile->get_y(),pm)){
 							//actualizo vector
-							unaPosicion.first = proxTile->get_x();
-							unaPosicion.second = proxTile->get_y();
+							unEnemigo->setPosSiguiente(proxTile->get_x(),proxTile->get_y());
+							cout << "Se mueve a " << proxTile->get_x()<<","<<proxTile->get_y() <<endl;
+						
+						
+						
+							cout << "pos actual " << posX<<","<<posY <<endl;
+						
+				//			system("pause");
 							//cout<< "enviando a " << nickPersonajeActualizado <<" a " << unaPosicion.first << ","<<unaPosicion.second<<endl;   
 							//cout << "valor vector"<<ultimaPosicionEnemigo[0].first << "," <<ultimaPosicionEnemigo[0].second<<endl;
 							// Informamos a los demas del movimiento del enemigo

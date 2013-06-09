@@ -21,7 +21,7 @@ void Enemigo::init_Enemy(const std::string& nickname,const std::string& tipo,uns
 
 
 TileServidor* Enemigo::get_proximo_tile_recta_horizontal(MapaServidor& Mapa){
-		if (this->direccion == noSeMovio){
+	if (this->direccion == noSeMovio){
 		this->direccion = derecha;
 	} 
 
@@ -274,7 +274,7 @@ TileServidor * Enemigo::get_proximo_tile_circular(MapaServidor& Mapa){
 	return res;
 	
 }
-bool Enemigo::personaje_en_radio(MapaServidor& mapa,PlayerManager& pm){
+bool Enemigo::personaje_en_radio(MapaServidor& mapa,PlayerManager& pm,TileServidor*& tilePersonaje){
 	//it-> first = nick
 	//it-> second = pje
 	//TileServidor* tileEnemigo = mapa.getTilePorPixeles(this->getX(),this->getY());
@@ -293,6 +293,7 @@ bool Enemigo::personaje_en_radio(MapaServidor& mapa,PlayerManager& pm){
 		if( (XLogicoPersonaje >= (XlogicoEnemigo - radioAtaque)) && (XLogicoPersonaje <= (XlogicoEnemigo + radioAtaque)) ){
 			if( (YLogicoPersonaje >= (YlogicoEnemigo - radioAtaque)) && (YLogicoPersonaje <= (YlogicoEnemigo + radioAtaque)) ){
 				encontro_personaje = true;
+				tilePersonaje = mapa.getTile( XLogicoPersonaje,YLogicoPersonaje);
 				break;
 			}
 		}
@@ -302,14 +303,15 @@ bool Enemigo::personaje_en_radio(MapaServidor& mapa,PlayerManager& pm){
 }
 TileServidor* Enemigo::get_proximo_tile_enemigo(MapaServidor& mapa,PlayerManager& pm){
 	TileServidor* res = NULL;
-	bool estaEnRadio = this->personaje_en_radio(mapa,pm);
+	TileServidor* tileDestino = NULL;
+	bool estaEnRadio = this->personaje_en_radio(mapa,pm,tileDestino);
 	if (estaEnRadio){
 		//sigo al personaje por el camino minimo
-	//	TileServidor* tileOrigen = mapa.getTilePorPixeles(this->getX(),this->getY());
-	//	tileOrigen* tileDestino = mapa.getTilePorPixeles(pjm.getPjeLocal().getX(),pjm.getPjeLocal().getY());
-		//vector<pair <int,int> > camino = mapa.getCaminoMinimo(tileOrigen,tileDestino);
-	//	if (camino.size() > 0 )
-		//	res = mapa.getTile(camino[1].first,camino[1].second);
+
+		TileServidor* tileOrigen = mapa.getTile(this->getX(),this->getY());
+		vector<pair <int,int> > camino = mapa.getCaminoMinimo(tileOrigen,tileDestino);
+		if (camino.size() > 0 )
+			res = mapa.getTile(camino[1].first,camino[1].second);
 	}else{
 		//sigo mi camino segun mi estrategia
 		if (this->estrategia == 1){

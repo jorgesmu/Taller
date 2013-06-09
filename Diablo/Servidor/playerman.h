@@ -17,7 +17,7 @@ class Player {
 	std::string nick;
 	std::string tipo_personaje;
 	bool isOnline;
-	int x, y; // Pos en tiles logicos en el mapa
+	int x, y,xSiguiente,ySiguiente; // Pos en tiles logicos en el mapa
 	TilesRecorridos tiles_recorridos;
 	double velocidad;
 	float radio;
@@ -42,6 +42,9 @@ class Player {
 	double getVelocidad() { return velocidad; }
 	void setVelocidad(double newVel) { velocidad=newVel; }
 	char getEnergia() { return energia; }
+	int getXSiguiente() const ;
+	int getYSiguiente() const ;
+	void setPosSiguiente( int XAntiguo,int YAntiguo);
 	void setEnergia(char newEnergia) { energia=newEnergia; }
 	char getMagia() { return magia; }
 	void setMagia(char newMagia) { magia=newMagia; }
@@ -98,7 +101,7 @@ class PlayerManager {
 	bool enemyExists(const std::string& nick) const;
 	// Agrega un jugador
 	// Inicializa en una posicion aleatoria del mapa
-	void addEnemy(const std::string& nick, const std::string& tipo_pj, MapaServidor& mapa);
+	void addEnemy(const std::string& nick, const std::string& tipo_pj, MapaServidor& mapa,int estrategiaElegida);
 	// Devuelve un jugador
 	Enemigo* getEnemy(const std::string& nick);
 	// Devuelve el mapa de jugadores

@@ -3,6 +3,7 @@
 #include <vector>
 #include <algorithm>
 #include "../source/utilities/grafo.h"
+class PlayerManager;
 // clase de Tile para el mapa servidor
 // por default es caminable
 using namespace std;
@@ -64,5 +65,13 @@ class MapaServidor {
 	// Getter para el vector de tiles, para recorrerlo entero
 	TileVecServidor& allTiles();
 	//cargar grafo
-	void cargarGrafo();
+	void cargarGrafo(PlayerManager& pm);
+	//actualiza un vertice
+	void actualizarGrafoVertice(int tileX,int tileY);
+	//actualiza vertices adyacentes
+	void actualizarGrafo(int pos_x, int pos_y);
+	//actualizar personajes y enemigos
+	void actualizarGrafoPersonajes(PlayerManager& pm);
+	//me devuelve si hay un personaje, enemigo o golem en esa posicion
+	bool tile_esta_ocupado(int x,int y,PlayerManager& pm);
 };

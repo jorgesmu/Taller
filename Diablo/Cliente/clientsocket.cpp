@@ -373,8 +373,8 @@ void ClientSocket::listenDo() {
 			char energia,magia,energiaEscudo,cantTerremoto,cantHielo;
 			bs >> nick_who >> vel_recv >> energia >> magia >> energiaEscudo >> cantTerremoto >> cantHielo >> radio;
 			//double vel=(double)vel_recv;
-			double vel =0.01;
-			cout <<"Velocidad jor = "<< vel<<endl;
+			double vel =0.01;//cambiar
+			cout <<"Velocidad  = "<< vel<<endl;
 			//Seteamos los atributos del jugador
 			std::cout << "CLIENT SOCKET INIT_ATT: " << radio << "\n";
 			pjm.getPje(nick_who).setVelocidad(vel);
@@ -463,6 +463,7 @@ void ClientSocket::listenDo() {
 			}else{
 				auto& p = pjm.getPje(nick);
 				p.mover(mapa.getTile(x, y));
+				p.set_posicion_actualizada(false);
 				//bool bolaDeCristal;//hacer metodo que me diga si tengo bola de cristal
 				//if(bolaDeCristal){
 				//	std::vector<Tile*> exploradosEnemigo = p.getTilesExplorados();

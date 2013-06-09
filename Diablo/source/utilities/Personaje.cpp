@@ -91,7 +91,6 @@ void Personaje::inicializarAtributosEnValoresDefault() {
 	this -> cambioDireccionHabilitado = true;
 	this -> espada = NULL;
 }
-
 /*
 	Pre:-
 		 
@@ -103,6 +102,7 @@ Personaje::Personaje(){
 	// Se setean los atributos a sus valores por defecto.
 	this -> inicializarAtributosEnValoresDefault();
 	this->nickname = "untitled";
+	this->PosicionActualizada = false;
 }
 
 /*

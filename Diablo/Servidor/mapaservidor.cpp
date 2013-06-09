@@ -1,5 +1,6 @@
 #include "mapaservidor.h"
-
+#include "playerman.h"
+#include "enemigoServer.h"
 // Ctor
 MapaServidor::MapaServidor() {
 	w = h = 0;
@@ -60,7 +61,7 @@ vector <pair<int,int> > MapaServidor::getCaminoMinimo(TileServidor* tileOrigen, 
 	return camino;
 }
 //carga el grafo con la informacion del mapa en ese momento
-void MapaServidor::cargarGrafo(){
+void MapaServidor::cargarGrafo(PlayerManager& pm){
 	int altoMapa = this->h;
 	int anchoMapa = this->w;
 	double raizDeDos = 1.4142;
@@ -145,4 +146,156 @@ void MapaServidor::cargarGrafo(){
 			}
 		}
 	}
+}
+//actualiza unicamente un vertice
+void MapaServidor::actualizarGrafoVertice(int tileX,int tileY){
+	int altoMapa = this ->h ;
+	int anchoMapa = this->w;
+	double raizDeDos = 1.4142;
+	double pesoNoCaminable = 500;
+
+
+
+	if((tileX-1)>=0){
+		//izquierda
+		TileServidor* tileArista = this->getTile(tileX-1,tileY);
+		if(tileArista->isCaminable()){
+			this->grafoMapa.actualizar_arista(tileX,tileY,tileX-1,tileY,1);			
+		}else{
+			this->grafoMapa.actualizar_arista(tileX,tileY,tileX-1,tileY,pesoNoCaminable);								
+		}
+	}
+	if((tileY-1)>=0){
+		//arriba
+		TileServidor* tileArista = this->getTile(tileX,tileY-1);
+		if(tileArista->isCaminable()){
+			this->grafoMapa.actualizar_arista(tileX,tileY,tileX,tileY-1,1);			
+		}else{
+			this->grafoMapa.actualizar_arista(tileX,tileY,tileX,tileY-1,pesoNoCaminable);								
+		}
+	}
+	if((tileX+1)<=anchoMapa-1){
+		//derecha
+		TileServidor* tileArista = this->getTile(tileX+1,tileY);
+		if(tileArista->isCaminable()){
+			this->grafoMapa.actualizar_arista(tileX,tileY,tileX+1,tileY,1);			
+		}else{
+			this->grafoMapa.actualizar_arista(tileX,tileY,tileX+1,tileY,pesoNoCaminable);								
+		}
+	}
+	if((tileY+1)<=altoMapa-1){
+		//abajo
+		TileServidor* tileArista = this->getTile(tileX,tileY+1);
+		if(tileArista->isCaminable()){
+			this->grafoMapa.actualizar_arista(tileX,tileY,tileX,tileY+1,1);			
+		}else{
+			this->grafoMapa.actualizar_arista(tileX,tileY,tileX,tileY+1,pesoNoCaminable);								
+		}
+	}
+	if(((tileX-1)>=0) && ((tileY-1)>=0)){
+		//arriba izquierda
+		TileServidor* tileArista = this->getTile(tileX-1,tileY-1);
+		if(tileArista->isCaminable()){
+			this->grafoMapa.actualizar_arista(tileX,tileY,tileX-1,tileY-1,raizDeDos);			
+		}else{
+			this->grafoMapa.actualizar_arista(tileX,tileY,tileX-1,tileY-1,pesoNoCaminable*raizDeDos);								
+		}
+	}
+	if(((tileX-1)>=0) && ((tileY+1)<=altoMapa-1)){
+		//abajo izquierda
+		TileServidor* tileArista = this->getTile(tileX-1,tileY+1);
+		if(tileArista->isCaminable()){
+			this->grafoMapa.actualizar_arista(tileX,tileY,tileX-1,tileY+1,raizDeDos);			
+		}else{
+			this->grafoMapa.actualizar_arista(tileX,tileY,tileX-1,tileY+1,pesoNoCaminable*raizDeDos);								
+		}
+	}
+	if(((tileX+1)<=anchoMapa-1) && ((tileY-1)>=0)){
+		//arriba derecha
+		TileServidor* tileArista = this->getTile(tileX+1,tileY-1);
+		if(tileArista->isCaminable()){
+			this->grafoMapa.actualizar_arista(tileX,tileY,tileX+1,tileY-1,raizDeDos);			
+		}else{
+			this->grafoMapa.actualizar_arista(tileX,tileY,tileX+1,tileY-1,pesoNoCaminable*raizDeDos);								
+		}
+	}
+	if(((tileX+1)<=anchoMapa-1) && ((tileY+1)<=altoMapa-1)){
+		//abajo derecha
+		TileServidor* tileArista = this->getTile(tileX+1,tileY+1);
+		if(tileArista->isCaminable()){
+			this->grafoMapa.actualizar_arista(tileX,tileY,tileX+1,tileY+1,raizDeDos);			
+		}else{
+			this->grafoMapa.actualizar_arista(tileX,tileY,tileX+1,tileY+1,pesoNoCaminable*raizDeDos);								
+		}
+	}
+	
+}
+//actualiza el grafo con la informacion del mapa luego de moverse de un tile a otro
+void MapaServidor::actualizarGrafo(int pos_x, int pos_y){
+	//actualizo origen y adyacencias
+	this->actualizarGrafoVertice(pos_x,pos_y);
+	//actualizo adyacencias de x
+	if (tileExists(pos_x + 1 ,pos_y)){
+		//derecha
+		this->actualizarGrafoVertice(pos_x + 1,pos_y);
+	}
+	if (tileExists(pos_x - 1 ,pos_y)){
+		//izquierda
+		this->actualizarGrafoVertice(pos_x - 1,pos_y);
+	}
+	if (tileExists(pos_x ,pos_y -1)){
+		//arriba
+		this->actualizarGrafoVertice(pos_x,pos_y -1);
+	}
+	if (tileExists(pos_x ,pos_y + 1)){
+		//abajo
+		this->actualizarGrafoVertice(pos_x,pos_y + 1);
+	}
+	if (tileExists(pos_x + 1 ,pos_y -1)){
+		//derecha arriba
+		this->actualizarGrafoVertice(pos_x + 1,pos_y -1);
+	}
+	if (tileExists(pos_x + 1 ,pos_y + 1)){
+		//derecha abajo
+		this->actualizarGrafoVertice(pos_x + 1,pos_y + 1);
+	}
+	
+	if (tileExists(pos_x -1 ,pos_y + 1)){
+		//izquierda abajo
+		this->actualizarGrafoVertice(pos_x - 1,pos_y + 1);
+	}
+	if (tileExists(pos_x -1 ,pos_y - 1)){
+		//izquierda arriba
+		this->actualizarGrafoVertice(pos_x - 1,pos_y - 1);
+	}
+	
+
+}
+//actualizar personajes y enemigos
+void MapaServidor::actualizarGrafoPersonajes(PlayerManager& pm){
+	//actualizo enemigos
+	for(auto it = pm.getEnemies().begin();it != pm.getEnemies().end();it++) {
+		Enemigo* unEnemigo = it->second;
+		this->actualizarGrafo(unEnemigo->getX(),unEnemigo->getY());
+	}
+	//actualizo personajes
+	for (auto it = pm.getPlayers().begin();it != pm.getPlayers().end();it++) {
+		//it->second = player
+		this->actualizarGrafo(it->second.getX(),it->second.getY());
+	}
+}
+bool MapaServidor::tile_esta_ocupado(int x,int y,PlayerManager& pm){
+	bool res = false;
+	for(auto it = pm.getEnemies().begin();it != pm.getEnemies().end();it++) {
+		Enemigo* unEnemigo = it->second;
+		if (unEnemigo->getX()== x && unEnemigo->getY() ==y)
+			res = true ;
+	}
+	//actualizo personajes
+	for (auto it = pm.getPlayers().begin();it != pm.getPlayers().end();it++) {
+		//it->second = player
+		if(it->second.getX() == x && it->second.getY()==y)
+			res = true;
+	}
+	return res;
 }

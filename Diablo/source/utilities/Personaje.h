@@ -110,6 +110,8 @@ protected:
 
 		float radioY,radioX;
 
+		bool PosicionActualizada; // para el update de enemigos
+
 		//Tiene o no los hechizos(podria tener mas de uno quizas?, por eso un char)
 		char terremoto;
 		char hielo;
@@ -135,7 +137,8 @@ protected:
 
 		//Timer para revivir
 		Timer timerRevivir;
-								
+		//timer para actualizar enemigos
+		Timer timerUpdateServidor;
 		// Arma default
 		Arma* espada;
 				
@@ -196,6 +199,10 @@ public:
 		Nota: Puede suceder que si una entidad ocupa varios Tiles la entidad se de de alta
 		en algun Tile en el que no estaba, y se de de baja en alguno en cual estaba.
 	*/
+	virtual Timer& get_timer_update(){
+		return timerUpdateServidor; 
+	}
+	
 	virtual void mover(Tile* tileDestino);
 
 	/*
@@ -286,6 +293,13 @@ public:
 
 	// Retorna el ancla de niebla Y adecuada
 	virtual int getYAnclajeNiebla();
+	virtual bool get_posicion_actualizada(){
+		return PosicionActualizada;
+	}
+	virtual void set_posicion_actualizada(bool nuevoValor){
+		PosicionActualizada = nuevoValor;
+	}
+
 	/*
 		Pre: La instancia ha sido creada.
 		Post: Se retorna verdadero si se puede ocupar el tile donde se encuentra la

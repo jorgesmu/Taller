@@ -103,7 +103,7 @@ entidades:
     caminable: false
 
 escenarios:
-  - nombre: bosque_encantado3
+  - nombre: bosque_encantado
     size_x: 15
     size_y: 15
     entidadesDef:

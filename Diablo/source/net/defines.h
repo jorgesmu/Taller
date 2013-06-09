@@ -71,6 +71,9 @@ const unsigned char OLD_ATT = 'y';
 const unsigned char INIT_ATT = 'z';
 // Congela a un personaje
 const unsigned char CONGELAR = 'A';
+// Termino de mover enemigo
+const unsigned char EN_MOVE_CMPLT = 'B';
+
 
 
 }

@@ -137,8 +137,8 @@
     </ClCompile>
     <ClCompile Include="source\utilities\soundman.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>   
-   <ClCompile Include="source\utilities\interface.cpp">
+    </ClCompile>
+    <ClCompile Include="source\utilities\interface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -177,9 +177,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="source\display\entidad.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="source\display\mapa.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="source\display\resman.h">
@@ -312,6 +309,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="source\utilities\interface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\display\mapa.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

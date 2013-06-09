@@ -14,14 +14,16 @@
 
 #include "playerman.h"
 #include "mapaservidor.h"
-
+#include "enemigoServer.h"
 extern PlayerManager pm;
 extern MapaServidor mapa;
 extern std::vector <config_entidad> entidades;
 extern int escenario_elegido_id;
-
+extern bool puedeMoverseEnemigo; 
+extern bool conectandose;
 bool ServerSocket::WSinit = false;
 size_t ServerSocket::ref_count = 0;
+BitStream bs;
 
 ServerSocket::ServerSocket() {
 	// Increase ref count
@@ -360,8 +362,21 @@ unsigned int __stdcall ServerSocket::acceptLastEntry(void* pthis) {
 }
 
 void ServerSocket::acceptLastDo() {
+	//creo vector de posiciones y de control de si se completo
+	vector< pair<int , int> > ultimaPosicionEnemigo;
+	ultimaPosicionEnemigo.resize(pm.getEnemies().size());
+	//inicializo vector
+	for (int i=0; i<ultimaPosicionEnemigo.size();i++){
+		pair<int,int>& unPar = ultimaPosicionEnemigo[i];
+		unPar.first = -1;
+		unPar.second= -1;
+	}
+	pair<int,int>& unpar=ultimaPosicionEnemigo[0];
+	unpar.first = 1;
+	unpar.second = 1;
 
-
+	//bloqueo el loop ppal
+	conectandose=true;
 	// Iniciamos el seed de srand
 	std::srand(std::time(NULL));
 
@@ -424,7 +439,7 @@ void ServerSocket::acceptLastDo() {
 		// Agregamos al playermanager si no existe
 		if(pm.playerExists(new_nick)) {
 			std::string tipo = pm.getPlayer(new_nick).getTipo();
-			BitStream bs;
+			//BitStream bs;
 			bs << PROTO::PREVIOUSTYPE << tipo;
 			send(cid, bs.str());
 		}else{
@@ -520,6 +535,20 @@ void ServerSocket::acceptLastDo() {
 			bs << PROTO::INIT_ATT << it->first << (float)p.getVelocidad() << p.getEnergia() << p.getMagia() << p.getEnergiaEscudo() << p.getTerremoto() << p.getHielo() << (float)p.getRadio();
 			send(cid,bs.str());
 		}
+		// Mandamos todos los otros players al que se unio
+		for(auto it = pm.getEnemies().begin();it != pm.getEnemies().end();it++) {
+			Enemigo* unEnemigo = it->second;
+	
+			if( unEnemigo->getNick() == new_nick) continue; // Salteamos a nuestro jugador			
+			auto p = pm.getEnemy(unEnemigo->getNick());
+			bs.clear();
+			bs << PROTO::NEW_PLAYER << unEnemigo->getNick() << unEnemigo->getTipo() << unEnemigo->getX() << unEnemigo->getY() << unEnemigo-> isOn();
+			send(cid, bs.str());
+			//Mando los atributos principales del jugador
+			bs.clear();
+			bs << PROTO::INIT_ATT << it->first << (float)unEnemigo->getVelocidad() << unEnemigo->getEnergia() << unEnemigo->getMagia() << unEnemigo->getEnergiaEscudo() << unEnemigo->getTerremoto() << unEnemigo->getHielo() << (float)unEnemigo->getRadio();
+			send(cid,bs.str());
+		}
 
 		//Le aviso todos los que estaban congelados
 		for (auto it = pm.getPlayers().begin();it != pm.getPlayers().end();it++) {
@@ -531,6 +560,8 @@ void ServerSocket::acceptLastDo() {
 		}
 
 		LeaveCriticalSection(&critSect);
+		//desbloqueo el loop
+		conectandose = false;
 		// Receive loop
 		while(this->receive(cid, buff)) {
 
@@ -709,6 +740,54 @@ void ServerSocket::acceptLastDo() {
 					std::cout << "REPLY: FAIL\n";
 					this->send(cid, bs.str());
 				}
+			}else if(pt == PROTO::EN_MOVE_CMPLT){
+
+
+				string nickPersonajeActualizado;
+				int posX,posY;
+				bs >> nickPersonajeActualizado >> posX >> posY;
+				//busco si es un enemigo
+				Enemigo* unEnemigo = NULL;
+				int pos = 0;
+				cout << "termino " << nickPersonajeActualizado << endl;
+				for(auto it = pm.getEnemies().begin();it != pm.getEnemies().end();it++) {\
+					string nickEnemy = it->first;
+					if (strcmp(nickPersonajeActualizado.c_str(),nickEnemy.c_str()) == 0){
+						unEnemigo = it->second;
+						break;
+					}
+					pos++;
+				}
+				cout << "pos " <<pos<<endl;
+
+				if(unEnemigo != NULL){
+					pair<int,int>& unaPosicion = ultimaPosicionEnemigo[pos];
+
+					//verifico si era una posicion vieja
+					cout << "unaPoscion " << unaPosicion.first << "," <<unaPosicion.second <<endl;
+					cout << "pos xy " << posX << "," <<posY <<endl;
+						//			system("PAUSE");
+					if (unaPosicion.first == posX && unaPosicion.second == posY){
+					
+						//si es un enemigo actualizo su posicion
+						TileServidor* proxTile = unEnemigo->get_proximo_tile_enemigo(mapa,pm);
+						if (proxTile != NULL){
+							//actualizo vector
+							unaPosicion.first = proxTile->get_x();
+							unaPosicion.second = proxTile->get_y();
+							cout<< "enviando a " << nickPersonajeActualizado <<" a " << unaPosicion.first << ","<<unaPosicion.second<<endl;   
+							cout << "valor vector"<<ultimaPosicionEnemigo[0].first << "," <<ultimaPosicionEnemigo[0].second<<endl;
+							// Informamos a los demas del movimiento del enemigo
+							for(auto it = clients_map.begin();it != clients_map.end();it++) {
+									bs.clear();
+									bs << PROTO::MOVE_PLAYER << nickPersonajeActualizado << proxTile->get_x() << proxTile->get_y() ;
+									send(it->second.sock, bs.str());
+									std::cout << "Mandando update de enemigo a " << it->second.nick << "\n";
+							}
+						}
+					}
+				}
+				
 			}else{
 				bs.clear();
 				bs << PROTO::TEXTMSG << std::string("Unknown packet type");
@@ -796,4 +875,7 @@ std::string ServerSocket::getCIDbyNick(const std::string& nick) {
 	}
 	LeaveCriticalSection(&critSect);
 	return "";
+}
+std::map<std::string, Client> ServerSocket::get_clients(){
+	return clients_map;
 }

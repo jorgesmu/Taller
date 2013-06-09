@@ -368,7 +368,9 @@ void ClientSocket::listenDo() {
 			float vel_recv,radio;
 			char energia,magia,energiaEscudo,cantTerremoto,cantHielo;
 			bs >> nick_who >> vel_recv >> energia >> magia >> energiaEscudo >> cantTerremoto >> cantHielo >> radio;
-			double vel=(double)vel_recv;
+			//double vel=(double)vel_recv;
+			double vel =0.01;
+			cout <<"Velocidad jor = "<< vel<<endl;
 			//Seteamos los atributos del jugador
 			std::cout << "CLIENT SOCKET INIT_ATT: " << radio << "\n";
 			pjm.getPje(nick_who).setVelocidad(vel);

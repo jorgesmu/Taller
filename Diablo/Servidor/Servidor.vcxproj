@@ -12,6 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\source\net\bitstream.cpp" />
+    <ClCompile Include="..\source\utilities\arista.cpp" />
     <ClCompile Include="..\source\utilities\aux_func.cpp" />
     <ClCompile Include="..\source\utilities\config_cliente.cpp" />
     <ClCompile Include="..\source\utilities\config_entidad.cpp" />
@@ -21,9 +22,13 @@
     <ClCompile Include="..\source\utilities\config_juego.cpp" />
     <ClCompile Include="..\source\utilities\config_pantalla.cpp" />
     <ClCompile Include="..\source\utilities\coordenadas.cpp" />
+    <ClCompile Include="..\source\utilities\grafo.cpp" />
     <ClCompile Include="..\source\utilities\PruebasParser.cpp" />
     <ClCompile Include="..\source\utilities\timer.cpp" />
+    <ClCompile Include="..\source\utilities\vertice.cpp" />
     <ClCompile Include="config_servidor.cpp" />
+    <ClCompile Include="enemigoServer.cpp" />
+    <ClCompile Include="golem.cpp" />
     <ClCompile Include="logErroresServer.cpp" />
     <ClCompile Include="mapaservidor.cpp" />
     <ClCompile Include="parserServer.cpp" />
@@ -34,6 +39,7 @@
   <ItemGroup>
     <ClInclude Include="..\source\net\bitstream.h" />
     <ClInclude Include="..\source\net\defines.h" />
+    <ClInclude Include="..\source\utilities\arista.h" />
     <ClInclude Include="..\source\utilities\aux_func.h" />
     <ClInclude Include="..\source\utilities\chatwindow.h" />
     <ClInclude Include="..\source\utilities\config_cliente.h" />
@@ -44,10 +50,14 @@
     <ClInclude Include="..\source\utilities\config_juego.h" />
     <ClInclude Include="..\source\utilities\config_pantalla.h" />
     <ClInclude Include="..\source\utilities\coordenadas.h" />
+    <ClInclude Include="..\source\utilities\grafo.h" />
     <ClInclude Include="..\source\utilities\PruebasParser.h" />
     <ClInclude Include="..\source\utilities\timer.h" />
     <ClInclude Include="..\source\utilities\vec2.h" />
+    <ClInclude Include="..\source\utilities\vertice.h" />
     <ClInclude Include="config_servidor.h" />
+    <ClInclude Include="enemigoServer.h" />
+    <ClInclude Include="golem.h" />
     <ClInclude Include="logErroresServer.h" />
     <ClInclude Include="mapaservidor.h" />
     <ClInclude Include="parserServer.h" />

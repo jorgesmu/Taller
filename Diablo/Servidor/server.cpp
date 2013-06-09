@@ -22,7 +22,8 @@
 #include "mapaservidor.h"
 #include <cstdlib>
 #include <ctime>
-
+#include "enemigoServer.h"
+#include "../source/net/bitstream.h"
 logErrores err_log("log_parser.txt");
 PlayerManager pm;
 MapaServidor mapa;
@@ -34,17 +35,21 @@ config_pantalla* pantalla;
 vector <config_entidad> entidades;
 config_general configuracion;
 vector <config_escenario> escenarios;
-
+bool puedeMoverseEnemigo = false;
+bool conectandose=false;
+//dependencias externas
+extern BitStream bs;
+unsigned int enemyCount = 0;
 int main(int argc, char* argv[]) {
 
 	// Parseamos el escenario a elegir
-	if(argc != 2) {
+	/*if(argc != 2) {
 		std::cerr << "Falta especificar el escenario:\n \tservidor.exe <escenario>\n";
 		return -1;
 	}else{
 		escenario_elegido = argv[1];
-	}
-
+	}*/
+	escenario_elegido = "bosque_encantado";
 	// Iniciamos el seed de srand
 	std::srand(std::time(NULL));
 
@@ -118,11 +123,38 @@ int main(int argc, char* argv[]) {
 			}
 		}
 	}
+	
+	//Agregar enemigos automaticos
+	pm.addEnemy("Enemigo1","soldado",mapa);
+//	pm.addEnemy("Enemigo2","soldado",mapa);	
+	//pm.addEnemy("Enemigo3","soldado",mapa);
 
+	Enemigo* unEnemigo = pm.getEnemy("Enemigo1");
+
+	unEnemigo->setPos(1,1);
 	// Spawneamos el thread de listen
 	_beginthreadex(NULL, 0, ServerSocket::listenLoopEntry, (void*)&sock, 0, NULL);
-
+	bool mando = false;
 	while(true) {
+/*
+		if(!conectandose){
+	
+			puedeMoverseEnemigo= true; 
+			// Informamos a los demas del movimiento del enemigo
+			std::map<std::string, Client> clients_map = sock.get_clients();
+			for(auto it = clients_map.begin();it != clients_map.end();it++) {
+				if(!mando){
+					Sleep(8000);
+					bs.clear();
+					std::string nick = "Enemigo1";
+					bs << PROTO::MOVE_PLAYER << nick << 2 <<2 ;
+
+					sock.send(it->second.sock, bs.str());
+					std::cout << "Mandando update a " << it->second.nick << "\n";
+					mando = true;
+				}
+			}
+		}*/
 		Sleep(100);
 	}
 

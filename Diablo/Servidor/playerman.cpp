@@ -1,6 +1,6 @@
 #include "playerman.h"
 #include "../source/utilities/aux_func.h"
-
+#include "enemigoServer.h"
 #include <exception>
 #include <cassert>
 #include <ctime>
@@ -11,7 +11,7 @@ Player::Player() {
 	tipo_personaje = "uninit-pje";
 	isOnline = false;
 	x = y = 0;
-	velocidad = 0;
+	velocidad = 105/1000;
 	congelado = 0; //descongelado
 }
 
@@ -116,4 +116,52 @@ Player& PlayerManager::getPlayer(const std::string& nick) {
 
 PlayerMapT& PlayerManager::getPlayers() {
 	return this->player_map;
+}
+//metodos de enemigos
+// Devuelve si un player existe
+bool PlayerManager::enemyExists(const std::string& nick) const {
+	return enemy_map.find(nick) != enemy_map.end();
+}
+
+// Agrega un jugador
+void PlayerManager::addEnemy(const std::string& nick, const std::string& tipo_pje, MapaServidor& mapa) {
+	// Chequeo de sanidad
+	assert(!playerExists(nick));
+	Enemigo*& p = enemy_map[nick];
+	p = new Enemigo();
+	p->init_Enemy(nick, tipo_pje,1); //DESCOMENTAR!
+	// Buscar posicion en el mapa
+	bool found = false;
+	int x = 0; // Contador de iteraciones
+	int w, h; // Para guardar el tamaño del mapa
+	mapa.getSize(&w, &h);
+	//std::cout << "Mapa size: " << w << "," << h << "\n";
+	int rand_x, rand_y;
+	// Limitamos la cantidad de iteraciones
+	while(!found && x < 1000) {
+		rand_x = intRand(0, w-1);
+		rand_y = intRand(0, h-1);
+		//std::cout << rand_x << "," << rand_y << "\n";
+		if(mapa.getTile(rand_x, rand_y)->isCaminable()) {
+			found = true;
+		}
+		x++;
+	}
+	if(!found) {
+		throw std::runtime_error("No se pudo ubicar el personaje\n");
+	}else{
+		//Descomentar
+		p->setOnline();
+		p->setPos(rand_x, rand_y);
+	}
+}
+
+// Devuelva un jugador
+Enemigo* PlayerManager::getEnemy(const std::string& nick) {
+	assert(enemyExists(nick));
+	return enemy_map[nick];
+}
+
+EnemyMapT& PlayerManager::getEnemies() {
+	return this->enemy_map;
 }

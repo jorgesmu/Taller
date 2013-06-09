@@ -7,7 +7,7 @@
 
 #include "mapaservidor.h"
 #include "../source/utilities/vec2.h"
-
+class Enemigo;
 typedef std::vector< std::pair<short,short> > TilesRecorridos;
 
 class Player {
@@ -63,12 +63,13 @@ class Player {
 };
 
 typedef std::map<std::string, Player> PlayerMapT;
+typedef std::map<std::string, Enemigo*> EnemyMapT;
 
 class PlayerManager {
 	private:
 	// Hash con los jugadores que entraron al servidor
 	PlayerMapT player_map;
-
+	map<std::string, Enemigo*> enemy_map;
 	public:
 	// Devuelve si un player existe
 	bool playerExists(const std::string& nick) const;
@@ -79,5 +80,15 @@ class PlayerManager {
 	Player& getPlayer(const std::string& nick);
 	// Devuelve el mapa de jugadores
 	PlayerMapT& getPlayers();
+
+	// Devuelve si un enemigo existe
+	bool enemyExists(const std::string& nick) const;
+	// Agrega un jugador
+	// Inicializa en una posicion aleatoria del mapa
+	void addEnemy(const std::string& nick, const std::string& tipo_pj, MapaServidor& mapa);
+	// Devuelve un jugador
+	Enemigo* getEnemy(const std::string& nick);
+	// Devuelve el mapa de jugadores
+	EnemyMapT& getEnemies();
 
 };

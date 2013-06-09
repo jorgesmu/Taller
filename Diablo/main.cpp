@@ -85,7 +85,7 @@ ClientSocket sock;
 
 int main(int argc, char* argv[]) {
 	// Verificamos que se pase el nick y el tipo
-	if(argc != 3) {
+/*	if(argc != 3) {
 		std::cout << "Falta especificar nick:\ncliente.exe <nick> <tipo_personaje>\n";
 		return 0;
 	}else{
@@ -93,10 +93,10 @@ int main(int argc, char* argv[]) {
 		pje_local_nick = argv[1];
 		pje_local_tipo = argv[2];
 	}
-	//borrar estas dos lineas
-	//pje_local_nick = "jugador";
-	//pje_local_tipo = "soldado";
-	//escenario_elegido_id = 0;
+	*///borrar estas dos lineas
+	pje_local_nick = "jugador";
+	pje_local_tipo = "soldado";
+	escenario_elegido_id = 0;
 
 	InitializeCriticalSection(&cs_main);
 	// Socket de cliente
@@ -294,7 +294,7 @@ int main(int argc, char* argv[]) {
 	int ultimoMovimientoY = NOSEMOVIO;// idem coordenada y
 	int ultimoDestinoX = NOSEMOVIO;//guarda el destino actual
 	int ultimoDestinoY = NOSEMOVIO;//guarda el destino actual
-	
+
 	while((!quit ) && (sock.isOpen()) ) {
 
 		// Sync stuff
@@ -485,9 +485,23 @@ int main(int argc, char* argv[]) {
 				(*it)->update(&mapa);
 			}
 			// Actualizamos los personajes
-			for(auto it = pjm.getPjes().begin();it != pjm.getPjes().end(); it++) {
-				it->second.update(&mapa);
-			}
+	/*		for(auto it = pjm.getPjes().begin();it != pjm.getPjes().end(); it++) {
+				int control;
+				control = it->second.update(&mapa);
+				if (control == Personaje::MOVER_COMPLETADO){
+					//aviso al server que se termino de mover un personaje para si es un enemigo actualizarlo
+					Sleep(25);
+					Tile* unTile = it->second.getPosicion(&mapa);
+					cout << "pos " << unTile->getU() << "," <<unTile->getV() <<endl;
+					bs.clear();
+					bs << PROTO::EN_MOVE_CMPLT << it->second.getNick() << unTile->getU() << unTile ->getV() ;
+					sock.send(bs.str());
+					//std::cout << "Mandando termino de moverse personaje a servidor" << it->second.getNick() << "\n";
+					estadoPersonaje = Personaje::ESPERANDO_ACCION;
+					bs.clear();
+					
+				}
+			}*/
 			// Actualizamos el personaje principal
 			Tile* t = mapa.getTilePorPixeles(pjm.getPjeLocal().getX(),pjm.getPjeLocal().getY());
 			tileActual = make_pair<int,int>(t->getU(), t->getV());
@@ -623,9 +637,24 @@ int main(int argc, char* argv[]) {
 			}
 			if (indice==0) puedeMoverse=true;
 			*/
-			// Update a todos los otros personajes
+
+			// Update a todos los otros personaje
 			for(auto it = pjm.getPjes().begin();it != pjm.getPjes().end();it++) {
-				it->second.update(&mapa);
+				int estadoPersonaje;
+				estadoPersonaje = it->second.update(&mapa);
+				if (estadoPersonaje == Personaje::MOVER_COMPLETADO){
+					//aviso al server que se termino de mover un personaje para si es un enemigo actualizarlo
+
+					Tile* unTile = it->second.getPosicion(&mapa);
+					cout << "pos "<< unTile->getU() << "," <<unTile->getV();
+					bs.clear();
+					bs << PROTO::EN_MOVE_CMPLT << it->second.getNick() << unTile->getU() << unTile ->getV() ;
+					sock.send(bs.str());
+					std::cout << "Mandando termino de moverse personaje a servidor" << it->second.getNick() << "\n";
+					estadoPersonaje = Personaje::ESPERANDO_ACCION;
+					bs.clear();
+				
+				}
 			}
 			// Update a tiles recorridos
 			if(update_recorrido.timer.getTicks() > update_recorrido.INTERVAL) {

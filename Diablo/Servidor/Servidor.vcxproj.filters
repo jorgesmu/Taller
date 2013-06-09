@@ -72,22 +72,12 @@
     <ClCompile Include="mapaservidor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="enemigoServer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="misiones.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\source\utilities\arista.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\source\utilities\grafo.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\source\utilities\vertice.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="golem.cpp">
     <ClCompile Include="enemigoServer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -98,7 +88,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\source\utilities\vertice.cpp">
->>>>>>> a40763413297c21547d03d7dfe0831f2aacbb354
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -166,9 +155,6 @@
     <ClInclude Include="mapaservidor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="enemigoServer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="misiones.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -185,9 +171,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\source\utilities\vertice.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="golem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

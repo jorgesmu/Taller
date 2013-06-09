@@ -34,6 +34,7 @@
     <ClCompile Include="source\utilities\config_general.cpp" />
     <ClCompile Include="source\utilities\config_juego.cpp" />
     <ClCompile Include="source\utilities\config_pantalla.cpp" />
+    <ClCompile Include="source\utilities\console.cpp" />
     <ClCompile Include="source\utilities\coordenadas.cpp" />
     <ClCompile Include="source\utilities\enemigo.cpp" />
     <ClCompile Include="source\utilities\grafo.cpp" />
@@ -84,6 +85,7 @@
     <ClInclude Include="source\utilities\config_general.h" />
     <ClInclude Include="source\utilities\config_juego.h" />
     <ClInclude Include="source\utilities\config_pantalla.h" />
+    <ClInclude Include="source\utilities\console.h" />
     <ClInclude Include="source\utilities\coordenadas.h" />
     <ClInclude Include="source\utilities\corazon.h" />
     <ClInclude Include="source\utilities\enemigo.h" />

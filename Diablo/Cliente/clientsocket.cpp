@@ -4,8 +4,10 @@
 #include "../../source/net/PjeManager.h"
 #include "../../source/utilities/config_cliente.h"
 #include "../../source/utilities/parser.h"
+#include "../../source/utilities/console.h"
 #include "clientsocket.h"
 #include "../../source/utilities/chatwindow.h"
+#include "../source/utilities/bandera.h"
 #include <iostream>
 #include <fstream>
 
@@ -24,8 +26,10 @@ extern bool init_bolaDeCristal;
 extern char init_energia,init_magia,init_escudo,init_terremoto,init_hielo;
 extern config_general configuracion;
 extern ResMan resman;
+extern Console consola;
 extern ChatWindow chat_window;
 extern int estadoMovimiento;
+extern std::vector<EntidadFija*> entidades_cargadas;
 
 bool ClientSocket::WSinit = false;
 size_t ClientSocket::ref_count = 0;
@@ -395,7 +399,9 @@ void ClientSocket::listenDo() {
 			bool bolaDeCristal;
 			char energia,magia,energiaEscudo,cantTerremoto,cantHielo;
 			bs >> nick_who >> vel_recv >> energia >> magia >> energiaEscudo >> cantTerremoto >> cantHielo >> radio >> bolaDeCristal;
-			double vel=(double)vel_recv;
+			//double vel=(double)vel_recv;
+			double vel =0.01;
+			cout <<"Velocidad jor = "<< vel<<endl;
 			//Seteamos los atributos del jugador
 			pjm.getPje(nick_who).setVelocidad(vel);
 			pjm.getPje(nick_who).setEnergia(energia);
@@ -420,6 +426,9 @@ void ClientSocket::listenDo() {
 				// Si existe, lo marcamos como desconectado
 				auto& p = pjm.getPje(who_nick);
 				p.freezar(true);
+				std::stringstream ss;
+				ss << who_nick << " abandono el servidor";
+				consola.log(ss.str());
 			}
 		}else if(pt == PROTO::ATACAR) {
 			std::string who_nick;
@@ -457,6 +466,21 @@ void ClientSocket::listenDo() {
 					std::cout << "GOT FAIL FROM SERVER\n";
 				}
 			}
+		}else if(pt == PROTO::POS_REQUEST_REV_REPLY) {
+			bool reply;
+			bs >> reply;
+			if(estadoMovimiento != MOV::ESPERANDO_OK) {
+				std::cout << "Received POS_REQUEST_REV_REPLY without MOV::ESPERANDO_OK\n";
+			}else{
+				if(reply) {
+					pjm.getPjeLocal().revivir();
+					estadoMovimiento = MOV::OK_REV_RECV;
+					std::cout << "GOT OK REV FROM SERVER\n";					
+				}else{
+					estadoMovimiento = MOV::FAIL_RECV;
+					std::cout << "GOT FAIL REV FROM SERVER\n";
+				}
+			}
 		}else if(pt == PROTO::MOVE_PLAYER) {
 			std::string nick;
 			int x, y;
@@ -474,6 +498,20 @@ void ClientSocket::listenDo() {
 					}
 				}
 				std::cout << "Server requested move of <" << nick << "> to " << x << ";" << y << "\n";
+			}
+		}else if(pt == PROTO::REV_PLAYER) {
+			std::string nick;
+			int x, y;
+			bs >> nick >> x >> y;
+			if(!pjm.PjeExiste(nick)) {
+				std::cout << "Server requested move of invalid PJ: " << nick << "\n";
+			}else{
+				auto& p = pjm.getPje(nick);
+				mapa.getTile(p.getPosicion(&mapa)->getU(), p.getPosicion(&mapa)->getV())->deleteEntidad(&p);
+				mapa.getTile(x, y)->addEntidad(&p);
+				p.setTileActual(mapa.getTile(x, y));
+				p.revivir();
+				std::cout << "Server requested revival of <" << nick << "> to " << x << ";" << y << "\n";
 			}
 		}else if(pt == PROTO::USE_ITEM) {
 			std::string nick_who;
@@ -558,6 +596,30 @@ void ClientSocket::listenDo() {
 					break;
 				}
 			}
+		}else if(pt == PROTO::NEW_FLAG) {	
+			int x,y;
+			bs >> x >> y;
+			//Agrego bandera
+			std::cout << "Adding flag in pos (" << x << "," << y << ")" << endl;
+			// Esperamos a que cargue el mapa
+			while(!cargoMapa) {
+				Sleep(10);
+			}
+			Bandera* bandera;
+			bandera = new Bandera("bandera",1,1,true, x , y,NULL,&mapa,resman,Imagen::COLOR_KEY );
+			mapa.getTile(x, y)->addEntidad(bandera,&mapa);
+			entidades_cargadas.push_back(bandera);	
+		}else if(pt == PROTO::WINNER) {	
+			std::string nick_winner;
+			bs >> nick_winner;
+			// Veo si soy yo
+			std::stringstream ss;
+			if (pjm.getPjeLocal().getNick()==nick_winner) {
+				ss << "Felicitaciones! Ganaste la mision!";
+			} else {
+				ss << nick_winner << " gano esta partida, jugale una revancha!";
+			}
+			consola.log(ss.str());
 		}else{
 			std::cout << "Unknown packet type " << int(pt) << " received\n";
 		}

@@ -24,6 +24,7 @@
     <ClCompile Include="source\net\bitstream.cpp" />
     <ClCompile Include="source\net\PjeManager.cpp" />
     <ClCompile Include="source\utilities\arista.cpp" />
+    <ClCompile Include="source\utilities\arma.cpp" />
     <ClCompile Include="source\utilities\aux_func.cpp" />
     <ClCompile Include="source\utilities\chatwindow.cpp" />
     <ClCompile Include="source\utilities\config_cliente.cpp" />
@@ -33,11 +34,13 @@
     <ClCompile Include="source\utilities\config_general.cpp" />
     <ClCompile Include="source\utilities\config_juego.cpp" />
     <ClCompile Include="source\utilities\config_pantalla.cpp" />
+    <ClCompile Include="source\utilities\console.cpp" />
     <ClCompile Include="source\utilities\coordenadas.cpp" />
     <ClCompile Include="source\utilities\enemigo.cpp" />
     <ClCompile Include="source\utilities\grafo.cpp" />
     <ClCompile Include="source\utilities\Imagen.cpp" />
     <ClCompile Include="source\utilities\ImagenAnimada.cpp" />
+    <ClCompile Include="source\utilities\ImagenArma.cpp" />
     <ClCompile Include="source\utilities\ImagenEstatica.cpp" />
     <ClCompile Include="source\utilities\ImagenPersonaje.cpp" />
     <ClCompile Include="source\utilities\interface.cpp" />
@@ -69,8 +72,10 @@
     <ClInclude Include="source\net\defines.h" />
     <ClInclude Include="source\net\PjeManager.h" />
     <ClInclude Include="source\utilities\arista.h" />
+    <ClInclude Include="source\utilities\arma.h" />
     <ClInclude Include="source\utilities\aux_func.h" />
     <ClInclude Include="source\utilities\bolaDeCristal.h" />
+    <ClInclude Include="source\utilities\bandera.h" />
     <ClInclude Include="source\utilities\bombas.h" />
     <ClInclude Include="source\utilities\botella.h" />
     <ClInclude Include="source\utilities\chatwindow.h" />
@@ -81,6 +86,7 @@
     <ClInclude Include="source\utilities\config_general.h" />
     <ClInclude Include="source\utilities\config_juego.h" />
     <ClInclude Include="source\utilities\config_pantalla.h" />
+    <ClInclude Include="source\utilities\console.h" />
     <ClInclude Include="source\utilities\coordenadas.h" />
     <ClInclude Include="source\utilities\corazon.h" />
     <ClInclude Include="source\utilities\enemigo.h" />
@@ -91,6 +97,7 @@
     <ClInclude Include="source\utilities\hielo.h" />
     <ClInclude Include="source\utilities\Imagen.h" />
     <ClInclude Include="source\utilities\ImagenAnimada.h" />
+    <ClInclude Include="source\utilities\ImagenArma.h" />
     <ClInclude Include="source\utilities\ImagenEstatica.h" />
     <ClInclude Include="source\utilities\ImagenPersonaje.h" />
     <ClInclude Include="source\utilities\imagen_error.h" />

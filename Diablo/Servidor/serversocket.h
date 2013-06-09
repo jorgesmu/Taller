@@ -86,4 +86,5 @@ class ServerSocket {
 	static unsigned int __stdcall listenLoopEntry(void* pthis);
 	// Funcion de listen 
 	void listenLoop();
+	std::map<std::string, Client> ServerSocket::get_clients();
 };

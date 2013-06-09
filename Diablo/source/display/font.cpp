@@ -48,6 +48,19 @@ void Font::blit(SDL_Surface* dest, int x, int y, const std::string& msg, const S
 	SDL_FreeSurface(txt_surf);
 }
 
+// Se entiende
+void Font::blitCentered(SDL_Surface* dest, int x, int y, const std::string& msg, const SDL_Color& color) {
+	// Cargamos las coordenadas a donde blittear
+	SDL_Rect dest_coords; dest_coords.x = x; dest_coords.y = y;
+	SDL_Surface* txt_surf = TTF_RenderText_Solid(this->font, msg.c_str(), color);
+	assert(txt_surf != NULL);
+	// Centramos
+	dest_coords.x -= txt_surf->w/2;
+	dest_coords.y -= txt_surf->h/2;
+	SDL_BlitSurface(txt_surf, NULL, dest, &dest_coords);
+	SDL_FreeSurface(txt_surf);
+}
+
 // Esta funcion hace el blit pero guarda una copia del surface la primera vez
 // Si ese surface ya existe, se lo reutiliza
 void Font::buffBlit(SDL_Surface* dest, int x, int y, const std::string& msg, const SDL_Color& color) {
@@ -82,4 +95,8 @@ void Font::calcSize(const std::string& msg, int* w, int* h) const {
 	if(TTF_SizeText(this->font, msg.c_str(), w, h) == -1) {
 		std::cerr << "Error @ Font::calcSize(): " << TTF_GetError() << "\n";
 	}
+}
+
+int Font::getH() const {
+	return TTF_FontHeight(this->font);
 }

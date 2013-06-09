@@ -1,12 +1,15 @@
 #pragma once
 
 #include <vector>
-
+#include <algorithm>
+#include "../source/utilities/grafo.h"
 // clase de Tile para el mapa servidor
 // por default es caminable
+using namespace std;
 class TileServidor {
 	private:
 	bool caminable;
+	int x,y;
 
 	public:
 	TileServidor() {
@@ -21,6 +24,20 @@ class TileServidor {
 	void setNoCaminable() {
 		caminable = false;
 	}
+	//gets
+	int get_x(){
+		return x;
+	}
+	int get_y(){
+		return y;
+	}
+	//sets
+	void set_x(int new_value){
+		x = new_value;
+	}
+	void set_y(int new_value){
+		y = new_value;
+	}
 };
 
 // Mapa servidor
@@ -30,7 +47,7 @@ class MapaServidor {
 	private:
 	int w, h;
 	TileVecServidor tiles;
-
+	grafo grafoMapa;
 	public:
 	MapaServidor();
 	// Resize para el mapa
@@ -41,6 +58,11 @@ class MapaServidor {
 	TileServidor* getTile(int x, int y);
 	// Verifica si el tile existe
 	bool tileExists(int x, int y) const;
+	//devuelve el camino minimo
+	vector<pair<int,int> > getCaminoMinimo(TileServidor* tileOrigen, TileServidor* tileDestino);
+	//vector <pair<int,int>> getCaminoMinimo(TileServidor* tileOrigen, TileServidor* tileDestino);
 	// Getter para el vector de tiles, para recorrerlo entero
 	TileVecServidor& allTiles();
+	//cargar grafo
+	void cargarGrafo();
 };

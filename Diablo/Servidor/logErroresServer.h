@@ -28,7 +28,7 @@ const unsigned int spriteAnchoDef = 10;
 const bool esCaminableDef = true;
 const string ipDef = "127.0.0.1";
 const unsigned int puertoDef = 8080;
-;
+ 
 
 //hay que mover la implementacion del .h al .cpp, se hace de esta forma ya que el compilador tira error sino!!
 class logErrores {

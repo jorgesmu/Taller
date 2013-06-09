@@ -6,6 +6,7 @@
 #include "../utilities/ImagenPersonaje.h"
 #include "../display/tile.h"
 #include "../display/mapa.h"
+#include "timer.h"
 //#include "../utilities/corazon.h"
 class Tile;
 class Mapa;
@@ -19,7 +20,13 @@ class Granadas;
 class Varitas;
 class Escudo;
 class BolaDeCristal;
+class Lampara;
+class MapaItem;
+class Terremoto;
+class Hielo;
+class Bandera;
 class ClientSocket;
+class Arma;
 
 class Personaje : public Entidad {
 public:
@@ -64,6 +71,9 @@ public:
 		//Radio de los hechizos
 		const static unsigned int RADIO_HECHIZO = 4; //en tiles
 
+		//Revivir tiempo
+		const static unsigned int TIEMPO_REVIVIR = 3000;
+
 		//Daño maximo de los hechizos
 		const static char DAÑO_TERREMOTO = 100;
 
@@ -75,6 +85,9 @@ public:
 
 		//Magia inicial
 		const static char MAGIA_TOTAL = 100;
+
+		//Precision
+		const static char PRECISION_PERSONAJE = 30;
 
 	//	const static int DELTA_TIEMPO_UPDATE_POSICION = 20; // Tiempo entre cada update en clocks
 
@@ -108,6 +121,9 @@ protected:
 		//Magia
 		char magia;
 
+		//Para ataques
+		char precision;
+
 		//Armas
 		int flechas;
 		int bombas;
@@ -120,6 +136,11 @@ protected:
 
 		//si tiene la bola de cristal
 		bool bolaDeCristal;
+		//Timer para revivir
+		Timer timerRevivir;
+								
+		// Arma default
+		Arma* espada;
 				
 public:
 	
@@ -206,6 +227,15 @@ public:
 		Post: Se ha realizado un ataque en la direccion correspondiente del tile parametro.
 
 	*/
+	virtual unsigned int ataque(Tile* tileDestino , Mapa* mapa , Personaje* personajeObjetivo);
+
+	/*
+		Pre: Mapa distinto de null. El parametro tileDestino es cualquier tile en la 
+		dirección del ataque.
+
+		Post: Se ha realizado un ataque en la direccion correspondiente del tile parametro.
+
+	*/
 	virtual void freezar();
 
 	// Valor = true freezea, valor = false; desfreezea
@@ -222,6 +252,8 @@ public:
 	
 
 	void animacionMuerte();
+
+	void animacionRevivir();
 
 	/*
 		Pre: La instancia ha sido creada.
@@ -249,6 +281,9 @@ public:
 	*/
 	virtual unsigned int update(Mapa* mapa);
 
+	//Con logica de timer revivir
+	void updateRevivir();
+
 	// Retorna el ancla de niebla X adecuada
 	virtual int getXAnclajeNiebla();
 
@@ -273,17 +308,57 @@ public:
 
 	virtual void setBolaDeCristal(bool bolaDeCristal);
 
+	/*
+		Pre: Los parámetros cumplen las siguiente condiciones:
+
+			dest: Surface sobre el que se quiere pintar.
+
+			camara: Camara correspondiente.
+
+			mapa: mapa correspondiente
+
+			tileX , tileY : Tile sobre el que se trata de dibujar la entidad.
+			NOTA: Cuidado al momento de hacer updates, ya que hay entidades que 
+			ocupan varios Tiles. En sintesis, un update por entidad al momento
+			de pintar toda la pantalla.
+
+		Post: Se ha pintado la entidad en el surface dest según la camara y el mapa.
+
+	*/
+	virtual void blit(SDL_Surface* dest, Camara* camara , Mapa* mapa,
+					const unsigned int tileX ,	const unsigned int tileY);
+
+	/*
+		Pre: Los parámetros cumplen las siguiente condiciones:
+
+			dest: Surface sobre el que se quiere pintar.
+
+			camara: Camara correspondiente.
+
+			mapa: mapa correspondiente
+
+			tileX , tileY : Tile sobre el que se trata de dibujar la entidad.
+			NOTA: Cuidado al momento de hacer updates, ya que hay entidades que 
+			ocupan varios Tiles. En sintesis, un update por entidad al momento
+			de pintar toda la pantalla.
+
+		Post: Se ha pintado la entidad en el surface dest según la camara y el mapa.
+
+	*/
+	virtual void blit(SDL_Surface* dest, Camara* camara , Mapa* mapa,
+					const unsigned int tileX ,	const unsigned int tileY , bool color);
+	
 	//Colisiones
 	
-	void chocarConEntidad() {std::cout << "Choco con entidad\n"; }
+	void chocarConEntidad() { }
 
-	void chocarConEntidadFija() {std::cout << "Choco con entidad fija\n"; }
+	void chocarConEntidadFija() { }
 
-	void chocarConItem() {std::cout << "Agarro item\n"; }
+	void chocarConItem() { }
 
-	void chocarConLampara();
+	void chocarConLampara(Lampara * lampara);
 
-	void chocarConMapa();
+	void chocarConMapa(MapaItem* mapaItem);
 
 	void aumentarVelocidad(char porcentaje);
 
@@ -291,11 +366,11 @@ public:
 
 	void chocarConBolaDeCristal();
 
-	void chocarConHechizo() {std::cout << "Choco con hechizo\n"; }
+	void chocarConHechizo() { }
 
-	void chocarConTerremoto();
+	void chocarConTerremoto(Terremoto* terremoto);
 
-	void chocarConHielo();
+	void chocarConHielo(Hielo* hielo);
 	
 	void chocarConCorazon(Corazon* corazon);
 
@@ -310,6 +385,8 @@ public:
 	void chocarConVaritas(Varitas* varitas);
 
 	void chocarConEscudo(Escudo* escudo);
+
+	void chocarConBandera(Bandera* bandera);
 
 	void setTerremoto(char valor) { this->terremoto=valor; }
 
@@ -329,7 +406,11 @@ public:
 
 	bool estaVivo() {return vivo; }
 
-	void revivir() { this->vivo=true; }
+	void revivir();
+
+	void setPrecision(char new_precision) { precision=new_precision; }
+
+	char getPrecision() { return precision; }
 
 	//Setea el radio de vision en el eje Y
 	void setRadio(float newRadio) { 
@@ -338,7 +419,7 @@ public:
 	}
 
 	//Recibe un valor de proporcion (0.25 aumenta 25%) para aumentar el radio de vision
-	void aumentarRadio(double proporcion);
+	void aumentarRadio(float proporcion);
 
 	float getRadioX() { return radioX; }
 
@@ -358,9 +439,13 @@ public:
 
 	double getVelocidad() { return velocidad; }
 
-	void setVelocidad(double velocidad) { this->velocidad=velocidad; }
+	void setVelocidad(double velocidad) { 
+		this->velocidad=velocidad; 
+	}
 
 	void dañar(char daño); 
+
+	Arma* getArmaActiva();
 
 protected:
 

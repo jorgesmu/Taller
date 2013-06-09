@@ -72,7 +72,21 @@ const unsigned char INIT_ATT = 'z';
 // Congela a un personaje
 const unsigned char CONGELAR = 'A';
 
+// Termino de mover enemigo
+const unsigned char EN_MOVE_CMPLT = 'B';
 
+// Revive posicion
+const unsigned char REQUEST_REV_POS = 'B';
+// Revive posicion OK
+const unsigned char POS_REQUEST_REV_REPLY = 'C';
+// Transportar player a revive posicion
+const unsigned char REV_PLAYER = 'D';
+// Colocar bandera en una posicion del mapa
+const unsigned char NEW_FLAG = 'E';
+// Atrape una bandera
+const unsigned char CATCH_FLAG = 'F';
+// Aviso al clliente que gano la mision
+const unsigned char WINNER = 'G';
 }
 
 // Cosas de movimiento
@@ -82,6 +96,8 @@ namespace MOV {
 	const int OK_RECV = 2;
 	const int FAIL_RECV = 3;
 	const int MANDAR_POS = 4;
+	const int MUERTO = 5;
+	const int OK_REV_RECV = 6;
 }
 
 // Cosas de items

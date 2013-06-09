@@ -2,6 +2,7 @@
 
 #include "../source/utilities/aux_func.h"
 #include "parserServer.h"
+#include "misiones.h"
 
 #include <iostream>
 #include <sstream>
@@ -14,14 +15,18 @@
 
 #include "playerman.h"
 #include "mapaservidor.h"
-
+#include "enemigoServer.h"
 extern PlayerManager pm;
 extern MapaServidor mapa;
 extern std::vector <config_entidad> entidades;
 extern int escenario_elegido_id;
-
+extern bool puedeMoverseEnemigo; 
+extern bool conectandose;
 bool ServerSocket::WSinit = false;
 size_t ServerSocket::ref_count = 0;
+
+BitStream bs;
+extern Misiones mision;
 
 ServerSocket::ServerSocket() {
 	// Increase ref count
@@ -360,8 +365,8 @@ unsigned int __stdcall ServerSocket::acceptLastEntry(void* pthis) {
 }
 
 void ServerSocket::acceptLastDo() {
-
-
+	//bloqueo el loop ppal
+	conectandose=true;
 	// Iniciamos el seed de srand
 	std::srand(std::time(NULL));
 
@@ -424,7 +429,7 @@ void ServerSocket::acceptLastDo() {
 		// Agregamos al playermanager si no existe
 		if(pm.playerExists(new_nick)) {
 			std::string tipo = pm.getPlayer(new_nick).getTipo();
-			BitStream bs;
+			//BitStream bs;
 			bs << PROTO::PREVIOUSTYPE << tipo;
 			send(cid, bs.str());
 		}else{
@@ -480,8 +485,8 @@ void ServerSocket::acceptLastDo() {
 			for(auto it = pm.getPlayer(new_nick).getTilesRecorridos().begin(); it != pm.getPlayer(new_nick).getTilesRecorridos().end();it++) {
 				bs << it->first << it->second;
 			}
-			send(cid, bs.str());		
-		}
+			send(cid, bs.str());
+		}		
 
 		// Para tipear menos, p_local = referencia al player de este thread
 		const auto p_local = pm.getPlayer(new_nick);
@@ -505,22 +510,32 @@ void ServerSocket::acceptLastDo() {
 			}
 		}
 
-		LeaveCriticalSection(&critSect);
-		// Receive loop
-		while(this->receive(cid, buff)) {
-
-			// Mandamos todos los otros players al que se unio
-			for(auto it = pm.getPlayers().begin();it != pm.getPlayers().end();it++) {
-				if(it->second.getNick() == new_nick) continue; // Salteamos a nuestro jugador			
-				auto p = pm.getPlayer(it->second.getNick());
-				bs.clear();
-				bs << PROTO::NEW_PLAYER << it->second.getNick() << p.getTipo() << p.getX() << p.getY() << p.isOn();
-				send(cid, bs.str());
-				//Mando los atributos principales del jugador
-				bs.clear();
-				bs << PROTO::INIT_ATT << it->first << (float)p.getVelocidad() << p.getEnergia() << p.getMagia() << p.getEnergiaEscudo() << p.getTerremoto() << p.getHielo() << (float)p.getRadio() << (bool)p.getBolaDeCristal();
-				send(cid,bs.str());
-			}
+		// Mandamos todos los otros players al que se unio
+		for(auto it = pm.getPlayers().begin();it != pm.getPlayers().end();it++) {
+			if(it->second.getNick() == new_nick) continue; // Salteamos a nuestro jugador			
+			auto p = pm.getPlayer(it->second.getNick());
+			bs.clear();
+			bs << PROTO::NEW_PLAYER << it->second.getNick() << p.getTipo() << p.getX() << p.getY() << p.isOn();
+			send(cid, bs.str());
+			//Mando los atributos principales del jugador
+			bs.clear();
+			bs << PROTO::INIT_ATT << it->first << (float)p.getVelocidad() << p.getEnergia() << p.getMagia() << p.getEnergiaEscudo() << p.getTerremoto() << p.getHielo() << (float)p.getRadio();
+			send(cid,bs.str());
+		}
+		// Mandamos todos los otros players al que se unio
+		for(auto it = pm.getEnemies().begin();it != pm.getEnemies().end();it++) {
+			Enemigo* unEnemigo = it->second;
+	
+			if( unEnemigo->getNick() == new_nick) continue; // Salteamos a nuestro jugador			
+			auto p = pm.getEnemy(unEnemigo->getNick());
+			bs.clear();
+			bs << PROTO::NEW_PLAYER << unEnemigo->getNick() << unEnemigo->getTipo() << unEnemigo->getX() << unEnemigo->getY() << unEnemigo-> isOn();
+			send(cid, bs.str());
+			//Mando los atributos principales del jugador
+			bs.clear();
+			bs << PROTO::INIT_ATT << it->first << (float)unEnemigo->getVelocidad() << unEnemigo->getEnergia() << unEnemigo->getMagia() << unEnemigo->getEnergiaEscudo() << unEnemigo->getTerremoto() << unEnemigo->getHielo() << (float)unEnemigo->getRadio();
+			send(cid,bs.str());
+		}
 
 			//Le aviso todos los que estaban congelados
 			for (auto it = pm.getPlayers().begin();it != pm.getPlayers().end();it++) {
@@ -530,38 +545,24 @@ void ServerSocket::acceptLastDo() {
 					send(cid,bs.str());
 				}
 			}
+		//Mandamos las banderas si correponde la mision
+		if (mision.getTipo()==Misiones::MISION_BANDERAS) {
+			int contBanderas=0;
+			std::list<std::pair<int,int>> banderas=mision.getBanderas();
+			for (auto it=banderas.begin(); it != banderas.end(); it++) {
+				bs.clear();
+				bs << PROTO::NEW_FLAG << it->first << it->second;
+				send(cid,bs.str());
+				std::cout << "Sending flag " << contBanderas+1 << " pos (" << it->first << "," << it->second << ")" << endl;
+				contBanderas++;
+			}			
+		}
 
-			//for(auto it = pm.getPlayers().begin(); it != pm.getPlayers().end();it++) {
-
-			//	if(it->second.getTilesRecorridos().size() > 0) {
-
-			//		std::cout << "mando tile recorridos de: " << it->second.getNick() << "\n";
-
-			//		bs.clear();
-			//		bs << PROTO::NIEBLA_SYNC << new_nick << short(it->second.getTilesRecorridos().size());
-			//		for(auto it2 = it->second.getTilesRecorridos().begin(); it2 != it->second.getTilesRecorridos().end();it2++) {
-			//			bs << it2->first << it2->second;
-			//		}
-			//		send(cid, bs.str());
-			//	}
-			//}
-
-			//std::cout << "checkeo si tiene bola de cristal: " << new_nick << "\n";
-			//if(pm.getPlayer(new_nick).getBolaDeCristal()){
-
-			//	std::cout << "Tiene bola de cristal: " << new_nick << "\n";
-
-			//	for(auto it = pm.getPlayers().begin(); it != pm.getPlayers().end();it++) {
-			//		if(it->second.getTilesRecorridos().size() > 0) {
-			//			bs.clear();
-			//			bs << PROTO::NIEBLA_LIST << short(it->second.getTilesRecorridos().size());
-			//			for(auto it2 = it->second.getTilesRecorridos().begin(); it2 != it->second.getTilesRecorridos().end();it2++) {
-			//				bs << it2->first << it2->second;
-			//			}
-			//			send(cid, bs.str());
-			//		}
-			//	}
-			//}
+		LeaveCriticalSection(&critSect);
+		//desbloqueo el loop
+		conectandose = false;
+		// Receive loop
+		while(this->receive(cid, buff)) {
 
 			// This is for debugging purposes
 			std::stringstream ss;
@@ -654,6 +655,8 @@ void ServerSocket::acceptLastDo() {
 				bs >> nick_who >> nick_to;
 				char dmg;
 				bs >> dmg;
+				//Actualizamos datos locales para la mision de matar un enemigo
+				pm.getPlayer(nick_to).atacadoPor(nick_who);
 				// Avisamos a los otros jugadores 
 				for(auto it = clients_map.begin();it != clients_map.end();it++) {
 					if(it->second.nick == new_nick) continue; // Salteamos a nuestro jugador de avisarle
@@ -750,9 +753,7 @@ void ServerSocket::acceptLastDo() {
 						ok = false;
 						break;
 					}
-				}
-				
-				
+				}				
 				if(ok) {
 					//le seteo el seMovio en true
 					pm.getPlayer(new_nick).setSeMovio(true);
@@ -770,7 +771,6 @@ void ServerSocket::acceptLastDo() {
 						if(it->second.nick == new_nick) continue; // Salteamos el jugador en cuestion
 						send(it->second.sock, bs.str());
 						std::cout << "Mandando update a " << it->second.nick << "\n";
-
 						if(pm.getPlayer(it->second.nick).getBolaDeCristal()){
 							//si tiene bola de cristal le mando los tiles explorados del que se movio para que los agregue
 							bs.clear();
@@ -789,6 +789,123 @@ void ServerSocket::acceptLastDo() {
 					std::cout << "REPLY: FAIL\n";
 					this->send(cid, bs.str());
 				}
+			/*}else if(pt == PROTO::EN_MOVE_CMPLT){
+
+
+				string nickPersonajeActualizado;
+				int posX,posY;
+				bs >> nickPersonajeActualizado >> posX >> posY;
+				//busco si es un enemigo
+				Enemigo* unEnemigo = NULL;
+				int pos = 0;
+				//cout << "termino " << nickPersonajeActualizado << endl;
+				for(auto it = pm.getEnemies().begin();it != pm.getEnemies().end();it++) {\
+					string nickEnemy = it->first;
+					if (strcmp(nickPersonajeActualizado.c_str(),nickEnemy.c_str()) == 0){
+						unEnemigo = it->second;
+						break;
+					}
+					pos++;
+				}
+				//cout << "pos " <<pos<<endl;
+
+				if(unEnemigo != NULL){
+					pair<int,int>& unaPosicion = ultimaPosicionEnemigo[pos];
+
+					//verifico si era una posicion vieja
+					//cout << "unaPoscion " << unaPosicion.first << "," <<unaPosicion.second <<endl;
+					//cout << "pos xy " << posX << "," <<posY <<endl;
+						//			system("PAUSE");
+					if (unaPosicion.first == posX && unaPosicion.second == posY){
+					
+						//si es un enemigo actualizo su posicion
+						TileServidor* proxTile = unEnemigo->get_proximo_tile_enemigo(mapa,pm);
+						if (proxTile != NULL){
+							//actualizo vector
+							unaPosicion.first = proxTile->get_x();
+							unaPosicion.second = proxTile->get_y();
+							//cout<< "enviando a " << nickPersonajeActualizado <<" a " << unaPosicion.first << ","<<unaPosicion.second<<endl;   
+							//cout << "valor vector"<<ultimaPosicionEnemigo[0].first << "," <<ultimaPosicionEnemigo[0].second<<endl;
+							// Informamos a los demas del movimiento del enemigo
+							for(auto it = clients_map.begin();it != clients_map.end();it++) {
+									bs.clear();
+									bs << PROTO::MOVE_PLAYER << nickPersonajeActualizado << proxTile->get_x() << proxTile->get_y() ;
+									send(it->second.sock, bs.str());
+									std::cout << "Mandando update de enemigo a " << it->second.nick << "\n";
+							}
+						}
+					}
+				}*/
+				
+			}else if(pt == PROTO::REQUEST_REV_POS) {
+				int x, y;
+				bs >> x >> y;
+				bool ok = true;
+				std::cout << "GOT REQUEST_REV_POS <" << new_nick << ">: " << x << ";" << y << "\n";
+				//Veo si era el enemigo a matar
+				bool terminoPartida=false;
+				if (new_nick==mision.enemigoMision()) {
+					terminoPartida=true;
+					bs.clear();
+					bs << PROTO::WINNER << pm.getPlayer(new_nick).ultimoAtacante();
+					for(auto it = clients_map.begin();it != clients_map.end();it++) {
+						send(it->second.sock, bs.str());
+						std::cout << "Mandando ganador de la mision a " << it->second.nick << "\n";
+					}
+					Sleep(5000);
+					exit(0);
+
+				}
+				//if (terminoPartida) break; //salteamos lo que queda
+				// Iteramos para ver si hay algun personaje
+				for(auto it = pm.getPlayers().begin();it != pm.getPlayers().end();it++) {
+					if (it->first == new_nick) continue;
+					if(it->second.getX() == x && it->second.getY() == y) {
+						ok = false;
+						break;
+					}
+				}				
+				if(ok) {
+					// Si el movimiento esta ok, actualizamos la posicion
+					pm.getPlayer(new_nick).setPos(x, y);
+					// Informamos al jugador que esta ok
+					bs.clear();
+					bs << PROTO::POS_REQUEST_REV_REPLY << true;
+					std::cout << "REPLY_REV: OK\n";
+					this->send(cid, bs.str());
+					// Informamos a los demas del movimiento
+					bs.clear();
+					bs << PROTO::REV_PLAYER << new_nick << x << y;
+					for(auto it = clients_map.begin();it != clients_map.end();it++) {
+						if(it->second.nick == new_nick) continue; // Salteamos el jugador en cuestion
+						send(it->second.sock, bs.str());
+						std::cout << "Mandando update de revivir a " << it->second.nick << "\n";
+					}
+				}else{
+					// Si fallo, avisamos al cliente
+					bs.clear();
+					bs << PROTO::POS_REQUEST_REV_REPLY << false;
+					std::cout << "REPLY: FAIL\n";
+					this->send(cid, bs.str());
+				}
+			}else if(pt == PROTO::CATCH_FLAG) {
+				int x,y;
+				bs >> x >> y;
+				std::cout << new_nick << " atrapo bandera en pos (" << x << "," << y << ")" << endl;
+				if (mision.hayBandera(x,y) && !pm.getPlayer(new_nick).tieneBandera(x,y)) {
+					pm.getPlayer(new_nick).atrapoBandera(x,y);
+					//Veo si gano la mision
+					if (pm.getPlayer(new_nick).cantBanderas()==mision.cantBanderas()) {
+						bs.clear();
+						bs << PROTO::WINNER << new_nick;
+						for(auto it = clients_map.begin();it != clients_map.end();it++) {
+							send(it->second.sock, bs.str());
+							std::cout << "Mandando ganador de la mision a " << it->second.nick << "\n";
+						}
+						Sleep(5000);
+						exit(0);
+					}
+				}				
 			}else{
 				bs.clear();
 				bs << PROTO::TEXTMSG << std::string("Unknown packet type");
@@ -876,4 +993,7 @@ std::string ServerSocket::getCIDbyNick(const std::string& nick) {
 	}
 	LeaveCriticalSection(&critSect);
 	return "";
+}
+std::map<std::string, Client> ServerSocket::get_clients(){
+	return clients_map;
 }

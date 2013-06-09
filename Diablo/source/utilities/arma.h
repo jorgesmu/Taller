@@ -11,6 +11,15 @@ class Arma: public Item {
 
 public:
 	
+	//Pixeles de referencia default
+	const static int PIXEL_REF_SPRITES_PRIMARIO_X = 0;
+	const static int PIXEL_REF_SPRITES_PRIMARIO_Y = 70;
+	const static int PIXEL_REF_SPRITES_ACCION_ESPECIAL_X = 20;
+	const static int PIXEL_REF_SPRITES_ACCION_ESPECIAL_Y = 20;
+
+	//Otras constantes default
+	const static char DANIO_MAXIMO_DEFAULT = 100;
+	
 	//Direccion
 	const static unsigned int SUR = 0;
 	const static unsigned int SURESTE = 1;

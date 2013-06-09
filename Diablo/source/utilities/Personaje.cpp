@@ -207,12 +207,10 @@ void Personaje::init(const std::string& nickname, const std::string& name,
 	this -> setNoDibujaFueraDelRadio();
 	this -> ordenBliteo = Entidad::ORDEN_PERSONAJE;
 	// Se inicializa el arma default que es la espada
-	this -> espada = new Arma("espada", 2 , 500 , 11,
-			   0,70,
-			   20,20,
-			   tile,
-			   rm,Imagen::COLOR_KEY,
-			   100,this);
+	this -> espada = new Arma("espada" , 2 , 500 , 11,
+		Arma::PIXEL_REF_SPRITES_PRIMARIO_X , Arma::PIXEL_REF_SPRITES_PRIMARIO_Y,
+		Arma::PIXEL_REF_SPRITES_ACCION_ESPECIAL_X , Arma::PIXEL_REF_SPRITES_ACCION_ESPECIAL_Y ,
+		tile , rm , Imagen::COLOR_KEY , Arma::DANIO_MAXIMO_DEFAULT , this);
 }
 
 /*

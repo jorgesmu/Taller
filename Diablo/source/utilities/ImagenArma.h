@@ -44,9 +44,12 @@ public:
 	const static unsigned int EST_SUROESTE = 23;
 
 	//Defender
-	const static unsigned int ACCION_ESPECIAL = 24;
+	const static unsigned int ITEM = 24;
+	const static unsigned int ACCION_ESPECIAL = 24;//cambiar por Item luego
 	//Invisible
 	const static unsigned int INVISIBLE = 25;
+	//Colocada
+	const static unsigned int COLOCADA = 26;
 	//Avanzar direccion actual
 	const static unsigned int AVANCE_DIRECCION_ACTUAL = 26;
 	//Atacar en direccion actual

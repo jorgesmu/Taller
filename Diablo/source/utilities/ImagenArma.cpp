@@ -44,7 +44,7 @@ ImagenArma::~ImagenArma() {
 	Post: Se ha seteado la accion.
 */
 void ImagenArma::setAccionEfectiva(unsigned int accion) {
-	if ((accion < (unsigned int) this -> maxFilas) && (accion <= ImagenArma::ACCION_ESPECIAL)) {
+	if ((accion < (unsigned int) this -> maxFilas) && (accion <= ImagenArma::ITEM)) {
 		this -> accionSiguiente = accion;
 		int delta = this -> accionSiguiente	- this -> accionActual;	
 		if (delta != 0) {
@@ -124,7 +124,7 @@ void ImagenArma::setAccionEfectiva(unsigned int accion) {
 							}
 						} else {
 							// Siguiente Ataque y actual Actual Estatico
-							if (this -> accionActual < ImagenArma::ACCION_ESPECIAL) {
+							if (this -> accionActual < ImagenArma::ITEM) {
 								this -> accionActual-= 8;
 								this -> columnaActual = 0;
 							// Siguiente Ataque y actual Accion Especial
@@ -136,7 +136,7 @@ void ImagenArma::setAccionEfectiva(unsigned int accion) {
 					}
 				} else {
 					// Siguiente Estatico
-					if (this -> accionSiguiente < ImagenArma::ACCION_ESPECIAL){
+					if (this -> accionSiguiente < ImagenArma::ITEM){
 						// Siguiente Estatico actual Desplazamiento
 						if (this -> accionActual < ImagenArma::AT_SUR) {
 							this -> accionActual += 16;
@@ -148,7 +148,7 @@ void ImagenArma::setAccionEfectiva(unsigned int accion) {
 								//this -> columnaActual = 0;
 							} else {
 								// Siguiente Estatico actual Estatico
-								if (this -> accionActual < ImagenArma::ACCION_ESPECIAL) {
+								if (this -> accionActual < ImagenArma::ITEM) {
 									if (delta > 0) {
 										if (delta <=3) {
 											this -> accionActual++;
@@ -178,8 +178,8 @@ void ImagenArma::setAccionEfectiva(unsigned int accion) {
 							}
 						}
 					} else {
-						if (this -> accionActual == ImagenArma::ACCION_ESPECIAL) {
-							this -> accionActual = ImagenArma::ACCION_ESPECIAL;
+						if (this -> accionActual == ImagenArma::ITEM) {
+							this -> accionActual = ImagenArma::ITEM;
 							this -> columnaActual = 0;
 						} else {
 							this -> accionActual = accion;
@@ -217,7 +217,7 @@ bool ImagenArma::setAccion(unsigned int accion){
 							this -> setAccionEfectiva(this -> accionActual - 8);
 						} else {
 							// Accion actual estatico 
-							if (accionActual < ACCION_ESPECIAL){
+							if (accionActual < ITEM){
 								this -> setAccionEfectiva( this -> accionActual-16);
 							} else {
 								// Si accion actual ACCION ESPECIAL
@@ -235,7 +235,7 @@ bool ImagenArma::setAccion(unsigned int accion){
 					} else {
 						// Accion actual estatico
 						if ((this -> accionActual >= ImagenArma::EST_SUR)
-							&& (accionActual < ImagenArma::ACCION_ESPECIAL)) {
+							&& (accionActual < ImagenArma::ITEM)) {
 							this -> setAccionEfectiva(this -> accionActual-8);
 						} else {
 							// Accion actual ACCION ESPECIAL

@@ -37,6 +37,7 @@
 #include "../../source/utilities/interface.h"
 #include "../../source/utilities/bandera.h"
 #include "../../source/utilities/arma.h"
+#include "../../source/utilities/console.h"
 using namespace std;
 
 logErrores err_log("log_cliente.txt");
@@ -71,6 +72,8 @@ int estadoMovimiento;
 ChatWindow chat_window;
 // User Interface
 Interface ui;
+// Consola de mensajes
+Console consola;
 // ResMan
 ResMan resman;
 // Sound manager
@@ -162,6 +165,9 @@ int main(int argc, char* argv[]) {
 	// Ventana de chat
 	chat_window.init(&resman, 40, 40, Font::SIZE_NORMAL, 250, 500, COLOR::WHITE);
 	chat_window.setNickLocal(pje_local_nick);
+
+	// Consola
+	consola.init(&resman, 10, 10, 200, Font::SIZE_NORMAL, COLOR::WHITE);
 
 	resman.addRes("bandera","../resources/bandera.png");
 	// Cargo la entidad por default
@@ -675,7 +681,8 @@ int main(int argc, char* argv[]) {
 					}
 				}
 			}
-
+			// Update a la consola
+			consola.update();
 			// Decrease al accum
 			accum -= CONST_DT;
 		}
@@ -688,6 +695,8 @@ int main(int argc, char* argv[]) {
 		mapa.setEntidadesDibujadasFalse(&pjm.getPjeLocal());
 		// Dibujamos la ventana de chat
 		chat_window.show(screen);
+		// Dibujamos la consola
+		consola.show(screen);
 
 		ui.blitInterface(screen);
 

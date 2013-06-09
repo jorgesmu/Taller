@@ -4,6 +4,7 @@
 #include "../../source/net/PjeManager.h"
 #include "../../source/utilities/config_cliente.h"
 #include "../../source/utilities/parser.h"
+#include "../../source/utilities/console.h"
 #include "clientsocket.h"
 #include "../../source/utilities/chatwindow.h"
 #include "../source/utilities/bandera.h"
@@ -24,6 +25,7 @@ extern float init_radio;
 extern char init_energia,init_magia,init_escudo,init_terremoto,init_hielo;
 extern config_general configuracion;
 extern ResMan resman;
+extern Console consola;
 extern ChatWindow chat_window;
 extern int estadoMovimiento;
 extern std::vector<EntidadFija*> entidades_cargadas;
@@ -397,6 +399,9 @@ void ClientSocket::listenDo() {
 				// Si existe, lo marcamos como desconectado
 				auto& p = pjm.getPje(who_nick);
 				p.freezar(true);
+				std::stringstream ss;
+				ss << who_nick << " abandono el servidor";
+				consola.log(ss.str());
 			}
 		}else if(pt == PROTO::ATACAR) {
 			std::string who_nick;
@@ -578,11 +583,13 @@ void ClientSocket::listenDo() {
 			std::string nick_winner;
 			bs >> nick_winner;
 			// Veo si soy yo
+			std::stringstream ss;
 			if (pjm.getPjeLocal().getNick()==nick_winner) {
-				std::cout << "Felicitaciones! Ganaste la mision!" << endl;
+				ss << "Felicitaciones! Ganaste la mision!";
 			} else {
-				std::cout << nick_winner << " gano esta partida, jugale una revancha!" << endl;
+				ss << nick_winner << " gano esta partida, jugale una revancha!";
 			}
+			consola.log(ss.str());
 		}else{
 			std::cout << "Unknown packet type " << int(pt) << " received\n";
 		}

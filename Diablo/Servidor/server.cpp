@@ -127,7 +127,7 @@ int main(int argc, char* argv[]) {
 	}
 	
 	//Agregar enemigos automaticos
-	pm.addEnemy("Enemigo1","soldado",mapa);
+//	pm.addEnemy("Enemigo1","soldado",mapa);
 //	pm.addEnemy("Enemigo2","soldado",mapa);	
 	//pm.addEnemy("Enemigo3","soldado",mapa);
 	//Creacion de misiones(TODO:logica random entre los distintos tipos)

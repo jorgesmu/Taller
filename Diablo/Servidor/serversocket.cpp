@@ -641,14 +641,33 @@ void ServerSocket::acceptLastDo() {
 				bs >> nick_who;
 				char item;
 				bs >> item;
+				int posBombaX,posBombaY; //solo si recibo una bomba
 				if (item==ITEM::TERREMOTO) pm.getPlayer(nick_who).restarTerremoto();
 				if (item==ITEM::HIELO) pm.getPlayer(nick_who).restarHielo();
+				if (item==ITEM::BOMBA) {
+					bs >> posBombaX >> posBombaY;
+					std::cout << nick_who << "puso bomba en pos (" << posBombaX << "," << posBombaY << ")" << endl;
+				}
 				// Avisamos a los otros jugadores 
 				for(auto it = clients_map.begin();it != clients_map.end();it++) {
 					if(it->second.nick == new_nick) continue; // Salteamos a nuestro jugador
-					BitStream bs;
-					bs << PROTO::USE_ITEM << nick_who << item;
+					bs.clear();
+					bs << PROTO::USE_ITEM << item << nick_who;
+					//Si es bomba ademas paso la posicion donde se la coloco
+					if (item==ITEM::BOMBA) {
+						bs << posBombaX << posBombaY;
+						std::cout << "Update a " << it->second.nick << " bomba en pos (" << posBombaX << "," << posBombaY << ")" << endl;
+					}
 					send(it->second.sock, bs.str());
+				}
+			}else if(pt == PROTO::BOMB_OFF) {
+				// Avisamos a los otros jugadores 
+				for(auto it = clients_map.begin();it != clients_map.end();it++) {
+					if(it->second.nick == new_nick) continue; // Salteamos a nuestro jugador
+					bs.clear();
+					bs << PROTO::BOMB_OFF << new_nick;
+					send(it->second.sock, bs.str());
+					std::cout << "Update a " << it->second.nick << ": bomba explotada de " << new_nick <<endl;
 				}
 			}else if(pt == PROTO::DAMAGE) {	
 				std::string nick_who, nick_to;

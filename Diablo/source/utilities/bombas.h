@@ -6,7 +6,7 @@ class Bombas: public Arma {
 	
 	private:
 	
-		int cantBombas;
+		char cantBombas;
 	
 	public:
 	
@@ -23,6 +23,6 @@ class Bombas: public Arma {
 			personaje->chocarConBombas(this);
 		}
 
-		int getCantBombas() { return this->cantBombas; }
+		char getCantBombas() { return this->cantBombas; }
 
 };

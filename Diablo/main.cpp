@@ -217,6 +217,10 @@ int main(int argc, char* argv[]) {
 			it->addEntidad((Entidad*)&entidadPisoPorDefecto);
 		}
 	}	
+
+	//Recursos para armas
+	resman.addRes("bomba","../resources/bomba.jpg");
+
 	//Prueba de carga items
 	resman.addRes("cofre","../resources/chest.png");
 	GolemItem cofre("cofre",1,1,true, 6 ,13,NULL,&mapa,resman,Imagen::COLOR_KEY );
@@ -397,6 +401,14 @@ int main(int argc, char* argv[]) {
 							//caminoMinimo.clear();
 							break;
 						}
+						case 'b' : {
+							if (pjm.getPjeLocal().getCantBombas()>0) {
+								int x = pjm.getPjeLocal().getPosicion(&mapa)->getU();
+								int y = pjm.getPjeLocal().getPosicion(&mapa)->getV();
+								pjm.getPjeLocal().utilizarBomba(x,y);
+							}
+							break;
+						}
 						case 'd' : {
 							pjm.getPjeLocal().defender(NULL , &mapa);
 							BitStream bs;
@@ -551,7 +563,7 @@ int main(int argc, char* argv[]) {
 					//cout << "pos " << unTile->getU() << "," <<unTile->getV() <<endl;
 					bs.clear();
 					bs << PROTO::EN_MOVE_CMPLT << it->second.getNick() << unTile->getU() << unTile ->getV() ;
-					sock.send(bs.str());
+					//sock.send(bs.str()); //DESCOMENTAR
 					//std::cout << "Mandando termino de moverse personaje a servidor" << it->second.getNick() << "\n";
 					//estado de personaje es para el pje local y estoy en un loop de otros personajes
 					//estadoPersonaje = Personaje::ESPERANDO_ACCION;
@@ -566,6 +578,9 @@ int main(int argc, char* argv[]) {
 
 			//Para revivir
 			pjm.getPjeLocal().updateRevivir();
+
+			//Para que exploten bombas
+			pjm.getPjeLocal().updateBomba();
 			
 			if (puedeMoverse) {				
 				if (!choco) {

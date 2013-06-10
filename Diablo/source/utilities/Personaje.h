@@ -27,6 +27,7 @@ class Hielo;
 class Bandera;
 class ClientSocket;
 class Arma;
+class ArmaBomba;
 
 class Personaje : public Entidad {
 public:
@@ -128,10 +129,15 @@ protected:
 
 		//Armas
 		int flechas;
-		int bombas;
+		char bombas;
 		int granadas;
 		bool varita;
 		char energiaEscudo;
+
+		//Para la bomba
+		Timer tBomba; //timer para que explote
+		int posBombaX,posBombaY;
+		ArmaBomba* bombaColocada;
 
 		//Muerte
 		bool vivo;
@@ -468,6 +474,29 @@ public:
 	void dañar(char daño); 
 
 	Arma* getArmaActiva();
+
+	//Para la bomba
+	char getCantBombas() { return bombas; }
+
+	void setCantBombas(char cantidad) { bombas=cantidad; }
+
+	void sumarBombas(char cantidad) { bombas+=cantidad; }
+
+	void utilizarBomba(int xPersonaje, int yPersonaje);
+
+	void updateBomba();
+
+	void setBombaColocada(ArmaBomba* nuevaBomba) { bombaColocada=nuevaBomba; }
+
+	ArmaBomba* getBombaColocada() { return bombaColocada; }
+
+	void setBombaX(int pos) { posBombaX=pos; }
+	
+	int getBombaX() { return posBombaX; }
+
+	void setBombaY(int pos) { posBombaY=pos; }
+
+	int getBombaY() { return posBombaY; }
 
 protected:
 

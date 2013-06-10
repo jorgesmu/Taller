@@ -16,6 +16,7 @@
 #include "playerman.h"
 #include "mapaservidor.h"
 #include "enemigoServer.h"
+#include "../source/utilities/timer.h"
 extern PlayerManager pm;
 extern MapaServidor mapa;
 extern std::vector <config_entidad> entidades;
@@ -24,7 +25,7 @@ extern bool puedeMoverseEnemigo;
 extern bool conectandose;
 bool ServerSocket::WSinit = false;
 size_t ServerSocket::ref_count = 0;
-
+const int tiempoAtaque = 1000;
 BitStream bs;
 extern Misiones mision;
 
@@ -370,7 +371,6 @@ void ServerSocket::acceptLastDo() {
 	// Iniciamos el seed de srand
 	std::srand(std::time(NULL));
 
-	EnterCriticalSection(&critSect);
 	if(clients_queue.empty()) {
 		std::cerr << "Empty queue on acceptLastDo()\n";
 		LeaveCriticalSection(&critSect);
@@ -563,6 +563,8 @@ void ServerSocket::acceptLastDo() {
 		conectandose = false;
 		// Receive loop
 		while(this->receive(cid, buff)) {
+			Sleep(50);
+			//EnterCriticalSection(&critSect);
 
 			// This is for debugging purposes
 			std::stringstream ss;
@@ -843,31 +845,44 @@ void ServerSocket::acceptLastDo() {
 				//busco si es un enemigo
 				Enemigo* unEnemigo = NULL;
 				int pos = 0;
-				//cout << "termino " << nickPersonajeActualizado << endl;
 				if(pm.enemyExists(nickPersonajeActualizado)){
+					//busco el enemigo
 					unEnemigo = pm.getEnemy(nickPersonajeActualizado);
 				} 
-				//cout << "pos " <<pos<<endl;
 
+	
 				if(unEnemigo != NULL){
+
 					int XSiguiente = unEnemigo->getXSiguiente();
 					int YSiguiente = unEnemigo->getYSiguiente();
-
 					if (XSiguiente == posX && YSiguiente == posY){
+						//si es el primer cliente que me manda el update
 						mapa.actualizarGrafo(unEnemigo->getX(),unEnemigo->getY());//actuzliazo grafo pos vieja
-						unEnemigo->setPos(posX,posY);					
+						unEnemigo->setPos(posX,posY);//actualizo posiciones		
 						mapa.actualizarGrafoPersonajes(pm);//actuzliazo grafo nueva
-						//si es un enemigo actualizo su posicion
-						TileServidor* proxTile = unEnemigo->get_proximo_tile_enemigo(mapa,pm);
+
+						TileServidor* proxTile;
+						string enemigoAtacado;//guarda el nick si va a atacar
+						bool personajeAdyacente= unEnemigo->personaje_adyacente(mapa,pm,proxTile,enemigoAtacado); // me dice si hay un personaje en un tile adyacente para atacarlo
+						if ( (personajeAdyacente && unEnemigo->get_timer_ataque().getTicks() >= tiempoAtaque) || (personajeAdyacente && !unEnemigo->get_ultima_accion_atacar()) ){
+							unEnemigo->atacar(enemigoAtacado,pm,*this);
+							unEnemigo->get_timer_ataque().start();
+							unEnemigo->set_ultima_accion_atacar(true);
+						}else {
+							unEnemigo->set_ultima_accion_atacar(false);
+							unEnemigo->get_timer_ataque().stop();
+							//si es un enemigo actualizo su posicion
+							TileServidor* proxTile = unEnemigo->get_proximo_tile_enemigo(mapa,pm);
 						
-						if (proxTile != NULL && !mapa.tile_esta_ocupado(proxTile->get_x(),proxTile->get_y(),pm)){
-							unEnemigo->setPosSiguiente(proxTile->get_x(),proxTile->get_y());
-							// Informamos a los demas del movimiento del enemigo
-							for(auto it = clients_map.begin();it != clients_map.end();it++) {
-									bs.clear();
-									bs << PROTO::MOVE_PLAYER << nickPersonajeActualizado << proxTile->get_x() << proxTile->get_y() ;
-									send(it->second.sock, bs.str());
-									std::cout << "Mandando update de enemigo a " << it->second.nick << "\n";
+							if (proxTile != NULL && !mapa.tile_esta_ocupado(proxTile->get_x(),proxTile->get_y(),pm)){
+								unEnemigo->setPosSiguiente(proxTile->get_x(),proxTile->get_y());
+								// Informamos a los demas del movimiento del enemigo
+								for(auto it = clients_map.begin();it != clients_map.end();it++) {
+										bs.clear();
+										bs << PROTO::MOVE_PLAYER << nickPersonajeActualizado << proxTile->get_x() << proxTile->get_y() ;
+										send(it->second.sock, bs.str());
+										std::cout << "Mandando update de enemigo a " << it->second.nick << "\n";
+								}
 							}
 						}
 					}
@@ -947,6 +962,7 @@ void ServerSocket::acceptLastDo() {
 				bs << PROTO::TEXTMSG << std::string("Unknown packet type");
 				this->send(cid, bs.str());
 			}
+			//LeaveCriticalSection(&critSect);
 		}
 
 		// Cuando hay una desconexion loggeamos e informamos al resto
@@ -1030,6 +1046,6 @@ std::string ServerSocket::getCIDbyNick(const std::string& nick) {
 	LeaveCriticalSection(&critSect);
 	return "";
 }
-std::map<std::string, Client> ServerSocket::get_clients(){
+std::map<std::string, Client>& ServerSocket::get_clients(){
 	return clients_map;
 }

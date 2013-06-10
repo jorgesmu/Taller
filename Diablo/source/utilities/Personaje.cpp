@@ -1134,12 +1134,14 @@ void Personaje::aumentarRadio(float proporcion) {
 }
 
 void Personaje::muere() {
-	this->animacionMuerte();
-	std::cout << "Fui asesinado" << endl;
-	//Redirecciono a la posicion inicial nuevamente
-	this->vivo=false;
-	this->timerRevivir.start();
- }
+	if (this->vivo){
+		this->animacionMuerte();
+		std::cout << "Fui asesinado" << endl;
+		//Redirecciono a la posicion inicial nuevamente
+		this->vivo=false;
+		this->timerRevivir.start();
+	} 
+}
 
  void Personaje::revivir() {
 	 this->vivo=true;

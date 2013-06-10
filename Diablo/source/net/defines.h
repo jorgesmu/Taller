@@ -72,9 +72,6 @@ const unsigned char INIT_ATT = 'z';
 // Congela a un personaje
 const unsigned char CONGELAR = 'A';
 
-// Termino de mover enemigo
-const unsigned char EN_MOVE_CMPLT = 'B';
-
 // Revive posicion
 const unsigned char REQUEST_REV_POS = 'B';
 // Revive posicion OK
@@ -89,6 +86,9 @@ const unsigned char CATCH_FLAG = 'F';
 const unsigned char WINNER = 'G';
 //Avisa que murio enemigo
 const unsigned char ENEMY_DEAD = 'H';
+// Termino de mover enemigo
+const unsigned char EN_MOVE_CMPLT = 'J';
+
 }
 
 // Cosas de movimiento

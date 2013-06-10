@@ -2,7 +2,9 @@
 #include "playerman.h"
 #include <vector>
 #include <algorithm>
-
+#include "../source/net/bitstream.h"
+#include "../source/net/defines.h"
+#include "../source/utilities/aux_func.h"
 const int noSeMovio = 0;
 const int derecha = 1;
 const int izquierda = 2;
@@ -15,6 +17,7 @@ void Enemigo::init_Enemy(const std::string& nickname,const std::string& tipo,uns
 	this->estrategia = estrategiaElegida;
 	this->direccion = 0;
 	this->pasosCaminados = 0;
+	this->ultimaAccionAtacar = false;
 }
 
 //getters
@@ -323,4 +326,34 @@ TileServidor* Enemigo::get_proximo_tile_enemigo(MapaServidor& mapa,PlayerManager
 		}
 	}
 	return res;
+}
+bool Enemigo::personaje_adyacente(MapaServidor& mapa,PlayerManager& pm, TileServidor*& tilePersonaje,string& enemigoAtacado){
+	bool res = false;
+	for(auto it = pm.getPlayers().begin();it != pm.getPlayers().end();it++) {
+		int x = it->second.getX() - this->getX();
+		int y = it->second.getY() - this->getY();
+		if(abs(x) <=1 && abs(y)<=1){
+			tilePersonaje = mapa.getTile(it->second.getX(),it->second.getY());
+			res = true;
+			enemigoAtacado = it->second.getNick();
+			break;
+		}
+	}
+	return res;
+}
+void Enemigo::atacar(string& NickAtacado,PlayerManager& pm,ServerSocket& socks){
+	BitStream bs;
+	int danio = intRand(0,100);
+
+	for(auto it = socks.get_clients().begin();it !=socks.get_clients().end();it++) {
+		//ataco con la danio
+		bs.clear();
+		bs << PROTO::ATACAR << this->getNick();
+		socks.send(it->second.sock, bs.str());
+		//mando danio
+		bs.clear();
+		bs << PROTO::DAMAGE << this->getNick() << NickAtacado << danio;
+		socks.send(it->second.sock, bs.str());
+	}
+	return;
 }

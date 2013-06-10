@@ -469,7 +469,7 @@ void ServerSocket::acceptLastDo() {
 		//Le mandamos la velocidad que tenia		
 		bs.clear();
 		auto p=pm.getPlayer(new_nick); //alias shortcut
-		bs << PROTO::OLD_ATT << (float)p.getVelocidad() << p.getEnergia() << p.getMagia() << p.getEnergiaEscudo() << p.getTerremoto() << p.getHielo() << p.getRadio(); 
+		bs << PROTO::OLD_ATT << (float)p.getVelocidad() << p.getEnergia() << p.getMagia() << p.getEnergiaEscudo() << p.getTerremoto() << p.getHielo() << (float)p.getRadio() << (bool)p.getBolaDeCristal(); 
 		send(cid, bs.str());
 
 		// Le mandamos el id escenario
@@ -479,7 +479,7 @@ void ServerSocket::acceptLastDo() {
 		send(cid, bs.str());
 
 		// Mandamos los tiles recorridos
-		if(pm.getPlayer(new_nick).getTilesRecorridos().size() > 0) {
+		if(pm.getPlayer(new_nick).getTilesRecorridos().size() > 0){
 			bs.clear();
 			bs << PROTO::NIEBLA_LIST << short(pm.getPlayer(new_nick).getTilesRecorridos().size());
 			for(auto it = pm.getPlayer(new_nick).getTilesRecorridos().begin(); it != pm.getPlayer(new_nick).getTilesRecorridos().end();it++) {
@@ -501,14 +501,13 @@ void ServerSocket::acceptLastDo() {
 			//Mando los atributos principales del jugador
 			bs.clear();
 			auto p=pm.getPlayer(new_nick);
-			bs << PROTO::INIT_ATT << new_nick << (float)p.getVelocidad() << p.getEnergia() << p.getMagia() << p.getEnergiaEscudo() << p.getTerremoto() << p.getHielo() << p.getRadio();
+			bs << PROTO::INIT_ATT << new_nick << (float)p.getVelocidad() << p.getEnergia() << p.getMagia() << p.getEnergiaEscudo() << p.getTerremoto() << p.getHielo() << (float)p.getRadio() << (bool)p.getBolaDeCristal();
 			send(it->second.sock,bs.str());
 			if (pm.getPlayer(new_nick).isCongelado()) {
 				bs.clear();
 				bs << PROTO::CONGELAR << std::string("RESTORE") << new_nick;
 				send(it->second.sock,bs.str());
 			}
-
 		}
 
 		// Mandamos todos los otros players al que se unio
@@ -538,15 +537,14 @@ void ServerSocket::acceptLastDo() {
 			send(cid,bs.str());
 		}
 
-		//Le aviso todos los que estaban congelados
-		for (auto it = pm.getPlayers().begin();it != pm.getPlayers().end();it++) {
-			if (it->second.isCongelado()) {
-				bs.clear();
-				bs << PROTO::CONGELAR << std::string("RESTORE") << it->first;
-				send(cid,bs.str());
+			//Le aviso todos los que estaban congelados
+			for (auto it = pm.getPlayers().begin();it != pm.getPlayers().end();it++) {
+				if (it->second.isCongelado()) {
+					bs.clear();
+					bs << PROTO::CONGELAR << std::string("RESTORE") << it->first;
+					send(cid,bs.str());
+				}
 			}
-		}
-
 		//Mandamos las banderas si correponde la mision
 		if (mision.getTipo()==Misiones::MISION_BANDERAS) {
 			int contBanderas=0;
@@ -600,6 +598,23 @@ void ServerSocket::acceptLastDo() {
 				int new_tile_x, new_tile_y;
 				bs >> new_tile_x >> new_tile_y;
 				pm.getPlayer(new_nick).addTileRecorrido(new_tile_x, new_tile_y);
+
+				if(!(pm.getPlayer(new_nick).getSeMovio())){
+					//recorro los personajes y les aviso q explore este tile
+					for(auto it = pm.getPlayers().begin(); it != pm.getPlayers().end(); ++it){
+						if(it->first == new_nick) continue;
+						if(it->second.getBolaDeCristal()){
+							if(!(it->second.existsTileRecorrido(new_tile_x, new_tile_y))) {
+								it->second.addTileRecorrido(new_tile_x, new_tile_y);
+								bs.clear();
+								bs << PROTO::NIEBLA_LIST << (short)1;
+								bs << (short)new_tile_x << (short)new_tile_y;
+								send(getCIDbyNick(it->first), bs.str());
+							}
+						}
+					}				
+				}
+
 				//std::cout << "RECEIVED NIEBLA SYNC: " << new_tile_x << "," << new_tile_y << "\n";
 			}else if(pt == PROTO::ATACAR) {
 				std::string nick_atacante;
@@ -666,9 +681,13 @@ void ServerSocket::acceptLastDo() {
 				bs >> tipoAtt;
 				float nuevoVal;
 				char nuevoValor;
+				bool bolaDeCristal;
 				if ((tipoAtt==ATT::VEL) || (tipoAtt==ATT::RADIO)) {
-					// Valor float: velocidad
+					// Valor float: velocidad/radio
 					bs >> nuevoVal;
+				}else if(tipoAtt==ATT::BOLA_DE_CRISTAL){
+					//valor bool: bola de cristal
+					bs >> bolaDeCristal;
 				} else {
 					// Valor char: energia/magia/escudo/terremoto/hielo/radio
 					bs >> nuevoValor;
@@ -688,8 +707,25 @@ void ServerSocket::acceptLastDo() {
 							pm.getPlayer(new_nick).setTerremoto(nuevoValor);
 						} else if (tipoAtt==ATT::CANT_HIELO) {
 							pm.getPlayer(new_nick).setHielo(nuevoValor);
+						} else if (tipoAtt==ATT::BOLA_DE_CRISTAL) {
+							pm.getPlayer(new_nick).setBolaDeCristal(bolaDeCristal);
+
+							if(bolaDeCristal){
+								//mando al jugador los tiles del resto
+								for(auto it = pm.getPlayers().begin(); it != pm.getPlayers().end();it++) {
+									if(it->first == new_nick) continue;
+									if(it->second.getTilesRecorridos().size() > 0) {
+										bs.clear();
+										bs << PROTO::NIEBLA_LIST << short(it->second.getTilesRecorridos().size());
+										for(auto it2 = it->second.getTilesRecorridos().begin(); it2 != it->second.getTilesRecorridos().end();it2++) {
+											bs << it2->first << it2->second;
+											it->second.addTileRecorrido(it2->first, it2->second);
+										}
+										send(cid, bs.str());
+									}
+								}
+							}
 						} else if (tipoAtt==ATT::RADIO) {
-							std::cout << "SERVER SOCKET UPDATE_ATT RADIO: " << nuevoVal << "\n";
 							pm.getPlayer(new_nick).setRadio(nuevoVal);
 						}
 
@@ -697,8 +733,9 @@ void ServerSocket::acceptLastDo() {
 					}
 					bs.clear();
 					if ((tipoAtt==ATT::VEL) || (tipoAtt==ATT::RADIO)) {
-						std::cout << "SERVER SOCKET UPDATE_ATT NUEVO RADIO: " << nuevoVal << "\n";
 						bs << PROTO::UPDATE_ATT << tipoAtt << new_nick << nuevoVal;
+					} else if(tipoAtt==ATT::BOLA_DE_CRISTAL){
+						bs << PROTO::UPDATE_ATT << tipoAtt << new_nick << bolaDeCristal;					
 					} else {
 						bs << PROTO::UPDATE_ATT << tipoAtt << new_nick << nuevoValor;
 					}
@@ -724,6 +761,8 @@ void ServerSocket::acceptLastDo() {
 					}
 				}
 				if(ok) {
+					//le seteo el seMovio en true
+					pm.getPlayer(new_nick).setSeMovio(true);
 					// Si el movimiento esta ok, actualizamos la posicion
 					mapa.actualizarGrafo(pm.getPlayer(new_nick).getX(),pm.getPlayer(new_nick).getY());// actualizo la posicion vieja
 					pm.getPlayer(new_nick).setPos(x, y);
@@ -740,6 +779,16 @@ void ServerSocket::acceptLastDo() {
 						if(it->second.nick == new_nick) continue; // Salteamos el jugador en cuestion
 						send(it->second.sock, bs.str());
 						std::cout << "Mandando update a " << it->second.nick << "\n";
+						if(pm.getPlayer(it->second.nick).getBolaDeCristal()){
+							//si tiene bola de cristal le mando los tiles explorados del que se movio para que los agregue
+							bs.clear();
+							bs << PROTO::NIEBLA_LIST << short(pm.getPlayer(new_nick).getTilesRecorridos().size());
+							for(auto it2 = pm.getPlayer(new_nick).getTilesRecorridos().begin(); it2 != pm.getPlayer(new_nick).getTilesRecorridos().end();it2++) {
+								bs << it2->first << it2->second;
+								pm.getPlayer(it->second.nick).addTileRecorrido(it2->first, it2->second);
+							}
+							send(it->second.sock, bs.str());
+						}
 					}
 				}else{
 					// Si fallo, avisamos al cliente
@@ -749,7 +798,6 @@ void ServerSocket::acceptLastDo() {
 					this->send(cid, bs.str());
 				}
 			}else if(pt == PROTO::EN_MOVE_CMPLT){
-
 
 				string nickPersonajeActualizado;
 				int posX,posY;
@@ -775,17 +823,7 @@ void ServerSocket::acceptLastDo() {
 						TileServidor* proxTile = unEnemigo->get_proximo_tile_enemigo(mapa,pm);
 						
 						if (proxTile != NULL && !mapa.tile_esta_ocupado(proxTile->get_x(),proxTile->get_y(),pm)){
-							//actualizo vector
 							unEnemigo->setPosSiguiente(proxTile->get_x(),proxTile->get_y());
-							cout << "Se mueve a " << proxTile->get_x()<<","<<proxTile->get_y() <<endl;
-						
-						
-						
-							cout << "pos actual " << posX<<","<<posY <<endl;
-						
-				//			system("pause");
-							//cout<< "enviando a " << nickPersonajeActualizado <<" a " << unaPosicion.first << ","<<unaPosicion.second<<endl;   
-							//cout << "valor vector"<<ultimaPosicionEnemigo[0].first << "," <<ultimaPosicionEnemigo[0].second<<endl;
 							// Informamos a los demas del movimiento del enemigo
 							for(auto it = clients_map.begin();it != clients_map.end();it++) {
 									bs.clear();
@@ -812,6 +850,9 @@ void ServerSocket::acceptLastDo() {
 						send(it->second.sock, bs.str());
 						std::cout << "Mandando ganador de la mision a " << it->second.nick << "\n";
 					}
+					Sleep(5000);
+					exit(0);
+
 				}
 				//if (terminoPartida) break; //salteamos lo que queda
 				// Iteramos para ver si hay algun personaje
@@ -859,6 +900,8 @@ void ServerSocket::acceptLastDo() {
 							send(it->second.sock, bs.str());
 							std::cout << "Mandando ganador de la mision a " << it->second.nick << "\n";
 						}
+						Sleep(5000);
+						exit(0);
 					}
 				}				
 			}else{

@@ -39,19 +39,20 @@ config_general configuracion;
 vector <config_escenario> escenarios;
 bool puedeMoverseEnemigo = false;
 bool conectandose=false;
+bool crearMision = true;
 //dependencias externas
 extern BitStream bs;
 unsigned int enemyCount = 0;
 int main(int argc, char* argv[]) {
 
 	// Parseamos el escenario a elegir
-	/*if(argc != 2) {
-		std::cerr << "Falta especificar el escenario:\n \tservidor.exe <escenario>\n";
-		return -1;
+	if(argc != 2) {
+		//std::cerr << "Falta especificar el escenario:\n \tservidor.exe <escenario>\n";
+		escenario_elegido = "a";
+		crearMision = false;
 	}else{
 		escenario_elegido = argv[1];
-	}*/
-	escenario_elegido = "bosque_encantado";
+	}
 	// Iniciamos el seed de srand
 	std::srand(std::time(NULL));
 
@@ -128,14 +129,16 @@ int main(int argc, char* argv[]) {
 	
 	//Agregar enemigos automaticos
 	pm.addEnemy("Enemigo1","soldado",mapa,1);
-//	pm.addEnemy("Enemigo2","soldado",mapa);	
-	//pm.addEnemy("Enemigo3","soldado",mapa);
-	//Creacion de misiones(TODO:logica random entre los distintos tipos)
-	//mision.crearMisionBanderas(2);
-	//std::cout << "Se creo mision de " << mision.cantBanderas() << " banderas" << endl;
-	mision.crearMisionEnemigo("derecha");
+	pm.addEnemy("Enemigo2","soldado",mapa,2);	
+	pm.addEnemy("Enemigo3","soldado",mapa,2);
+	if(crearMision){
+		//Creacion de misiones(TODO:logica random entre los distintos tipos)
+		mision.crearMisionBanderas(2);
+		//std::cout << "Se creo mision de " << mision.cantBanderas() << " banderas" << endl;
+		//mision.crearMisionEnemigo("derecha");
+	}
 
-	Enemigo* unEnemigo = pm.getEnemy("Enemigo1");
+	//Enemigo* unEnemigo = pm.getEnemy("Enemigo1");
 
 	mapa.cargarGrafo(pm);
 	mapa.actualizarGrafoPersonajes(pm);

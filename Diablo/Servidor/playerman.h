@@ -18,6 +18,8 @@ class Player {
 	std::string tipo_personaje;
 	bool isOnline;
 	int x, y,xSiguiente,ySiguiente; // Pos en tiles logicos en el mapa
+	bool bolaDeCristal;
+	bool seMovio;
 	TilesRecorridos tiles_recorridos;
 	double velocidad;
 	float radio;
@@ -63,6 +65,10 @@ class Player {
 	void setHielo(char valor) { hielo=valor; }
 	float getRadio() { return radio; }
 	void setRadio(float newRadio) { radio=newRadio; }
+	bool getBolaDeCristal() { return bolaDeCristal; }
+	void setBolaDeCristal(bool tieneBolaDeCristal) { bolaDeCristal=tieneBolaDeCristal; }
+	bool getSeMovio() { return seMovio; }
+	void setSeMovio(bool yaSeMovio) { seMovio = yaSeMovio; }
 	//Agrega una nueva bandera atrapada por el jugador
 	void atrapoBandera(int x, int y);
 	//Se fija si ya atrapo la bandera dada
@@ -74,6 +80,7 @@ class Player {
 	std::string ultimoAtacante() { return lastDamagedBy; }
 
 	void addTileRecorrido(short x, short y);
+	bool Player::existsTileRecorrido(short x, short y);
 	TilesRecorridos& getTilesRecorridos();
 
 };

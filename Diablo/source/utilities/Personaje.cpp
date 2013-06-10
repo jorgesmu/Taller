@@ -89,6 +89,7 @@ void Personaje::inicializarAtributosEnValoresDefault() {
 	this->vivo=true;
 	this->precision=this->PRECISION_PERSONAJE;
 	this -> cambioDireccionHabilitado = true;
+	this -> bolaDeCristal = false;
 	this -> espada = NULL;
 }
 /*
@@ -206,6 +207,7 @@ void Personaje::init(const std::string& nickname, const std::string& name,
 	this -> actualizandoPosicion = false;
 	this -> setNoDibujaFueraDelRadio();
 	this -> ordenBliteo = Entidad::ORDEN_PERSONAJE;
+	this -> bolaDeCristal = false;
 	// Se inicializa el arma default que es la espada
 	this -> espada = new Arma("espada" , 2 , 500 , 11,
 		Arma::PIXEL_REF_SPRITES_PRIMARIO_X , Arma::PIXEL_REF_SPRITES_PRIMARIO_Y,
@@ -563,6 +565,17 @@ bool Personaje::isCaminable(Tile* tile){
 	return ( (tile != NULL) && (this -> tileAncla != NULL) && (tile == this -> tileAncla) );
 }
 
+bool Personaje::getBolaDeCristal(){
+	return this->bolaDeCristal;
+}
+
+void Personaje::setBolaDeCristal(bool bolaDeCristal){
+	if(bolaDeCristal){
+		int a = 0;
+	}
+	this->bolaDeCristal = bolaDeCristal;
+}
+
 /*
 	Pre: La instancia ha sido creada.
 	Post: Se retorna el tile donde se encuentra la instancia.
@@ -608,6 +621,7 @@ unsigned int Personaje::update(Mapa* mapa) {
 void Personaje::updateRevivir() {
 	//Logica de revivir
 	if ((this->timerRevivir.isStarted()) && (this->timerRevivir.getTicks()>this->TIEMPO_REVIVIR)) {
+		std::cout << "pidiendo al server q me reviva \n";
 		BitStream bs;
 		bs << PROTO::REQUEST_REV_POS << start_pos_x << start_pos_y;
 		sock.send(bs.str());
@@ -920,6 +934,26 @@ void Personaje::chocarConZapatos(Zapatos* zapatos) {
 	sock.send(bs.str());
 }
 
+void Personaje::chocarConBolaDeCristal() {
+
+	if(this->magia >= MAGIA_HECHIZO){
+		std::cout << "veo niebla de los enemigos \n";
+
+		BitStream bs;
+		this->magia-=this->MAGIA_HECHIZO;
+		bs << PROTO::UPDATE_ATT << ATT::MAGIA << this->getMagia();
+		sock.send(bs.str());
+
+		this->bolaDeCristal = true;
+		bs.clear();
+		bs << PROTO::UPDATE_ATT << ATT::BOLA_DE_CRISTAL << true;
+		sock.send(bs.str());
+	}else{
+		std::cout << "magia insuficiente para bola de cristal \n";	
+	}
+
+}
+
 void Personaje::chocarConTerremoto(Terremoto* terremoto) {
 	this->getPosicion(&mapa)->deleteEntidad(terremoto);
 	this->terremoto++;
@@ -961,7 +995,7 @@ void Personaje::utilizarTerremoto(Mapa* mapa, PjeManager* pjm, ClientSocket* soc
 					yPersonaje=tilePersonaje->getV();
 					if ((i==xPersonaje) && (j==yPersonaje)) {
 						srand (time(NULL));
-						dañoRealizado=rand()%(this->ENERGIA_TOTAL+1);	
+						dañoRealizado=rand()%(this->ENERGIA_TOTAL+1);
 						it->second.dañar(dañoRealizado);
 						std::cout << "Se danio a " << it->first << " con terremoto, total de " << (int)dañoRealizado << endl;
 						bs.clear();

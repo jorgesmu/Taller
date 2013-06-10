@@ -19,6 +19,7 @@ class Bombas;
 class Granadas;
 class Varitas;
 class Escudo;
+class BolaDeCristal;
 class Lampara;
 class MapaItem;
 class Terremoto;
@@ -135,6 +136,8 @@ protected:
 		//Muerte
 		bool vivo;
 
+		//si tiene la bola de cristal
+		bool bolaDeCristal;
 		//Timer para revivir
 		Timer timerRevivir;
 		//timer para actualizar enemigos
@@ -315,6 +318,10 @@ public:
 	// Deprecated
 	virtual bool isCaminable();	
 
+	virtual bool getBolaDeCristal();
+
+	virtual void setBolaDeCristal(bool bolaDeCristal);
+
 	/*
 		Pre: Los parámetros cumplen las siguiente condiciones:
 
@@ -370,6 +377,8 @@ public:
 	void aumentarVelocidad(char porcentaje);
 
 	void chocarConZapatos(Zapatos* zapatos);
+
+	void chocarConBolaDeCristal();
 
 	void chocarConHechizo() { }
 

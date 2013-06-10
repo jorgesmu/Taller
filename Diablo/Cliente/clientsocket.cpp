@@ -22,6 +22,7 @@ extern int start_pos_x, start_pos_y;
 extern int escenario_elegido_id;
 extern double init_vel;
 extern float init_radio;
+extern bool init_bolaDeCristal;
 extern char init_energia,init_magia,init_escudo,init_terremoto,init_hielo;
 extern config_general configuracion;
 extern ResMan resman;
@@ -309,10 +310,10 @@ void ClientSocket::listenDo() {
 			bs >> start_pos_y;
 			//std::cout << "RECEIVED INIT POS: (" << start_pos_x << "," << start_pos_y << ")\n";
 		}else if(pt == PROTO::OLD_ATT) {
+			bool bolaDeCristal;
 			float recv_vel,radio;
 			char energia,magia,energiaEscudo,cantTerremoto,cantHielo;
-			bs >> recv_vel >> energia >> magia >> energiaEscudo >> cantTerremoto >> cantHielo >> radio;
-			std::cout << "CLIENT SOCKET OLD_ATT: " << radio << "\n";
+			bs >> recv_vel >> energia >> magia >> energiaEscudo >> cantTerremoto >> cantHielo >> radio >> bolaDeCristal;
 			init_vel=(double)recv_vel;
 			init_energia=energia;
 			init_magia=magia;
@@ -320,11 +321,15 @@ void ClientSocket::listenDo() {
 			init_terremoto=cantTerremoto;
 			init_hielo=cantHielo;
 			init_radio=radio;
+			init_bolaDeCristal = bolaDeCristal;
 		}else if(pt == PROTO::ESC_ID) {
 			bs >> escenario_elegido_id;
 			//std::cout << "RECEIVED ESC ID: (" << escenario_elegido_id << ")\n";
 		}else if(pt == PROTO::NIEBLA_LIST) {
 			// Esperamos a que cargue el mapa
+
+			std::cout << "recibo tile explorado ";
+
 			while(!cargoMapa) {
 				Sleep(10);
 			}
@@ -335,6 +340,27 @@ void ClientSocket::listenDo() {
 				short x, y;
 				bs >> x >> y;
 				Tile::setearExplorados(x, y, &pjm.getPjeLocal(), &mapa);
+				//std::cout << x << "," << y << " ";
+			}
+			//std::cout << "\n";
+		}else if(pt == PROTO::NIEBLA_SYNC) {
+			// Esperamos a que cargue el mapa
+			while(!cargoMapa) {
+				Sleep(10);
+			}
+			std::string nick;
+			bs >> nick;
+			//busco el personaje de ese nick
+			Personaje personaje = pjm.getPje(nick);
+
+			short tile_list_size;
+			bs >> tile_list_size;
+			//std::cout << "RECEIVED NIEBLA_SYNC (" << tile_list_size << "): \n";
+			for(int i = 0;i < tile_list_size;i++) {
+				short x, y;
+				bs >> x >> y;
+
+				Tile::setearExplorados(x, y, &personaje, &mapa);
 				//std::cout << x << "," << y << " ";
 			}
 			//std::cout << "\n";
@@ -370,13 +396,13 @@ void ClientSocket::listenDo() {
 			}
 			std::string nick_who;
 			float vel_recv,radio;
+			bool bolaDeCristal;
 			char energia,magia,energiaEscudo,cantTerremoto,cantHielo;
-			bs >> nick_who >> vel_recv >> energia >> magia >> energiaEscudo >> cantTerremoto >> cantHielo >> radio;
+			bs >> nick_who >> vel_recv >> energia >> magia >> energiaEscudo >> cantTerremoto >> cantHielo >> radio >> bolaDeCristal;
 			//double vel=(double)vel_recv;
 			double vel =0.01;//cambiar
 			cout <<"Velocidad  = "<< vel<<endl;
 			//Seteamos los atributos del jugador
-			std::cout << "CLIENT SOCKET INIT_ATT: " << radio << "\n";
 			pjm.getPje(nick_who).setVelocidad(vel);
 			pjm.getPje(nick_who).setEnergia(energia);
 			pjm.getPje(nick_who).setMagia(magia);
@@ -384,6 +410,7 @@ void ClientSocket::listenDo() {
 			pjm.getPje(nick_who).setTerremoto(cantTerremoto);
 			pjm.getPje(nick_who).setHielo(cantHielo);
 			pjm.getPje(nick_who).setRadio(radio);
+			pjm.getPje(nick_who).setBolaDeCristal(bolaDeCristal);
 		}else if(pt == PROTO::PLAYER_EXIT) {
 			// Esperamos a que cargue el mapa
 			while(!cargoMapa) {
@@ -464,14 +491,14 @@ void ClientSocket::listenDo() {
 				auto& p = pjm.getPje(nick);
 				p.mover(mapa.getTile(x, y));
 				p.set_posicion_actualizada(false);
-				//bool bolaDeCristal;//hacer metodo que me diga si tengo bola de cristal
-				//if(bolaDeCristal){
-				//	std::vector<Tile*> exploradosEnemigo = p.getTilesExplorados();
-				//	for(auto it = exploradosEnemigo.begin(); it != exploradosEnemigo.end(); ++it){
-				//		Tile* tileExplorado = mapa.getTile((*it)->getU(), (*it)->getV());
-				//		pjm.getPjeLocal().agregarTilesExplorados(tileExplorado);
-				//	}
-				//}
+		
+				if(pjm.getPjeLocal().getBolaDeCristal()){
+					std::vector<Tile*> exploradosEnemigo = p.getTilesExplorados();
+					for(auto it = exploradosEnemigo.begin(); it != exploradosEnemigo.end(); ++it){
+						Tile* tileExplorado = mapa.getTile((*it)->getU(), (*it)->getV());
+						pjm.getPjeLocal().agregarTilesExplorados(tileExplorado);
+					}
+				}
 				std::cout << "Server requested move of <" << nick << "> to " << x << ";" << y << "\n";
 			}
 		}else if(pt == PROTO::REV_PLAYER) {
@@ -538,9 +565,12 @@ void ClientSocket::listenDo() {
 			std::cout << "CLIENT SOCKET UPDATE_ATT: " << nick_who << "\n";
 			float nuevoVal;
 			char nuevoValor;
-			if ((tipoAtt==ATT::VEL) || tipoAtt==ATT::RADIO) {
+			bool bolaDeCristal;
+			if ((tipoAtt==ATT::VEL) || (tipoAtt==ATT::RADIO)) {
 				// Valor float: velocidad/radio
 				bs >> nuevoVal;
+			} else if(tipoAtt==ATT::BOLA_DE_CRISTAL){
+				bs >> bolaDeCristal;
 			} else {
 				// Valor char: energia/magia/escudo/terremoto/hielo
 				bs >> nuevoValor;
@@ -560,8 +590,9 @@ void ClientSocket::listenDo() {
 						it->second.setTerremoto(nuevoValor);
 					} else if (tipoAtt==ATT::CANT_HIELO) {
 						it->second.setHielo(nuevoValor);
+					} else if (tipoAtt==ATT::BOLA_DE_CRISTAL) {
+						it->second.setBolaDeCristal(bolaDeCristal);
 					} else if (tipoAtt==ATT::RADIO) {
-						std::cout << "CLIENT SOCKET UPDATE_ATT RADIO: " << nuevoVal << "\n";
 						it->second.setRadio(nuevoVal);
 					}
 					break;

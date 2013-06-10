@@ -116,4 +116,5 @@ namespace ATT {
 	const char CANT_TERREMOTO = 5;
 	const char CANT_HIELO = 6;
 	const char RADIO = 7;
+	const char BOLA_DE_CRISTAL = 8;
 }

@@ -35,8 +35,10 @@
 #include "../../source/utilities/terremoto.h"
 #include "../../source/utilities/escudo.h"
 #include "../../source/utilities/interface.h"
+#include "../../source/utilities/bolaDeCristal.h"
 #include "../../source/utilities/bandera.h"
 #include "../../source/utilities/arma.h"
+#include "../../source/display/boton.h"
 #include "../../source/utilities/console.h"
 using namespace std;
 
@@ -47,6 +49,7 @@ const int NOSEMOVIO = -1;
 // Variables globales
 // Critical section
 CRITICAL_SECTION cs_main;
+SDL_Event event;
 // Mapa
 Mapa mapa;
 // Personaje Manager
@@ -58,6 +61,7 @@ int start_pos_x, start_pos_y;
 int escenario_elegido_id;
 double init_vel;
 float init_radio;
+bool init_bolaDeCristal;
 char init_energia,init_magia,init_escudo,init_terremoto,init_hielo;
 // Cosas para mantener al server actualizado sobre los tiles que recorrimos
 struct {
@@ -91,23 +95,72 @@ std::vector<EntidadFija*> entidades_cargadas;
 
 int main(int argc, char* argv[]) {
 	// Verificamos que se pase el nick y el tipo
-	/*if(argc != 3) {
+	if(argc != 3) {
 		std::cout << "Falta especificar nick:\ncliente.exe <nick> <tipo_personaje>\n";
-		return 0;
+		pje_local_nick = "jugador";
+		pje_local_tipo = "soldado";
+		//return 0;
 	}else{
 		// Cargamos el nick y tipo de la consola
 		pje_local_nick = argv[1];
 		pje_local_tipo = argv[2];
-	}*/
-	//borrar estas dos lineas
-	pje_local_nick = "jugador";
-	pje_local_tipo = "soldado";
-	escenario_elegido_id = 0;
+	}
+
+	// Ventana de prueba
+	SDL_Surface* screen;
+	putenv("SDL_VIDEO_CENTERED=1"); // Para centrar la ventana
+	if(SDL_Init(SDL_INIT_EVERYTHING) == -1) { std::cerr << "Error @ SDL_Init(): " << SDL_GetError() << "\n"; return -1; }
+	// Init the window 
+	// tamaño de pantalla hardcodeado
+	//screen = SDL_SetVideoMode(pantalla->get_ancho(), pantalla->get_alto(), 32, SDL_SWSURFACE);
+	screen = SDL_SetVideoMode(800, 600, 32, SDL_SWSURFACE);
+	// Resman
+	if(!resman.init()) return -2;
+	resman.addRes("boton_sp", "../resources/static/boton_sp.png");
+	resman.addRes("boton_mp", "../resources/static/boton_mp.png");
+	// Para confinar el mouse a la ventana
+	//SDL_WM_GrabInput(SDL_GRAB_ON);
+	// Lo movemos al medio
+	SDL_WarpMouse(800/2, 600/2);
+	SDL_WM_SetCaption("Diablo", NULL);
+
+	// MENU
+	//////////////////////////
+	Boton sp, mp;
+	sp.init(&resman, 10, 10, "boton_sp");
+	mp.init(&resman, 10, 40, "boton_mp");
+	int opcion_menu = -1;
+	// 1 = sp, 2 = mp, 3 = exit
+	while(opcion_menu == -1) {
+		SDL_PollEvent(&event);
+		if(sp.handleInput(event)) opcion_menu = 1;
+		if(mp.handleInput(event)) opcion_menu = 2;
+		if(event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE || event.type == SDL_QUIT) opcion_menu = 3;
+		sp.show(screen);
+		mp.show(screen);
+		SDL_Flip(screen);
+	}
+	//std::cout << "OPCION MENU: " << opcion_menu << "\n";
+
+	if(opcion_menu == 1) {
+		// Single player
+		ShellExecute(NULL, "open", "servidor.exe", NULL, NULL, SW_SHOWMINNOACTIVE);
+	}else if(opcion_menu == 2) {
+		// Multiplayer, no hace nada
+	}else if(opcion_menu == 3) {
+		// Salir
+		return 1;
+	}
+
+
+	// FIN DE MENU
+	//////////////////////////
 
 	InitializeCriticalSection(&cs_main);
 	// Socket de cliente
-	if(!sock.init(&cs_main)) 
+	if(!sock.init(&cs_main)) {
 		return 1;
+	}
 
 	//cargo ip servidor y puerto
 	config_cliente configuracion_red = parsear_red("../resources/static/red.yaml");
@@ -134,29 +187,12 @@ int main(int argc, char* argv[]) {
 	vector <config_entidad> entidades = juego.get_entidades();
 	configuracion = juego.get_configuracion();
 	vector <config_escenario> escenarios = juego.get_escenarios();
-			
-	// Ventana de prueba
-	SDL_Surface* screen;
-	putenv("SDL_VIDEO_CENTERED=1"); // Para centrar la ventana
-	if(SDL_Init(SDL_INIT_EVERYTHING) == -1) { std::cerr << "Error @ SDL_Init(): " << SDL_GetError() << "\n"; return -1; }
-	// Init the window 
-	screen = SDL_SetVideoMode(pantalla->get_ancho(), pantalla->get_alto(), 32, SDL_SWSURFACE);
-	// Init a SDL_TTF
-	if(TTF_Init() == -1) { std::cerr << "Error @ TTF_Init(): " << TTF_GetError() << "\n"; return -1; }
-	// Para confinar el mouse a la ventana
-	//SDL_WM_GrabInput(SDL_GRAB_ON);
-	// Lo movemos al medio
-	SDL_WarpMouse(pantalla->get_ancho()/2, pantalla->get_alto()/2);
-	SDL_WM_SetCaption("Diablo", NULL);
 
 	mapa.resize(escenarios[escenario_elegido_id].get_tam_x(), escenarios[escenario_elegido_id].get_tam_x());
 
 	// Camara
 	Camara camara;
 	camara.init(pantalla->get_ancho(), pantalla->get_alto(), configuracion.get_margen_scroll(), mapa);
-
-	// Resman
-	if(!resman.init()) return -2;
 	
 	// SoundMan
 	if(!soundman.init(&camara, &pjm.getPjeLocal())) return -3;
@@ -181,6 +217,10 @@ int main(int argc, char* argv[]) {
 		}
 	}	
 	//Prueba de carga items
+	resman.addRes("cofre","../resources/chest.png");
+	BolaDeCristal cofre("cofre",1,1,true, 6 ,13,NULL,&mapa,resman,Imagen::COLOR_KEY );
+	mapa.getTile(6,13)->addEntidad(&cofre,&mapa);
+	entidades_cargadas.push_back(&cofre);
 	/*
 	resman.addRes("cofre","../resources/bandera.png");
 	Bandera cofre("cofre",1,1,true, 6 ,13,NULL,&mapa,resman,Imagen::COLOR_KEY );
@@ -250,6 +290,7 @@ int main(int argc, char* argv[]) {
 		pjm.getPjeLocal().setTerremoto(init_terremoto);
 		pjm.getPjeLocal().setHielo(init_hielo);
 		pjm.getPjeLocal().setRadio(init_radio);
+		pjm.getPjeLocal().setBolaDeCristal(init_bolaDeCristal);
 	} else {
 		//Aviso al server mis valores por defecto de atributos
 		bs.clear();
@@ -273,6 +314,9 @@ int main(int argc, char* argv[]) {
 		bs.clear();
 		bs << PROTO::UPDATE_ATT << ATT::RADIO << pjm.getPjeLocal().getRadioY();
 		sock.send(bs.str());
+		bs.clear();
+		bs << PROTO::UPDATE_ATT << ATT::BOLA_DE_CRISTAL << pjm.getPjeLocal().getBolaDeCristal();
+		sock.send(bs.str());
 	}
 	
 	// Posiciono el personaje
@@ -291,9 +335,6 @@ int main(int argc, char* argv[]) {
 	double curr_time = SDL_GetTicks();
     double accum = 0.0;
 	bool quit = false;
-
-	// Para guardar los eventos  de input
-	SDL_Event event;
 
 	//variables para el control del movimiento
 	vector< pair<int,int> > caminoMinimo;

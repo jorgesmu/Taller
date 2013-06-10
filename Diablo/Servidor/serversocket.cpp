@@ -469,7 +469,7 @@ void ServerSocket::acceptLastDo() {
 		//Le mandamos la velocidad que tenia		
 		bs.clear();
 		auto p=pm.getPlayer(new_nick); //alias shortcut
-		bs << PROTO::OLD_ATT << (float)p.getVelocidad() << p.getEnergia() << p.getMagia() << p.getEnergiaEscudo() << p.getTerremoto() << p.getHielo() << (float)p.getRadio() << (bool)p.getBolaDeCristal(); 
+		bs << PROTO::OLD_ATT << (float)p.getVelocidad() << p.getEnergia() << p.getMagia() << p.getEnergiaEscudo() << p.getTerremoto() << p.getHielo() << (float)p.getRadio() << (bool)p.getBolaDeCristal() << (bool)p.tieneGolem(); 
 		send(cid, bs.str());
 
 		// Le mandamos el id escenario
@@ -501,7 +501,7 @@ void ServerSocket::acceptLastDo() {
 			//Mando los atributos principales del jugador
 			bs.clear();
 			auto p=pm.getPlayer(new_nick);
-			bs << PROTO::INIT_ATT << new_nick << (float)p.getVelocidad() << p.getEnergia() << p.getMagia() << p.getEnergiaEscudo() << p.getTerremoto() << p.getHielo() << (float)p.getRadio() << (bool)p.getBolaDeCristal();
+			bs << PROTO::INIT_ATT << new_nick << (float)p.getVelocidad() << p.getEnergia() << p.getMagia() << p.getEnergiaEscudo() << p.getTerremoto() << p.getHielo() << (float)p.getRadio() << (bool)p.getBolaDeCristal() << (bool)p.tieneGolem();
 			send(it->second.sock,bs.str());
 			if (pm.getPlayer(new_nick).isCongelado()) {
 				bs.clear();
@@ -641,14 +641,33 @@ void ServerSocket::acceptLastDo() {
 				bs >> nick_who;
 				char item;
 				bs >> item;
+				int posBombaX,posBombaY; //solo si recibo una bomba
 				if (item==ITEM::TERREMOTO) pm.getPlayer(nick_who).restarTerremoto();
 				if (item==ITEM::HIELO) pm.getPlayer(nick_who).restarHielo();
+				if (item==ITEM::BOMBA) {
+					bs >> posBombaX >> posBombaY;
+					std::cout << nick_who << "puso bomba en pos (" << posBombaX << "," << posBombaY << ")" << endl;
+				}
 				// Avisamos a los otros jugadores 
 				for(auto it = clients_map.begin();it != clients_map.end();it++) {
 					if(it->second.nick == new_nick) continue; // Salteamos a nuestro jugador
-					BitStream bs;
-					bs << PROTO::USE_ITEM << nick_who << item;
+					bs.clear();
+					bs << PROTO::USE_ITEM << item << nick_who;
+					//Si es bomba ademas paso la posicion donde se la coloco
+					if (item==ITEM::BOMBA) {
+						bs << posBombaX << posBombaY;
+						std::cout << "Update a " << it->second.nick << " bomba en pos (" << posBombaX << "," << posBombaY << ")" << endl;
+					}
 					send(it->second.sock, bs.str());
+				}
+			}else if(pt == PROTO::BOMB_OFF) {
+				// Avisamos a los otros jugadores 
+				for(auto it = clients_map.begin();it != clients_map.end();it++) {
+					if(it->second.nick == new_nick) continue; // Salteamos a nuestro jugador
+					bs.clear();
+					bs << PROTO::BOMB_OFF << new_nick;
+					send(it->second.sock, bs.str());
+					std::cout << "Update a " << it->second.nick << ": bomba explotada de " << new_nick <<endl;
 				}
 			}else if(pt == PROTO::DAMAGE) {	
 				std::string nick_who, nick_to;
@@ -657,13 +676,49 @@ void ServerSocket::acceptLastDo() {
 				bs >> dmg;
 				std::cout << "Ataque " << nick_who << "->" << nick_to << " de " << (int)dmg << endl;
 				//Actualizamos datos locales para la mision de matar un enemigo
-				pm.getPlayer(nick_to).atacadoPor(nick_who);
+				//pm.getPlayer(nick_to).atacadoPor(nick_who);
+				bool terminoMision = false;
+				bool murioPersonaje = false;
+				//busco si se ataco a un enemigo
+				for(auto it = pm.getEnemies().begin();it != pm.getEnemies().end();it++) {
+					if(it->second->getNick() == nick_to){
+						it->second->hacerDanio(dmg);
+						it->second->atacadoPor(nick_who);
+						if (!it->second->estaVivo()){
+							murioPersonaje = true;
+							if(mision.getTipo() == Misiones::MISION_ENEMIGO){
+								if (mision.enemigoMision() == it->second->getNick()){
+									//termino mision
+									terminoMision = true;
+								}
+							}
+						cout << "elimine a " << it->second->getNick()<<endl;
+						pm.getEnemies().erase(it);
+						break;
+						}
+					}
+				}
+				//hacer para golem
 				// Avisamos a los otros jugadores 
 				for(auto it = clients_map.begin();it != clients_map.end();it++) {
 					if(it->second.nick == new_nick) continue; // Salteamos a nuestro jugador de avisarle
 					bs.clear();
 					bs << PROTO::DAMAGE << nick_who << nick_to << dmg;
 					send(it->second.sock, bs.str());
+				}
+				//aviso si murio enemigo o termine mision
+				if (murioPersonaje){
+					for(auto it = clients_map.begin();it != clients_map.end();it++) {
+						bs.clear();
+						if(terminoMision){
+							//aviso a los demas que termino la mision
+							bs << PROTO::WINNER << nick_who;
+						}else{
+							//aviso a los demas que murio enemigo
+							bs << PROTO::ENEMY_DEAD << nick_to;
+						}
+						send(it->second.sock,bs.str());
+					}
 				}
 			}else if(pt == PROTO::CONGELAR) {	
 				std::string nick_who, nick_to;
@@ -682,13 +737,13 @@ void ServerSocket::acceptLastDo() {
 				bs >> tipoAtt;
 				float nuevoVal;
 				char nuevoValor;
-				bool bolaDeCristal;
+				bool nuevoValorBool;
 				if ((tipoAtt==ATT::VEL) || (tipoAtt==ATT::RADIO)) {
 					// Valor float: velocidad/radio
 					bs >> nuevoVal;
-				}else if(tipoAtt==ATT::BOLA_DE_CRISTAL){
-					//valor bool: bola de cristal
-					bs >> bolaDeCristal;
+				}else if((tipoAtt==ATT::BOLA_DE_CRISTAL) || (tipoAtt==ATT::GOLEM)){
+					//valor bool: bola de cristal/golem
+					bs >> nuevoValorBool;
 				} else {
 					// Valor char: energia/magia/escudo/terremoto/hielo/radio
 					bs >> nuevoValor;
@@ -709,9 +764,9 @@ void ServerSocket::acceptLastDo() {
 						} else if (tipoAtt==ATT::CANT_HIELO) {
 							pm.getPlayer(new_nick).setHielo(nuevoValor);
 						} else if (tipoAtt==ATT::BOLA_DE_CRISTAL) {
-							pm.getPlayer(new_nick).setBolaDeCristal(bolaDeCristal);
+							pm.getPlayer(new_nick).setBolaDeCristal(nuevoValorBool);
 
-							if(bolaDeCristal){
+							if(nuevoValorBool){
 								//mando al jugador los tiles del resto
 								for(auto it = pm.getPlayers().begin(); it != pm.getPlayers().end();it++) {
 									if(it->first == new_nick) continue;
@@ -726,6 +781,8 @@ void ServerSocket::acceptLastDo() {
 									}
 								}
 							}
+						} else if (tipoAtt==ATT::GOLEM) {
+							pm.getPlayer(new_nick).setGolem(nuevoValorBool);
 						} else if (tipoAtt==ATT::RADIO) {
 							pm.getPlayer(new_nick).setRadio(nuevoVal);
 						}
@@ -735,8 +792,8 @@ void ServerSocket::acceptLastDo() {
 					bs.clear();
 					if ((tipoAtt==ATT::VEL) || (tipoAtt==ATT::RADIO)) {
 						bs << PROTO::UPDATE_ATT << tipoAtt << new_nick << nuevoVal;
-					} else if(tipoAtt==ATT::BOLA_DE_CRISTAL){
-						bs << PROTO::UPDATE_ATT << tipoAtt << new_nick << bolaDeCristal;					
+					} else if((tipoAtt==ATT::BOLA_DE_CRISTAL) || (tipoAtt==ATT::GOLEM)){
+						bs << PROTO::UPDATE_ATT << tipoAtt << new_nick << nuevoValorBool;					
 					} else {
 						bs << PROTO::UPDATE_ATT << tipoAtt << new_nick << nuevoValor;
 					}

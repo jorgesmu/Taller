@@ -17,11 +17,14 @@
 #include "../net/defines.h"
 #include "../../Cliente/clientsocket.h"
 #include "../utilities/Arma.h"
+#include "armaBomba.h"
 extern PjeManager pjm;
 extern ClientSocket sock;
 extern int start_pos_x,start_pos_y;
 extern int estadoMovimiento;
 extern Mapa mapa;
+extern std::vector<EntidadFija*> entidades_cargadas;
+extern ResMan resman;
 
 /*
 	Pre:- 
@@ -77,12 +80,12 @@ void Personaje::inicializarAtributosEnValoresDefault() {
 	this -> actualizandoPosicion = false;
 	this -> ordenBliteo = Entidad::ORDEN_PERSONAJE;
 	this->setRadio(125);
-	this->terremoto=10;
-	this->hielo=10; 
+	this->terremoto=10; //DESCOMENTAR
+	this->hielo=10; //DESCOMENTAR
 	this->energia=this->ENERGIA_TOTAL;
 	this->magia=this->MAGIA_TOTAL;
 	this->flechas=0;
-	this->bombas=0;
+	this->bombas=10; //DESCOMENTAR
 	this->granadas=0;
 	this->varita=false;
 	this->energiaEscudo=0;
@@ -141,7 +144,11 @@ Personaje::~Personaje() {
 		this -> imagen = NULL;
 	}
 	this -> surf = NULL;
-	this -> tileAncla = NULL;
+	if (this -> tileAncla != NULL){
+		this -> tileAncla ->deleteEntidad(this);
+		this -> tileAncla = NULL; 
+	}
+	
 	// Se elimina la espada
 	if (this -> espada != NULL) {
 		delete(this -> espada);
@@ -569,10 +576,15 @@ bool Personaje::getBolaDeCristal(){
 }
 
 void Personaje::setBolaDeCristal(bool bolaDeCristal){
-	if(bolaDeCristal){
-		int a = 0;
-	}
 	this->bolaDeCristal = bolaDeCristal;
+}
+
+bool Personaje::tieneGolem(){
+	return this->golem;
+}
+
+void Personaje::setGolem(bool agarroGolem){
+	this->golem = agarroGolem;
 }
 
 /*
@@ -953,6 +965,15 @@ void Personaje::chocarConBolaDeCristal() {
 
 }
 
+void Personaje::chocarConGolem() {
+
+		std::cout << "agarre golem \n";
+		this->golem = true;
+		BitStream bs;
+		bs << PROTO::UPDATE_ATT << ATT::GOLEM << true;
+		sock.send(bs.str());
+}
+
 void Personaje::chocarConTerremoto(Terremoto* terremoto) {
 	this->getPosicion(&mapa)->deleteEntidad(terremoto);
 	this->terremoto++;
@@ -1235,4 +1256,71 @@ void Personaje::blit(SDL_Surface* dest , Camara* camara , Mapa* mapa,
 
 Arma* Personaje::getArmaActiva(){
 	return this -> espada;
+}
+
+void Personaje::utilizarBomba(int xPersonaje, int yPersonaje) {
+	this->bombas--;
+	int xBomba = xPersonaje+1;
+	int yBomba = yPersonaje+1;
+	this->posBombaX = xBomba;
+	this->posBombaY = yBomba;
+	//Agrego la bomba al mapa en el tile adyacente
+	std::cout << "Colocando bomba en pos (" << xBomba << "," << yBomba << ")" << endl;
+	ArmaBomba* bomba;
+	bomba = new ArmaBomba("bomba",1,1,true, xBomba , yBomba,NULL,&mapa,resman,Imagen::COLOR_KEY );
+	mapa.getTile(xBomba, yBomba)->addEntidad(bomba,&mapa);
+	entidades_cargadas.push_back(bomba);
+	this->setBombaColocada(bomba);
+	//Aviso al server que puse bomba
+	BitStream bs;
+	bs << PROTO::USE_ITEM << this->getNick() << ITEM::BOMBA << posBombaX << posBombaY;
+	sock.send(bs.str());
+	tBomba.start();
+}
+
+void Personaje::updateBomba() {
+	if ((this->tBomba.isStarted()) && (this->tBomba.getTicks()>3000)) {
+		std::cout << "Explota la bomba! \n";
+		//Daño a todo el radio
+		int radio = 2;
+		Tile* tilePersonaje;
+		int xPersonaje,yPersonaje,dañoRealizado;
+		for (int i=posBombaX-radio;i<=posBombaX+radio;i++) {
+			for (int j=posBombaY-radio;j<=posBombaY+radio;j++) {
+				//Veo si yo estoy en el radio
+				tilePersonaje=pjm.getPjeLocal().getPosicion(&mapa);
+				xPersonaje=tilePersonaje->getU();
+				yPersonaje=tilePersonaje->getV();
+				if ((i==xPersonaje) && (j==yPersonaje)) {
+					srand (time(NULL));
+					dañoRealizado=rand()%(this->ENERGIA_TOTAL+1);
+					pjm.getPjeLocal().dañar(dañoRealizado);
+					std::cout << "Me autodanie con bomba, total de " << (int)dañoRealizado << endl;
+				}
+				//Veo si algun personaje se encuentra en el radio
+				for (auto it=pjm.getPjes().begin();it!=pjm.getPjes().end();it++) {
+					tilePersonaje=it->second.getPosicion(&mapa);
+					xPersonaje=tilePersonaje->getU();
+					yPersonaje=tilePersonaje->getV();
+					if ((i==xPersonaje) && (j==yPersonaje)) {
+						srand (time(NULL));
+						dañoRealizado=rand()%(this->ENERGIA_TOTAL+1);
+						it->second.dañar(dañoRealizado);
+						std::cout << "Se danio a " << it->first << " con bomba, total de " << (int)dañoRealizado << endl;
+						BitStream bs;
+						bs << PROTO::DAMAGE << this->getNick() << it->first << dañoRealizado;
+						sock.send(bs.str());
+					}
+				}
+			}
+		}
+		this->tBomba.stop();
+		//Elimino la bomba del mapa
+		mapa.getTile(posBombaX,posBombaY)->deleteEntidad(this->getBombaColocada());
+		//Aviso al server que exploto la bomba
+		BitStream bs;
+		bs << PROTO::BOMB_OFF;
+		sock.send(bs.str());
+		std::cout << "Aviso a server que exploto mi bomba" << endl;
+	}
 }

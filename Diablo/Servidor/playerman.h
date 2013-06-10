@@ -18,7 +18,7 @@ class Player {
 	std::string tipo_personaje;
 	bool isOnline;
 	int x, y,xSiguiente,ySiguiente; // Pos en tiles logicos en el mapa
-	bool bolaDeCristal;
+	bool bolaDeCristal, golem;
 	bool seMovio;
 	TilesRecorridos tiles_recorridos;
 	double velocidad;
@@ -43,7 +43,6 @@ class Player {
 	std::string getNick() const;
 	double getVelocidad() { return velocidad; }
 	void setVelocidad(double newVel) { velocidad=newVel; }
-	char getEnergia() { return energia; }
 	int getXSiguiente() const ;
 	int getYSiguiente() const ;
 	void setPosSiguiente( int XAntiguo,int YAntiguo);
@@ -67,6 +66,8 @@ class Player {
 	void setRadio(float newRadio) { radio=newRadio; }
 	bool getBolaDeCristal() { return bolaDeCristal; }
 	void setBolaDeCristal(bool tieneBolaDeCristal) { bolaDeCristal=tieneBolaDeCristal; }
+	bool tieneGolem() { return golem; }
+	void setGolem(bool agarroGolem) { golem=agarroGolem; }
 	bool getSeMovio() { return seMovio; }
 	void setSeMovio(bool yaSeMovio) { seMovio = yaSeMovio; }
 	//Agrega una nueva bandera atrapada por el jugador
@@ -78,7 +79,10 @@ class Player {
 	//Para saber el ultimo que me ataco por si cumple mision
 	void atacadoPor(std::string atacker) { lastDamagedBy=atacker; }
 	std::string ultimoAtacante() { return lastDamagedBy; }
-
+	//recibe danio, disminuye la energia
+	void hacerDanio(char value);
+	char getEnergia();
+	bool estaVivo();
 	void addTileRecorrido(short x, short y);
 	bool Player::existsTileRecorrido(short x, short y);
 	TilesRecorridos& getTilesRecorridos();

@@ -36,6 +36,7 @@
 #include "../../source/utilities/escudo.h"
 #include "../../source/utilities/interface.h"
 #include "../../source/utilities/bolaDeCristal.h"
+#include "../../source/utilities/GolemItem.h"
 #include "../../source/utilities/bandera.h"
 #include "../../source/utilities/arma.h"
 #include "../../source/display/boton.h"
@@ -61,7 +62,7 @@ int start_pos_x, start_pos_y;
 int escenario_elegido_id;
 double init_vel;
 float init_radio;
-bool init_bolaDeCristal;
+bool init_bolaDeCristal, init_golem;
 char init_energia,init_magia,init_escudo,init_terremoto,init_hielo;
 // Cosas para mantener al server actualizado sobre los tiles que recorrimos
 struct {
@@ -216,9 +217,13 @@ int main(int argc, char* argv[]) {
 			it->addEntidad((Entidad*)&entidadPisoPorDefecto);
 		}
 	}	
+
+	//Recursos para armas
+	resman.addRes("bomba","../resources/bomba.jpg");
+
 	//Prueba de carga items
 	resman.addRes("cofre","../resources/chest.png");
-	BolaDeCristal cofre("cofre",1,1,true, 6 ,13,NULL,&mapa,resman,Imagen::COLOR_KEY );
+	GolemItem cofre("cofre",1,1,true, 6 ,13,NULL,&mapa,resman,Imagen::COLOR_KEY );
 	mapa.getTile(6,13)->addEntidad(&cofre,&mapa);
 	entidades_cargadas.push_back(&cofre);
 	/*
@@ -291,6 +296,7 @@ int main(int argc, char* argv[]) {
 		pjm.getPjeLocal().setHielo(init_hielo);
 		pjm.getPjeLocal().setRadio(init_radio);
 		pjm.getPjeLocal().setBolaDeCristal(init_bolaDeCristal);
+		pjm.getPjeLocal().setGolem(init_golem);
 	} else {
 		//Aviso al server mis valores por defecto de atributos
 		bs.clear();
@@ -317,8 +323,12 @@ int main(int argc, char* argv[]) {
 		bs.clear();
 		bs << PROTO::UPDATE_ATT << ATT::BOLA_DE_CRISTAL << pjm.getPjeLocal().getBolaDeCristal();
 		sock.send(bs.str());
+		bs.clear();
+		bs << PROTO::UPDATE_ATT << ATT::GOLEM << pjm.getPjeLocal().tieneGolem();
+		sock.send(bs.str());
 	}
 	
+	std::cout << "valor del golem: " << pjm.getPjeLocal().tieneGolem() << "\n";
 	// Posiciono el personaje
 	mapa.getTile(start_pos_x, start_pos_y)->addEntidad(&(pjm.getPjeLocal()));
 	pjm.getPjeLocal().setTileActual(mapa.getTile(start_pos_x, start_pos_y));
@@ -389,6 +399,14 @@ int main(int argc, char* argv[]) {
 							bs << PROTO::ATACAR << pjm.getPjeLocal().getNick();
 							sock.send(bs.str());
 							//caminoMinimo.clear();
+							break;
+						}
+						case 'b' : {
+							if (pjm.getPjeLocal().getCantBombas()>0) {
+								int x = pjm.getPjeLocal().getPosicion(&mapa)->getU();
+								int y = pjm.getPjeLocal().getPosicion(&mapa)->getV();
+								pjm.getPjeLocal().utilizarBomba(x,y);
+							}
 							break;
 						}
 						case 'd' : {
@@ -542,10 +560,10 @@ int main(int argc, char* argv[]) {
 				if (control == Personaje::MOVER_COMPLETADO && it->second.get_posicion_actualizada()==false){
 					//aviso al server que se termino de mover un personaje para si es un enemigo actualizarlo
 					Tile* unTile = it->second.getPosicion(&mapa);
-					cout << "pos " << unTile->getU() << "," <<unTile->getV() <<endl;
+					//cout << "pos " << unTile->getU() << "," <<unTile->getV() <<endl;
 					bs.clear();
 					bs << PROTO::EN_MOVE_CMPLT << it->second.getNick() << unTile->getU() << unTile ->getV() ;
-					sock.send(bs.str());
+					//sock.send(bs.str()); //DESCOMENTAR
 					//std::cout << "Mandando termino de moverse personaje a servidor" << it->second.getNick() << "\n";
 					//estado de personaje es para el pje local y estoy en un loop de otros personajes
 					//estadoPersonaje = Personaje::ESPERANDO_ACCION;
@@ -560,6 +578,9 @@ int main(int argc, char* argv[]) {
 
 			//Para revivir
 			pjm.getPjeLocal().updateRevivir();
+
+			//Para que exploten bombas
+			pjm.getPjeLocal().updateBomba();
 			
 			if (puedeMoverse) {				
 				if (!choco) {

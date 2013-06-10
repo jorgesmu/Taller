@@ -27,6 +27,7 @@ class Hielo;
 class Bandera;
 class ClientSocket;
 class Arma;
+class ArmaBomba;
 
 class Personaje : public Entidad {
 public:
@@ -128,16 +129,23 @@ protected:
 
 		//Armas
 		int flechas;
-		int bombas;
+		char bombas;
 		int granadas;
 		bool varita;
 		char energiaEscudo;
+
+		//Para la bomba
+		Timer tBomba; //timer para que explote
+		int posBombaX,posBombaY;
+		ArmaBomba* bombaColocada;
 
 		//Muerte
 		bool vivo;
 
 		//si tiene la bola de cristal
 		bool bolaDeCristal;
+		//si tiene golem
+		bool golem;
 		//Timer para revivir
 		Timer timerRevivir;
 		//timer para actualizar enemigos
@@ -322,6 +330,10 @@ public:
 
 	virtual void setBolaDeCristal(bool bolaDeCristal);
 
+	virtual bool tieneGolem();
+
+	virtual void setGolem(bool agarroGolem);
+
 	/*
 		Pre: Los parámetros cumplen las siguiente condiciones:
 
@@ -379,6 +391,8 @@ public:
 	void chocarConZapatos(Zapatos* zapatos);
 
 	void chocarConBolaDeCristal();
+
+	void chocarConGolem();
 
 	void chocarConHechizo() { }
 
@@ -461,6 +475,29 @@ public:
 	void dañar(char daño); 
 
 	Arma* getArmaActiva();
+
+	//Para la bomba
+	char getCantBombas() { return bombas; }
+
+	void setCantBombas(char cantidad) { bombas=cantidad; }
+
+	void sumarBombas(char cantidad) { bombas+=cantidad; }
+
+	void utilizarBomba(int xPersonaje, int yPersonaje);
+
+	void updateBomba();
+
+	void setBombaColocada(ArmaBomba* nuevaBomba) { bombaColocada=nuevaBomba; }
+
+	ArmaBomba* getBombaColocada() { return bombaColocada; }
+
+	void setBombaX(int pos) { posBombaX=pos; }
+	
+	int getBombaX() { return posBombaX; }
+
+	void setBombaY(int pos) { posBombaY=pos; }
+
+	int getBombaY() { return posBombaY; }
 
 protected:
 

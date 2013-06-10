@@ -288,14 +288,27 @@ bool MapaServidor::tile_esta_ocupado(int x,int y,PlayerManager& pm){
 	bool res = false;
 	for(auto it = pm.getEnemies().begin();it != pm.getEnemies().end();it++) {
 		Enemigo* unEnemigo = it->second;
-		if (unEnemigo->getX()== x && unEnemigo->getY() ==y)
+		if (unEnemigo->getX()== x && unEnemigo->getY() == y){
+			//si esta ahi
 			res = true ;
+		}
+		if (unEnemigo->getXSiguiente()== x && unEnemigo->getYSiguiente() == y){
+			//si se esta moviendo ahi
+			res = true ;
+		}
+
 	}
 	//actualizo personajes
 	for (auto it = pm.getPlayers().begin();it != pm.getPlayers().end();it++) {
 		//it->second = player
-		if(it->second.getX() == x && it->second.getY()==y)
+		if(it->second.getX() == x && it->second.getY()== y){
+			//si esta ahi
 			res = true;
+		}
+		if(it->second.getXSiguiente() == x && it->second.getYSiguiente()== y){
+			//si se esta moviendo ahi
+			res = true;
+		}
 	}
 	return res;
 }

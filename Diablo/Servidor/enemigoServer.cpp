@@ -9,7 +9,7 @@ const int izquierda = 2;
 const int arriba = 3;
 const int abajo = 4;
 const int pasosMax = 2;
-const int radioAtaque = 4;// en golem tambien esta definido
+const int radioAtaque = 2;// en golem tambien esta definido
 void Enemigo::init_Enemy(const std::string& nickname,const std::string& tipo,unsigned int estrategiaElegida){
 	this->init(nickname,tipo);
 	this->estrategia = estrategiaElegida;

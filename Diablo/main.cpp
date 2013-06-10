@@ -299,7 +299,10 @@ int main(int argc, char* argv[]) {
 	int ultimoMovimientoY = NOSEMOVIO;// idem coordenada y
 	int ultimoDestinoX = NOSEMOVIO;//guarda el destino actual
 	int ultimoDestinoY = NOSEMOVIO;//guarda el destino actual
-	
+	//variable que informa ataque
+	bool enAtaque = false;
+	Personaje* personajeObjetivo = NULL;
+	Tile* tilePersonajeObjetivo = NULL;
 	while((!quit ) && (sock.isOpen()) ) {
 
 		// Sync stuff
@@ -391,20 +394,32 @@ int main(int argc, char* argv[]) {
 							ultimoDestinoY = tile_res.y;
 							// Verificamos si hay un personaje para activar el chat
 							bool found_pje = false;
+							Personaje* personajeObjetivoAux = NULL;
 							//std::cout << "CLICK @ " << tile_res.x << ";" << tile_res.y << "\n";
 							for(auto it = pjm.getPjes().begin();it != pjm.getPjes().end();it++) {
 								if(tileDestino == mapa.getTilePorPixeles(it->second.getX(), it->second.getY())) {
 									found_pje = true;
+									personajeObjetivoAux = &(it -> second);
 									break;
 								}
 							}
-
+							caminoMinimo = mapa.getCaminoMinimo(tilePersonaje, tileDestino);
+							indice = 1;
+							estadoMovimiento = MOV::MANDAR_POS;
 							if(!found_pje) {
-								caminoMinimo = mapa.getCaminoMinimo(tilePersonaje, tileDestino);
-								indice = 1;
-								estadoMovimiento = MOV::MANDAR_POS;
+								enAtaque = false;
+								personajeObjetivo = NULL;
+							} else {
+								if (personajeObjetivo !=  &(pjm.getPjeLocal())){
+									enAtaque = true;
+									personajeObjetivo = personajeObjetivoAux;
+									tilePersonajeObjetivo = tileDestino;
+									caminoMinimo.pop_back();
+								} else {
+									enAtaque = false;
+									personajeObjetivo = NULL;
+								}
 							}
-
 						}
 					}
 
@@ -438,7 +453,6 @@ int main(int argc, char* argv[]) {
 
 						}
 					}
-
 
 				}
 
@@ -606,10 +620,33 @@ int main(int argc, char* argv[]) {
 				){
 				puedeMoverse = false;
 			}*/
+					
 			if ((estadoPersonaje == Personaje::MOVER_COMPLETADO)) 
 				 {
 				puedeMoverse = true;
-
+				if ((indice == caminoMinimo.size()) && (enAtaque)){
+					// atacar
+					pjm.getPjeLocal().ataque(tilePersonajeObjetivo,&mapa,personajeObjetivo);
+					enAtaque = false;
+					caminoMinimo.clear();
+					// Si se movio, perseguirlo
+					/*
+					if ((personajeObjetivo != NULL) && (tilePersonajeObjetivo != NULL)){
+						Tile* tileActualizado = mapa.getTilePorPixeles(personajeObjetivo->getX(),
+																		personajeObjetivo->getY());
+						Tile* tilePersonajeLocal = mapa.getTilePorPixeles(pjm.getPjeLocal().getX(),
+																	pjm.getPjeLocal().getY());
+						
+						if ((tileActualizado != NULL) && (tileActualizado != tilePersonajeObjetivo) &&
+							(tilePersonajeLocal != NULL)){
+							caminoMinimo = mapa.getCaminoMinimo(tilePersonajeLocal, tileActualizado);
+							indice = 1;
+							caminoMinimo.pop_back();
+							estadoMovimiento = MOV::MANDAR_POS;
+							enAtaque = true;
+						}						
+					}*/
+				}
 			}else if ( (estadoPersonaje == Personaje::MOVER_EN_CURSO) || 
 				(estadoPersonaje == Personaje::MOVER_ERROR)){
  				puedeMoverse = false;

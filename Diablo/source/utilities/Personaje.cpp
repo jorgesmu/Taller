@@ -209,7 +209,6 @@ void Personaje::init(const std::string& nickname, const std::string& name,
 	// Se inicializa el arma default que es la espada
 	this -> espada = new Arma("espada" , 2 , 500 , 11,
 		Arma::PIXEL_REF_SPRITES_PRIMARIO_X , Arma::PIXEL_REF_SPRITES_PRIMARIO_Y,
-		Arma::PIXEL_REF_SPRITES_ACCION_ESPECIAL_X , Arma::PIXEL_REF_SPRITES_ACCION_ESPECIAL_Y ,
 		tile , rm , Imagen::COLOR_KEY , Arma::DANIO_MAXIMO_DEFAULT , this);
 }
 
@@ -1024,11 +1023,11 @@ void Personaje::utilizarHielo(Mapa* mapa, PjeManager* pjm) {
 	 this->getPosicion(&mapa)->deleteEntidad(flechas);
 	 this->flechas+=flechas->getCantFlechas();
  }
-
+ /*
  void Personaje::chocarConBombas(Bombas* bombas) {
 	 this->getPosicion(&mapa)->deleteEntidad(bombas);
 	 this->bombas+=bombas->getCantBombas();
- }
+ }*/
 
  void Personaje::chocarConGranadas(Granadas* granadas) {
 	 this->getPosicion(&mapa)->deleteEntidad(granadas);

@@ -15,7 +15,7 @@ class Corazon;
 class Botella;
 class Zapatos;
 class Flechas;
-class Bombas;
+//class Bombas;
 class Granadas;
 class Varitas;
 class Escudo;
@@ -369,7 +369,7 @@ public:
 
 	void chocarConFlechas(Flechas* flechas);
 
-	void chocarConBombas(Bombas* bombas);
+//	void chocarConBombas(Bombas* bombas);
 
 	void chocarConGranadas(Granadas* granadas);
 
@@ -431,7 +431,8 @@ public:
 	double getVelocidad() { return velocidad; }
 
 	void setVelocidad(double velocidad) { this->velocidad=velocidad; }
-
+	
+	// Para dañar un personaje
 	void dañar(char daño); 
 
 	Arma* getArmaActiva();

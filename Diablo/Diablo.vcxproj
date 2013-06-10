@@ -26,6 +26,7 @@
     <ClCompile Include="source\utilities\arista.cpp" />
     <ClCompile Include="source\utilities\arma.cpp" />
     <ClCompile Include="source\utilities\aux_func.cpp" />
+    <ClCompile Include="source\utilities\bombas.cpp" />
     <ClCompile Include="source\utilities\chatwindow.cpp" />
     <ClCompile Include="source\utilities\config_cliente.cpp" />
     <ClCompile Include="source\utilities\config_entidad.cpp" />

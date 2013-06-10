@@ -86,7 +86,7 @@ const unsigned char WINNER = 'G';
 //Avisa que murio enemigo
 const unsigned char ENEMY_DEAD = 'H';
 //avise si termine de mover
-const unsigned char EN_MOVE_CMPLT = 'K';
+const unsigned char EN_MOVE_CMPLT = 'I';
 // Exploto una bomba
 const unsigned char BOMB_OFF = 'J';
 

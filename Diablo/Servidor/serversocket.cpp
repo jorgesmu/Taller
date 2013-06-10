@@ -935,7 +935,18 @@ void ServerSocket::acceptLastDo() {
 						ok = false;
 						break;
 					}
-				}				
+				}
+				for(auto it = pm.getEnemies().begin();it != pm.getEnemies().end();it++) {
+					if(it->second->getX() == x && it->second->getY() == y) {
+						ok = false;
+						break;
+					}
+					if(it->second->getXSiguiente() == x && it->second->getYSiguiente() == y) {
+						ok = false;
+						break;
+					}
+				}
+				//hacer para golem
 				if(ok) {
 					// Si el movimiento esta ok, actualizamos la posicion
 					pm.getPlayer(new_nick).setPos(x, y);

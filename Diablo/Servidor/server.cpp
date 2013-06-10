@@ -23,7 +23,8 @@
 #include "mapaservidor.h"
 #include <cstdlib>
 #include <ctime>
-
+#include "enemigoServer.h"
+#include "../source/net/bitstream.h"
 logErrores err_log("log_parser.txt");
 PlayerManager pm;
 MapaServidor mapa;
@@ -36,17 +37,22 @@ config_pantalla* pantalla;
 vector <config_entidad> entidades;
 config_general configuracion;
 vector <config_escenario> escenarios;
-
+bool puedeMoverseEnemigo = false;
+bool conectandose=false;
+bool crearMision = true;
+//dependencias externas
+extern BitStream bs;
+unsigned int enemyCount = 0;
 int main(int argc, char* argv[]) {
 
 	// Parseamos el escenario a elegir
 	if(argc != 2) {
-		std::cerr << "Falta especificar el escenario:\n \tservidor.exe <escenario>\n";
-		return -1;
+		//std::cerr << "Falta especificar el escenario:\n \tservidor.exe <escenario>\n";
+		escenario_elegido = "a";
+		crearMision = false;
 	}else{
 		escenario_elegido = argv[1];
 	}
-
 	// Iniciamos el seed de srand
 	std::srand(std::time(NULL));
 
@@ -120,16 +126,50 @@ int main(int argc, char* argv[]) {
 			}
 		}
 	}
-	//Creacion de misiones(TODO:logica random entre los distintos tipos)
-	//mision.crearMisionBanderas(2);
-	//std::cout << "Se creo mision de " << mision.cantBanderas() << " banderas" << endl;
-	mision.crearMisionEnemigo("derecha");
+	
+	//Agregar enemigos automaticos
+//	pm.addEnemy("Enemigo1","soldado",mapa,1);
+//	pm.addEnemy("Enemigo2","soldado",mapa,2);	
+//	pm.addEnemy("Enemigo3","soldado",mapa,2);
+	if(crearMision){
+		//Creacion de misiones(TODO:logica random entre los distintos tipos)
+		mision.crearMisionBanderas(2);
+		//std::cout << "Se creo mision de " << mision.cantBanderas() << " banderas" << endl;
+		//mision.crearMisionEnemigo("derecha");
+	}
 
+	//Enemigo* unEnemigo = pm.getEnemy("Enemigo1");
+
+	mapa.cargarGrafo(pm);
+	mapa.actualizarGrafoPersonajes(pm);
 	// Spawneamos el thread de listen
 	_beginthreadex(NULL, 0, ServerSocket::listenLoopEntry, (void*)&sock, 0, NULL);
-
+	bool mando = false;
 	while(true) {
+/*
+		if(!conectandose){
+	
+			puedeMoverseEnemigo= true; 
+			// Informamos a los demas del movimiento del enemigo
+			std::map<std::string, Client> clients_map = sock.get_clients();
+			for(auto it = clients_map.begin();it != clients_map.end();it++) {
+				if(!mando){
+					Sleep(8000);
+					bs.clear();
+					std::string nick = "Enemigo1";
+					bs << PROTO::MOVE_PLAYER << nick << 2 <<2 ;
+
+					sock.send(it->second.sock, bs.str());
+					std::cout << "Mandando update a " << it->second.nick << "\n";
+					mando = true;
+				}
+			}
+		}*/
 		Sleep(100);
+	}
+	//destruyo enemigos y golem 
+	for(auto it = pm.getEnemies().begin();it != pm.getEnemies().end();it++) {
+		delete(it->second);
 	}
 
 	// Close

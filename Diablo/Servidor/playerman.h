@@ -9,7 +9,7 @@
 
 #include "mapaservidor.h"
 #include "../source/utilities/vec2.h"
-
+class Enemigo;
 typedef std::vector< std::pair<short,short> > TilesRecorridos;
 
 class Player {
@@ -17,7 +17,9 @@ class Player {
 	std::string nick;
 	std::string tipo_personaje;
 	bool isOnline;
-	int x, y; // Pos en tiles logicos en el mapa
+	int x, y,xSiguiente,ySiguiente; // Pos en tiles logicos en el mapa
+	bool bolaDeCristal;
+	bool seMovio;
 	TilesRecorridos tiles_recorridos;
 	double velocidad;
 	float radio;
@@ -42,6 +44,9 @@ class Player {
 	double getVelocidad() { return velocidad; }
 	void setVelocidad(double newVel) { velocidad=newVel; }
 	char getEnergia() { return energia; }
+	int getXSiguiente() const ;
+	int getYSiguiente() const ;
+	void setPosSiguiente( int XAntiguo,int YAntiguo);
 	void setEnergia(char newEnergia) { energia=newEnergia; }
 	char getMagia() { return magia; }
 	void setMagia(char newMagia) { magia=newMagia; }
@@ -60,6 +65,10 @@ class Player {
 	void setHielo(char valor) { hielo=valor; }
 	float getRadio() { return radio; }
 	void setRadio(float newRadio) { radio=newRadio; }
+	bool getBolaDeCristal() { return bolaDeCristal; }
+	void setBolaDeCristal(bool tieneBolaDeCristal) { bolaDeCristal=tieneBolaDeCristal; }
+	bool getSeMovio() { return seMovio; }
+	void setSeMovio(bool yaSeMovio) { seMovio = yaSeMovio; }
 	//Agrega una nueva bandera atrapada por el jugador
 	void atrapoBandera(int x, int y);
 	//Se fija si ya atrapo la bandera dada
@@ -71,17 +80,19 @@ class Player {
 	std::string ultimoAtacante() { return lastDamagedBy; }
 
 	void addTileRecorrido(short x, short y);
+	bool Player::existsTileRecorrido(short x, short y);
 	TilesRecorridos& getTilesRecorridos();
 
 };
 
 typedef std::map<std::string, Player> PlayerMapT;
+typedef std::map<std::string, Enemigo*> EnemyMapT;
 
 class PlayerManager {
 	private:
 	// Hash con los jugadores que entraron al servidor
 	PlayerMapT player_map;
-
+	map<std::string, Enemigo*> enemy_map;
 	public:
 	// Devuelve si un player existe
 	bool playerExists(const std::string& nick) const;
@@ -92,5 +103,15 @@ class PlayerManager {
 	Player& getPlayer(const std::string& nick);
 	// Devuelve el mapa de jugadores
 	PlayerMapT& getPlayers();
+
+	// Devuelve si un enemigo existe
+	bool enemyExists(const std::string& nick) const;
+	// Agrega un jugador
+	// Inicializa en una posicion aleatoria del mapa
+	void addEnemy(const std::string& nick, const std::string& tipo_pj, MapaServidor& mapa,int estrategiaElegida);
+	// Devuelve un jugador
+	Enemigo* getEnemy(const std::string& nick);
+	// Devuelve el mapa de jugadores
+	EnemyMapT& getEnemies();
 
 };

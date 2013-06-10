@@ -561,7 +561,7 @@ unsigned int Arma::update(Mapa* mapa) {
 unsigned int Arma::atacar(Mapa* mapa, Tile* tileDestino , Personaje* personaje) {
 	unsigned int retorno = Personaje::ATACAR_COMPLETADO;
 	// chequeo que el tileDestino y el mapa sean diferentes de null
-	if ( (tileDestino != NULL) && (mapa != NULL)) {
+	if ( (tileDestino != NULL) && (mapa != NULL) && (personaje != NULL)) {
 		Tile* tileActualizado = mapa->getTilePorPixeles(personaje -> getX() , personaje -> getY());	
 		if ( tileActualizado == tileDestino){ 
 			this -> tileDestino = NULL;
@@ -775,13 +775,17 @@ void Arma::dañarPersonaje(Personaje* personajeObjetivo){
 	if ( (personajeObjetivo != NULL) && (this -> propietario != NULL)){
 		if (precision >= this ->propietario -> getPrecision()){
 			char danio = (rand()%100)*this -> danio_maximo;
+			int aux=danio;
+			printf("\n%i\n",danio);
 			personajeObjetivo -> dañar(danio);
-			// mensaje al servidor
-			std::cout << "Ataque\n";
-			BitStream bs;		
-			bs.clear();
-			bs << PROTO::DAMAGE << personajeObjetivo->getNick() << personajeObjetivo ->getNick() << danio;
-			sock.send(bs.str());
+			if (danio > 0) {
+				// mensaje al servidor
+				std::cout << "Ataque\n";
+				BitStream bs;		
+				bs << PROTO::DAMAGE << this-> propietario -> getNick() << personajeObjetivo->getNick() << danio;
+				sock.send(bs.str());
+				std::cout << "Ataque " << this-> propietario -> getNick() << "->" << personajeObjetivo->getNick() << " de " << (int)danio << endl;
+			}
 		}
 	}
 }

@@ -150,6 +150,12 @@
     <ClCompile Include="source\utilities\bombas.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="source\utilities\console.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\display\boton.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\utilities\timer.h">
@@ -323,6 +329,9 @@
     <ClInclude Include="source\utilities\interface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="source\utilities\bolaDeCristal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="source\utilities\arma.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -330,6 +339,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="source\utilities\bandera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\utilities\console.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\display\boton.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

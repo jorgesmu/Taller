@@ -71,6 +71,10 @@ const unsigned char OLD_ATT = 'y';
 const unsigned char INIT_ATT = 'z';
 // Congela a un personaje
 const unsigned char CONGELAR = 'A';
+
+// Termino de mover enemigo
+const unsigned char EN_MOVE_CMPLT = 'B';
+
 // Revive posicion
 const unsigned char REQUEST_REV_POS = 'B';
 // Revive posicion OK
@@ -112,4 +116,5 @@ namespace ATT {
 	const char CANT_TERREMOTO = 5;
 	const char CANT_HIELO = 6;
 	const char RADIO = 7;
+	const char BOLA_DE_CRISTAL = 8;
 }

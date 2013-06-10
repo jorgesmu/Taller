@@ -13,6 +13,7 @@
   <ItemGroup>
     <ClCompile Include="Cliente\clientsocket.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="source\display\boton.cpp" />
     <ClCompile Include="source\display\camara.cpp" />
     <ClCompile Include="source\display\entidad.cpp" />
     <ClCompile Include="source\display\entidadFija.cpp" />
@@ -35,6 +36,7 @@
     <ClCompile Include="source\utilities\config_general.cpp" />
     <ClCompile Include="source\utilities\config_juego.cpp" />
     <ClCompile Include="source\utilities\config_pantalla.cpp" />
+    <ClCompile Include="source\utilities\console.cpp" />
     <ClCompile Include="source\utilities\coordenadas.cpp" />
     <ClCompile Include="source\utilities\enemigo.cpp" />
     <ClCompile Include="source\utilities\grafo.cpp" />
@@ -60,6 +62,7 @@
   <ItemGroup>
     <ClInclude Include="Cliente\clientsocket.h" />
     <ClInclude Include="source\constants\model.h" />
+    <ClInclude Include="source\display\boton.h" />
     <ClInclude Include="source\display\camara.h" />
     <ClInclude Include="source\display\entidad.h" />
     <ClInclude Include="source\display\entidadFija.h" />
@@ -74,6 +77,7 @@
     <ClInclude Include="source\utilities\arista.h" />
     <ClInclude Include="source\utilities\arma.h" />
     <ClInclude Include="source\utilities\aux_func.h" />
+    <ClInclude Include="source\utilities\bolaDeCristal.h" />
     <ClInclude Include="source\utilities\bandera.h" />
     <ClInclude Include="source\utilities\bombas.h" />
     <ClInclude Include="source\utilities\botella.h" />
@@ -85,6 +89,7 @@
     <ClInclude Include="source\utilities\config_general.h" />
     <ClInclude Include="source\utilities\config_juego.h" />
     <ClInclude Include="source\utilities\config_pantalla.h" />
+    <ClInclude Include="source\utilities\console.h" />
     <ClInclude Include="source\utilities\coordenadas.h" />
     <ClInclude Include="source\utilities\corazon.h" />
     <ClInclude Include="source\utilities\enemigo.h" />

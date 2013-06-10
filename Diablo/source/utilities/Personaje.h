@@ -19,6 +19,7 @@ class Flechas;
 class Granadas;
 class Varitas;
 class Escudo;
+class BolaDeCristal;
 class Lampara;
 class MapaItem;
 class Terremoto;
@@ -110,6 +111,8 @@ protected:
 
 		float radioY,radioX;
 
+		bool PosicionActualizada; // para el update de enemigos
+
 		//Tiene o no los hechizos(podria tener mas de uno quizas?, por eso un char)
 		char terremoto;
 		char hielo;
@@ -133,9 +136,12 @@ protected:
 		//Muerte
 		bool vivo;
 
+		//si tiene la bola de cristal
+		bool bolaDeCristal;
 		//Timer para revivir
 		Timer timerRevivir;
-								
+		//timer para actualizar enemigos
+		Timer timerUpdateServidor;
 		// Arma default
 		Arma* espada;
 				
@@ -196,6 +202,10 @@ public:
 		Nota: Puede suceder que si una entidad ocupa varios Tiles la entidad se de de alta
 		en algun Tile en el que no estaba, y se de de baja en alguno en cual estaba.
 	*/
+	virtual Timer& get_timer_update(){
+		return timerUpdateServidor; 
+	}
+	
 	virtual void mover(Tile* tileDestino);
 
 	/*
@@ -286,6 +296,13 @@ public:
 
 	// Retorna el ancla de niebla Y adecuada
 	virtual int getYAnclajeNiebla();
+	virtual bool get_posicion_actualizada(){
+		return PosicionActualizada;
+	}
+	virtual void set_posicion_actualizada(bool nuevoValor){
+		PosicionActualizada = nuevoValor;
+	}
+
 	/*
 		Pre: La instancia ha sido creada.
 		Post: Se retorna verdadero si se puede ocupar el tile donde se encuentra la
@@ -300,6 +317,10 @@ public:
 	*/
 	// Deprecated
 	virtual bool isCaminable();	
+
+	virtual bool getBolaDeCristal();
+
+	virtual void setBolaDeCristal(bool bolaDeCristal);
 
 	/*
 		Pre: Los parámetros cumplen las siguiente condiciones:
@@ -356,6 +377,8 @@ public:
 	void aumentarVelocidad(char porcentaje);
 
 	void chocarConZapatos(Zapatos* zapatos);
+
+	void chocarConBolaDeCristal();
 
 	void chocarConHechizo() { }
 
@@ -429,9 +452,11 @@ public:
 	void setEnergiaEscudo(char energia) { energiaEscudo=energia; }
 
 	double getVelocidad() { return velocidad; }
-
-	void setVelocidad(double velocidad) { this->velocidad=velocidad; }
 	
+	void setVelocidad(double velocidad) { 
+		this->velocidad=velocidad; 
+	}
+
 	// Para dañar un personaje
 	void dañar(char daño); 
 

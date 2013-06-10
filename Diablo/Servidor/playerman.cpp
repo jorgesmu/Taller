@@ -1,6 +1,6 @@
 #include "playerman.h"
 #include "../source/utilities/aux_func.h"
-
+#include "enemigoServer.h"
 #include <exception>
 #include <cassert>
 #include <ctime>
@@ -11,8 +11,11 @@ Player::Player() {
 	tipo_personaje = "uninit-pje";
 	isOnline = false;
 	x = y = 0;
-	velocidad = 0;
+	velocidad = 105/1000;
 	congelado = 0; //descongelado
+	xSiguiente = ySiguiente = -1;
+	bolaDeCristal = false;
+	seMovio = false;
 }
 
 Player::~Player() {
@@ -36,9 +39,19 @@ int Player::getX() const {
 int Player::getY() const {
 	return y;
 }
+int Player::getXSiguiente() const {
+	return xSiguiente;
+}
 
+int Player::getYSiguiente() const {
+	return ySiguiente;
+}
 std::string Player::getTipo() const {
 	return tipo_personaje;
+}
+void Player::setPosSiguiente( int XNuevo,int YNuevo)  {
+	xSiguiente = XNuevo;
+	ySiguiente = YNuevo;
 }
 
 std::string Player::getNick() const {
@@ -63,6 +76,15 @@ void Player::addTileRecorrido(short x, short y) {
 	if(std::find(tiles_recorridos.begin(), tiles_recorridos.end(), p) == tiles_recorridos.end()) {
 		this->tiles_recorridos.push_back(p);
 	}
+}
+
+bool Player::existsTileRecorrido(short x, short y) {
+	// ToDo: Esto se puede mejorar usando sort+binary search
+	auto p = std::make_pair(x, y);
+	if(std::find(tiles_recorridos.begin(), tiles_recorridos.end(), p) == tiles_recorridos.end()) {
+		return false;
+	}
+	return true;
 }
 
 TilesRecorridos& Player::getTilesRecorridos() {
@@ -124,7 +146,9 @@ void PlayerManager::addPlayer(const std::string& nick, const std::string& tipo_p
 		throw std::runtime_error("No se pudo ubicar el personaje\n");
 	}else{
 		p.setOnline();
-		p.setPos(rand_x, rand_y);
+		//p.setPos(rand_x, rand_y);
+		p.setPos(10,10);
+
 	}
 }
 
@@ -136,4 +160,53 @@ Player& PlayerManager::getPlayer(const std::string& nick) {
 
 PlayerMapT& PlayerManager::getPlayers() {
 	return this->player_map;
+}
+//metodos de enemigos
+// Devuelve si un player existe
+bool PlayerManager::enemyExists(const std::string& nick) const {
+	return enemy_map.find(nick) != enemy_map.end();
+}
+
+// Agrega un jugador
+void PlayerManager::addEnemy(const std::string& nick, const std::string& tipo_pje, MapaServidor& mapa,int estrategiaElegida) {
+	// Chequeo de sanidad
+	assert(!enemyExists(nick));
+	Enemigo*& p = enemy_map[nick];
+	p = new Enemigo();
+	p->init_Enemy(nick, tipo_pje,estrategiaElegida); 
+	// Buscar posicion en el mapa
+	bool found = false;
+	int x = 0; // Contador de iteraciones
+	int w, h; // Para guardar el tamaño del mapa
+	mapa.getSize(&w, &h);
+	//std::cout << "Mapa size: " << w << "," << h << "\n";
+	int rand_x, rand_y;
+	// Limitamos la cantidad de iteraciones
+	while(!found && x < 1000) {
+		rand_x = intRand(0, w-1);
+		rand_y = intRand(0, h-1);
+		//std::cout << rand_x << "," << rand_y << "\n";
+		if(mapa.getTile(rand_x, rand_y)->isCaminable()) {
+			found = true;
+		}
+		x++;
+	}
+	if(!found) {
+		throw std::runtime_error("No se pudo ubicar el personaje\n");
+	}else{
+		p->setOnline();
+		p->setPos(rand_x, rand_y);
+		//cargo pos
+		p->setPosSiguiente(rand_x,rand_y);
+	}
+}
+
+// Devuelva un jugador
+Enemigo* PlayerManager::getEnemy(const std::string& nick) {
+	assert(enemyExists(nick));
+	return enemy_map[nick];
+}
+
+EnemyMapT& PlayerManager::getEnemies() {
+	return this->enemy_map;
 }

@@ -35,8 +35,11 @@
 #include "../../source/utilities/terremoto.h"
 #include "../../source/utilities/escudo.h"
 #include "../../source/utilities/interface.h"
+#include "../../source/utilities/bolaDeCristal.h"
 #include "../../source/utilities/bandera.h"
 #include "../../source/utilities/arma.h"
+#include "../../source/display/boton.h"
+#include "../../source/utilities/console.h"
 using namespace std;
 
 logErrores err_log("log_cliente.txt");
@@ -46,6 +49,7 @@ const int NOSEMOVIO = -1;
 // Variables globales
 // Critical section
 CRITICAL_SECTION cs_main;
+SDL_Event event;
 // Mapa
 Mapa mapa;
 // Personaje Manager
@@ -57,6 +61,7 @@ int start_pos_x, start_pos_y;
 int escenario_elegido_id;
 double init_vel;
 float init_radio;
+bool init_bolaDeCristal;
 char init_energia,init_magia,init_escudo,init_terremoto,init_hielo;
 // Cosas para mantener al server actualizado sobre los tiles que recorrimos
 struct {
@@ -71,6 +76,8 @@ int estadoMovimiento;
 ChatWindow chat_window;
 // User Interface
 Interface ui;
+// Consola de mensajes
+Console consola;
 // ResMan
 ResMan resman;
 // Sound manager
@@ -90,21 +97,70 @@ int main(int argc, char* argv[]) {
 	// Verificamos que se pase el nick y el tipo
 	if(argc != 3) {
 		std::cout << "Falta especificar nick:\ncliente.exe <nick> <tipo_personaje>\n";
-		return 0;
+		pje_local_nick = "jugador";
+		pje_local_tipo = "soldado";
+		//return 0;
 	}else{
 		// Cargamos el nick y tipo de la consola
 		pje_local_nick = argv[1];
 		pje_local_tipo = argv[2];
 	}
-	//borrar estas dos lineas
-	//pje_local_nick = "jugador";
-	//pje_local_tipo = "soldado";
-	//escenario_elegido_id = 0;
+
+	// Ventana de prueba
+	SDL_Surface* screen;
+	putenv("SDL_VIDEO_CENTERED=1"); // Para centrar la ventana
+	if(SDL_Init(SDL_INIT_EVERYTHING) == -1) { std::cerr << "Error @ SDL_Init(): " << SDL_GetError() << "\n"; return -1; }
+	// Init the window 
+	// tamaño de pantalla hardcodeado
+	//screen = SDL_SetVideoMode(pantalla->get_ancho(), pantalla->get_alto(), 32, SDL_SWSURFACE);
+	screen = SDL_SetVideoMode(800, 600, 32, SDL_SWSURFACE);
+	// Resman
+	if(!resman.init()) return -2;
+	resman.addRes("boton_sp", "../resources/static/boton_sp.png");
+	resman.addRes("boton_mp", "../resources/static/boton_mp.png");
+	// Para confinar el mouse a la ventana
+	//SDL_WM_GrabInput(SDL_GRAB_ON);
+	// Lo movemos al medio
+	SDL_WarpMouse(800/2, 600/2);
+	SDL_WM_SetCaption("Diablo", NULL);
+
+	// MENU
+	//////////////////////////
+	Boton sp, mp;
+	sp.init(&resman, 10, 10, "boton_sp");
+	mp.init(&resman, 10, 40, "boton_mp");
+	int opcion_menu = -1;
+	// 1 = sp, 2 = mp, 3 = exit
+	while(opcion_menu == -1) {
+		SDL_PollEvent(&event);
+		if(sp.handleInput(event)) opcion_menu = 1;
+		if(mp.handleInput(event)) opcion_menu = 2;
+		if(event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE || event.type == SDL_QUIT) opcion_menu = 3;
+		sp.show(screen);
+		mp.show(screen);
+		SDL_Flip(screen);
+	}
+	//std::cout << "OPCION MENU: " << opcion_menu << "\n";
+
+	if(opcion_menu == 1) {
+		// Single player
+		ShellExecute(NULL, "open", "servidor.exe", NULL, NULL, SW_SHOWMINNOACTIVE);
+	}else if(opcion_menu == 2) {
+		// Multiplayer, no hace nada
+	}else if(opcion_menu == 3) {
+		// Salir
+		return 1;
+	}
+
+
+	// FIN DE MENU
+	//////////////////////////
 
 	InitializeCriticalSection(&cs_main);
 	// Socket de cliente
-	if(!sock.init(&cs_main)) 
+	if(!sock.init(&cs_main)) {
 		return 1;
+	}
 
 	//cargo ip servidor y puerto
 	config_cliente configuracion_red = parsear_red("../resources/static/red.yaml");
@@ -131,29 +187,12 @@ int main(int argc, char* argv[]) {
 	vector <config_entidad> entidades = juego.get_entidades();
 	configuracion = juego.get_configuracion();
 	vector <config_escenario> escenarios = juego.get_escenarios();
-			
-	// Ventana de prueba
-	SDL_Surface* screen;
-	putenv("SDL_VIDEO_CENTERED=1"); // Para centrar la ventana
-	if(SDL_Init(SDL_INIT_EVERYTHING) == -1) { std::cerr << "Error @ SDL_Init(): " << SDL_GetError() << "\n"; return -1; }
-	// Init the window 
-	screen = SDL_SetVideoMode(pantalla->get_ancho(), pantalla->get_alto(), 32, SDL_SWSURFACE);
-	// Init a SDL_TTF
-	if(TTF_Init() == -1) { std::cerr << "Error @ TTF_Init(): " << TTF_GetError() << "\n"; return -1; }
-	// Para confinar el mouse a la ventana
-	//SDL_WM_GrabInput(SDL_GRAB_ON);
-	// Lo movemos al medio
-	SDL_WarpMouse(pantalla->get_ancho()/2, pantalla->get_alto()/2);
-	SDL_WM_SetCaption("Diablo", NULL);
 
 	mapa.resize(escenarios[escenario_elegido_id].get_tam_x(), escenarios[escenario_elegido_id].get_tam_x());
 
 	// Camara
 	Camara camara;
 	camara.init(pantalla->get_ancho(), pantalla->get_alto(), configuracion.get_margen_scroll(), mapa);
-
-	// Resman
-	if(!resman.init()) return -2;
 	
 	// SoundMan
 	if(!soundman.init(&camara, &pjm.getPjeLocal())) return -3;
@@ -162,6 +201,9 @@ int main(int argc, char* argv[]) {
 	// Ventana de chat
 	chat_window.init(&resman, 40, 40, Font::SIZE_NORMAL, 250, 500, COLOR::WHITE);
 	chat_window.setNickLocal(pje_local_nick);
+
+	// Consola
+	consola.init(&resman, 10, 10, 200, Font::SIZE_NORMAL, COLOR::WHITE);
 
 	resman.addRes("bandera","../resources/bandera.png");
 	// Cargo la entidad por default
@@ -175,6 +217,10 @@ int main(int argc, char* argv[]) {
 		}
 	}	
 	//Prueba de carga items
+	resman.addRes("cofre","../resources/chest.png");
+	BolaDeCristal cofre("cofre",1,1,true, 6 ,13,NULL,&mapa,resman,Imagen::COLOR_KEY );
+	mapa.getTile(6,13)->addEntidad(&cofre,&mapa);
+	entidades_cargadas.push_back(&cofre);
 	/*
 	resman.addRes("cofre","../resources/bandera.png");
 	Bandera cofre("cofre",1,1,true, 6 ,13,NULL,&mapa,resman,Imagen::COLOR_KEY );
@@ -244,6 +290,7 @@ int main(int argc, char* argv[]) {
 		pjm.getPjeLocal().setTerremoto(init_terremoto);
 		pjm.getPjeLocal().setHielo(init_hielo);
 		pjm.getPjeLocal().setRadio(init_radio);
+		pjm.getPjeLocal().setBolaDeCristal(init_bolaDeCristal);
 	} else {
 		//Aviso al server mis valores por defecto de atributos
 		bs.clear();
@@ -267,6 +314,9 @@ int main(int argc, char* argv[]) {
 		bs.clear();
 		bs << PROTO::UPDATE_ATT << ATT::RADIO << pjm.getPjeLocal().getRadioY();
 		sock.send(bs.str());
+		bs.clear();
+		bs << PROTO::UPDATE_ATT << ATT::BOLA_DE_CRISTAL << pjm.getPjeLocal().getBolaDeCristal();
+		sock.send(bs.str());
 	}
 	
 	// Posiciono el personaje
@@ -286,9 +336,6 @@ int main(int argc, char* argv[]) {
     double accum = 0.0;
 	bool quit = false;
 
-	// Para guardar los eventos  de input
-	SDL_Event event;
-
 	//variables para el control del movimiento
 	vector< pair<int,int> > caminoMinimo;
 	int indice = 0; //indica que paso del movimiento se encuentra
@@ -299,10 +346,7 @@ int main(int argc, char* argv[]) {
 	int ultimoMovimientoY = NOSEMOVIO;// idem coordenada y
 	int ultimoDestinoX = NOSEMOVIO;//guarda el destino actual
 	int ultimoDestinoY = NOSEMOVIO;//guarda el destino actual
-	//variable que informa ataque
-	bool enAtaque = false;
-	Personaje* personajeObjetivo = NULL;
-	Tile* tilePersonajeObjetivo = NULL;
+
 	while((!quit ) && (sock.isOpen()) ) {
 
 		// Sync stuff
@@ -394,32 +438,20 @@ int main(int argc, char* argv[]) {
 							ultimoDestinoY = tile_res.y;
 							// Verificamos si hay un personaje para activar el chat
 							bool found_pje = false;
-							Personaje* personajeObjetivoAux = NULL;
 							//std::cout << "CLICK @ " << tile_res.x << ";" << tile_res.y << "\n";
 							for(auto it = pjm.getPjes().begin();it != pjm.getPjes().end();it++) {
 								if(tileDestino == mapa.getTilePorPixeles(it->second.getX(), it->second.getY())) {
 									found_pje = true;
-									personajeObjetivoAux = &(it -> second);
 									break;
 								}
 							}
-							caminoMinimo = mapa.getCaminoMinimo(tilePersonaje, tileDestino);
-							indice = 1;
-							estadoMovimiento = MOV::MANDAR_POS;
+
 							if(!found_pje) {
-								enAtaque = false;
-								personajeObjetivo = NULL;
-							} else {
-								if (personajeObjetivo !=  &(pjm.getPjeLocal())){
-									enAtaque = true;
-									personajeObjetivo = personajeObjetivoAux;
-									tilePersonajeObjetivo = tileDestino;
-									caminoMinimo.pop_back();
-								} else {
-									enAtaque = false;
-									personajeObjetivo = NULL;
-								}
+								caminoMinimo = mapa.getCaminoMinimo(tilePersonaje, tileDestino);
+								indice = 1;
+								estadoMovimiento = MOV::MANDAR_POS;
 							}
+
 						}
 					}
 
@@ -453,6 +485,7 @@ int main(int argc, char* argv[]) {
 
 						}
 					}
+
 
 				}
 
@@ -501,7 +534,25 @@ int main(int argc, char* argv[]) {
 			}
 			// Actualizamos los personajes
 			for(auto it = pjm.getPjes().begin();it != pjm.getPjes().end(); it++) {
-				it->second.update(&mapa);
+				int control;
+				control = it->second.update(&mapa);
+				//reseteo update de personajes por si se freno
+				if(it->second.get_timer_update().getTicks() > 500)
+						it->second.set_posicion_actualizada(false);
+				if (control == Personaje::MOVER_COMPLETADO && it->second.get_posicion_actualizada()==false){
+					//aviso al server que se termino de mover un personaje para si es un enemigo actualizarlo
+					Tile* unTile = it->second.getPosicion(&mapa);
+					cout << "pos " << unTile->getU() << "," <<unTile->getV() <<endl;
+					bs.clear();
+					bs << PROTO::EN_MOVE_CMPLT << it->second.getNick() << unTile->getU() << unTile ->getV() ;
+					sock.send(bs.str());
+					//std::cout << "Mandando termino de moverse personaje a servidor" << it->second.getNick() << "\n";
+					//estado de personaje es para el pje local y estoy en un loop de otros personajes
+					//estadoPersonaje = Personaje::ESPERANDO_ACCION;
+					bs.clear();
+					it->second.set_posicion_actualizada(true);
+					it->second.get_timer_update().start();
+				}
 			}
 			// Actualizamos el personaje principal
 			Tile* t = mapa.getTilePorPixeles(pjm.getPjeLocal().getX(),pjm.getPjeLocal().getY());
@@ -620,33 +671,10 @@ int main(int argc, char* argv[]) {
 				){
 				puedeMoverse = false;
 			}*/
-					
 			if ((estadoPersonaje == Personaje::MOVER_COMPLETADO)) 
 				 {
 				puedeMoverse = true;
-				if ((indice == caminoMinimo.size()) && (enAtaque)){
-					// atacar
-					pjm.getPjeLocal().ataque(tilePersonajeObjetivo,&mapa,personajeObjetivo);
-					enAtaque = false;
-					caminoMinimo.clear();
-					// Si se movio, perseguirlo
-					/*
-					if ((personajeObjetivo != NULL) && (tilePersonajeObjetivo != NULL)){
-						Tile* tileActualizado = mapa.getTilePorPixeles(personajeObjetivo->getX(),
-																		personajeObjetivo->getY());
-						Tile* tilePersonajeLocal = mapa.getTilePorPixeles(pjm.getPjeLocal().getX(),
-																	pjm.getPjeLocal().getY());
-						
-						if ((tileActualizado != NULL) && (tileActualizado != tilePersonajeObjetivo) &&
-							(tilePersonajeLocal != NULL)){
-							caminoMinimo = mapa.getCaminoMinimo(tilePersonajeLocal, tileActualizado);
-							indice = 1;
-							caminoMinimo.pop_back();
-							estadoMovimiento = MOV::MANDAR_POS;
-							enAtaque = true;
-						}						
-					}*/
-				}
+
 			}else if ( (estadoPersonaje == Personaje::MOVER_EN_CURSO) || 
 				(estadoPersonaje == Personaje::MOVER_ERROR)){
  				puedeMoverse = false;
@@ -664,10 +692,25 @@ int main(int argc, char* argv[]) {
 			}
 			if (indice==0) puedeMoverse=true;
 			*/
-			// Update a todos los otros personajes
-			for(auto it = pjm.getPjes().begin();it != pjm.getPjes().end();it++) {
-				it->second.update(&mapa);
-			}
+
+			// Update a todos los otros personaje
+		/*	for(auto it = pjm.getPjes().begin();it != pjm.getPjes().end();it++) {
+				int estadoPersonaje;
+				estadoPersonaje = it->second.update(&mapa);
+				if (estadoPersonaje == Personaje::MOVER_COMPLETADO){
+					//aviso al server que se termino de mover un personaje para si es un enemigo actualizarlo
+
+/*					Tile* unTile = it->second.getPosicion(&mapa);
+					//cout << "pos "<< unTile->getU() << "," <<unTile->getV();
+					bs.clear();
+					bs << PROTO::EN_MOVE_CMPLT << it->second.getNick() << unTile->getU() << unTile ->getV() ;
+					sock.send(bs.str());
+					std::cout << "Mandando termino de moverse personaje a servidor" << it->second.getNick() << "\n";
+					estadoPersonaje = Personaje::ESPERANDO_ACCION;
+					bs.clear();
+				
+				}
+			}*/
 			// Update a tiles recorridos
 			if(update_recorrido.timer.getTicks() > update_recorrido.INTERVAL) {
 				update_recorrido.timer.start();
@@ -683,7 +726,8 @@ int main(int argc, char* argv[]) {
 					}
 				}
 			}
-
+			// Update a la consola
+			consola.update();
 			// Decrease al accum
 			accum -= CONST_DT;
 		}
@@ -696,6 +740,8 @@ int main(int argc, char* argv[]) {
 		mapa.setEntidadesDibujadasFalse(&pjm.getPjeLocal());
 		// Dibujamos la ventana de chat
 		chat_window.show(screen);
+		// Dibujamos la consola
+		consola.show(screen);
 
 		ui.blitInterface(screen);
 

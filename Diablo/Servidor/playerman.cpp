@@ -146,8 +146,8 @@ void PlayerManager::addPlayer(const std::string& nick, const std::string& tipo_p
 		throw std::runtime_error("No se pudo ubicar el personaje\n");
 	}else{
 		p.setOnline();
-		//p.setPos(rand_x, rand_y);
-		p.setPos(10,10);
+		p.setPos(rand_x, rand_y);
+		//p.setPos(10,10);
 
 	}
 }

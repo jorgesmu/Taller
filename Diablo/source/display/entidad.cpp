@@ -432,10 +432,12 @@ std::vector<Tile*> Entidad::getTilesExplorados(){
 	return tilesExplorados;
 }
 
-void Entidad::agregarTilesExplorados(Tile* tile){
+bool Entidad::agregarTilesExplorados(Tile* tile){
 	if (std::find(tilesExplorados.begin(), tilesExplorados.end(), tile) == tilesExplorados.end()){
 		this -> tilesExplorados.push_back(tile);
+		return true;
 	}
+	return false;
 }
 
 // Deprecated

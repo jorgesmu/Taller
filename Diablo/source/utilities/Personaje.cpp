@@ -11,8 +11,11 @@
 #include "lampara.h"
 #include "mapaItem.h"
 #include "terremoto.h"
+#include "bolaDeCristal.h"
 #include "hielo.h"
+#include "golemItem.h"
 #include "bandera.h"
+#include "aux_func.h"
 #include "../net/bitstream.h"
 #include "../net/defines.h"
 #include "../../Cliente/clientsocket.h"
@@ -509,6 +512,46 @@ void Personaje::mover(Tile* tileDestino) {
 	}
 }
 
+void Personaje::dejarItem(int x, int y, ResMan* resman){
+		//meto el item que deja cuando muere
+		int cant_items = 9;//cantidad de items que implementamos
+		int rand;
+		rand = intRand(0, cant_items);
+				
+		std::cout << "va a dejar el item del case " << rand << "\n";
+		switch(rand){
+			case 0:{
+				Lampara cofre("cofre",1,1,true, x , y, NULL,&mapa,*resman,Imagen::COLOR_KEY );
+			}
+			case 1:{
+				MapaItem cofre("cofre",1,1,true, x , y, NULL,&mapa,*resman,Imagen::COLOR_KEY );
+			}
+			case 2:{
+				Zapatos cofre("cofre",1,1,true, x , y, NULL,&mapa,*resman,Imagen::COLOR_KEY );
+			}
+   			case 3:{
+				Terremoto cofre("cofre",1,1,true, x , y, NULL,&mapa,*resman,Imagen::COLOR_KEY );
+			}
+   			case 4:{
+				Escudo cofre("cofre",1,1,true, x , y, NULL,&mapa,*resman,Imagen::COLOR_KEY );
+			}
+   			case 5:{
+				BolaDeCristal cofre("cofre",1,1,true, x , y, NULL,&mapa,*resman,Imagen::COLOR_KEY );
+			}
+   			case 6:{
+				GolemItem cofre("cofre",1,1,true, 6 ,13,NULL,&mapa,*resman,Imagen::COLOR_KEY );
+			}
+   			case 7:{
+				Botella cofre("cofre",1,1,true, x , y, NULL,&mapa,*resman,Imagen::COLOR_KEY );
+			}
+   			case 8:{
+				Corazon cofre("cofre",1,1,true, x , y, NULL,&mapa,*resman,Imagen::COLOR_KEY );
+			}
+   			case 9:{
+				Hielo cofre("cofre",1,1,true, x , y, NULL,&mapa,*resman,Imagen::COLOR_KEY );
+			}
+		}
+}
 
 /*
 	Pre: Los parámetros respetan la siguiente convención:
@@ -1010,6 +1053,7 @@ void Personaje::utilizarTerremoto(Mapa* mapa, PjeManager* pjm, ClientSocket* soc
 					if ((i==xPersonaje) && (j==yPersonaje)) {
 						srand (time(NULL));
 						dañoRealizado=rand()%(this->ENERGIA_TOTAL+1);
+						dañoRealizado=100;
 						it->second.dañar(dañoRealizado);
 						std::cout << "Se danio a " << it->first << " con terremoto, total de " << (int)dañoRealizado << endl;
 						bs.clear();

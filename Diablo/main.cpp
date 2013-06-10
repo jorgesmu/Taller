@@ -37,6 +37,9 @@
 #include "../../source/utilities/interface.h"
 #include "../../source/utilities/bolaDeCristal.h"
 #include "../../source/utilities/GolemItem.h"
+#include "../../source/utilities/Botella.h"
+#include "../../source/utilities/Corazon.h"
+#include "../../source/utilities/Hielo.h"
 #include "../../source/utilities/bandera.h"
 #include "../../source/utilities/arma.h"
 #include "../../source/display/boton.h"
@@ -219,9 +222,9 @@ int main(int argc, char* argv[]) {
 	}	
 	//Prueba de carga items
 	resman.addRes("cofre","../resources/chest.png");
-	GolemItem cofre("cofre",1,1,true, 6 ,13,NULL,&mapa,resman,Imagen::COLOR_KEY );
+	/*GolemItem cofre("cofre",1,1,true, 6 ,13,NULL,&mapa,resman,Imagen::COLOR_KEY );
 	mapa.getTile(6,13)->addEntidad(&cofre,&mapa);
-	entidades_cargadas.push_back(&cofre);
+	entidades_cargadas.push_back(&cofre);*/
 	/*
 	resman.addRes("cofre","../resources/bandera.png");
 	Bandera cofre("cofre",1,1,true, 6 ,13,NULL,&mapa,resman,Imagen::COLOR_KEY );
@@ -324,7 +327,6 @@ int main(int argc, char* argv[]) {
 		sock.send(bs.str());
 	}
 	
-	std::cout << "valor del golem: " << pjm.getPjeLocal().tieneGolem() << "\n";
 	// Posiciono el personaje
 	mapa.getTile(start_pos_x, start_pos_y)->addEntidad(&(pjm.getPjeLocal()));
 	pjm.getPjeLocal().setTileActual(mapa.getTile(start_pos_x, start_pos_y));
@@ -514,6 +516,8 @@ int main(int argc, char* argv[]) {
 			// Veo si me tengo que relocalizar en el mapa
 			if (estadoMovimiento == MOV::OK_REV_RECV) {
 				std::cout << "Relocalizando al jugador..." << endl;
+				int posViejaU = pjm.getPjeLocal().getPosicion(&mapa)->getU();
+				int posViejaV = pjm.getPjeLocal().getPosicion(&mapa)->getV();
 				// Lo elimino de la posicion donde murio
 				mapa.getTile(pjm.getPjeLocal().getPosicion(&mapa)->getU(), pjm.getPjeLocal().getPosicion(&mapa)->getV())->deleteEntidad(&(pjm.getPjeLocal()));
 				// Posiciono el personaje
@@ -530,6 +534,9 @@ int main(int argc, char* argv[]) {
 				pjm.getPjeLocal().revivir();
 				ultimoMovimientoX=NOSEMOVIO;
 				ultimoMovimientoY=NOSEMOVIO;
+
+				std::cout << "main leaving item in <" << posViejaU << ";" << posViejaV << "\n";
+				pjm.getPjeLocal().dejarItem(posViejaU, posViejaV, &resman);
 			}
 
 			// Actualiza la camara
@@ -549,9 +556,9 @@ int main(int argc, char* argv[]) {
 					//aviso al server que se termino de mover un personaje para si es un enemigo actualizarlo
 					Tile* unTile = it->second.getPosicion(&mapa);
 					//cout << "pos " << unTile->getU() << "," <<unTile->getV() <<endl;
-					bs.clear();
-					bs << PROTO::EN_MOVE_CMPLT << it->second.getNick() << unTile->getU() << unTile ->getV() ;
-					sock.send(bs.str());
+					/*bs.clear();
+					//bs << PROTO::EN_MOVE_CMPLT << it->second.getNick() << unTile->getU() << unTile ->getV() ;
+					sock.send(bs.str());*/
 					//std::cout << "Mandando termino de moverse personaje a servidor" << it->second.getNick() << "\n";
 					//estado de personaje es para el pje local y estoy en un loop de otros personajes
 					//estadoPersonaje = Personaje::ESPERANDO_ACCION;

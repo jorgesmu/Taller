@@ -73,7 +73,7 @@ const unsigned char INIT_ATT = 'z';
 const unsigned char CONGELAR = 'A';
 
 // Termino de mover enemigo
-const unsigned char EN_MOVE_CMPLT = 'B';
+const unsigned char EN_MOVE_CMPLT = 'H';
 
 // Revive posicion
 const unsigned char REQUEST_REV_POS = 'B';

@@ -5,9 +5,21 @@
 #include "../../source/utilities/config_cliente.h"
 #include "../../source/utilities/parser.h"
 #include "../../source/utilities/console.h"
+#include "../../source/utilities/aux_func.h"
 #include "clientsocket.h"
 #include "../../source/utilities/chatwindow.h"
 #include "../source/utilities/bandera.h"
+#include "../../source/utilities/lampara.h"
+#include "../../source/utilities/mapaItem.h"
+#include "../../source/utilities/zapatos.h"
+#include "../../source/utilities/terremoto.h"
+#include "../../source/utilities/escudo.h"
+#include "../../source/utilities/interface.h"
+#include "../../source/utilities/bolaDeCristal.h"
+#include "../../source/utilities/GolemItem.h"
+#include "../../source/utilities/Botella.h"
+#include "../../source/utilities/Corazon.h"
+#include "../../source/utilities/Hielo.h"
 #include <iostream>
 #include <fstream>
 
@@ -511,10 +523,14 @@ void ClientSocket::listenDo() {
 				std::cout << "Server requested move of invalid PJ: " << nick << "\n";
 			}else{
 				auto& p = pjm.getPje(nick);
+				int posViejaU = p.getPosicion(&mapa)->getU();
+				int posViejaV = p.getPosicion(&mapa)->getV();
 				mapa.getTile(p.getPosicion(&mapa)->getU(), p.getPosicion(&mapa)->getV())->deleteEntidad(&p);
 				mapa.getTile(x, y)->addEntidad(&p);
 				p.setTileActual(mapa.getTile(x, y));
 				p.revivir();
+				std::cout << "clientSocket leaving item in <" << posViejaU << ";" << posViejaV << "\n";
+				p.dejarItem(posViejaU, posViejaV, &resman);
 				std::cout << "Server requested revival of <" << nick << "> to " << x << ";" << y << "\n";
 			}
 		}else if(pt == PROTO::USE_ITEM) {

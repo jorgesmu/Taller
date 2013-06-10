@@ -469,6 +469,8 @@ public:
 
 	Arma* getArmaActiva();
 
+	void dejarItem(int x, int y, ResMan* resman);
+
 protected:
 
 	// Nombre del chabon

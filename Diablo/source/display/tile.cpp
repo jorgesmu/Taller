@@ -100,11 +100,12 @@ void Tile::blit(SDL_Surface* pantalla, Camara& cam, Personaje* personaje, Mapa* 
 			}
 		}
 
-		BitStream bs;
-		bs << PROTO::NIEBLA_SYNC << this->u << this->v;
-		sock.send(bs.str());
-
-		personaje->agregarTilesExplorados(this);
+		bool agregoTile = personaje->agregarTilesExplorados(this);
+		if(agregoTile){
+			BitStream bs;
+			bs << PROTO::NIEBLA_SYNC << this->u << this->v;
+			sock.send(bs.str());
+		}
 	}else{
 		std::vector<Tile*> tilesExplorados = personaje->getTilesExplorados();
 

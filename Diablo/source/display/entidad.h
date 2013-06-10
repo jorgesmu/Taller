@@ -263,7 +263,7 @@ public:
 
 	virtual std::vector<Tile*> getTilesExplorados();
 
-	void agregarTilesExplorados(Tile* tile);
+	bool agregarTilesExplorados(Tile* tile);
 
 	// Deprecated
 	virtual void setColor(bool value);

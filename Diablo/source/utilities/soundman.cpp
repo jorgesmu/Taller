@@ -23,7 +23,7 @@ SoundMan::~SoundMan() {
 
 bool SoundMan::init(Camara* cam, Personaje* pjl) {
 	// Cargamos SDL_mixer con los siguientes formatos
-	int flags = MIX_INIT_OGG|MIX_INIT_MP3;
+	int flags = MIX_INIT_OGG;
 	int initted = Mix_Init(flags);
 	if(initted&flags != flags) {
 		std::cerr << "Mix_Init() fail: " << Mix_GetError() << "\n";

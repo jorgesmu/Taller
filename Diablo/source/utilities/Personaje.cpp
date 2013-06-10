@@ -141,7 +141,11 @@ Personaje::~Personaje() {
 		this -> imagen = NULL;
 	}
 	this -> surf = NULL;
-	this -> tileAncla = NULL;
+	if (this -> tileAncla != NULL){
+		this -> tileAncla ->deleteEntidad(this);
+		this -> tileAncla = NULL; 
+	}
+	
 	// Se elimina la espada
 	if (this -> espada != NULL) {
 		delete(this -> espada);

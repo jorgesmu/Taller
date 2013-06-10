@@ -627,6 +627,18 @@ void ClientSocket::listenDo() {
 				ss << nick_winner << " gano esta partida, jugale una revancha!";
 			}
 			consola.log(ss.str());
+		}else if (pt == PROTO::ENEMY_DEAD){
+			string EnemigoNick;
+			//elimino enemigo
+			bs >> EnemigoNick;
+			for(auto it = pjm.getPjes().begin();it != pjm.getPjes().end();it++) {
+				if(it->first == EnemigoNick){
+					mapa.getTilePorPixeles(it->second.getX(),it->second.getY())->deleteEntidad(&it->second);
+					pjm.getPjes().erase(it);
+					break;
+				}
+			}
+				
 		}else{
 			std::cout << "Unknown packet type " << int(pt) << " received\n";
 		}

@@ -87,6 +87,8 @@ const unsigned char NEW_FLAG = 'E';
 const unsigned char CATCH_FLAG = 'F';
 // Aviso al clliente que gano la mision
 const unsigned char WINNER = 'G';
+//Avisa que murio enemigo
+const unsigned char ENEMY_DEAD = 'H';
 }
 
 // Cosas de movimiento

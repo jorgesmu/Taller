@@ -16,6 +16,7 @@ Player::Player() {
 	xSiguiente = ySiguiente = -1;
 	bolaDeCristal = false;
 	seMovio = false;
+	energia = 100;
 }
 
 Player::~Player() {
@@ -68,6 +69,19 @@ void Player::setOffline() {
 
 void Player::setOnline() {
 	isOnline = true;
+}
+//recibe danio, disminuye la energia
+void Player::hacerDanio(char value) {
+	this->energia = this->energia - value;
+}
+//devuelve la energia
+char Player::getEnergia() {
+	return this->energia;
+}
+bool Player::estaVivo() {
+	if (energia>= 0)
+		return true;
+	return false;
 }
 
 void Player::addTileRecorrido(short x, short y) {

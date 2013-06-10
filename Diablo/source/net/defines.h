@@ -71,10 +71,6 @@ const unsigned char OLD_ATT = 'y';
 const unsigned char INIT_ATT = 'z';
 // Congela a un personaje
 const unsigned char CONGELAR = 'A';
-
-// Termino de mover enemigo
-const unsigned char EN_MOVE_CMPLT = 'H';
-
 // Revive posicion
 const unsigned char REQUEST_REV_POS = 'B';
 // Revive posicion OK
@@ -87,6 +83,12 @@ const unsigned char NEW_FLAG = 'E';
 const unsigned char CATCH_FLAG = 'F';
 // Aviso al clliente que gano la mision
 const unsigned char WINNER = 'G';
+//Avisa que murio enemigo
+const unsigned char ENEMY_DEAD = 'H';
+// Termino de mover enemigo
+const unsigned char EN_MOVE_CMPLT = 'I';
+// Exploto una bomba
+const unsigned char BOMB_OFF = 'J';
 }
 
 // Cosas de movimiento
@@ -104,6 +106,7 @@ namespace MOV {
 namespace ITEM {
 	const char TERREMOTO = 0;
 	const char HIELO = 1;
+	const char BOMBA = 2;
 }
 
 // Cosas de atributos

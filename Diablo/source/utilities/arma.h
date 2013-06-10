@@ -18,7 +18,7 @@ public:
 	const static int PIXEL_REF_SPRITES_ACCION_ESPECIAL_Y = 20;
 
 	//Otras constantes default
-	const static char DANIO_MAXIMO_DEFAULT = 100;
+	const static char DANIO_MAXIMO_DEFAULT = 20;
 	
 	//Direccion
 	const static unsigned int SUR = 0;
@@ -67,12 +67,6 @@ protected:
 	
 protected:
 	
-	// pixeles de referencia sprites Accion Especial
-
-	int pixel_ref_sprites_accion_especial_x;
-	
-	int pixel_ref_sprites_accion_especial_y;
-	
 	Personaje* propietario;
 	
 	char danio_maximo; // energia que quita el arma
@@ -84,7 +78,6 @@ public:
 		const unsigned int fps , const unsigned int delay ,
 		const unsigned int velocidad ,
 		const int pixel_ref_sprites_primario_x , const int pixel_ref_sprites_primario_y,
-		const int pixel_ref_sprites_accion_especial_x , const int pixel_ref_sprites_accion_especial_y ,
 		Tile* tile, 
 		ResMan& rm , const int colorKey , 
 		char danio_maximo , Personaje* propietario);
@@ -116,7 +109,6 @@ public:
 					const unsigned int fps , const unsigned int delay ,
 					const unsigned int velocidad ,
 					const int pixel_ref_sprites_primario_x , const int pixel_ref_sprites_primario_y,
-					const int pixel_ref_sprites_accion_especial_x , const int pixel_ref_sprites_accion_especial_y ,
 					Tile* tile, 
 					ResMan& rm , const int colorKey , char danio_maximo , Personaje* propietario);
 	
@@ -305,6 +297,6 @@ protected:
 	bool verificarAncla(Tile* ancla);
 
 	//Sin tener en cuenta al escudo
-	void dañarPersonaje(char daño);
+	void dañarPersonaje(Personaje* personajeObjetivo);
 	
 };

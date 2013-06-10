@@ -33,4 +33,8 @@ void Interface::blitInterface(SDL_Surface* screen) {
 	y+=altura;
 	ss6 << "Hielos: " << (int)pjm.getPjeLocal().getHielo();
 	resman.getFont()->blit(screen, x, y, ss6.str(), COLOR::WHITE);
+	std::stringstream ss7;
+	y+=altura;
+	ss7 << "Bombas: " << (int)pjm.getPjeLocal().getCantBombas();
+	resman.getFont()->blit(screen, x, y, ss7.str(), COLOR::WHITE);
 }

@@ -1,4 +1,10 @@
 #include "arma.h"
+#include "../net/bitstream.h"
+#include "../net/defines.h"
+#include "../../Cliente/clientsocket.h"
+#include "../net/PjeManager.h"
+extern ClientSocket sock;
+
 /*
 	Pre:-
 		 
@@ -8,7 +14,6 @@ Arma::Arma(const std::string& name,
 		const unsigned int fps , const unsigned int delay ,
 		const unsigned int velocidad ,
 		const int pixel_ref_sprites_primario_x , const int pixel_ref_sprites_primario_y,
-		const int pixel_ref_sprites_accion_especial_x , const int pixel_ref_sprites_accion_especial_y ,
 		Tile* tile, 
 		ResMan& rm , const int colorKey , 
 		char danio_maximo , Personaje* propietario){
@@ -18,7 +23,6 @@ Arma::Arma(const std::string& name,
 	//carga de imagen y configuración inicial.
 	init(name , fps , delay , velocidad,
 		pixel_ref_sprites_primario_x , pixel_ref_sprites_primario_y,
-		pixel_ref_sprites_accion_especial_x , pixel_ref_sprites_accion_especial_y ,
 		tile , rm , colorKey , danio_maximo , propietario);	
 }
 
@@ -90,9 +94,6 @@ void Arma::inicializarAtributosEnValoresDefault() {
 	this -> actualizandoPosicion = false;
 	this -> ordenBliteo = Entidad::ORDEN_PERSONAJE;
 	this -> cambioDireccionHabilitado = true;
-	// pixeles de referencia sprites Accion Especial
-	this -> pixel_ref_sprites_accion_especial_x = Entidad::PIXEL_REF_X_DEFAULT;
-	this -> pixel_ref_sprites_accion_especial_y = Entidad::PIXEL_REF_Y_DEFAULT;
 	// propietario y daño
 	this -> propietario = propietario;
 	this -> danio_maximo = danio_maximo; // energia que quita el arma
@@ -129,7 +130,6 @@ void Arma::init(const std::string& name,
 				const unsigned int fps , const unsigned int delay ,
 				const unsigned int velocidad ,
 				const int pixel_ref_sprites_primario_x , const int pixel_ref_sprites_primario_y,
-				const int pixel_ref_sprites_accion_especial_x , const int pixel_ref_sprites_accion_especial_y ,
 				Tile* tile, 
 				ResMan& rm , const int colorKey , char danio_maximo , Personaje* propietario) {
 	// Se destruyen imagenes previas
@@ -150,9 +150,6 @@ void Arma::init(const std::string& name,
 	//pixel de referencia
 	this -> pixel_ref_x = pixel_ref_sprites_primario_x;
 	this -> pixel_ref_y = pixel_ref_sprites_primario_y;
-	//pixel de referencia
-	this -> pixel_ref_sprites_accion_especial_x = pixel_ref_sprites_accion_especial_x;
-	this -> pixel_ref_sprites_accion_especial_y = this -> pixel_ref_sprites_accion_especial_y;
 	//tile destino
 	this -> tileDestino = tile;
 	//tile ancla
@@ -564,58 +561,58 @@ unsigned int Arma::update(Mapa* mapa) {
 unsigned int Arma::atacar(Mapa* mapa, Tile* tileDestino , Personaje* personaje) {
 	unsigned int retorno = Personaje::ATACAR_COMPLETADO;
 	// chequeo que el tileDestino y el mapa sean diferentes de null
-	if ( (tileDestino != NULL) && (mapa != NULL)) {
-		this -> tileDestino = NULL;
-		unsigned int direccionAtaque = ImagenArma::ATAQUE_DIRECCION_ACTUAL;
-		int deltaX = tileDestino -> getX() - posX;
-		int deltaY = tileDestino -> getY() - posY;
-		//calculo de direccion
-		if (deltaX > 0){
-			if(deltaY < 0){
-				direccionAtaque = ImagenArma::AT_NORESTE;
-			} else{
-				if(deltaY == 0){
-					direccionAtaque = ImagenArma::AT_ESTE;
-				} else {
-					direccionAtaque = ImagenArma::AT_SURESTE;
-				}
-			}
-			 ImagenArma* imagenArma = static_cast< ImagenArma*> (this -> imagen);
-			if (imagenArma != NULL){
-				imagenArma -> setAccion(direccionAtaque);
-				/**
-					NOTA: Agregar la parte de la precision del personaje.
-				**/
-				//ataque a personaje
-				if (personaje != NULL) {
-					personaje->dañar(this->danio_maximo);
-				}
-			}
-		}else {
-			if (deltaX < 0) {
-				if (deltaY < 0){
-					direccionAtaque = ImagenArma::AT_NOROESTE;
-				}else{
-					if (deltaY == 0) {
-						direccionAtaque = ImagenArma::AT_OESTE;
-					}else {
-						direccionAtaque = ImagenArma::AT_SUROESTE;
-					}
-				}
-			}else{
-				if (deltaY < 0){
-					direccionAtaque = ImagenArma::AT_NORTE;
+	if ( (tileDestino != NULL) && (mapa != NULL) && (personaje != NULL)) {
+		Tile* tileActualizado = mapa->getTilePorPixeles(personaje -> getX() , personaje -> getY());	
+		if ( tileActualizado == tileDestino){ 
+			this -> tileDestino = NULL;
+			unsigned int direccionAtaque = ImagenArma::ATAQUE_DIRECCION_ACTUAL;
+			int deltaX = tileDestino -> getX() - posX;
+			int deltaY = tileDestino -> getY() - posY;
+			//calculo de direccion
+			if (deltaX > 0){
+				if(deltaY < 0){
+					direccionAtaque = ImagenArma::AT_NORESTE;
 				} else{
-					if(deltaY > 0){
-						direccionAtaque = ImagenArma::AT_SUR;
+					if(deltaY == 0){
+						direccionAtaque = ImagenArma::AT_ESTE;
+					} else {
+						direccionAtaque = ImagenArma::AT_SURESTE;
 					}
 				}
-			}
-			ImagenArma* imagenArma = static_cast<ImagenArma*> (this -> imagen);
-			if (imagenArma != NULL){
-				imagenArma -> setAccion(direccionAtaque);
-			}
+					ImagenArma* imagenArma = static_cast< ImagenArma*> (this -> imagen);
+				if (imagenArma != NULL){
+					imagenArma -> setAccion(direccionAtaque);
+					//ataque a personaje
+					dañarPersonaje(personaje);
+				}
+			}else {
+				if (deltaX < 0) {
+					if (deltaY < 0){
+						direccionAtaque = ImagenArma::AT_NOROESTE;
+					}else{
+						if (deltaY == 0) {
+							direccionAtaque = ImagenArma::AT_OESTE;
+						}else {
+							direccionAtaque = ImagenArma::AT_SUROESTE;
+						}
+					}
+				}else{
+					if (deltaY < 0){
+						direccionAtaque = ImagenArma::AT_NORTE;
+					} else{
+						if(deltaY > 0){
+							direccionAtaque = ImagenArma::AT_SUR;
+						}
+					}
+				}
+				ImagenArma* imagenArma = static_cast<ImagenArma*> (this -> imagen);
+				if (imagenArma != NULL){
+					imagenArma -> setAccion(direccionAtaque);
+					//ataque a personaje
+					dañarPersonaje(personaje);
+				}
 			
+			}
 		}
 	} else {
 		this -> tileDestino = NULL;
@@ -623,6 +620,8 @@ unsigned int Arma::atacar(Mapa* mapa, Tile* tileDestino , Personaje* personaje) 
 		ImagenArma* imagenArma = static_cast<ImagenArma*> (this -> imagen);
 		if (imagenArma != NULL){
 			imagenArma -> setAccion(direccionAtaque);
+			//ataque a personaje
+			dañarPersonaje(personaje);
 		}
 	}
 	return retorno;
@@ -766,6 +765,26 @@ void Arma::blit(SDL_Surface* dest , Camara* camara , Mapa* mapa,
 				this -> surf -> blitGris(dest , posX ,posY);	
 			} else {
 				this -> surf -> blit(dest , posX ,posY);		
+			}
+		}
+	}
+}
+
+void Arma::dañarPersonaje(Personaje* personajeObjetivo){
+	int precision = rand()%100;
+	if ( (personajeObjetivo != NULL) && (this -> propietario != NULL)){
+		if (precision >= this ->propietario -> getPrecision()){
+			char danio = (rand()%100)*this -> danio_maximo;
+			int aux=danio;
+			printf("\n%i\n",danio);
+			personajeObjetivo -> dañar(danio);
+			if (danio > 0) {
+				// mensaje al servidor
+				std::cout << "Ataque\n";
+				BitStream bs;		
+				bs << PROTO::DAMAGE << this-> propietario -> getNick() << personajeObjetivo->getNick() << danio;
+				sock.send(bs.str());
+				std::cout << "Ataque " << this-> propietario -> getNick() << "->" << personajeObjetivo->getNick() << " de " << (int)danio << endl;
 			}
 		}
 	}

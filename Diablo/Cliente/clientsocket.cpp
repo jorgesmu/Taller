@@ -8,6 +8,7 @@
 #include "clientsocket.h"
 #include "../../source/utilities/chatwindow.h"
 #include "../source/utilities/bandera.h"
+#include "../source/utilities/armaBomba.h"
 #include <iostream>
 #include <fstream>
 
@@ -518,11 +519,32 @@ void ClientSocket::listenDo() {
 				std::cout << "Server requested revival of <" << nick << "> to " << x << ";" << y << "\n";
 			}
 		}else if(pt == PROTO::USE_ITEM) {
+			char item;
+			int posBombaX,posBombaY; //solo si es una bomba
+			bs >> item;
 			std::string nick_who;
 			bs >> nick_who;
-			char item;
-			bs >> item;
+			if (item==ITEM::BOMBA) {
+				bs >> posBombaX >> posBombaY;
+				//Coloca la bomba en el mapa
+				std::cout << "Colocando bomba en pos (" << posBombaX << "," << posBombaY << ")" << endl;
+				ArmaBomba* bomba;
+				bomba = new ArmaBomba("bomba",1,1,true, posBombaX , posBombaY,NULL,&mapa,resman,Imagen::COLOR_KEY );
+				mapa.getTile(posBombaX, posBombaY)->addEntidad(bomba,&mapa);
+				entidades_cargadas.push_back(bomba);
+				pjm.getPje(nick_who).setBombaColocada(bomba);
+				pjm.getPje(nick_who).setBombaX(posBombaX);
+				pjm.getPje(nick_who).setBombaY(posBombaY);
+			}
 			// Hacemos algo, animaciones or something
+		}else if(pt == PROTO::BOMB_OFF) {
+			std::string nick_who;
+			bs >> nick_who;
+			auto p = pjm.getPje(nick_who);
+			std::cout << "Exploto la bomba de " << nick_who << " en pos (" << p.getBombaX() << "," << p.getBombaY() << ")...";
+			//Elimino bomba del mapa(FIX)
+			mapa.getTile(p.getBombaX(),p.getBombaY())->deleteEntidad(p.getBombaColocada());
+			std::cout << "eliminada" << endl;
 		}else if(pt == PROTO::DAMAGE) {	
 			std::string nick_who, nick_to;
 			bs >> nick_who >> nick_to;

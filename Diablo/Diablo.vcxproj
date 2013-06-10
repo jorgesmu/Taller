@@ -27,6 +27,7 @@
     <ClCompile Include="source\utilities\arista.cpp" />
     <ClCompile Include="source\utilities\arma.cpp" />
     <ClCompile Include="source\utilities\aux_func.cpp" />
+    <ClCompile Include="source\utilities\bombas.cpp" />
     <ClCompile Include="source\utilities\chatwindow.cpp" />
     <ClCompile Include="source\utilities\config_cliente.cpp" />
     <ClCompile Include="source\utilities\config_entidad.cpp" />
@@ -75,6 +76,7 @@
     <ClInclude Include="source\net\PjeManager.h" />
     <ClInclude Include="source\utilities\arista.h" />
     <ClInclude Include="source\utilities\arma.h" />
+    <ClInclude Include="source\utilities\armaBomba.h" />
     <ClInclude Include="source\utilities\aux_func.h" />
     <ClInclude Include="source\utilities\bolaDeCristal.h" />
     <ClInclude Include="source\utilities\bandera.h" />

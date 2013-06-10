@@ -138,6 +138,8 @@ protected:
 
 		//si tiene la bola de cristal
 		bool bolaDeCristal;
+		//si tiene golem
+		bool golem;
 		//Timer para revivir
 		Timer timerRevivir;
 		//timer para actualizar enemigos
@@ -322,6 +324,10 @@ public:
 
 	virtual void setBolaDeCristal(bool bolaDeCristal);
 
+	virtual bool tieneGolem();
+
+	virtual void setGolem(bool agarroGolem);
+
 	/*
 		Pre: Los parámetros cumplen las siguiente condiciones:
 
@@ -379,6 +385,8 @@ public:
 	void chocarConZapatos(Zapatos* zapatos);
 
 	void chocarConBolaDeCristal();
+
+	void chocarConGolem();
 
 	void chocarConHechizo() { }
 

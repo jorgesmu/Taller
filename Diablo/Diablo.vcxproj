@@ -94,6 +94,7 @@
     <ClInclude Include="source\utilities\enemigo.h" />
     <ClInclude Include="source\utilities\escudo.h" />
     <ClInclude Include="source\utilities\flechas.h" />
+    <ClInclude Include="source\utilities\golemItem.h" />
     <ClInclude Include="source\utilities\grafo.h" />
     <ClInclude Include="source\utilities\granadas.h" />
     <ClInclude Include="source\utilities\hielo.h" />

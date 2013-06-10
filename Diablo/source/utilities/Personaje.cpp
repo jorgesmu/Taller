@@ -570,10 +570,15 @@ bool Personaje::getBolaDeCristal(){
 }
 
 void Personaje::setBolaDeCristal(bool bolaDeCristal){
-	if(bolaDeCristal){
-		int a = 0;
-	}
 	this->bolaDeCristal = bolaDeCristal;
+}
+
+bool Personaje::tieneGolem(){
+	return this->golem;
+}
+
+void Personaje::setGolem(bool agarroGolem){
+	this->golem = agarroGolem;
 }
 
 /*
@@ -952,6 +957,15 @@ void Personaje::chocarConBolaDeCristal() {
 		std::cout << "magia insuficiente para bola de cristal \n";	
 	}
 
+}
+
+void Personaje::chocarConGolem() {
+
+		std::cout << "agarre golem \n";
+		this->golem = true;
+		BitStream bs;
+		bs << PROTO::UPDATE_ATT << ATT::GOLEM << true;
+		sock.send(bs.str());
 }
 
 void Personaje::chocarConTerremoto(Terremoto* terremoto) {

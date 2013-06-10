@@ -18,7 +18,7 @@ class Player {
 	std::string tipo_personaje;
 	bool isOnline;
 	int x, y,xSiguiente,ySiguiente; // Pos en tiles logicos en el mapa
-	bool bolaDeCristal;
+	bool bolaDeCristal, golem;
 	bool seMovio;
 	TilesRecorridos tiles_recorridos;
 	double velocidad;
@@ -67,6 +67,8 @@ class Player {
 	void setRadio(float newRadio) { radio=newRadio; }
 	bool getBolaDeCristal() { return bolaDeCristal; }
 	void setBolaDeCristal(bool tieneBolaDeCristal) { bolaDeCristal=tieneBolaDeCristal; }
+	bool tieneGolem() { return golem; }
+	void setGolem(bool agarroGolem) { golem=agarroGolem; }
 	bool getSeMovio() { return seMovio; }
 	void setSeMovio(bool yaSeMovio) { seMovio = yaSeMovio; }
 	//Agrega una nueva bandera atrapada por el jugador

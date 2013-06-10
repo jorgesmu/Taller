@@ -469,7 +469,7 @@ void ServerSocket::acceptLastDo() {
 		//Le mandamos la velocidad que tenia		
 		bs.clear();
 		auto p=pm.getPlayer(new_nick); //alias shortcut
-		bs << PROTO::OLD_ATT << (float)p.getVelocidad() << p.getEnergia() << p.getMagia() << p.getEnergiaEscudo() << p.getTerremoto() << p.getHielo() << (float)p.getRadio() << (bool)p.getBolaDeCristal(); 
+		bs << PROTO::OLD_ATT << (float)p.getVelocidad() << p.getEnergia() << p.getMagia() << p.getEnergiaEscudo() << p.getTerremoto() << p.getHielo() << (float)p.getRadio() << (bool)p.getBolaDeCristal() << (bool)p.tieneGolem(); 
 		send(cid, bs.str());
 
 		// Le mandamos el id escenario
@@ -501,7 +501,7 @@ void ServerSocket::acceptLastDo() {
 			//Mando los atributos principales del jugador
 			bs.clear();
 			auto p=pm.getPlayer(new_nick);
-			bs << PROTO::INIT_ATT << new_nick << (float)p.getVelocidad() << p.getEnergia() << p.getMagia() << p.getEnergiaEscudo() << p.getTerremoto() << p.getHielo() << (float)p.getRadio() << (bool)p.getBolaDeCristal();
+			bs << PROTO::INIT_ATT << new_nick << (float)p.getVelocidad() << p.getEnergia() << p.getMagia() << p.getEnergiaEscudo() << p.getTerremoto() << p.getHielo() << (float)p.getRadio() << (bool)p.getBolaDeCristal() << (bool)p.tieneGolem();
 			send(it->second.sock,bs.str());
 			if (pm.getPlayer(new_nick).isCongelado()) {
 				bs.clear();
@@ -681,13 +681,13 @@ void ServerSocket::acceptLastDo() {
 				bs >> tipoAtt;
 				float nuevoVal;
 				char nuevoValor;
-				bool bolaDeCristal;
+				bool nuevoValorBool;
 				if ((tipoAtt==ATT::VEL) || (tipoAtt==ATT::RADIO)) {
 					// Valor float: velocidad/radio
 					bs >> nuevoVal;
-				}else if(tipoAtt==ATT::BOLA_DE_CRISTAL){
-					//valor bool: bola de cristal
-					bs >> bolaDeCristal;
+				}else if((tipoAtt==ATT::BOLA_DE_CRISTAL) || (tipoAtt==ATT::GOLEM)){
+					//valor bool: bola de cristal/golem
+					bs >> nuevoValorBool;
 				} else {
 					// Valor char: energia/magia/escudo/terremoto/hielo/radio
 					bs >> nuevoValor;
@@ -708,9 +708,9 @@ void ServerSocket::acceptLastDo() {
 						} else if (tipoAtt==ATT::CANT_HIELO) {
 							pm.getPlayer(new_nick).setHielo(nuevoValor);
 						} else if (tipoAtt==ATT::BOLA_DE_CRISTAL) {
-							pm.getPlayer(new_nick).setBolaDeCristal(bolaDeCristal);
+							pm.getPlayer(new_nick).setBolaDeCristal(nuevoValorBool);
 
-							if(bolaDeCristal){
+							if(nuevoValorBool){
 								//mando al jugador los tiles del resto
 								for(auto it = pm.getPlayers().begin(); it != pm.getPlayers().end();it++) {
 									if(it->first == new_nick) continue;
@@ -725,6 +725,8 @@ void ServerSocket::acceptLastDo() {
 									}
 								}
 							}
+						} else if (tipoAtt==ATT::GOLEM) {
+							pm.getPlayer(new_nick).setGolem(nuevoValorBool);
 						} else if (tipoAtt==ATT::RADIO) {
 							pm.getPlayer(new_nick).setRadio(nuevoVal);
 						}
@@ -734,8 +736,8 @@ void ServerSocket::acceptLastDo() {
 					bs.clear();
 					if ((tipoAtt==ATT::VEL) || (tipoAtt==ATT::RADIO)) {
 						bs << PROTO::UPDATE_ATT << tipoAtt << new_nick << nuevoVal;
-					} else if(tipoAtt==ATT::BOLA_DE_CRISTAL){
-						bs << PROTO::UPDATE_ATT << tipoAtt << new_nick << bolaDeCristal;					
+					} else if((tipoAtt==ATT::BOLA_DE_CRISTAL) || (tipoAtt==ATT::GOLEM)){
+						bs << PROTO::UPDATE_ATT << tipoAtt << new_nick << nuevoValorBool;					
 					} else {
 						bs << PROTO::UPDATE_ATT << tipoAtt << new_nick << nuevoValor;
 					}

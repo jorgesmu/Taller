@@ -22,7 +22,7 @@ extern int start_pos_x, start_pos_y;
 extern int escenario_elegido_id;
 extern double init_vel;
 extern float init_radio;
-extern bool init_bolaDeCristal;
+extern bool init_bolaDeCristal, init_golem;
 extern char init_energia,init_magia,init_escudo,init_terremoto,init_hielo;
 extern config_general configuracion;
 extern ResMan resman;
@@ -310,10 +310,10 @@ void ClientSocket::listenDo() {
 			bs >> start_pos_y;
 			//std::cout << "RECEIVED INIT POS: (" << start_pos_x << "," << start_pos_y << ")\n";
 		}else if(pt == PROTO::OLD_ATT) {
-			bool bolaDeCristal;
+			bool bolaDeCristal, golem;
 			float recv_vel,radio;
 			char energia,magia,energiaEscudo,cantTerremoto,cantHielo;
-			bs >> recv_vel >> energia >> magia >> energiaEscudo >> cantTerremoto >> cantHielo >> radio >> bolaDeCristal;
+			bs >> recv_vel >> energia >> magia >> energiaEscudo >> cantTerremoto >> cantHielo >> radio >> bolaDeCristal >> golem;
 			init_vel=(double)recv_vel;
 			init_energia=energia;
 			init_magia=magia;
@@ -322,6 +322,7 @@ void ClientSocket::listenDo() {
 			init_hielo=cantHielo;
 			init_radio=radio;
 			init_bolaDeCristal = bolaDeCristal;
+			init_golem = golem;
 		}else if(pt == PROTO::ESC_ID) {
 			bs >> escenario_elegido_id;
 			//std::cout << "RECEIVED ESC ID: (" << escenario_elegido_id << ")\n";
@@ -396,9 +397,9 @@ void ClientSocket::listenDo() {
 			}
 			std::string nick_who;
 			float vel_recv,radio;
-			bool bolaDeCristal;
+			bool bolaDeCristal, golem;
 			char energia,magia,energiaEscudo,cantTerremoto,cantHielo;
-			bs >> nick_who >> vel_recv >> energia >> magia >> energiaEscudo >> cantTerremoto >> cantHielo >> radio >> bolaDeCristal;
+			bs >> nick_who >> vel_recv >> energia >> magia >> energiaEscudo >> cantTerremoto >> cantHielo >> radio >> bolaDeCristal >> golem;
 			//double vel=(double)vel_recv;
 			double vel =0.01;//cambiar
 			cout <<"Velocidad  = "<< vel<<endl;
@@ -411,6 +412,7 @@ void ClientSocket::listenDo() {
 			pjm.getPje(nick_who).setHielo(cantHielo);
 			pjm.getPje(nick_who).setRadio(radio);
 			pjm.getPje(nick_who).setBolaDeCristal(bolaDeCristal);
+			pjm.getPje(nick_who).setGolem(golem);
 		}else if(pt == PROTO::PLAYER_EXIT) {
 			// Esperamos a que cargue el mapa
 			while(!cargoMapa) {
@@ -565,12 +567,13 @@ void ClientSocket::listenDo() {
 			std::cout << "CLIENT SOCKET UPDATE_ATT: " << nick_who << "\n";
 			float nuevoVal;
 			char nuevoValor;
-			bool bolaDeCristal;
+			bool nuevoValorBool;
 			if ((tipoAtt==ATT::VEL) || (tipoAtt==ATT::RADIO)) {
 				// Valor float: velocidad/radio
 				bs >> nuevoVal;
-			} else if(tipoAtt==ATT::BOLA_DE_CRISTAL){
-				bs >> bolaDeCristal;
+			} else if((tipoAtt==ATT::BOLA_DE_CRISTAL) || (tipoAtt==ATT::GOLEM)){
+				// Valor bool: bolaDeCristal/golem
+				bs >> nuevoValorBool;
 			} else {
 				// Valor char: energia/magia/escudo/terremoto/hielo
 				bs >> nuevoValor;
@@ -591,7 +594,9 @@ void ClientSocket::listenDo() {
 					} else if (tipoAtt==ATT::CANT_HIELO) {
 						it->second.setHielo(nuevoValor);
 					} else if (tipoAtt==ATT::BOLA_DE_CRISTAL) {
-						it->second.setBolaDeCristal(bolaDeCristal);
+						it->second.setBolaDeCristal(nuevoValorBool);
+					} else if (tipoAtt==ATT::GOLEM) {
+						it->second.setGolem(nuevoValorBool);
 					} else if (tipoAtt==ATT::RADIO) {
 						it->second.setRadio(nuevoVal);
 					}

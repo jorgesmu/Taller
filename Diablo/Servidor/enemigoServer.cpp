@@ -5,6 +5,7 @@
 #include "../source/net/bitstream.h"
 #include "../source/net/defines.h"
 #include "../source/utilities/aux_func.h"
+#include "misiones.h"
 #include "golem.h"
 const int noSeMovio = 0;
 const int derecha = 1;
@@ -20,6 +21,7 @@ void Enemigo::init_Enemy(const std::string& nickname,const std::string& tipo,uns
 	this->pasosCaminados = 0;
 	this->ultimaAccionAtacar = false;
 }
+extern Misiones mision;
 
 //getters
 
@@ -384,9 +386,18 @@ void Enemigo::atacar(string& NickAtacado,PlayerManager& pm,ServerSocket& socks){
 		socks.send(it->second.sock, bs.str());
 		//aviso si murio
 		if(murio){
-			bs.clear();
-			bs << PROTO::ENEMY_DEAD << NickAtacado;
-			socks.send(it->second.sock, bs.str());
+			//Veo si termino la mision
+			if (mision.getTipo() == Misiones::MISION_ENEMIGO) {
+				if (mision.enemigoMision() == NickAtacado) {
+					bs.clear();
+					bs << PROTO::WINNER << pm.getEnemy(NickAtacado)->ultimoAtacante();
+					socks.send(it->second.sock, bs.str());
+				}
+			} else {
+				bs.clear();
+				bs << PROTO::ENEMY_DEAD << NickAtacado;
+				socks.send(it->second.sock, bs.str());
+			}
 		}
 	}
 	return;

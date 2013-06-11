@@ -97,6 +97,8 @@ const unsigned char DESCONGELAR = 'L';
 const unsigned char TRANSMUT = 'M';
 // Vuevlo atras la transmutacion
 const unsigned char DESTRANSMUT = 'N';
+// Aviso de muerte al servidor
+const unsigned char DEAD = 'O';
 
 
 }

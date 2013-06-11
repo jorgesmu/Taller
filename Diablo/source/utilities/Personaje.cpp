@@ -1157,11 +1157,17 @@ void Personaje::aumentarRadio(float proporcion) {
 }
 
 void Personaje::muere() {
-	this->animacionMuerte();
-	std::cout << "Fui asesinado" << endl;
-	//Redirecciono a la posicion inicial nuevamente
-	this->vivo=false;
-	this->timerRevivir.start();
+	if (vivo) {
+		this->animacionMuerte();
+		std::cout << "Fui asesinado" << endl;
+		//Redirecciono a la posicion inicial nuevamente
+		this->vivo=false;
+		//Aviso al server que me mori
+		BitStream bs;
+		bs << PROTO::DEAD << this->getNick();
+		sock.send(bs.str());
+		this->timerRevivir.start();
+	}
  }
 
  void Personaje::revivir() {

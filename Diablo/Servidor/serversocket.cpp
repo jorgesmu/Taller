@@ -1120,6 +1120,7 @@ void ServerSocket::acceptLastDo() {
 						send(it->second.sock, bs.str());
 						std::cout << "Mandando update de revivir a " << it->second.nick << "\n";
 					}
+					pm.getPlayer(new_nick).descongelar();
 				}else{
 					// Si fallo, avisamos al cliente
 					bs.clear();
@@ -1228,6 +1229,10 @@ void ServerSocket::acceptLastDo() {
 						send(cid,bs.str());*/
 					}
 				}
+			}else if (pt == PROTO::DEAD){
+				std::string nick_who;
+				bs >> nick_who;
+				pm.getPlayer(nick_who).congelar();
 			}else{
 				bs.clear();
 				bs << PROTO::TEXTMSG << std::string("Unknown packet type");

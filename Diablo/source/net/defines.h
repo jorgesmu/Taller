@@ -91,6 +91,8 @@ const unsigned char EN_MOVE_CMPLT = 'I';
 const unsigned char BOMB_OFF = 'J';
 // uso golem
 const unsigned char USO_GOLEM = 'K';
+// Descongelo un personaje
+const unsigned char DESCONGELAR = 'L';
 
 
 }

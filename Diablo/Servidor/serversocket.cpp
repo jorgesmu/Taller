@@ -779,12 +779,36 @@ void ServerSocket::acceptLastDo() {
 				std::string nick_who, nick_to;
 				bs >> nick_who >> nick_to;
 				// Actualizamos el estado del congelado
-				pm.getPlayer(nick_to).congelar();
+				if (pm.enemyExists(nick_to)) {
+					pm.getEnemy(nick_to)->congelar();
+				} else if (pm.golemExists(nick_to)) {
+					pm.getGolem(nick_to)->congelar();
+				} else {
+					pm.getPlayer(nick_to).congelar();
+				}
 				// Avisamos a los otros jugadores 
 				for(auto it = clients_map.begin();it != clients_map.end();it++) {
 					if(it->second.nick == new_nick) continue; // Salteamos a nuestro jugador de avisarle
 					bs.clear();
 					bs << PROTO::CONGELAR << nick_who << nick_to;
+					send(it->second.sock, bs.str());
+				}
+			}else if(pt == PROTO::DESCONGELAR) {	
+				std::string nick_to;
+				bs >> nick_to;
+				// Actualizamos el estado del congelado
+				if (pm.enemyExists(nick_to)) {
+					pm.getEnemy(nick_to)->descongelar();
+				} else if (pm.golemExists(nick_to)) {
+					pm.getGolem(nick_to)->descongelar();
+				} else {
+					pm.getPlayer(nick_to).descongelar();
+				}
+				// Avisamos a los jugadores que descongelen al jugador
+				for(auto it = clients_map.begin();it != clients_map.end();it++) {
+					if(it->second.nick == new_nick) continue; // Salteamos a nuestro jugador de avisarle
+					bs.clear();
+					bs << PROTO::DESCONGELAR << nick_to;
 					send(it->second.sock, bs.str());
 				}
 			}else if(pt == PROTO::UPDATE_ATT) {	

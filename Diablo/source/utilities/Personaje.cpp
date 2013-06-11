@@ -1054,6 +1054,9 @@ void Personaje::utilizarHielo(Mapa* mapa, PjeManager* pjm) {
 					yPersonaje=tilePersonaje->getV();
 					if ((i==xPersonaje) && (j==yPersonaje)) {
 						it->second.freezar();
+						//Lo agrego a la lista de congelados
+						nicks_congelados.push_back(it->first);
+						tHielo.start();
 						std::cout << "Se congelo a " << it->first << endl;
 						bs.clear();
 						bs << PROTO::CONGELAR << this->getNick() << it->first;
@@ -1063,6 +1066,22 @@ void Personaje::utilizarHielo(Mapa* mapa, PjeManager* pjm) {
 			}
 		}
 		this->hielo--;
+	}
+}
+
+void Personaje::updateHielo() {
+	if (tHielo.isStarted() && tHielo.getTicks()>Personaje::TIEMPO_DESCONGELAR) {
+		std::cout << "Pidiendo al server que descongele a los que congele \n";
+		//Descongelo los que habia hechizado
+		for (auto it = nicks_congelados.begin(); it != nicks_congelados.end(); it++) {
+			std::string nick = (*it);
+			std::cout << "Descongelando a " << nick << endl;
+			pjm.getPje(nick).freezar(false);
+			BitStream bs;
+			bs << PROTO::DESCONGELAR << nick;
+			sock.send(bs.str());
+		}
+		tHielo.stop();
 	}
 }
 

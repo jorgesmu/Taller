@@ -637,6 +637,9 @@ int main(int argc, char* argv[]) {
 
 			//Para que exploten bombas
 			pjm.getPjeLocal().updateBomba();
+
+			//Para que termine el hechizo hielo
+			pjm.getPjeLocal().updateHielo();
 			
 			if (puedeMoverse) {				
 				if (!choco) {

@@ -2,6 +2,7 @@
 #include <iostream>
 #include <stdlib.h> 
 #include <time.h> 
+#include <list>
 #include "../display/entidad.h"
 #include "../utilities/ImagenPersonaje.h"
 #include "../display/tile.h"
@@ -75,6 +76,9 @@ public:
 		//Revivir tiempo
 		const static unsigned int TIEMPO_REVIVIR = 3000;
 
+		//Dejan de estar congelados tiempo
+		const static unsigned int TIEMPO_DESCONGELAR = 10000;
+
 		//Daño maximo de los hechizos
 		const static char DAÑO_TERREMOTO = 100;
 
@@ -116,7 +120,11 @@ protected:
 
 		//Tiene o no los hechizos(podria tener mas de uno quizas?, por eso un char)
 		char terremoto;
+		
 		char hielo;
+		Timer tHielo;
+		std::list<std::string> nicks_congelados;
+
 		bool transmutacion;
 
 		//Vida restante
@@ -432,6 +440,8 @@ public:
 	bool tieneHielo() { return this->hielo>0; }
 
 	void utilizarHielo(Mapa* mapa, PjeManager* pjm);
+
+	void updateHielo();
 
 	void setTransmutacion(bool valor) { transmutacion = valor; }
 

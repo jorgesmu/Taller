@@ -584,6 +584,20 @@ void ClientSocket::listenDo() {
 					}
 				}
 			}
+		}else if(pt == PROTO::DESCONGELAR) {	
+			std::string nick_to;
+			bs >> nick_to;
+			// Buscamos el personaje 
+			if(nick_to == pjm.getPjeLocal().getNick()) {
+				pjm.getPjeLocal().freezar(false);
+			}else{
+				for(auto it = pjm.getPjes().begin();it != pjm.getPjes().end();it++) {
+					if(it->first == nick_to) {
+						it->second.freezar(false);
+						break;
+					}
+				}
+			}
 		}else if(pt == PROTO::UPDATE_ATT) {	
 			char tipoAtt;
 			bs >> tipoAtt;

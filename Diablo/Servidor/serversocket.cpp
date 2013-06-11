@@ -29,6 +29,7 @@ size_t ServerSocket::ref_count = 0;
 const int tiempoAtaque = 1000;
 BitStream bs;
 extern Misiones mision;
+extern bool crearMision;
 
 ServerSocket::ServerSocket() {
 	// Increase ref count
@@ -227,8 +228,8 @@ bool ServerSocket::receive(const std::string& cid, std::string& buff) {
 	int packet_size = -1;
 	int bytes_read = 0;
 	// Loop until we read a full packet
+	EnterCriticalSection(&critSect);
 	while(true) {
-		EnterCriticalSection(&critSect);
 		std::string tmp;
 		// If we have something in the queue, push it it
 		if(queue_buf[cid].size() > 0) {
@@ -295,7 +296,7 @@ bool ServerSocket::receive(const std::string& cid, std::string& buff) {
 			LeaveCriticalSection(&critSect);
 			return false;
 		}
-		LeaveCriticalSection(&critSect);
+		//LeaveCriticalSection(&critSect);
 	}
 	LeaveCriticalSection(&critSect);
 	return false;
@@ -367,6 +368,7 @@ unsigned int __stdcall ServerSocket::acceptLastEntry(void* pthis) {
 }
 
 void ServerSocket::acceptLastDo() {
+	EnterCriticalSection(&critSect);
 	//bloqueo el loop ppal
 	conectandose=true;
 	// Iniciamos el seed de srand
@@ -576,6 +578,30 @@ void ServerSocket::acceptLastDo() {
 		LeaveCriticalSection(&critSect);
 		//desbloqueo el loop
 		conectandose = false;
+
+		//Objetivos de las misiones
+		if (crearMision) {
+			if (mision.getTipo()==Misiones::MISION_BANDERAS) {
+				Sleep(2000);
+				bs.clear();
+				bs << PROTO::TEXTMSG << std::string("Captura todas las banderas...");
+				send(cid,bs.str());
+				bs.clear();
+				std::stringstream msj;
+				msj << "Hay " << mision.cantBanderas() << " en total!";
+				bs << PROTO::TEXTMSG << msj.str();
+				send(cid,bs.str());
+			} else {
+				Sleep(2000);
+				bs.clear();
+				bs << PROTO::TEXTMSG << std::string("Elimina a tu eterno enemigo!");
+				send(cid,bs.str());
+				bs.clear();
+				bs << PROTO::TEXTMSG << std::string("Quiero ver sangre!!!");
+				send(cid,bs.str());
+			}
+		}
+
 		// Receive loop
 		while(this->receive(cid, buff)) {
 			Sleep(50);

@@ -663,7 +663,7 @@ unsigned int Personaje::ataque(Tile* tileDestino , Mapa* mapa) {
 unsigned int Personaje::ataque(Tile* tileDestino , Mapa* mapa , Personaje* personajeObjetivo) {
 	unsigned int retorno = Personaje::ATACAR_COMPLETADO;
 	// chequeo que el tileDestino y el mapa sean diferentes de null
-	if ( (tileDestino != NULL) && (mapa != NULL) ) {
+	if ( (tileDestino != NULL) && (mapa != NULL)) {
 		this -> tileDestino = NULL;
 		unsigned int direccionAtaque = ImagenPersonaje::ATAQUE_DIRECCION_ACTUAL;
 		int deltaX = tileDestino -> getX() - posX;
@@ -1136,14 +1136,12 @@ void Personaje::aumentarRadio(float proporcion) {
 }
 
 void Personaje::muere() {
-	if (this->vivo){
-		this->animacionMuerte();
-		std::cout << "Fui asesinado" << endl;
-		//Redirecciono a la posicion inicial nuevamente
-		this->vivo=false;
-		this->timerRevivir.start();
-	} 
-}
+	this->animacionMuerte();
+	std::cout << "Fui asesinado" << endl;
+	//Redirecciono a la posicion inicial nuevamente
+	this->vivo=false;
+	this->timerRevivir.start();
+ }
 
  void Personaje::revivir() {
 	 this->vivo=true;

@@ -231,7 +231,10 @@ void ClientSocket::listenDo() {
 		if(pt == PROTO::TEXTMSG) {
 			std::string msg;
 			bs >> msg;
+			std::stringstream ss;
 			std::cout << "Server says: " << msg << "\n";
+			ss << msg;
+			consola.log(ss.str());
 		}else if(pt == PROTO::CHAT) {
 			std::string nick_source, nick_destino, mensaje;
 			bs >> nick_source >> nick_destino >> mensaje;
@@ -463,7 +466,7 @@ void ClientSocket::listenDo() {
 			}else{
 				if(reply) {
 					estadoMovimiento = MOV::OK_RECV;
-					std::cout << "GOT OK FROM SERVER\n";
+					//std::cout << "GOT OK FROM SERVER\n";
 				}else{
 					estadoMovimiento = MOV::FAIL_RECV;
 					std::cout << "GOT FAIL FROM SERVER\n";
@@ -502,7 +505,7 @@ void ClientSocket::listenDo() {
 						pjm.getPjeLocal().agregarTilesExplorados(tileExplorado);
 					}
 				}
-				std::cout << "Server requested move of <" << nick << "> to " << x << ";" << y << "\n";
+				//std::cout << "Server requested move of <" << nick << "> to " << x << ";" << y << "\n";
 			}
 		}else if(pt == PROTO::REV_PLAYER) {
 			std::string nick;

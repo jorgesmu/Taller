@@ -4,6 +4,7 @@
 #include "../../Cliente/clientsocket.h"
 #include "../net/PjeManager.h"
 #include "../../source/utilities/soundman.h"
+#include "aux_func.h"
 extern ClientSocket sock;
 extern SoundMan soundman;
 
@@ -774,11 +775,12 @@ void Arma::blit(SDL_Surface* dest , Camara* camara , Mapa* mapa,
 }
 
 void Arma::dañarPersonaje(Personaje* personajeObjetivo){
-	int precision = rand()%100;
+	int precision = intRand(0,100);
 	if ( (personajeObjetivo != NULL) && (this -> propietario != NULL)){
 		if (precision >= this ->propietario -> getPrecision()){
-			char danio = (rand()%100)*this -> danio_maximo;
-			int aux=danio;
+			srand (time(NULL));
+			char danio=rand()%(this->danio_maximo+1);
+			//int aux=danio;
 			printf("\n%i\n",danio);
 			personajeObjetivo -> dañar(danio);
 			if (danio > 0) {

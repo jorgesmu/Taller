@@ -133,6 +133,7 @@ namespace ATT {
 	const char RADIO = 7;
 	const char BOLA_DE_CRISTAL = 8;
 	const char GOLEM = 9;
+	const char CANT_BOMBAS = 10;
 }
 
 // Cosas a las que se puede transmutar

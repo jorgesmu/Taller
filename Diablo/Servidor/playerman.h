@@ -26,7 +26,7 @@ class Player {
 	float radio;
 	char energia,magia,energiaEscudo;
 	char congelado; //1=congelado,0=no congelado
-	char terremoto,hielo; //cant de hechizos de cada tipo
+	char terremoto,hielo,bombas; //cant de hechizos de cada tipo
 	std::list<std::pair<int,int>> banderasAtrapadas; //para la mision de atrapar banderas
 	std::string lastDamagedBy;
 
@@ -71,6 +71,8 @@ class Player {
 	void setGolem(bool agarroGolem) { golem=agarroGolem; }
 	bool getSeMovio() { return seMovio; }
 	void setSeMovio(bool yaSeMovio) { seMovio = yaSeMovio; }
+	char getCantBombas() { return bombas; }
+	void setCantBombas(char valor) { bombas = valor; }
 	//Agrega una nueva bandera atrapada por el jugador
 	void atrapoBandera(int x, int y);
 	//Se fija si ya atrapo la bandera dada

@@ -24,7 +24,7 @@ extern int escenario_elegido_id;
 extern double init_vel;
 extern float init_radio;
 extern bool init_bolaDeCristal, init_golem;
-extern char init_energia,init_magia,init_escudo,init_terremoto,init_hielo;
+extern char init_energia,init_magia,init_escudo,init_terremoto,init_hielo,init_bombas;
 extern config_general configuracion;
 extern ResMan resman;
 extern Console consola;
@@ -316,8 +316,8 @@ void ClientSocket::listenDo() {
 		}else if(pt == PROTO::OLD_ATT) {
 			bool bolaDeCristal, golem;
 			float recv_vel,radio;
-			char energia,magia,energiaEscudo,cantTerremoto,cantHielo;
-			bs >> recv_vel >> energia >> magia >> energiaEscudo >> cantTerremoto >> cantHielo >> radio >> bolaDeCristal >> golem;
+			char energia,magia,energiaEscudo,cantTerremoto,cantHielo,cantBombas;
+			bs >> recv_vel >> energia >> magia >> energiaEscudo >> cantTerremoto >> cantHielo >> radio >> bolaDeCristal >> golem >> cantBombas; 
 			init_vel=(double)recv_vel;
 			init_energia=energia;
 			init_magia=magia;
@@ -327,6 +327,7 @@ void ClientSocket::listenDo() {
 			init_radio=radio;
 			init_bolaDeCristal = bolaDeCristal;
 			init_golem = golem;
+			init_bombas = cantBombas;
 		}else if(pt == PROTO::ESC_ID) {
 			bs >> escenario_elegido_id;
 			//std::cout << "RECEIVED ESC ID: (" << escenario_elegido_id << ")\n";
@@ -543,7 +544,7 @@ void ClientSocket::listenDo() {
 		}else if(pt == PROTO::BOMB_OFF) {
 			std::string nick_who;
 			bs >> nick_who;
-			auto p = pjm.getPje(nick_who);
+			auto &p = pjm.getPje(nick_who);
 			std::cout << "Exploto la bomba de " << nick_who << " en pos (" << p.getBombaX() << "," << p.getBombaY() << ")...";
 			//Elimino bomba del mapa(FIX)
 			mapa.getTile(p.getBombaX(),p.getBombaY())->deleteEntidad(p.getBombaColocada());

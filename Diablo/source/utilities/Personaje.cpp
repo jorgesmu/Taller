@@ -1285,10 +1285,32 @@ Arma* Personaje::getArmaActiva(){
 	return this -> espada;
 }
 
+std::pair<int,int> Personaje::buscarUbicacionBomba(int x, int y) {
+	std::pair<int,int> pos;
+	if (mapa.tileExists(x+1,y+1) && mapa.getTile(x+1,y+1)->isCaminable()) {
+		pos = make_pair<int,int>(x+1, y+1);
+	} else if (mapa.tileExists(x-1,y-1) && mapa.getTile(x-1,y-1)->isCaminable()) {
+		pos = make_pair<int,int>(x-1, y-1);
+	} else if (mapa.tileExists(x,y-1) && mapa.getTile(x,y-1)->isCaminable()) {
+		pos = make_pair<int,int>(x, y-1);
+	} else if (mapa.tileExists(x,y+1) && mapa.getTile(x-1,y+1)->isCaminable()) {
+		pos = make_pair<int,int>(x, y+1);
+	} else if (mapa.tileExists(x-1,y) && mapa.getTile(x-1,y)->isCaminable()) {
+		pos = make_pair<int,int>(x-1, y);
+	} else if (mapa.tileExists(x+1,y) && mapa.getTile(x+1,y)->isCaminable()) {
+		pos = make_pair<int,int>(x+1, y);
+	}
+	return pos;
+}
+
 void Personaje::utilizarBomba(int xPersonaje, int yPersonaje) {
 	this->bombas--;
-	int xBomba = xPersonaje+1;
-	int yBomba = yPersonaje+1;
+	BitStream bs;
+	bs << PROTO::UPDATE_ATT << ATT::CANT_BOMBAS << this->getCantBombas();
+	sock.send(bs.str());
+	std::pair<int,int> posBomba = this->buscarUbicacionBomba(xPersonaje,yPersonaje);
+	int xBomba = posBomba.first;
+	int yBomba = posBomba.second;
 	this->posBombaX = xBomba;
 	this->posBombaY = yBomba;
 	//Agrego la bomba al mapa en el tile adyacente
@@ -1299,7 +1321,7 @@ void Personaje::utilizarBomba(int xPersonaje, int yPersonaje) {
 	entidades_cargadas.push_back(bomba);
 	this->setBombaColocada(bomba);
 	//Aviso al server que puse bomba
-	BitStream bs;
+	bs.clear();
 	bs << PROTO::USE_ITEM << this->getNick() << ITEM::BOMBA << posBombaX << posBombaY;
 	sock.send(bs.str());
 	tBomba.start();
@@ -1334,6 +1356,9 @@ void Personaje::updateBomba() {
 					dañoRealizado=rand()%(this->ENERGIA_TOTAL+1);
 					pjm.getPjeLocal().dañar(dañoRealizado);
 					std::cout << "Me autodanie con bomba, total de " << (int)dañoRealizado << endl;
+					BitStream bs;
+					bs << PROTO::UPDATE_ATT << ATT::ENERGIA << this->getEnergia();
+					sock.send(bs.str());
 				}
 				//Veo si algun personaje se encuentra en el radio
 				for (auto it=pjm.getPjes().begin();it!=pjm.getPjes().end();it++) {

@@ -509,6 +509,8 @@ public:
 
 	void sumarBombas(char cantidad) { bombas+=cantidad; }
 
+	std::pair<int,int> buscarUbicacionBomba(int x, int y);
+
 	void utilizarBomba(int xPersonaje, int yPersonaje);
 
 	void Personaje::utilizarGolem() ;

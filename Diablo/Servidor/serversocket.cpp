@@ -472,7 +472,7 @@ void ServerSocket::acceptLastDo() {
 		//Le mandamos la velocidad que tenia		
 		bs.clear();
 		auto p=pm.getPlayer(new_nick); //alias shortcut
-		bs << PROTO::OLD_ATT << (float)p.getVelocidad() << p.getEnergia() << p.getMagia() << p.getEnergiaEscudo() << p.getTerremoto() << p.getHielo() << (float)p.getRadio() << (bool)p.getBolaDeCristal() << (bool)p.tieneGolem(); 
+		bs << PROTO::OLD_ATT << (float)p.getVelocidad() << p.getEnergia() << p.getMagia() << p.getEnergiaEscudo() << p.getTerremoto() << p.getHielo() << (float)p.getRadio() << (bool)p.getBolaDeCristal() << (bool)p.tieneGolem() << p.getCantBombas(); 
 		send(cid, bs.str());
 
 		// Le mandamos el id escenario
@@ -824,7 +824,7 @@ void ServerSocket::acceptLastDo() {
 					//valor bool: bola de cristal/golem
 					bs >> nuevoValorBool;
 				} else {
-					// Valor char: energia/magia/escudo/terremoto/hielo/radio
+					// Valor char: energia/magia/escudo/terremoto/hielo/radio/bombas
 					bs >> nuevoValor;
 				}
 				// Avisamos a los otros jugadores 
@@ -864,6 +864,8 @@ void ServerSocket::acceptLastDo() {
 							pm.getPlayer(new_nick).setGolem(nuevoValorBool);
 						} else if (tipoAtt==ATT::RADIO) {
 							pm.getPlayer(new_nick).setRadio(nuevoVal);
+						} else if (tipoAtt==ATT::CANT_BOMBAS) {
+							pm.getPlayer(new_nick).setCantBombas(nuevoValor);
 						}
 
 						continue; // Salteamos a nuestro jugador de avisarle

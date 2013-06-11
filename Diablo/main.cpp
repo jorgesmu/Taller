@@ -63,7 +63,7 @@ int escenario_elegido_id;
 double init_vel;
 float init_radio;
 bool init_bolaDeCristal, init_golem;
-char init_energia,init_magia,init_escudo,init_terremoto,init_hielo;
+char init_energia,init_magia,init_escudo,init_terremoto,init_hielo,init_bombas;
 // Cosas para mantener al server actualizado sobre los tiles que recorrimos
 struct {
 	vec2<int> tile_actual, tile_anterior;
@@ -287,6 +287,7 @@ int main(int argc, char* argv[]) {
 
 	//Si no me conecto por primera vez al servidor
 	if (init_vel!=0) {
+		std::cout << "Restaurando atributos..." << endl;
 		// El server me paso atributos para cargar
 		pjm.getPjeLocal().setVelocidad(init_vel);
 		pjm.getPjeLocal().setEnergia(init_energia);
@@ -297,8 +298,10 @@ int main(int argc, char* argv[]) {
 		pjm.getPjeLocal().setRadio(init_radio);
 		pjm.getPjeLocal().setBolaDeCristal(init_bolaDeCristal);
 		pjm.getPjeLocal().setGolem(init_golem);
+		pjm.getPjeLocal().setCantBombas(init_bombas);
 	} else {
 		//Aviso al server mis valores por defecto de atributos
+		std::cout << "Avisando al server de mis attributos default..." << endl;
 		bs.clear();
 		bs << PROTO::UPDATE_ATT << ATT::VEL << (float)pjm.getPjeLocal().getVelocidad();
 		sock.send(bs.str());
@@ -326,9 +329,12 @@ int main(int argc, char* argv[]) {
 		bs.clear();
 		bs << PROTO::UPDATE_ATT << ATT::GOLEM << pjm.getPjeLocal().tieneGolem();
 		sock.send(bs.str());
+		bs.clear();
+		bs << PROTO::UPDATE_ATT << ATT::CANT_BOMBAS << pjm.getPjeLocal().getCantBombas();
+		sock.send(bs.str());
 	}
 	
-	std::cout << "valor del golem: " << pjm.getPjeLocal().tieneGolem() << "\n";
+	//std::cout << "valor del golem: " << pjm.getPjeLocal().tieneGolem() << "\n";
 	// Posiciono el personaje
 	mapa.getTile(start_pos_x, start_pos_y)->addEntidad(&(pjm.getPjeLocal()));
 	pjm.getPjeLocal().setTileActual(mapa.getTile(start_pos_x, start_pos_y));

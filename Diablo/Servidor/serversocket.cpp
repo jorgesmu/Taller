@@ -16,6 +16,7 @@
 #include "playerman.h"
 #include "mapaservidor.h"
 #include "enemigoServer.h"
+#include "golem.h"
 #include "../source/utilities/timer.h"
 extern PlayerManager pm;
 extern MapaServidor mapa;
@@ -524,7 +525,7 @@ void ServerSocket::acceptLastDo() {
 			bs << PROTO::INIT_ATT << it->first << (float)p.getVelocidad() << p.getEnergia() << p.getMagia() << p.getEnergiaEscudo() << p.getTerremoto() << p.getHielo() << (float)p.getRadio();
 			send(cid,bs.str());
 		}
-		// Mandamos todos los otros players al que se unio
+		// Mandamos todos los enemigos al que se unio
 		for(auto it = pm.getEnemies().begin();it != pm.getEnemies().end();it++) {
 			Enemigo* unEnemigo = it->second;
 	
@@ -536,6 +537,20 @@ void ServerSocket::acceptLastDo() {
 			//Mando los atributos principales del jugador
 			bs.clear();
 			bs << PROTO::INIT_ATT << it->first << (float)unEnemigo->getVelocidad() << unEnemigo->getEnergia() << unEnemigo->getMagia() << unEnemigo->getEnergiaEscudo() << unEnemigo->getTerremoto() << unEnemigo->getHielo() << (float)unEnemigo->getRadio();
+			send(cid,bs.str());
+		}
+		// Mandamos todos los Golems al que se unio
+		for(auto it = pm.getGolems().begin();it != pm.getGolems().end();it++) {
+			Golem* unGolem = it->second;
+	
+			if( unGolem->getNick() == new_nick) continue; // Salteamos a nuestro jugador			
+			auto p = pm.getEnemy(unGolem->getNick());
+			bs.clear();
+			bs << PROTO::NEW_PLAYER << unGolem->getNick() << unGolem->getTipo() << unGolem->getX() << unGolem->getY() << unGolem-> isOn();
+			send(cid, bs.str());
+			//Mando los atributos principales del jugador
+			bs.clear();
+			bs << PROTO::INIT_ATT << it->first << (float)unGolem->getVelocidad() << unGolem->getEnergia() << unGolem->getMagia() << unGolem->getEnergiaEscudo() << unGolem->getTerremoto() << unGolem->getHielo() << (float)unGolem->getRadio();
 			send(cid,bs.str());
 		}
 
@@ -720,13 +735,25 @@ void ServerSocket::acceptLastDo() {
 									terminoMision = true;
 								}
 							}
-						cout << "elimine a " << it->second->getNick()<<endl;
-						pm.getEnemies().erase(it);
-						break;
+							cout << "elimine a " << it->second->getNick()<<endl;
+							pm.getEnemies().erase(it);
+							break;
 						}
 					}
 				}
-				//hacer para golem
+				//golem
+				for(auto it = pm.getGolems().begin();it != pm.getGolems().end();it++) {
+					if(it->second->getNick() == nick_to){
+						it->second->hacerDanio(dmg);
+						it->second->atacadoPor(nick_who);
+						if (!it->second->estaVivo()){
+							murioPersonaje = true;
+							cout << "elimine a " << it->second->getNick()<<endl;
+							pm.getGolems().erase(it);
+							break;
+						}
+					}
+				}
 				// Avisamos a los otros jugadores 
 				for(auto it = clients_map.begin();it != clients_map.end();it++) {
 					if(it->second.nick == new_nick) continue; // Salteamos a nuestro jugador de avisarle
@@ -840,8 +867,28 @@ void ServerSocket::acceptLastDo() {
 						break;
 					}
 				}				
+				//enemigos
 				for(auto it = pm.getEnemies().begin();it != pm.getEnemies().end();it++) {
 					if(it->second->getX() == x && it->second->getY() == y) {
+						//si esta ahi
+						ok = false;
+						break;
+					}
+					if(it->second->getXSiguiente() == x && it->second->getYSiguiente() == y) {
+						//si se mueve a ahi
+						ok = false;
+						break;
+					}
+				}
+				//golem
+				for(auto it = pm.getGolems().begin();it != pm.getGolems().end();it++) {
+					if(it->second->getX() == x && it->second->getY() == y) {
+						//si esta ahi
+						ok = false;
+						break;
+					}
+					if(it->second->getXSiguiente() == x && it->second->getYSiguiente() == y) {
+						//si se mueve a ahi
 						ok = false;
 						break;
 					}
@@ -890,12 +937,17 @@ void ServerSocket::acceptLastDo() {
 				bs >> nickPersonajeActualizado >> posX >> posY;
 				//busco si es un enemigo
 				Enemigo* unEnemigo = NULL;
+				Golem* unGolem = NULL;
 				int pos = 0;
 				if(pm.enemyExists(nickPersonajeActualizado)){
 					//busco el enemigo
 					unEnemigo = pm.getEnemy(nickPersonajeActualizado);
 				} 
-
+				//busco si es un golem
+				if(pm.golemExists(nickPersonajeActualizado)){
+					//busco el golem
+					unGolem = pm.getGolem(nickPersonajeActualizado);
+				} 
 	
 				if(unEnemigo != NULL){
 
@@ -933,7 +985,43 @@ void ServerSocket::acceptLastDo() {
 						}
 					}
 				}
-				
+					
+				if(unGolem != NULL){
+
+					int XSiguiente = unGolem->getXSiguiente();
+					int YSiguiente = unGolem->getYSiguiente();
+					if (XSiguiente == posX && YSiguiente == posY){
+						//si es el primer cliente que me manda el update
+						mapa.actualizarGrafo(unGolem->getX(),unGolem->getY());//actuzliazo grafo pos vieja
+						unGolem->setPos(posX,posY);//actualizo posiciones		
+						mapa.actualizarGrafoPersonajes(pm);//actuzliazo grafo nueva
+
+						TileServidor* proxTile;
+						string enemigoAtacado;//guarda el nick si va a atacar
+						bool personajeAdyacente= unGolem->personaje_adyacente(mapa,pm,proxTile,enemigoAtacado); // me dice si hay un personaje en un tile adyacente para atacarlo
+						if ( (personajeAdyacente && unGolem->get_timer_ataque().getTicks() >= tiempoAtaque) || (personajeAdyacente && !unGolem->get_ultima_accion_atacar()) ){
+							unGolem->atacar(enemigoAtacado,pm,*this);
+							unGolem->get_timer_ataque().start();
+							unGolem->set_ultima_accion_atacar(true);
+						}else {
+							unGolem->set_ultima_accion_atacar(false);
+							unGolem->get_timer_ataque().stop();
+							//si es un enemigo actualizo su posicion
+							TileServidor* proxTile = unGolem->get_proximo_tile_enemigo(mapa,pm);
+						
+							if (proxTile != NULL && !mapa.tile_esta_ocupado(proxTile->get_x(),proxTile->get_y(),pm)){
+								unGolem->setPosSiguiente(proxTile->get_x(),proxTile->get_y());
+								// Informamos a los demas del movimiento del enemigo
+								for(auto it = clients_map.begin();it != clients_map.end();it++) {
+										bs.clear();
+										bs << PROTO::MOVE_PLAYER << nickPersonajeActualizado << proxTile->get_x() << proxTile->get_y() ;
+										send(it->second.sock, bs.str());
+										std::cout << "Mandando update de enemigo a " << it->second.nick << "\n";
+								}
+							}
+						}
+					}
+				}
 			}else if(pt == PROTO::REQUEST_REV_POS) {
 				int x, y;
 				bs >> x >> y;
@@ -962,17 +1050,32 @@ void ServerSocket::acceptLastDo() {
 						break;
 					}
 				}
+				//para enemigos
 				for(auto it = pm.getEnemies().begin();it != pm.getEnemies().end();it++) {
 					if(it->second->getX() == x && it->second->getY() == y) {
+						//si esta ahi
 						ok = false;
 						break;
 					}
 					if(it->second->getXSiguiente() == x && it->second->getYSiguiente() == y) {
+						//si va a ahi
 						ok = false;
 						break;
 					}
 				}
-				//hacer para golem
+				// para golem
+				for(auto it = pm.getGolems().begin();it != pm.getGolems().end();it++) {
+					if(it->second->getX() == x && it->second->getY() == y) {
+						//si esta ahi
+						ok = false;
+						break;
+					}
+					if(it->second->getXSiguiente() == x && it->second->getYSiguiente() == y) {
+						//si va a ahi
+						ok = false;
+						break;
+					}
+				}
 				if(ok) {
 					// Si el movimiento esta ok, actualizamos la posicion
 					pm.getPlayer(new_nick).setPos(x, y);
@@ -1014,6 +1117,28 @@ void ServerSocket::acceptLastDo() {
 						exit(0);
 					}
 				}				
+			}else if (pt == PROTO::USO_GOLEM){
+				string nickDuenio;
+				int xDuenio,yDuenio;
+				bs >> nickDuenio >> xDuenio >> yDuenio;
+				string nickGolem = "Golem";
+				stringstream indice;
+				indice << pm.getGolems().size();
+				nickGolem = nickGolem + indice.str();
+				pm.addGolem(nickGolem,"orco",mapa,1,nickDuenio,xDuenio,yDuenio);
+				//mando el golem a todos
+				Golem* unGolem = pm.getGolem(nickGolem);
+				for(auto it = clients_map.begin();it != clients_map.end();it++) {
+					bs.clear();
+					bs << PROTO::NEW_PLAYER << unGolem->getNick() << unGolem->getTipo() << unGolem->getX() << unGolem->getY() << unGolem-> isOn();
+					send(cid, bs.str());
+					//Mando los atributos principales del jugador
+					bs.clear();
+					bs << PROTO::INIT_ATT << unGolem->getNick() << (float)unGolem->getVelocidad() << unGolem->getEnergia() << unGolem->getMagia() << unGolem->getEnergiaEscudo() << unGolem->getTerremoto() << unGolem->getHielo() << (float)unGolem->getRadio();
+					send(cid,bs.str());
+				}
+			
+
 			}else{
 				bs.clear();
 				bs << PROTO::TEXTMSG << std::string("Unknown packet type");

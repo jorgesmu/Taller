@@ -492,6 +492,8 @@ public:
 
 	void utilizarBomba(int xPersonaje, int yPersonaje);
 
+	void Personaje::utilizarGolem() ;
+
 	void updateBomba();
 
 	void setBombaColocada(ArmaBomba* nuevaBomba) { bombaColocada=nuevaBomba; }

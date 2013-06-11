@@ -1,6 +1,7 @@
 #include "mapaservidor.h"
 #include "playerman.h"
 #include "enemigoServer.h"
+#include "golem.h"
 // Ctor
 MapaServidor::MapaServidor() {
 	w = h = 0;
@@ -283,9 +284,14 @@ void MapaServidor::actualizarGrafoPersonajes(PlayerManager& pm){
 		//it->second = player
 		this->actualizarGrafo(it->second.getX(),it->second.getY());
 	}
+	//golem
+	for(auto it = pm.getGolems().begin();it != pm.getGolems().end();it++) {
+		this->actualizarGrafo(it->second->getX(),it->second->getY());
+	}
 }
 bool MapaServidor::tile_esta_ocupado(int x,int y,PlayerManager& pm){
 	bool res = false;
+	//enemigos
 	for(auto it = pm.getEnemies().begin();it != pm.getEnemies().end();it++) {
 		Enemigo* unEnemigo = it->second;
 		if (unEnemigo->getX()== x && unEnemigo->getY() == y){
@@ -293,6 +299,19 @@ bool MapaServidor::tile_esta_ocupado(int x,int y,PlayerManager& pm){
 			res = true ;
 		}
 		if (unEnemigo->getXSiguiente()== x && unEnemigo->getYSiguiente() == y){
+			//si se esta moviendo ahi
+			res = true ;
+		}
+
+	}
+	//golem
+	for(auto it = pm.getGolems().begin();it != pm.getGolems().end();it++) {
+		Golem* unGolem = it->second;
+		if (unGolem->getX()== x && unGolem->getY() == y){
+			//si esta ahi
+			res = true ;
+		}
+		if (unGolem->getXSiguiente()== x && unGolem->getYSiguiente() == y){
 			//si se esta moviendo ahi
 			res = true ;
 		}

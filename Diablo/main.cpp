@@ -422,6 +422,12 @@ int main(int argc, char* argv[]) {
 							}
 							break;
 						}
+						case 'g' : {
+							if (pjm.getPjeLocal().tieneGolem()) {
+								pjm.getPjeLocal().utilizarGolem();
+							}
+							break;
+						}
 						case 'd' : {
 							pjm.getPjeLocal().defender(NULL , &mapa);
 							BitStream bs;

@@ -4,7 +4,7 @@
 #include "serversocket.h"
 #include "../source/utilities/timer.h"
 class Enemigo:public Player{
-	private:
+	protected:
 		unsigned int estrategia,direccion;
 		int pasosCaminados;
 		Timer ultimoAtaque;
@@ -16,10 +16,10 @@ class Enemigo:public Player{
 		TileServidor* Enemigo::get_proximo_tile_recta_horizontal(MapaServidor& Mapa);
 		TileServidor* Enemigo::get_proximo_tile_recta_vertical(MapaServidor& Mapa);
 		TileServidor* Enemigo::get_proximo_tile_circular(MapaServidor& Mapa);
-		TileServidor* get_proximo_tile_enemigo(MapaServidor& Mapa,PlayerManager& pm);
+		virtual TileServidor* get_proximo_tile_enemigo(MapaServidor& Mapa,PlayerManager& pm);
 		virtual bool personaje_en_radio(MapaServidor& mapa,PlayerManager& pm, TileServidor*& tilePersonajes);
 		virtual bool personaje_adyacente(MapaServidor& mapa,PlayerManager& pm, TileServidor*& tilePersonaje,string& enemigoAtacado);
-		void atacar(string& NickAtacado,PlayerManager& pm,ServerSocket& socks);
+		virtual void atacar(string& NickAtacado,PlayerManager& pm,ServerSocket& socks);
 		Timer& get_timer_ataque(){
 			return this->ultimoAtaque;
 		}

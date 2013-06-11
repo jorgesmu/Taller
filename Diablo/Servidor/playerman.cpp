@@ -1,6 +1,7 @@
 #include "playerman.h"
 #include "../source/utilities/aux_func.h"
 #include "enemigoServer.h"
+#include "golem.h"
 #include <exception>
 #include <cassert>
 #include <ctime>
@@ -221,4 +222,82 @@ Enemigo* PlayerManager::getEnemy(const std::string& nick) {
 
 EnemyMapT& PlayerManager::getEnemies() {
 	return this->enemy_map;
+}
+//metodos de Gole,
+// Devuelve si un player existe
+bool PlayerManager::golemExists(const std::string& nick) const {
+	return golem_map.find(nick) != golem_map.end();
+}
+
+// Agrega un golem
+void PlayerManager::addGolem(const std::string& nick, const std::string& tipo_pje, MapaServidor& mapa,int estrategiaElegida,string& nickDuenio,int posXduenio, int posYDuenio) {
+	// Chequeo de sanidad
+	assert(!golemExists(nick));
+	Golem*& p = golem_map[nick];
+	p = new Golem(nick, tipo_pje,estrategiaElegida,nickDuenio); 
+	// Buscar posicion en el mapa
+	bool found = false;
+	int x = 0; // Contador de iteraciones
+	int w, h; // Para guardar el tamaño del mapa
+	mapa.getSize(&w, &h);
+	//std::cout << "Mapa size: " << w << "," << h << "\n";
+	// Limitamos la cantidad de iteraciones
+	TileServidor* unTile;
+	int cantIteraciones = 10;
+	for (int i = 0 ; i< cantIteraciones;i++){
+		//busco un tile cercano libre
+		if(mapa.tileExists(posXduenio + i ,posYDuenio)){
+			//derecha
+			unTile = mapa.getTile(posXduenio + i ,posYDuenio);
+			if (unTile->isCaminable() && !mapa.tile_esta_ocupado(posXduenio + i ,posYDuenio,*this)){
+				found = true;
+				break;
+			}
+		}
+		if(mapa.tileExists(posXduenio - i ,posYDuenio)){
+			//izquierda
+			unTile = mapa.getTile(posXduenio - i ,posYDuenio);
+			if (unTile->isCaminable() && !mapa.tile_esta_ocupado(posXduenio - i ,posYDuenio,*this)){
+				found = true;
+				break;
+			}
+		}
+		if(mapa.tileExists(posXduenio ,posYDuenio + i)){
+			//abajo
+			unTile = mapa.getTile(posXduenio,posYDuenio + i );
+			if (unTile->isCaminable() && !mapa.tile_esta_ocupado(posXduenio,posYDuenio + i ,*this)){
+				found = true;
+				break;
+			}
+		}
+		if(mapa.tileExists(posXduenio ,posYDuenio - i)){
+			//arriba
+			unTile = mapa.getTile(posXduenio,posYDuenio - i );
+			if (unTile->isCaminable() && !mapa.tile_esta_ocupado(posXduenio,posYDuenio - i ,*this)){
+				found = true;
+				break;
+			}
+		}
+
+	}
+
+	
+	if(!found) {
+		throw std::runtime_error("No se pudo ubicar el personaje\n");
+	}else{
+		p->setOnline();
+		p->setPos(unTile->get_x(), unTile->get_y());
+		//cargo pos
+		p->setPosSiguiente(unTile->get_x(), unTile->get_y());
+	}
+}
+
+// Devuelva un jugador
+Golem* PlayerManager::getGolem(const std::string& nick) {
+	assert(golemExists(nick));
+	return golem_map[nick];
+}
+
+GolemMapT& PlayerManager:: getGolems() {
+	return this->golem_map;
 }

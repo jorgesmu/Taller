@@ -5,6 +5,7 @@
 #include "../source/net/bitstream.h"
 #include "../source/net/defines.h"
 #include "../source/utilities/aux_func.h"
+#include "golem.h"
 const int noSeMovio = 0;
 const int derecha = 1;
 const int izquierda = 2;
@@ -344,7 +345,34 @@ bool Enemigo::personaje_adyacente(MapaServidor& mapa,PlayerManager& pm, TileServ
 void Enemigo::atacar(string& NickAtacado,PlayerManager& pm,ServerSocket& socks){
 	BitStream bs;
 	int danio = intRand(0,100);
-
+	//resto danio si ataca a un golem o a un enemigo
+	bool encontro = false;
+	bool murio = false;
+	for(auto it = pm.getEnemies().begin();it !=pm.getEnemies().end();it++) {
+		Enemigo* unEnemigo = it->second;
+		if(unEnemigo->getNick() == NickAtacado){
+			unEnemigo->hacerDanio(danio);
+			encontro = true;
+			if(!it->second->estaVivo()){
+				murio = true;
+				break;
+			}
+		}
+	}
+	//para golem
+	if(!encontro){
+		for(auto it = pm.getGolems().begin();it !=pm.getGolems().end();it++) {
+			Golem* unGolem = it->second;
+			if(unGolem->getNick() == NickAtacado){
+				unGolem->hacerDanio(danio);
+			}
+			if(!it->second->estaVivo()){
+				//aviso a los demas que murio enemigo
+				murio = true;
+			}
+		}
+	}
+	//aviso del ataque
 	for(auto it = socks.get_clients().begin();it !=socks.get_clients().end();it++) {
 		//ataco con la danio
 		bs.clear();
@@ -354,6 +382,12 @@ void Enemigo::atacar(string& NickAtacado,PlayerManager& pm,ServerSocket& socks){
 		bs.clear();
 		bs << PROTO::DAMAGE << this->getNick() << NickAtacado << danio;
 		socks.send(it->second.sock, bs.str());
+		//aviso si murio
+		if(murio){
+			bs.clear();
+			bs << PROTO::ENEMY_DEAD << NickAtacado;
+			socks.send(it->second.sock, bs.str());
+		}
 	}
 	return;
 }

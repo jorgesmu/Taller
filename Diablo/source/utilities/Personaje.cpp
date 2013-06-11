@@ -1279,6 +1279,17 @@ void Personaje::utilizarBomba(int xPersonaje, int yPersonaje) {
 	sock.send(bs.str());
 	tBomba.start();
 }
+void Personaje::utilizarGolem() {
+	BitStream bs;
+	this->magia-=this->MAGIA_HECHIZO;
+	bs.clear();
+	bs << PROTO::UPDATE_ATT << ATT::MAGIA << this->getMagia();
+	sock.send(bs.str());
+	bs.clear();
+	Tile* tileJugador = mapa.getTilePorPixeles(this->getX(),this->getY());
+	bs << PROTO::USO_GOLEM << this->getNick() << tileJugador->getU() << tileJugador->getV();
+	sock.send(bs.str());
+}
 
 void Personaje::updateBomba() {
 	if ((this->tBomba.isStarted()) && (this->tBomba.getTicks()>3000)) {

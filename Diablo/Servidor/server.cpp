@@ -128,10 +128,10 @@ int main(int argc, char* argv[]) {
 	}
 	
 	//Agregar enemigos automaticos
+	pm.addEnemy("Enemigo0","soldado",mapa,1);
 	pm.addEnemy("Enemigo1","soldado",mapa,1);
-//	pm.addEnemy("Enemigo1","soldado",mapa,1);
-//	pm.addEnemy("Enemigo2","soldado",mapa,2);	
-//	pm.addEnemy("Enemigo3","soldado",mapa,2);
+	pm.addEnemy("Enemigo2","soldado",mapa,2);	
+	pm.addEnemy("Enemigo3","soldado",mapa,2);
 	if(crearMision){
 		//Creacion de misiones(TODO:logica random entre los distintos tipos)
 		mision.crearMisionBanderas(2);
@@ -170,6 +170,9 @@ int main(int argc, char* argv[]) {
 	}
 	//destruyo enemigos y golem 
 	for(auto it = pm.getEnemies().begin();it != pm.getEnemies().end();it++) {
+		delete(it->second);
+	}
+	for(auto it = pm.getGolems().begin();it != pm.getGolems().end();it++) {
 		delete(it->second);
 	}
 

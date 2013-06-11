@@ -89,6 +89,8 @@ const unsigned char ENEMY_DEAD = 'H';
 const unsigned char EN_MOVE_CMPLT = 'I';
 // Exploto una bomba
 const unsigned char BOMB_OFF = 'J';
+// uso golem
+const unsigned char USO_GOLEM = 'K';
 
 
 }

@@ -226,8 +226,8 @@ bool ServerSocket::receive(const std::string& cid, std::string& buff) {
 	int packet_size = -1;
 	int bytes_read = 0;
 	// Loop until we read a full packet
+	EnterCriticalSection(&critSect);
 	while(true) {
-		EnterCriticalSection(&critSect);
 		std::string tmp;
 		// If we have something in the queue, push it it
 		if(queue_buf[cid].size() > 0) {
@@ -294,7 +294,7 @@ bool ServerSocket::receive(const std::string& cid, std::string& buff) {
 			LeaveCriticalSection(&critSect);
 			return false;
 		}
-		LeaveCriticalSection(&critSect);
+		//LeaveCriticalSection(&critSect);
 	}
 	LeaveCriticalSection(&critSect);
 	return false;
@@ -366,6 +366,7 @@ unsigned int __stdcall ServerSocket::acceptLastEntry(void* pthis) {
 }
 
 void ServerSocket::acceptLastDo() {
+	EnterCriticalSection(&critSect);
 	//bloqueo el loop ppal
 	conectandose=true;
 	// Iniciamos el seed de srand

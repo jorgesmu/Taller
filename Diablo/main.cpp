@@ -390,14 +390,27 @@ int main(int argc, char* argv[]) {
 							vec2<int> tile_res = MouseCoords2Tile(vec2<int>(posX,  posY), camara);
 							if(mapa.tileExists(tile_res.x, tile_res.y)) {
 								Tile* tileDestino = mapa.getTile(tile_res.x, tile_res.y);
-								pjm.getPjeLocal().ataque(tileDestino , &mapa);
+								Personaje* personaje = NULL;
+								bool found_pje = false;
+								for(auto it = pjm.getPjes().begin();it != pjm.getPjes().end();it++) {
+									if(tileDestino == mapa.getTilePorPixeles(it->second.getX(), it->second.getY())) {
+										found_pje = true;
+										personaje= &(it -> second);
+										break;
+									}
+								}
+								if (found_pje){
+									if (personaje->getNick() != pjm.getPjeLocal().getNick()) {
+										pjm.getPjeLocal().ataque(tileDestino , &mapa , personaje);
+									}
+								}
 							} else {
 								pjm.getPjeLocal().ataque(NULL , &mapa);
 							}
-							soundman.playSound("sword", 0, 0);
-							BitStream bs;
-							bs << PROTO::ATACAR << pjm.getPjeLocal().getNick();
-							sock.send(bs.str());
+							
+							//BitStream bs;
+							//bs << PROTO::ATACAR << pjm.getPjeLocal().getNick();
+							//sock.send(bs.str());
 							//caminoMinimo.clear();
 							break;
 						}
@@ -555,7 +568,7 @@ int main(int argc, char* argv[]) {
 				int control;
 				control = it->second.update(&mapa);
 				//reseteo update de personajes por si se freno
-				if(it->second.get_timer_update().getTicks() > 1000)
+				if(it->second.get_timer_update().getTicks() > 500)
 						it->second.set_posicion_actualizada(false);
 				if (control == Personaje::MOVER_COMPLETADO && it->second.get_posicion_actualizada()==false){
 					//aviso al server que se termino de mover un personaje para si es un enemigo actualizarlo
@@ -563,7 +576,7 @@ int main(int argc, char* argv[]) {
 					//cout << "pos " << unTile->getU() << "," <<unTile->getV() <<endl;
 					bs.clear();
 					bs << PROTO::EN_MOVE_CMPLT << it->second.getNick() << unTile->getU() << unTile ->getV() ;
-					sock.send(bs.str()); //DESCOMENTAR
+					//sock.send(bs.str()); //DESCOMENTAR
 					//std::cout << "Mandando termino de moverse personaje a servidor" << it->second.getNick() << "\n";
 					//estado de personaje es para el pje local y estoy en un loop de otros personajes
 					//estadoPersonaje = Personaje::ESPERANDO_ACCION;

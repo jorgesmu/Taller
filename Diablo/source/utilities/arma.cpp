@@ -3,7 +3,9 @@
 #include "../net/defines.h"
 #include "../../Cliente/clientsocket.h"
 #include "../net/PjeManager.h"
+#include "../../source/utilities/soundman.h"
 extern ClientSocket sock;
+extern SoundMan soundman;
 
 /*
 	Pre:-
@@ -614,7 +616,8 @@ unsigned int Arma::atacar(Mapa* mapa, Tile* tileDestino , Personaje* personaje) 
 			
 			}
 		}
-	} else {
+		soundman.playSound("sword", 0, 0);
+	} /*else {
 		this -> tileDestino = NULL;
 		unsigned int direccionAtaque = ImagenArma::ATAQUE_DIRECCION_ACTUAL;
 		ImagenArma* imagenArma = static_cast<ImagenArma*> (this -> imagen);
@@ -623,7 +626,7 @@ unsigned int Arma::atacar(Mapa* mapa, Tile* tileDestino , Personaje* personaje) 
 			//ataque a personaje
 			dañarPersonaje(personaje);
 		}
-	}
+	}*/
 	return retorno;
 }
 

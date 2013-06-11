@@ -356,7 +356,9 @@ int main(int argc, char* argv[]) {
 	int ultimoMovimientoY = NOSEMOVIO;// idem coordenada y
 	int ultimoDestinoX = NOSEMOVIO;//guarda el destino actual
 	int ultimoDestinoY = NOSEMOVIO;//guarda el destino actual
-
+	Personaje* personajeObjetivo = NULL;
+	Tile* tilePersonajeObjetivo =  NULL;
+	bool enAtaque = false;
 	while((!quit ) && (sock.isOpen()) ) {
 
 		// Sync stuff
@@ -480,6 +482,10 @@ int main(int argc, char* argv[]) {
 				// Mouse clicks
 				if(event.type == SDL_MOUSEBUTTONDOWN) {
 					if(event.button.button == SDL_BUTTON_LEFT) {
+						// ante un click el ataque se anula
+						personajeObjetivo = NULL;
+						enAtaque = false;
+						tilePersonajeObjetivo = NULL;
 						vec2<int> tile_res = MouseCoords2Tile(vec2<int>(event.button.x, event.button.y), camara);
 						if(mapa.tileExists(tile_res.x, tile_res.y)) {
 
@@ -496,17 +502,27 @@ int main(int argc, char* argv[]) {
 							ultimoDestinoY = tile_res.y;
 							// Verificamos si hay un personaje para activar el chat
 							bool found_pje = false;
+							Personaje* personajeAux = NULL;
 							//std::cout << "CLICK @ " << tile_res.x << ";" << tile_res.y << "\n";
 							for(auto it = pjm.getPjes().begin();it != pjm.getPjes().end();it++) {
 								if(tileDestino == mapa.getTilePorPixeles(it->second.getX(), it->second.getY())) {
 									found_pje = true;
+									personajeAux =  &(it->second);
 									break;
 								}
 							}
-
 							if(!found_pje) {
 								caminoMinimo = mapa.getCaminoMinimo(tilePersonaje, tileDestino);
 								indice = 1;
+								estadoMovimiento = MOV::MANDAR_POS;
+							} else if  (personajeAux -> getNick() != pjm.getPjeLocal().getNick()){
+								caminoMinimo = mapa.getCaminoMinimo(tilePersonaje, tileDestino);
+								indice = 1;
+								estadoMovimiento = MOV::MANDAR_POS;
+								caminoMinimo.pop_back();
+								enAtaque = true;
+								tilePersonajeObjetivo = tileDestino;
+								personajeObjetivo = personajeAux;
 								estadoMovimiento = MOV::MANDAR_POS;
 							}
 
@@ -735,7 +751,41 @@ int main(int argc, char* argv[]) {
 			if ((estadoPersonaje == Personaje::MOVER_COMPLETADO)) 
 				 {
 				puedeMoverse = true;
-
+				if (enAtaque) {
+					if (indice == caminoMinimo.size()){
+						pjm.getPjeLocal().ataque(tilePersonajeObjetivo,&mapa,personajeObjetivo);
+						enAtaque = false;
+						personajeObjetivo = NULL;
+						tilePersonajeObjetivo = NULL;
+					} else {
+						if ((personajeObjetivo != NULL) && (tilePersonajeObjetivo != NULL)){
+							Tile* tileActualObjetivo = mapa.getTilePorPixeles(personajeObjetivo->getX(),personajeObjetivo->getY());
+							if (tileActualObjetivo != NULL){
+								if (tileActualObjetivo != tilePersonajeObjetivo){
+									Tile* tileActualLocal = mapa.getTilePorPixeles(pjm.getPjeLocal().getX(),pjm.getPjeLocal().getY());
+									if (tileActualLocal != NULL) {
+										printf("\nSe movio\n");
+										caminoMinimo = mapa.getCaminoMinimo(tileActualLocal, tileActualObjetivo);
+										indice = 1;
+										estadoMovimiento = MOV::MANDAR_POS;
+										caminoMinimo.pop_back();
+										enAtaque = true;
+										tilePersonajeObjetivo = tileActualObjetivo;
+										estadoMovimiento = MOV::MANDAR_POS;
+									} else {
+										enAtaque = false;
+										tilePersonajeObjetivo = NULL;
+										personajeObjetivo = NULL;
+									}
+								}
+							} else{
+								enAtaque = false;
+								tilePersonajeObjetivo = NULL;
+								personajeObjetivo = NULL;
+							}
+						}
+					}
+				}
 			}else if ( (estadoPersonaje == Personaje::MOVER_EN_CURSO) || 
 				(estadoPersonaje == Personaje::MOVER_ERROR)){
  				puedeMoverse = false;

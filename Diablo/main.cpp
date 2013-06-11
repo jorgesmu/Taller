@@ -362,9 +362,12 @@ int main(int argc, char* argv[]) {
 	int ultimoMovimientoY = NOSEMOVIO;// idem coordenada y
 	int ultimoDestinoX = NOSEMOVIO;//guarda el destino actual
 	int ultimoDestinoY = NOSEMOVIO;//guarda el destino actual
+	// Variables especiales para ataque
 	Personaje* personajeObjetivo = NULL;
 	Tile* tilePersonajeObjetivo =  NULL;
-	bool enAtaque = false;
+	// Flags ataque
+	bool enAtaque = false; // indica si se encuentra en ataque
+	bool calcularAtaque = false; // indica si se debe calcular el camino minimo para un ataque
 	while((!quit ) && (sock.isOpen()) ) {
 
 		// Sync stuff
@@ -492,6 +495,7 @@ int main(int argc, char* argv[]) {
 						personajeObjetivo = NULL;
 						enAtaque = false;
 						tilePersonajeObjetivo = NULL;
+						calcularAtaque = false;
 						vec2<int> tile_res = MouseCoords2Tile(vec2<int>(event.button.x, event.button.y), camara);
 						if(mapa.tileExists(tile_res.x, tile_res.y)) {
 
@@ -522,16 +526,11 @@ int main(int argc, char* argv[]) {
 								indice = 1;
 								estadoMovimiento = MOV::MANDAR_POS;
 							} else if  (personajeAux -> getNick() != pjm.getPjeLocal().getNick()){
-								caminoMinimo = mapa.getCaminoMinimo(tilePersonaje, tileDestino);
-								indice = 1;
-								estadoMovimiento = MOV::MANDAR_POS;
-								caminoMinimo.pop_back();
 								enAtaque = true;
 								tilePersonajeObjetivo = tileDestino;
 								personajeObjetivo = personajeAux;
-								estadoMovimiento = MOV::MANDAR_POS;
+								calcularAtaque = true;
 							}
-
 						}
 					}
 
@@ -570,6 +569,30 @@ int main(int argc, char* argv[]) {
 				}
 
 			}
+		}
+
+		// calculo de ataque
+		if ((calcularAtaque) && (enAtaque)) {
+			printf("\nCalculo del camino de ataque %s\n", pjm.getPjeLocal().getNick().c_str());
+			if (personajeObjetivo != NULL) {
+				Tile* tileActualLocal = mapa.getTilePorPixeles(pjm.getPjeLocal().getX(),pjm.getPjeLocal().getY());
+				tilePersonajeObjetivo = mapa.getTilePorPixeles(personajeObjetivo->getX(),personajeObjetivo->getY());
+				if ((tileActualLocal != NULL) && (tilePersonajeObjetivo != NULL)){
+					caminoMinimo = mapa.getCaminoMinimo(tileActualLocal,tilePersonajeObjetivo);
+					indice = 1;
+					estadoMovimiento = MOV::MANDAR_POS;
+					caminoMinimo.pop_back();
+					enAtaque = true;
+				}else {
+					enAtaque = false;
+					personajeObjetivo = NULL;
+					tilePersonajeObjetivo = NULL;
+				}
+			} else {
+				enAtaque = false;
+				personajeObjetivo = NULL;
+			}
+			calcularAtaque = false;
 		}
 
 		// Cuenterio para hacer el timestep (CONST_DT) independiente de los FPS
@@ -763,38 +786,32 @@ int main(int argc, char* argv[]) {
 			if ((estadoPersonaje == Personaje::MOVER_COMPLETADO)) 
 				 {
 				puedeMoverse = true;
+				puedeMoverse = true;
+				// verifico si se encuentra en condiciones de atacar
 				if (enAtaque) {
-					if (indice == caminoMinimo.size()){
-						pjm.getPjeLocal().ataque(tilePersonajeObjetivo,&mapa,personajeObjetivo);
-						enAtaque = false;
-						personajeObjetivo = NULL;
-						tilePersonajeObjetivo = NULL;
-					} else {
-						if ((personajeObjetivo != NULL) && (tilePersonajeObjetivo != NULL)){
-							Tile* tileActualObjetivo = mapa.getTilePorPixeles(personajeObjetivo->getX(),personajeObjetivo->getY());
-							if (tileActualObjetivo != NULL){
-								if (tileActualObjetivo != tilePersonajeObjetivo){
-									Tile* tileActualLocal = mapa.getTilePorPixeles(pjm.getPjeLocal().getX(),pjm.getPjeLocal().getY());
-									if (tileActualLocal != NULL) {
-										printf("\nSe movio\n");
-										caminoMinimo = mapa.getCaminoMinimo(tileActualLocal, tileActualObjetivo);
-										indice = 1;
-										estadoMovimiento = MOV::MANDAR_POS;
-										caminoMinimo.pop_back();
-										enAtaque = true;
-										tilePersonajeObjetivo = tileActualObjetivo;
-										estadoMovimiento = MOV::MANDAR_POS;
-									} else {
-										enAtaque = false;
-										tilePersonajeObjetivo = NULL;
-										personajeObjetivo = NULL;
-									}
+					// verifico que el personaje se encuentre en tile sobre el cual calcule el camino minimo
+					if ((personajeObjetivo != NULL) && (tilePersonajeObjetivo != NULL)){
+						Tile* tileActualObjetivo = mapa.getTilePorPixeles(personajeObjetivo->getX(),personajeObjetivo->getY());
+						if (tileActualObjetivo != NULL){
+							// si no lo esta vuelvo a calcular el camino
+							if (tileActualObjetivo != tilePersonajeObjetivo){
+								printf("\nSe determino que se debe recalcular camino %s\n",pjm.getPjeLocal().getNick().c_str());
+								calcularAtaque = true;
+								puedeMoverse = false;
+							} else {
+								// verifico si se llego al final de camino minimo
+								if (indice == caminoMinimo.size()){
+									pjm.getPjeLocal().ataque(tilePersonajeObjetivo,&mapa,personajeObjetivo);
+									enAtaque = false;
+									personajeObjetivo = NULL;
+									tilePersonajeObjetivo = NULL;
+									printf("\nAtaque Finalizado %s\n",pjm.getPjeLocal().getNick().c_str());
 								}
-							} else{
-								enAtaque = false;
-								tilePersonajeObjetivo = NULL;
-								personajeObjetivo = NULL;
 							}
+						} else{
+							enAtaque = false;
+							tilePersonajeObjetivo = NULL;
+							personajeObjetivo = NULL;
 						}
 					}
 				}

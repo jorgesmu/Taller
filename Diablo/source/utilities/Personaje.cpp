@@ -94,6 +94,7 @@ void Personaje::inicializarAtributosEnValoresDefault() {
 	this -> cambioDireccionHabilitado = true;
 	this -> bolaDeCristal = false;
 	this -> espada = NULL;
+	this->transmutacion = true; //DESCOMENTAR
 }
 /*
 	Pre:-
@@ -1323,4 +1324,8 @@ void Personaje::updateBomba() {
 		sock.send(bs.str());
 		std::cout << "Aviso a server que exploto mi bomba" << endl;
 	}
+}
+
+void Personaje::utilizarTransmutacion(std::string nick_enemigo) {
+	std::cout << "Uso hechizo de transmutacion con " << nick_enemigo << endl;
 }

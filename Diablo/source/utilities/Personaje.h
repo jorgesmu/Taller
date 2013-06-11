@@ -117,6 +117,7 @@ protected:
 		//Tiene o no los hechizos(podria tener mas de uno quizas?, por eso un char)
 		char terremoto;
 		char hielo;
+		bool transmutacion;
 
 		//Vida restante
 		char energia;
@@ -431,6 +432,12 @@ public:
 	bool tieneHielo() { return this->hielo>0; }
 
 	void utilizarHielo(Mapa* mapa, PjeManager* pjm);
+
+	void setTransmutacion(bool valor) { transmutacion = valor; }
+
+	bool tieneTransmutacion() { return transmutacion; }
+
+	void utilizarTransmutacion(std::string nick_enemigo);
 
 	bool estaVivo() {return vivo; }
 

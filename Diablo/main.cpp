@@ -447,6 +447,27 @@ int main(int argc, char* argv[]) {
 							pjm.getPjeLocal().utilizarHielo(&mapa,&pjm);
 							break;
 						}
+						case 'x' : {
+							if (pjm.getPjeLocal().tieneTransmutacion()) {
+								//Veo si hay un enemigo en algun tile adyacente
+								int deltaX,deltaY;
+								int otraPosX,otraPosY,miPosX,miPosY;
+								miPosX = pjm.getPjeLocal().getPosicion(&mapa)->getU();
+								miPosY = pjm.getPjeLocal().getPosicion(&mapa)->getV();
+								bool enemigoCerca = false;
+								for (auto it = pjm.getPjes().begin(); it != pjm.getPjes().end(); it++) {
+									otraPosX = it->second.getPosicion(&mapa)->getU();
+									otraPosY = it->second.getPosicion(&mapa)->getV();
+									deltaX = std::abs(miPosX-otraPosX);
+									deltaY = std::abs(miPosY-otraPosY);
+									if (deltaX <= 1 && deltaY <= 1) {
+										pjm.getPjeLocal().utilizarTransmutacion(it->first);
+									}
+								}
+								
+							}
+							break;
+						}
 					}
 					
 				}

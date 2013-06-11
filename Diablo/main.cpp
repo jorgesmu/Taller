@@ -612,7 +612,7 @@ int main(int argc, char* argv[]) {
 					}
 					
 					if(estadoMovimiento == MOV::OK_RECV) {
-						std::cout << "OK_RECV\n";
+						//std::cout << "OK_RECV\n";
 						pjm.getPjeLocal().mover(mapa.getTile(proximoTile.first,proximoTile.second));
 						choco=false;
 						//actualizo posiciones para calcular correctamente el camino minimo
@@ -657,10 +657,10 @@ int main(int argc, char* argv[]) {
 						//std::cout << "ESPERANDO_OK\n";
 						// Nada
 					}else if(estadoMovimiento == MOV::MANDAR_POS) {
-						std::cout << "MANDAR_POS\n";
+						//std::cout << "MANDAR_POS\n";
 						estadoMovimiento = MOV::ESPERANDO_OK;
-						std::cout << "TILE ACTUAL: " << tileActual.first << ";" << tileActual.second << "\n";
-						std::cout << "PROX TILE: " << proximoTile.first << ";" << proximoTile.second << "\n";
+						//std::cout << "TILE ACTUAL: " << tileActual.first << ";" << tileActual.second << "\n";
+						//std::cout << "PROX TILE: " << proximoTile.first << ";" << proximoTile.second << "\n";
 						BitStream bs;
 						bs << PROTO::REQUEST_POS << proximoTile.first << proximoTile.second;
 						sock.send(bs.str());

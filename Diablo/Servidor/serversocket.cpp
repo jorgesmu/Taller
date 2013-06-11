@@ -561,6 +561,28 @@ void ServerSocket::acceptLastDo() {
 		LeaveCriticalSection(&critSect);
 		//desbloqueo el loop
 		conectandose = false;
+
+		//Objetivos de las misiones
+		if (mision.getTipo()==Misiones::MISION_BANDERAS) {
+			Sleep(2000);
+			bs.clear();
+			bs << PROTO::TEXTMSG << std::string("Captura todas las banderas...");
+			send(cid,bs.str());
+			bs.clear();
+			std::stringstream msj;
+			msj << "Hay " << mision.cantBanderas() << " en total!";
+			bs << PROTO::TEXTMSG << msj.str();
+			send(cid,bs.str());
+		} else {
+			Sleep(2000);
+			bs.clear();
+			bs << PROTO::TEXTMSG << std::string("Elimina a tu eterno enemigo!");
+			send(cid,bs.str());
+			bs.clear();
+			bs << PROTO::TEXTMSG << std::string("Quiero ver sangre!!!");
+			send(cid,bs.str());
+		}
+
 		// Receive loop
 		while(this->receive(cid, buff)) {
 			Sleep(50);

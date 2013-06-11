@@ -29,4 +29,12 @@ class Enemigo:public Player{
 		bool get_ultima_accion_atacar(){
 			return this->ultimaAccionAtacar;
 		}
+
+		void cambiarEstrategia() {
+			if (estrategia == 1) {
+				estrategia = 2;
+			} else {
+				estrategia = 1;
+			}
+		}
 };

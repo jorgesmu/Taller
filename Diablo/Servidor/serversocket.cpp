@@ -917,6 +917,10 @@ void ServerSocket::acceptLastDo() {
 						break;
 					}
 				}
+				//Si esta congelado no se puede mover a ningun lado
+				if (pm.getPlayer(new_nick).isCongelado()) {
+					ok = false;
+				}
 				if(ok) {
 					//le seteo el seMovio en true
 					pm.getPlayer(new_nick).setSeMovio(true);
@@ -1163,6 +1167,67 @@ void ServerSocket::acceptLastDo() {
 				}
 			
 
+			}else if (pt == PROTO::TRANSMUT){
+				char tipo;
+				bs >> tipo;
+				std::string nick;
+				bs >> nick;
+				if (tipo == TIPO::LAPIDA) {
+					// Aviso a todos que lo conviertan a lapida
+					bs.clear();
+					bs << PROTO::TRANSMUT << tipo << nick;
+					for(auto it = clients_map.begin();it != clients_map.end();it++) {
+						send(it->second.sock, bs.str());
+					}
+					// Lo congelo para que no pueda moverse
+					if (pm.enemyExists(nick)) {
+						pm.getEnemy(nick)->congelar();
+					} else if (pm.golemExists(nick)) {
+						pm.getGolem(nick)->congelar();
+					} else {
+						pm.getPlayer(nick).congelar();
+					}
+				} else if (tipo == TIPO::ESTRATEGIA_ENEMY) {
+					if (pm.enemyExists(nick)) {
+						std::cout << "Enemigo " << nick << "cambiando de estrategia" << endl;
+						pm.getEnemy(nick)->cambiarEstrategia();
+					} else {
+						bs.clear();
+						bs << PROTO::TEXTMSG << std::string("Tipo de transmut solo valida con enemigos autonomos");
+						send(cid,bs.str());
+					}
+					
+				}
+			}else if (pt == PROTO::DESTRANSMUT){
+				char tipo;
+				bs >> tipo;
+				std::string nick;
+				bs >> nick;
+				if (tipo == TIPO::LAPIDA) {
+					// Aviso a todos que lo conviertan a lapida
+					bs.clear();
+					bs << PROTO::DESTRANSMUT << tipo << nick;
+					for(auto it = clients_map.begin();it != clients_map.end();it++) {
+						send(it->second.sock, bs.str());
+					}
+					// Lo descongelo para que pueda volver a moverse
+					if (pm.enemyExists(nick)) {
+						pm.getEnemy(nick)->descongelar();
+					} else if (pm.golemExists(nick)) {
+						pm.getGolem(nick)->descongelar();
+					} else {
+						pm.getPlayer(nick).descongelar();
+					}
+				} else if (tipo == TIPO::ESTRATEGIA_ENEMY) {
+					if (pm.enemyExists(nick)) {
+						std::cout << "Enemigo " << nick << " volviendo a vieja estrategia" << endl;
+						pm.getEnemy(nick)->cambiarEstrategia();
+					} else {
+						/*bs.clear();
+						bs << PROTO::TEXTMSG << std::string("Tipo de transmut solo valida con enemigos autonomos");
+						send(cid,bs.str());*/
+					}
+				}
 			}else{
 				bs.clear();
 				bs << PROTO::TEXTMSG << std::string("Unknown packet type");

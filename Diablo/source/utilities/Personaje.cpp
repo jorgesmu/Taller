@@ -18,6 +18,7 @@
 #include "../../Cliente/clientsocket.h"
 #include "../utilities/Arma.h"
 #include "armaBomba.h"
+#include "aux_func.h"
 extern PjeManager pjm;
 extern ClientSocket sock;
 extern int start_pos_x,start_pos_y;
@@ -1358,4 +1359,36 @@ void Personaje::updateBomba() {
 
 void Personaje::utilizarTransmutacion(std::string nick_enemigo) {
 	std::cout << "Uso hechizo de transmutacion con " << nick_enemigo << endl;
+	//auto enemigo = pjm.getPje(nick_enemigo);
+	//Veo en que se convierte, si en otro enemigo o en una lapida
+	srand (time(NULL));
+	char cambio=rand()%2;
+	if (cambio == 0) {
+		//Se convierte en lapida
+		std::cout << "Convertiendo en lapida a " << nick_enemigo << endl;
+		pjm.getPje(nick_enemigo).animacionMuerte();
+		BitStream bs;
+		bs << PROTO::TRANSMUT << TIPO::LAPIDA << nick_enemigo;
+		sock.send(bs.str());
+	} else {
+		//Se convierte en un enemigo con distinta estrategia
+		std::cout << "Convertido en otro tipo de enemigo" << endl;
+		BitStream bs;
+		bs << PROTO::TRANSMUT << TIPO::ESTRATEGIA_ENEMY << nick_enemigo;
+		sock.send(bs.str());
+	}
+	tipoTransmut = cambio;
+	transmutado = nick_enemigo;
+	tTransmut.start();
+}
+
+void Personaje::updateTransmutacion() {
+	if (tTransmut.isStarted() && tTransmut.getTicks()>Personaje::TIEMPO_TRANSMUT) {
+		std::cout << "Volviendo atras la transmutacion \n";
+		pjm.getPje(transmutado).animacionRevivir();
+		BitStream bs;
+		bs << PROTO::DESTRANSMUT << tipoTransmut << transmutado;
+		sock.send(bs.str());
+		tTransmut.stop();
+	}
 }

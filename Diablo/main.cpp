@@ -640,6 +640,9 @@ int main(int argc, char* argv[]) {
 
 			//Para que termine el hechizo hielo
 			pjm.getPjeLocal().updateHielo();
+
+			//Para que vuelva atras la transmutacion
+			pjm.getPjeLocal().updateTransmutacion();
 			
 			if (puedeMoverse) {				
 				if (!choco) {

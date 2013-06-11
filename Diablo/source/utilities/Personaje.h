@@ -79,6 +79,10 @@ public:
 		//Dejan de estar congelados tiempo
 		const static unsigned int TIEMPO_DESCONGELAR = 10000;
 
+
+		//Vuelven a su forma original
+		const static unsigned int TIEMPO_TRANSMUT = 10000;
+
 		//Daño maximo de los hechizos
 		const static char DAÑO_TERREMOTO = 100;
 
@@ -126,6 +130,9 @@ protected:
 		std::list<std::string> nicks_congelados;
 
 		bool transmutacion;
+		Timer tTransmut;
+		char tipoTransmut;
+		std::string transmutado;
 
 		//Vida restante
 		char energia;
@@ -274,7 +281,7 @@ public:
 	*/
 	virtual unsigned int defender(Tile* tileDestino , Mapa* mapa);
 	
-
+	//Animaciones
 	void animacionMuerte();
 
 	void animacionRevivir();
@@ -448,6 +455,8 @@ public:
 	bool tieneTransmutacion() { return transmutacion; }
 
 	void utilizarTransmutacion(std::string nick_enemigo);
+
+	void updateTransmutacion();
 
 	bool estaVivo() {return vivo; }
 

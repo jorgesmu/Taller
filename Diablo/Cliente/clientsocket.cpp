@@ -678,6 +678,36 @@ void ClientSocket::listenDo() {
 				}
 			}
 				
+		}else if (pt == PROTO::TRANSMUT){
+			char tipo;
+			bs >> tipo;
+			std::string nick;
+			bs >> nick;
+			if (tipo == TIPO::LAPIDA) {
+				if (pjm.getPjeLocal().getNick() == nick) {
+					pjm.getPjeLocal().animacionMuerte();
+				} else {
+					pjm.getPje(nick).animacionMuerte();
+				}				
+				std::cout << "Convirtiendo a " << nick << " en lapida" << endl;
+			} else if (tipo == TIPO::ESTRATEGIA_ENEMY) {
+				std::cout << "Enemigo " << nick << "cambiando de estrategia" << endl;
+			}				
+		}else if (pt == PROTO::DESTRANSMUT){
+			char tipo;
+			bs >> tipo;
+			std::string nick;
+			bs >> nick;
+			if (tipo == TIPO::LAPIDA) {
+				if (pjm.getPjeLocal().getNick() == nick) {
+					pjm.getPjeLocal().animacionRevivir();
+				} else {
+					pjm.getPje(nick).animacionRevivir();
+				}				
+				std::cout << "Desconvirtiendo a " << nick << " de lapida" << endl;
+			} else if (tipo == TIPO::ESTRATEGIA_ENEMY) {
+				std::cout << "Enemigo " << nick << "cambiando de estrategia" << endl;
+			}				
 		}else{
 			std::cout << "Unknown packet type " << int(pt) << " received\n";
 		}

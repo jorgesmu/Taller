@@ -93,6 +93,10 @@ const unsigned char BOMB_OFF = 'J';
 const unsigned char USO_GOLEM = 'K';
 // Descongelo un personaje
 const unsigned char DESCONGELAR = 'L';
+// Transmutacion - Convirtio a un enemigo en otra cosa
+const unsigned char TRANSMUT = 'M';
+// Vuevlo atras la transmutacion
+const unsigned char DESTRANSMUT = 'N';
 
 
 }
@@ -127,4 +131,10 @@ namespace ATT {
 	const char RADIO = 7;
 	const char BOLA_DE_CRISTAL = 8;
 	const char GOLEM = 9;
+}
+
+// Cosas a las que se puede transmutar
+namespace TIPO {
+	const char LAPIDA = 0;
+	const char ESTRATEGIA_ENEMY = 1;
 }

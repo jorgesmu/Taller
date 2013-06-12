@@ -89,11 +89,11 @@ void Personaje::inicializarAtributosEnValoresDefault() {
 	this -> ordenBliteo = Entidad::ORDEN_PERSONAJE;
 	this->setRadio(125);
 	this->terremoto=10; //DESCOMENTAR
-	this->hielo=10; //DESCOMENTAR
+	this->hielo=0; //DESCOMENTAR
 	this->energia=this->ENERGIA_TOTAL;
 	this->magia=this->MAGIA_TOTAL;
 	this->flechas=0;
-	this->bombas=10; //DESCOMENTAR
+	this->bombas=0; //DESCOMENTAR
 	this->granadas=0;
 	this->varita=false;
 	this->energiaEscudo=0;

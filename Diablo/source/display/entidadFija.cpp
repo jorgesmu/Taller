@@ -1,6 +1,10 @@
 #include "entidadFija.h"
 #include "tile.h"
 #include "mapa.h"
+#include "../net/bitstream.h"
+#include "../net/defines.h"
+#include "../../Cliente/clientsocket.h"
+extern ClientSocket sock;
 
 	/*
 		Pre:-
@@ -477,7 +481,12 @@ void EntidadFija::setDibujada(bool seDibujo, Mapa* mapa,Personaje* personaje){
 					int posAnclaY = this -> posY + (contTilesY + contTilesX)*Tile::TILE_ALTO/2;
 					Tile* ancla = mapa -> getTilePorPixeles(posAnclaX , posAnclaY);
 					if (ancla != NULL){
-						personaje -> agregarTilesExplorados(ancla);
+						if(personaje -> agregarTilesExplorados(ancla)){
+							Tile* tile = mapa->getTilePorPixeles(this->getX(), this->getY());
+							BitStream bs;
+							bs << PROTO::NIEBLA_SYNC << tile->getU() << tile->getV();
+							sock.send(bs.str());
+						}
 						contTilesY += delta;
 					} else {
 						salida = true;

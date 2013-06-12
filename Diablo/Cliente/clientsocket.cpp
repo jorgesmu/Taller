@@ -751,7 +751,8 @@ void ClientSocket::listenDo() {
 				Sleep(10);
 			}
 			Bandera* bandera;
-			bandera = new Bandera("bandera",1,1,true, x , y,NULL,&mapa,resman,Imagen::COLOR_KEY );
+			Tile* tile = mapa.getTile(x,y);
+			bandera = new Bandera("bandera",1,1,true, -30 , 15,tile,&mapa,resman,Imagen::COLOR_KEY );
 			mapa.getTile(x, y)->addEntidad(bandera,&mapa);
 			entidades_cargadas.push_back(bandera);	
 		}else if(pt == PROTO::WINNER) {	

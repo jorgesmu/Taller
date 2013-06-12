@@ -78,6 +78,8 @@ class Entidad {
 
 		unsigned int ordenBliteo;
 
+		bool esItem;
+
 public:
 	
 	/*

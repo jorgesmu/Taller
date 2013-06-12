@@ -231,7 +231,7 @@ int main(int argc, char* argv[]) {
 	resman.addRes("bomba","../resources/bomba.jpg");
 
 	//Prueba de carga items
-	resman.addRes("cofre","../resources/chest.png");
+	resman.addRes("cofre","../resources/cajaEstatica.png");
 	/*GolemItem cofre("cofre",1,1,true, 6 ,13,NULL,&mapa,resman,Imagen::COLOR_KEY );
 	mapa.getTile(6,13)->addEntidad(&cofre,&mapa);
 	entidades_cargadas.push_back(&cofre);*/
@@ -639,10 +639,12 @@ int main(int argc, char* argv[]) {
 				int cant_items = 9;//cantidad de items que implementamos
 				int rand;
 				rand = intRand(0, cant_items);
+				Tile* tile = mapa.getTile(x,y);
 				Item* item;
+				rand = 0;
 				switch(rand){
 					case 0:{
-						item = new Lampara("cofre",1,1,true, x , y, NULL,&mapa,resman,Imagen::COLOR_KEY );
+						item = new Lampara("cofre",1,1,true, -13 , 20, tile,&mapa,resman,Imagen::COLOR_KEY );
 						mapa.getTile(x, y)->addEntidad(item,&mapa);
 						entidades_cargadas.push_back(item);
 						BitStream bs;

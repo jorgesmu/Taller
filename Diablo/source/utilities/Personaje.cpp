@@ -21,8 +21,10 @@
 #include "../net/defines.h"
 #include "../../Cliente/clientsocket.h"
 #include "../utilities/Arma.h"
+#include "../utilities/console.h"
 #include "armaBomba.h"
 #include "aux_func.h"
+#include <sstream>
 extern PjeManager pjm;
 extern ClientSocket sock;
 extern int start_pos_x,start_pos_y;
@@ -30,6 +32,7 @@ extern int estadoMovimiento;
 extern Mapa mapa;
 extern std::vector<EntidadFija*> entidades_cargadas;
 extern ResMan resman;
+extern Console consola;
 
 /*
 	Pre:- 
@@ -1022,6 +1025,9 @@ void Personaje::dañar(char daño) {
 void Personaje::chocarConLampara(Lampara* lampara) {
 	this->getPosicion(&mapa)->deleteEntidad(lampara);
 	this->aumentarRadio(lampara->getProporcionAumento());
+	std::stringstream msj;
+	msj << "Agarro Lampara";
+	consola.log(msj.str());
 }
 
 //Mejorar: recorrer todos los tiles y colocarlos como visitados
@@ -1038,11 +1044,16 @@ void Personaje::chocarConMapa(MapaItem* mapaItem) {
 		sock.send(bs.str());
 	}
 	std::vector<Tile*> tileExplorados = tilesExplorados;	
+	std::stringstream msj;
+	msj << "Agarro Mapa";
+	consola.log(msj.str());
 }
 
 void Personaje::aumentarVelocidad(char porcentaje) {
-	double aumento = porcentaje+100;
-	this->velocidad*=(aumento/100);
+	if(this->velocidad == this->VELOCIDAD_DEFAULT){
+		double aumento = porcentaje+100;
+		this->velocidad*=(aumento/100);
+	}
 }
 
 void Personaje::chocarConZapatos(Zapatos* zapatos) {
@@ -1052,6 +1063,9 @@ void Personaje::chocarConZapatos(Zapatos* zapatos) {
 	BitStream bs;
 	bs << PROTO::UPDATE_ATT << ATT::VEL << (float)pjm.getPjeLocal().getVelocidad();
 	sock.send(bs.str());
+	std::stringstream msj;
+	msj << "Agarro Zapatos";
+	consola.log(msj.str());
 }
 
 void Personaje::chocarConBolaDeCristal() {
@@ -1071,16 +1085,21 @@ void Personaje::chocarConBolaDeCristal() {
 	}else{
 		std::cout << "magia insuficiente para bola de cristal \n";	
 	}
+	std::stringstream msj;
+	msj << "Agarro Bola de cristal";
+	consola.log(msj.str());
 
 }
 
 void Personaje::chocarConGolem() {
 
-		std::cout << "agarre golem \n";
-		this->golem = true;
-		BitStream bs;
-		bs << PROTO::UPDATE_ATT << ATT::GOLEM << true;
-		sock.send(bs.str());
+	this->golem = true;
+	BitStream bs;
+	bs << PROTO::UPDATE_ATT << ATT::GOLEM << true;
+	sock.send(bs.str());
+	std::stringstream msj;
+	msj << "Agarro Golem";
+	consola.log(msj.str());
 }
 
 void Personaje::chocarConTerremoto(Terremoto* terremoto) {
@@ -1089,6 +1108,9 @@ void Personaje::chocarConTerremoto(Terremoto* terremoto) {
 	BitStream bs;
 	bs << PROTO::UPDATE_ATT << ATT::CANT_TERREMOTO << this->getTerremoto();
 	sock.send(bs.str());
+	std::stringstream msj;
+	msj << "Agarro Terremoto";
+	consola.log(msj.str());
 }
 
 void Personaje::chocarConHielo(Hielo* hielo) {
@@ -1097,6 +1119,9 @@ void Personaje::chocarConHielo(Hielo* hielo) {
 	BitStream bs;
 	bs << PROTO::UPDATE_ATT << ATT::CANT_HIELO << this->getHielo();
 	sock.send(bs.str());
+	std::stringstream msj;
+	msj << "Agarro Hielo";
+	consola.log(msj.str());
 }
 
 void Personaje::utilizarTerremoto(Mapa* mapa, PjeManager* pjm, ClientSocket* sock) {
@@ -1202,6 +1227,9 @@ void Personaje::updateHielo() {
 	BitStream bs;
 	bs << PROTO::UPDATE_ATT << ATT::ENERGIA << pjm.getPjeLocal().getEnergia();
 	sock.send(bs.str());
+	std::stringstream msj;
+	msj << "Agarro Corazon";
+	consola.log(msj.str());
 }
 
  void Personaje::chocarConBotella(Botella* botella) {
@@ -1212,6 +1240,9 @@ void Personaje::updateHielo() {
 	BitStream bs;
 	bs << PROTO::UPDATE_ATT << ATT::MAGIA << pjm.getPjeLocal().getMagia();
 	sock.send(bs.str());
+	std::stringstream msj;
+	msj << "Agarro Flechas";
+	consola.log(msj.str());
  }
 
  void Personaje::chocarConFlechas(Flechas* flechas) {
@@ -1241,6 +1272,9 @@ void Personaje::updateHielo() {
 	 BitStream bs;
 	 bs << PROTO::UPDATE_ATT << ATT::ENERGIA_ESCUDO << pjm.getPjeLocal().getEnergiaEscudo();
 	 sock.send(bs.str());
+	 std::stringstream msj;
+     msj << "Agarro Escudo";
+ 	 consola.log(msj.str());
  }
 
  void Personaje::chocarConBandera(Bandera* bandera) {
@@ -1251,6 +1285,9 @@ void Personaje::updateHielo() {
 	 std::cout << "Atrape bandera en pos (" << x << "," << y << ")" << endl;
 	 bs << PROTO::CATCH_FLAG << x << y;
 	 sock.send(bs.str());
+     std::stringstream msj;
+ 	 msj << "Atrapo Bandera";
+ 	 consola.log(msj.str());
  }
 
 void Personaje::aumentarRadio(float proporcion) {

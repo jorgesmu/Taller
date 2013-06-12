@@ -331,7 +331,9 @@
 					if (colorAux) {
 						this -> surf -> blit(dest , tileX , tileY);	
 					} else {
-						this -> surf -> blitGris(dest , tileX , tileY);	
+						if(!esItem){
+							this -> surf -> blitGris(dest , tileX , tileY);	
+						}
 					}
 				}
 				else {
@@ -341,7 +343,9 @@
 						if (colorAux) {
 							this -> surf -> blit(dest , posX , posY);
 						} else {
-							this -> surf -> blitGris(dest , posX , posY);
+							if(!esItem){
+								this -> surf -> blitGris(dest , posX , posY);
+							}
 						}
 					} else{
 						int posX;
@@ -356,7 +360,9 @@
 						if (colorAux) {
 							this -> surf -> blit(dest , posX , posY , rect);
 						}else{
-							this -> surf -> blitGris(dest , posX , posY , rect);
+							if(!esItem){
+								this -> surf -> blitGris(dest , posX , posY , rect);
+							}
 						}
 					}
 				}

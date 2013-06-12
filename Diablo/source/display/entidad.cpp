@@ -36,6 +36,7 @@ void Entidad::inicializarAtributosEnValoresDefault() {
 	} else{
 		this -> ordenBliteo = Entidad::ORDEN_EDIFICIO;	
 	}
+	this->esItem = false;
 }
 
 /*

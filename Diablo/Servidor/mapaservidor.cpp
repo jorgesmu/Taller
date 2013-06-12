@@ -2,6 +2,9 @@
 #include "playerman.h"
 #include "enemigoServer.h"
 #include "golem.h"
+
+extern PlayerManager pm;
+
 // Ctor
 MapaServidor::MapaServidor() {
 	w = h = 0;
@@ -150,17 +153,17 @@ void MapaServidor::cargarGrafo(PlayerManager& pm){
 }
 //actualiza unicamente un vertice
 void MapaServidor::actualizarGrafoVertice(int tileX,int tileY){
-	int altoMapa = this ->h ;
+	int altoMapa = this ->h;
 	int anchoMapa = this->w;
-	double raizDeDos = 1.4142;
-	double pesoNoCaminable = 500;
+	const double raizDeDos = 1.4142;
+	const double pesoNoCaminable = 500;
 
 
 
 	if((tileX-1)>=0){
 		//izquierda
 		TileServidor* tileArista = this->getTile(tileX-1,tileY);
-		if(tileArista->isCaminable()){
+		if(tileArista->isCaminable() && !tile_esta_ocupado(tileX-1, tileY, pm)){
 			this->grafoMapa.actualizar_arista(tileX,tileY,tileX-1,tileY,1);			
 		}else{
 			this->grafoMapa.actualizar_arista(tileX,tileY,tileX-1,tileY,pesoNoCaminable);								
@@ -169,7 +172,7 @@ void MapaServidor::actualizarGrafoVertice(int tileX,int tileY){
 	if((tileY-1)>=0){
 		//arriba
 		TileServidor* tileArista = this->getTile(tileX,tileY-1);
-		if(tileArista->isCaminable()){
+		if(tileArista->isCaminable() && !tile_esta_ocupado(tileX, tileY-1, pm)){
 			this->grafoMapa.actualizar_arista(tileX,tileY,tileX,tileY-1,1);			
 		}else{
 			this->grafoMapa.actualizar_arista(tileX,tileY,tileX,tileY-1,pesoNoCaminable);								
@@ -178,7 +181,7 @@ void MapaServidor::actualizarGrafoVertice(int tileX,int tileY){
 	if((tileX+1)<=anchoMapa-1){
 		//derecha
 		TileServidor* tileArista = this->getTile(tileX+1,tileY);
-		if(tileArista->isCaminable()){
+		if(tileArista->isCaminable() && !tile_esta_ocupado(tileX+1, tileY, pm)){
 			this->grafoMapa.actualizar_arista(tileX,tileY,tileX+1,tileY,1);			
 		}else{
 			this->grafoMapa.actualizar_arista(tileX,tileY,tileX+1,tileY,pesoNoCaminable);								
@@ -187,7 +190,7 @@ void MapaServidor::actualizarGrafoVertice(int tileX,int tileY){
 	if((tileY+1)<=altoMapa-1){
 		//abajo
 		TileServidor* tileArista = this->getTile(tileX,tileY+1);
-		if(tileArista->isCaminable()){
+		if(tileArista->isCaminable() && !tile_esta_ocupado(tileX, tileY+1, pm)){
 			this->grafoMapa.actualizar_arista(tileX,tileY,tileX,tileY+1,1);			
 		}else{
 			this->grafoMapa.actualizar_arista(tileX,tileY,tileX,tileY+1,pesoNoCaminable);								
@@ -196,7 +199,7 @@ void MapaServidor::actualizarGrafoVertice(int tileX,int tileY){
 	if(((tileX-1)>=0) && ((tileY-1)>=0)){
 		//arriba izquierda
 		TileServidor* tileArista = this->getTile(tileX-1,tileY-1);
-		if(tileArista->isCaminable()){
+		if(tileArista->isCaminable() && !tile_esta_ocupado(tileX-1, tileY-1, pm)){
 			this->grafoMapa.actualizar_arista(tileX,tileY,tileX-1,tileY-1,raizDeDos);			
 		}else{
 			this->grafoMapa.actualizar_arista(tileX,tileY,tileX-1,tileY-1,pesoNoCaminable*raizDeDos);								
@@ -205,7 +208,7 @@ void MapaServidor::actualizarGrafoVertice(int tileX,int tileY){
 	if(((tileX-1)>=0) && ((tileY+1)<=altoMapa-1)){
 		//abajo izquierda
 		TileServidor* tileArista = this->getTile(tileX-1,tileY+1);
-		if(tileArista->isCaminable()){
+		if(tileArista->isCaminable() && !tile_esta_ocupado(tileX-1, tileY+1, pm)){
 			this->grafoMapa.actualizar_arista(tileX,tileY,tileX-1,tileY+1,raizDeDos);			
 		}else{
 			this->grafoMapa.actualizar_arista(tileX,tileY,tileX-1,tileY+1,pesoNoCaminable*raizDeDos);								
@@ -214,7 +217,7 @@ void MapaServidor::actualizarGrafoVertice(int tileX,int tileY){
 	if(((tileX+1)<=anchoMapa-1) && ((tileY-1)>=0)){
 		//arriba derecha
 		TileServidor* tileArista = this->getTile(tileX+1,tileY-1);
-		if(tileArista->isCaminable()){
+		if(tileArista->isCaminable() && !tile_esta_ocupado(tileX+1, tileY-1, pm)){
 			this->grafoMapa.actualizar_arista(tileX,tileY,tileX+1,tileY-1,raizDeDos);			
 		}else{
 			this->grafoMapa.actualizar_arista(tileX,tileY,tileX+1,tileY-1,pesoNoCaminable*raizDeDos);								
@@ -223,7 +226,7 @@ void MapaServidor::actualizarGrafoVertice(int tileX,int tileY){
 	if(((tileX+1)<=anchoMapa-1) && ((tileY+1)<=altoMapa-1)){
 		//abajo derecha
 		TileServidor* tileArista = this->getTile(tileX+1,tileY+1);
-		if(tileArista->isCaminable()){
+		if(tileArista->isCaminable() && !tile_esta_ocupado(tileX+1, tileY+1, pm)){
 			this->grafoMapa.actualizar_arista(tileX,tileY,tileX+1,tileY+1,raizDeDos);			
 		}else{
 			this->grafoMapa.actualizar_arista(tileX,tileY,tileX+1,tileY+1,pesoNoCaminable*raizDeDos);								

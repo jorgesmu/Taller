@@ -617,7 +617,7 @@ unsigned int Arma::atacar(Mapa* mapa, Tile* tileDestino , Personaje* personaje) 
 			
 			}
 		}
-		soundman.playSound("sword", 0, 0);
+		soundman.playSound("sword", tileActualizado->getX(), tileActualizado->getY());
 	} /*else {
 		this -> tileDestino = NULL;
 		unsigned int direccionAtaque = ImagenArma::ATAQUE_DIRECCION_ACTUAL;

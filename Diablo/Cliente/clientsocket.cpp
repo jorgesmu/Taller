@@ -155,7 +155,7 @@ bool ClientSocket::receive(std::string& buff) {
 			queue_buf.clear();
 		}
 		// If we have an empty packet, read the size first
-		if(packet_size == -1 && !tmp.empty()) {
+		if(packet_size == -1 && tmp.size() >= 2) {
 			// First 2 bytes 
 			unsigned char buf[sizeof(short)];
 			std::copy(tmp.begin(), tmp.begin()+sizeof(short), buf);

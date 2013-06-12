@@ -36,13 +36,17 @@ extern int escenario_elegido_id;
 extern double init_vel;
 extern float init_radio;
 extern bool init_bolaDeCristal, init_golem;
-extern char init_energia,init_magia,init_escudo,init_terremoto,init_hielo;
+extern char init_energia,init_magia,init_escudo,init_terremoto,init_hielo,init_bombas;
 extern config_general configuracion;
 extern ResMan resman;
 extern Console consola;
 extern ChatWindow chat_window;
 extern int estadoMovimiento;
 extern std::vector<EntidadFija*> entidades_cargadas;
+
+extern bool enAtaque; // indica si se encuentra en ataque
+extern bool calcularAtaque; // indica si se debe calcular el camino minimo para un ataque
+extern Personaje* personajeObjetivo;
 
 bool ClientSocket::WSinit = false;
 size_t ClientSocket::ref_count = 0;
@@ -243,7 +247,10 @@ void ClientSocket::listenDo() {
 		if(pt == PROTO::TEXTMSG) {
 			std::string msg;
 			bs >> msg;
+			std::stringstream ss;
 			std::cout << "Server says: " << msg << "\n";
+			ss << msg;
+			consola.log(ss.str());
 		}else if(pt == PROTO::CHAT) {
 			std::string nick_source, nick_destino, mensaje;
 			bs >> nick_source >> nick_destino >> mensaje;
@@ -325,8 +332,8 @@ void ClientSocket::listenDo() {
 		}else if(pt == PROTO::OLD_ATT) {
 			bool bolaDeCristal, golem;
 			float recv_vel,radio;
-			char energia,magia,energiaEscudo,cantTerremoto,cantHielo;
-			bs >> recv_vel >> energia >> magia >> energiaEscudo >> cantTerremoto >> cantHielo >> radio >> bolaDeCristal >> golem;
+			char energia,magia,energiaEscudo,cantTerremoto,cantHielo,cantBombas;
+			bs >> recv_vel >> energia >> magia >> energiaEscudo >> cantTerremoto >> cantHielo >> radio >> bolaDeCristal >> golem >> cantBombas; 
 			init_vel=(double)recv_vel;
 			init_energia=energia;
 			init_magia=magia;
@@ -336,6 +343,7 @@ void ClientSocket::listenDo() {
 			init_radio=radio;
 			init_bolaDeCristal = bolaDeCristal;
 			init_golem = golem;
+			init_bombas = cantBombas;
 		}else if(pt == PROTO::ESC_ID) {
 			bs >> escenario_elegido_id;
 			//std::cout << "RECEIVED ESC ID: (" << escenario_elegido_id << ")\n";
@@ -475,7 +483,7 @@ void ClientSocket::listenDo() {
 			}else{
 				if(reply) {
 					estadoMovimiento = MOV::OK_RECV;
-					std::cout << "GOT OK FROM SERVER\n";
+					//std::cout << "GOT OK FROM SERVER\n";
 				}else{
 					estadoMovimiento = MOV::FAIL_RECV;
 					std::cout << "GOT FAIL FROM SERVER\n";
@@ -506,7 +514,9 @@ void ClientSocket::listenDo() {
 				auto& p = pjm.getPje(nick);
 				p.mover(mapa.getTile(x, y));
 				p.set_posicion_actualizada(false);
-		
+				if(enAtaque && &p == personajeObjetivo) {
+					calcularAtaque = true;
+				}
 				if(pjm.getPjeLocal().getBolaDeCristal()){
 					std::vector<Tile*> exploradosEnemigo = p.getTilesExplorados();
 					for(auto it = exploradosEnemigo.begin(); it != exploradosEnemigo.end(); ++it){
@@ -514,7 +524,7 @@ void ClientSocket::listenDo() {
 						pjm.getPjeLocal().agregarTilesExplorados(tileExplorado);
 					}
 				}
-				std::cout << "Server requested move of <" << nick << "> to " << x << ";" << y << "\n";
+				//std::cout << "Server requested move of <" << nick << "> to " << x << ";" << y << "\n";
 			}
 		}else if(pt == PROTO::REV_PLAYER) {
 			std::string nick;
@@ -632,7 +642,7 @@ void ClientSocket::listenDo() {
 		}else if(pt == PROTO::BOMB_OFF) {
 			std::string nick_who;
 			bs >> nick_who;
-			auto p = pjm.getPje(nick_who);
+			auto &p = pjm.getPje(nick_who);
 			std::cout << "Exploto la bomba de " << nick_who << " en pos (" << p.getBombaX() << "," << p.getBombaY() << ")...";
 			//Elimino bomba del mapa(FIX)
 			mapa.getTile(p.getBombaX(),p.getBombaY())->deleteEntidad(p.getBombaColocada());
@@ -669,6 +679,20 @@ void ClientSocket::listenDo() {
 				for(auto it = pjm.getPjes().begin();it != pjm.getPjes().end();it++) {
 					if(it->first == nick_to) {
 						it->second.freezar();
+						break;
+					}
+				}
+			}
+		}else if(pt == PROTO::DESCONGELAR) {	
+			std::string nick_to;
+			bs >> nick_to;
+			// Buscamos el personaje 
+			if(nick_to == pjm.getPjeLocal().getNick()) {
+				pjm.getPjeLocal().freezar(false);
+			}else{
+				for(auto it = pjm.getPjes().begin();it != pjm.getPjes().end();it++) {
+					if(it->first == nick_to) {
+						it->second.freezar(false);
 						break;
 					}
 				}
@@ -753,6 +777,36 @@ void ClientSocket::listenDo() {
 				}
 			}
 				
+		}else if (pt == PROTO::TRANSMUT){
+			char tipo;
+			bs >> tipo;
+			std::string nick;
+			bs >> nick;
+			if (tipo == TIPO::LAPIDA) {
+				if (pjm.getPjeLocal().getNick() == nick) {
+					pjm.getPjeLocal().animacionMuerte();
+				} else {
+					pjm.getPje(nick).animacionMuerte();
+				}				
+				std::cout << "Convirtiendo a " << nick << " en lapida" << endl;
+			} else if (tipo == TIPO::ESTRATEGIA_ENEMY) {
+				std::cout << "Enemigo " << nick << "cambiando de estrategia" << endl;
+			}				
+		}else if (pt == PROTO::DESTRANSMUT){
+			char tipo;
+			bs >> tipo;
+			std::string nick;
+			bs >> nick;
+			if (tipo == TIPO::LAPIDA) {
+				if (pjm.getPjeLocal().getNick() == nick) {
+					pjm.getPjeLocal().animacionRevivir();
+				} else {
+					pjm.getPje(nick).animacionRevivir();
+				}				
+				std::cout << "Desconvirtiendo a " << nick << " de lapida" << endl;
+			} else if (tipo == TIPO::ESTRATEGIA_ENEMY) {
+				std::cout << "Enemigo " << nick << "cambiando de estrategia" << endl;
+			}				
 		}else{
 			std::cout << "Unknown packet type " << int(pt) << " received\n";
 		}

@@ -66,7 +66,7 @@ int escenario_elegido_id;
 double init_vel;
 float init_radio;
 bool init_bolaDeCristal, init_golem;
-char init_energia,init_magia,init_escudo,init_terremoto,init_hielo;
+char init_energia,init_magia,init_escudo,init_terremoto,init_hielo,init_bombas;
 // Cosas para mantener al server actualizado sobre los tiles que recorrimos
 struct {
 	vec2<int> tile_actual, tile_anterior;
@@ -92,6 +92,12 @@ config_general configuracion;
 bool choco;
 //Muerte que llega desde el personaje como aviso
 //bool murio;
+// Flags ataque
+bool enAtaque = false; // indica si se encuentra en ataque
+bool calcularAtaque = false; // indica si se debe calcular el camino minimo para un ataque
+// Variables especiales para ataque
+Personaje* personajeObjetivo = NULL;
+Tile* tilePersonajeObjetivo =  NULL;
 //Socket
 ClientSocket sock;
 // Cargo las entidades en un vector
@@ -290,6 +296,7 @@ int main(int argc, char* argv[]) {
 
 	//Si no me conecto por primera vez al servidor
 	if (init_vel!=0) {
+		std::cout << "Restaurando atributos..." << endl;
 		// El server me paso atributos para cargar
 		pjm.getPjeLocal().setVelocidad(init_vel);
 		pjm.getPjeLocal().setEnergia(init_energia);
@@ -300,8 +307,10 @@ int main(int argc, char* argv[]) {
 		pjm.getPjeLocal().setRadio(init_radio);
 		pjm.getPjeLocal().setBolaDeCristal(init_bolaDeCristal);
 		pjm.getPjeLocal().setGolem(init_golem);
+		pjm.getPjeLocal().setCantBombas(init_bombas);
 	} else {
 		//Aviso al server mis valores por defecto de atributos
+		std::cout << "Avisando al server de mis attributos default..." << endl;
 		bs.clear();
 		bs << PROTO::UPDATE_ATT << ATT::VEL << (float)pjm.getPjeLocal().getVelocidad();
 		sock.send(bs.str());
@@ -329,8 +338,12 @@ int main(int argc, char* argv[]) {
 		bs.clear();
 		bs << PROTO::UPDATE_ATT << ATT::GOLEM << pjm.getPjeLocal().tieneGolem();
 		sock.send(bs.str());
+		bs.clear();
+		bs << PROTO::UPDATE_ATT << ATT::CANT_BOMBAS << pjm.getPjeLocal().getCantBombas();
+		sock.send(bs.str());
 	}
 	
+	//std::cout << "valor del golem: " << pjm.getPjeLocal().tieneGolem() << "\n";
 	// Posiciono el personaje
 	mapa.getTile(start_pos_x, start_pos_y)->addEntidad(&(pjm.getPjeLocal()));
 	pjm.getPjeLocal().setTileActual(mapa.getTile(start_pos_x, start_pos_y));
@@ -358,7 +371,6 @@ int main(int argc, char* argv[]) {
 	int ultimoMovimientoY = NOSEMOVIO;// idem coordenada y
 	int ultimoDestinoX = NOSEMOVIO;//guarda el destino actual
 	int ultimoDestinoY = NOSEMOVIO;//guarda el destino actual
-
 	while((!quit ) && (sock.isOpen()) ) {
 
 		// Sync stuff
@@ -392,14 +404,27 @@ int main(int argc, char* argv[]) {
 							vec2<int> tile_res = MouseCoords2Tile(vec2<int>(posX,  posY), camara);
 							if(mapa.tileExists(tile_res.x, tile_res.y)) {
 								Tile* tileDestino = mapa.getTile(tile_res.x, tile_res.y);
-								pjm.getPjeLocal().ataque(tileDestino , &mapa);
+								Personaje* personaje = NULL;
+								bool found_pje = false;
+								for(auto it = pjm.getPjes().begin();it != pjm.getPjes().end();it++) {
+									if(tileDestino == mapa.getTilePorPixeles(it->second.getX(), it->second.getY())) {
+										found_pje = true;
+										personaje= &(it -> second);
+										break;
+									}
+								}
+								if (found_pje){
+									if (personaje->getNick() != pjm.getPjeLocal().getNick()) {
+										pjm.getPjeLocal().ataque(tileDestino , &mapa , personaje);
+									}
+								}
 							} else {
 								pjm.getPjeLocal().ataque(NULL , &mapa);
 							}
-							soundman.playSound("sword", 0, 0);
-							BitStream bs;
-							bs << PROTO::ATACAR << pjm.getPjeLocal().getNick();
-							sock.send(bs.str());
+							
+							//BitStream bs;
+							//bs << PROTO::ATACAR << pjm.getPjeLocal().getNick();
+							//sock.send(bs.str());
 							//caminoMinimo.clear();
 							break;
 						}
@@ -408,6 +433,12 @@ int main(int argc, char* argv[]) {
 								int x = pjm.getPjeLocal().getPosicion(&mapa)->getU();
 								int y = pjm.getPjeLocal().getPosicion(&mapa)->getV();
 								pjm.getPjeLocal().utilizarBomba(x,y);
+							}
+							break;
+						}
+						case 'g' : {
+							if (pjm.getPjeLocal().tieneGolem()) {
+								pjm.getPjeLocal().utilizarGolem();
 							}
 							break;
 						}
@@ -436,12 +467,38 @@ int main(int argc, char* argv[]) {
 							pjm.getPjeLocal().utilizarHielo(&mapa,&pjm);
 							break;
 						}
+						case 'x' : {
+							if (pjm.getPjeLocal().tieneTransmutacion()) {
+								//Veo si hay un enemigo en algun tile adyacente
+								int deltaX,deltaY;
+								int otraPosX,otraPosY,miPosX,miPosY;
+								miPosX = pjm.getPjeLocal().getPosicion(&mapa)->getU();
+								miPosY = pjm.getPjeLocal().getPosicion(&mapa)->getV();
+								bool enemigoCerca = false;
+								for (auto it = pjm.getPjes().begin(); it != pjm.getPjes().end(); it++) {
+									otraPosX = it->second.getPosicion(&mapa)->getU();
+									otraPosY = it->second.getPosicion(&mapa)->getV();
+									deltaX = std::abs(miPosX-otraPosX);
+									deltaY = std::abs(miPosY-otraPosY);
+									if (deltaX <= 1 && deltaY <= 1) {
+										pjm.getPjeLocal().utilizarTransmutacion(it->first);
+									}
+								}
+								
+							}
+							break;
+						}
 					}
 					
 				}
 				// Mouse clicks
 				if(event.type == SDL_MOUSEBUTTONDOWN) {
 					if(event.button.button == SDL_BUTTON_LEFT) {
+						// ante un click el ataque se anula
+						personajeObjetivo = NULL;
+						enAtaque = false;
+						tilePersonajeObjetivo = NULL;
+						calcularAtaque = false;
 						vec2<int> tile_res = MouseCoords2Tile(vec2<int>(event.button.x, event.button.y), camara);
 						if(mapa.tileExists(tile_res.x, tile_res.y)) {
 
@@ -458,20 +515,26 @@ int main(int argc, char* argv[]) {
 							ultimoDestinoY = tile_res.y;
 							// Verificamos si hay un personaje para activar el chat
 							bool found_pje = false;
+							Personaje* personajeAux = NULL;
 							//std::cout << "CLICK @ " << tile_res.x << ";" << tile_res.y << "\n";
 							for(auto it = pjm.getPjes().begin();it != pjm.getPjes().end();it++) {
 								if(tileDestino == mapa.getTilePorPixeles(it->second.getX(), it->second.getY())) {
 									found_pje = true;
+									personajeAux =  &(it->second);
 									break;
 								}
 							}
-
 							if(!found_pje) {
 								caminoMinimo = mapa.getCaminoMinimo(tilePersonaje, tileDestino);
 								indice = 1;
 								estadoMovimiento = MOV::MANDAR_POS;
+								enAtaque = false;
+								calcularAtaque = false;
+							} else if  (personajeAux -> getNick() != pjm.getPjeLocal().getNick()){
+								calcularAtaque = true;
+								tilePersonajeObjetivo = tileDestino;
+								personajeObjetivo = personajeAux;
 							}
-
 						}
 					}
 
@@ -510,6 +573,31 @@ int main(int argc, char* argv[]) {
 				}
 
 			}
+		}
+
+		// calculo de ataque
+		if (calcularAtaque) {
+			printf("\nCalculo del camino de ataque %s\n", pjm.getPjeLocal().getNick().c_str());
+			if (personajeObjetivo != NULL) {
+				Tile* tileActualLocal = mapa.getTilePorPixeles(pjm.getPjeLocal().getX(),pjm.getPjeLocal().getY());
+				tilePersonajeObjetivo = mapa.getTilePorPixeles(personajeObjetivo->getX(),personajeObjetivo->getY());
+				if ((tileActualLocal != NULL) && (tilePersonajeObjetivo != NULL)){
+					caminoMinimo = mapa.getCaminoMinimo(tileActualLocal,tilePersonajeObjetivo);
+					indice = 1;
+					estadoMovimiento = MOV::MANDAR_POS;
+					caminoMinimo.pop_back();
+					enAtaque = true;
+					std::cout << "enAtaque = true\n";
+				}else {
+					enAtaque = false;
+					personajeObjetivo = NULL;
+					tilePersonajeObjetivo = NULL;
+				}
+			} else {
+				enAtaque = false;
+				personajeObjetivo = NULL;
+			}
+			calcularAtaque = false;
 		}
 
 		// Cuenterio para hacer el timestep (CONST_DT) independiente de los FPS
@@ -668,7 +756,7 @@ int main(int argc, char* argv[]) {
 					//cout << "pos " << unTile->getU() << "," <<unTile->getV() <<endl;
 					bs.clear();
 					bs << PROTO::EN_MOVE_CMPLT << it->second.getNick() << unTile->getU() << unTile ->getV() ;
-					//sock.send(bs.str()); //DESCOMENTAR
+					sock.send(bs.str()); 
 					//std::cout << "Mandando termino de moverse personaje a servidor" << it->second.getNick() << "\n";
 					//estado de personaje es para el pje local y estoy en un loop de otros personajes
 					//estadoPersonaje = Personaje::ESPERANDO_ACCION;
@@ -686,6 +774,12 @@ int main(int argc, char* argv[]) {
 
 			//Para que exploten bombas
 			pjm.getPjeLocal().updateBomba();
+
+			//Para que termine el hechizo hielo
+			pjm.getPjeLocal().updateHielo();
+
+			//Para que vuelva atras la transmutacion
+			pjm.getPjeLocal().updateTransmutacion();
 			
 			if (puedeMoverse) {				
 				if (!choco) {
@@ -717,7 +811,7 @@ int main(int argc, char* argv[]) {
 					}
 					
 					if(estadoMovimiento == MOV::OK_RECV) {
-						std::cout << "OK_RECV\n";
+						//std::cout << "OK_RECV\n";
 						pjm.getPjeLocal().mover(mapa.getTile(proximoTile.first,proximoTile.second));
 						choco=false;
 						//actualizo posiciones para calcular correctamente el camino minimo
@@ -762,10 +856,10 @@ int main(int argc, char* argv[]) {
 						//std::cout << "ESPERANDO_OK\n";
 						// Nada
 					}else if(estadoMovimiento == MOV::MANDAR_POS) {
-						std::cout << "MANDAR_POS\n";
+						//std::cout << "MANDAR_POS\n";
 						estadoMovimiento = MOV::ESPERANDO_OK;
-						std::cout << "TILE ACTUAL: " << tileActual.first << ";" << tileActual.second << "\n";
-						std::cout << "PROX TILE: " << proximoTile.first << ";" << proximoTile.second << "\n";
+						//std::cout << "TILE ACTUAL: " << tileActual.first << ";" << tileActual.second << "\n";
+						//std::cout << "PROX TILE: " << proximoTile.first << ";" << proximoTile.second << "\n";
 						BitStream bs;
 						bs << PROTO::REQUEST_POS << proximoTile.first << proximoTile.second;
 						sock.send(bs.str());
@@ -800,7 +894,33 @@ int main(int argc, char* argv[]) {
 			if ((estadoPersonaje == Personaje::MOVER_COMPLETADO)) 
 				 {
 				puedeMoverse = true;
-
+				// verifico si se encuentra en condiciones de atacar
+				if (enAtaque) {
+					// verifico que el personaje se encuentre en tile sobre el cual calcule el camino minimo
+					if ((personajeObjetivo != NULL) && (tilePersonajeObjetivo != NULL)){
+						Tile* tileActualObjetivo = mapa.getTilePorPixeles(personajeObjetivo->getX(),personajeObjetivo->getY());
+						if (tileActualObjetivo != NULL){
+							// si no lo esta vuelvo a calcular el camino
+							if (tileActualObjetivo != tilePersonajeObjetivo){
+								printf("\nSe determino que se debe recalcular camino %s\n",pjm.getPjeLocal().getNick().c_str());
+								calcularAtaque = true;
+							} else {
+								// verifico si se llego al final de camino minimo
+								if (indice == caminoMinimo.size()){
+									pjm.getPjeLocal().ataque(tilePersonajeObjetivo,&mapa,personajeObjetivo);
+									enAtaque = false;
+									personajeObjetivo = NULL;
+									tilePersonajeObjetivo = NULL;
+									printf("\nAtaque Finalizado %s\n",pjm.getPjeLocal().getNick().c_str());
+								}
+							}
+						} else{
+							enAtaque = false;
+							tilePersonajeObjetivo = NULL;
+							personajeObjetivo = NULL;
+						}
+					}
+				}
 			}else if ( (estadoPersonaje == Personaje::MOVER_EN_CURSO) || 
 				(estadoPersonaje == Personaje::MOVER_ERROR)){
  				puedeMoverse = false;

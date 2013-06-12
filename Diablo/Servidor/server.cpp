@@ -40,18 +40,30 @@ vector <config_escenario> escenarios;
 bool puedeMoverseEnemigo = false;
 bool conectandose=false;
 bool crearMision = true;
+char tipoMision;
 //dependencias externas
 extern BitStream bs;
 unsigned int enemyCount = 0;
 int main(int argc, char* argv[]) {
 
 	// Parseamos el escenario a elegir
-	if(argc != 2) {
+	if(argc == 1) {
+		//Sin parametros
 		//std::cerr << "Falta especificar el escenario:\n \tservidor.exe <escenario>\n";
 		escenario_elegido = "a";
 		crearMision = false;
-	}else{
+	}else if (argc == 2){
+		//Con un parametro, escenario. Mision banderas por default.
 		escenario_elegido = argv[1];
+		tipoMision = Misiones::MISION_BANDERAS;
+	} else {
+		//Con dos parametros, escenario, tipo de mision
+		escenario_elegido = argv[1];
+		if (std::strcmp("enemy",argv[2])==0) {
+			tipoMision = Misiones::MISION_ENEMIGO;
+		} else {
+			tipoMision = Misiones::MISION_BANDERAS;
+		}
 	}
 	// Iniciamos el seed de srand
 	std::srand(std::time(NULL));
@@ -131,11 +143,14 @@ int main(int argc, char* argv[]) {
 	//pm.addEnemy("Enemigo1","soldado",mapa,1);
 	//pm.addEnemy("Enemigo2","soldado",mapa,2);	
 	//pm.addEnemy("Enemigo3","soldado",mapa,2);
+
+	//Creo la mision si corresponde
 	if(crearMision){
-		//Creacion de misiones(TODO:logica random entre los distintos tipos)
-		mision.crearMisionBanderas(2);
-		//std::cout << "Se creo mision de " << mision.cantBanderas() << " banderas" << endl;
-		//mision.crearMisionEnemigo("derecha");
+		if (tipoMision == Misiones::MISION_BANDERAS) {
+			mision.crearMisionBanderas(2);
+		} else {
+			mision.crearMisionEnemigo("EnemigoMaster");
+		}
 	}
 
 	//Enemigo* unEnemigo = pm.getEnemy("Enemigo1");
@@ -169,6 +184,9 @@ int main(int argc, char* argv[]) {
 	}
 	//destruyo enemigos y golem 
 	for(auto it = pm.getEnemies().begin();it != pm.getEnemies().end();it++) {
+		delete(it->second);
+	}
+	for(auto it = pm.getGolems().begin();it != pm.getGolems().end();it++) {
 		delete(it->second);
 	}
 

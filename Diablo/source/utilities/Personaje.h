@@ -2,6 +2,7 @@
 #include <iostream>
 #include <stdlib.h> 
 #include <time.h> 
+#include <list>
 #include "../display/entidad.h"
 #include "../utilities/ImagenPersonaje.h"
 #include "../display/tile.h"
@@ -75,6 +76,13 @@ public:
 		//Revivir tiempo
 		const static unsigned int TIEMPO_REVIVIR = 3000;
 
+		//Dejan de estar congelados tiempo
+		const static unsigned int TIEMPO_DESCONGELAR = 10000;
+
+
+		//Vuelven a su forma original
+		const static unsigned int TIEMPO_TRANSMUT = 10000;
+
 		//Daño maximo de los hechizos
 		const static char DAÑO_TERREMOTO = 100;
 
@@ -116,7 +124,15 @@ protected:
 
 		//Tiene o no los hechizos(podria tener mas de uno quizas?, por eso un char)
 		char terremoto;
+		
 		char hielo;
+		Timer tHielo;
+		std::list<std::string> nicks_congelados;
+
+		bool transmutacion;
+		Timer tTransmut;
+		char tipoTransmut;
+		std::string transmutado;
 
 		//Vida restante
 		char energia;
@@ -265,7 +281,7 @@ public:
 	*/
 	virtual unsigned int defender(Tile* tileDestino , Mapa* mapa);
 	
-
+	//Animaciones
 	void animacionMuerte();
 
 	void animacionRevivir();
@@ -432,6 +448,16 @@ public:
 
 	void utilizarHielo(Mapa* mapa, PjeManager* pjm);
 
+	void updateHielo();
+
+	void setTransmutacion(bool valor) { transmutacion = valor; }
+
+	bool tieneTransmutacion() { return transmutacion; }
+
+	void utilizarTransmutacion(std::string nick_enemigo);
+
+	void updateTransmutacion();
+
 	bool estaVivo() {return vivo; }
 
 	void revivir();
@@ -485,7 +511,11 @@ public:
 
 	void sumarBombas(char cantidad) { bombas+=cantidad; }
 
+	std::pair<int,int> buscarUbicacionBomba(int x, int y);
+
 	void utilizarBomba(int xPersonaje, int yPersonaje);
+
+	void Personaje::utilizarGolem() ;
 
 	void updateBomba();
 

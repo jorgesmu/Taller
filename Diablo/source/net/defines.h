@@ -85,12 +85,23 @@ const unsigned char CATCH_FLAG = 'F';
 const unsigned char WINNER = 'G';
 //Avisa que murio enemigo
 const unsigned char ENEMY_DEAD = 'H';
-// Termino de mover enemigo
+//avise si termine de mover
 const unsigned char EN_MOVE_CMPLT = 'I';
 // Exploto una bomba
 const unsigned char BOMB_OFF = 'J';
+// uso golem
+const unsigned char USO_GOLEM = 'K';
+// Descongelo un personaje
+const unsigned char DESCONGELAR = 'L';
+// Transmutacion - Convirtio a un enemigo en otra cosa
+const unsigned char TRANSMUT = 'M';
+// Vuevlo atras la transmutacion
+const unsigned char DESTRANSMUT = 'N';
+// Aviso de muerte al servidor
+const unsigned char DEAD = 'O';
 // Dejar item
-const unsigned char LEAVE_ITEM = 'L';
+const unsigned char LEAVE_ITEM = 'P';
+
 }
 
 // Cosas de movimiento
@@ -131,4 +142,11 @@ namespace ATT {
 	const char RADIO = 7;
 	const char BOLA_DE_CRISTAL = 8;
 	const char GOLEM = 9;
+	const char CANT_BOMBAS = 10;
+}
+
+// Cosas a las que se puede transmutar
+namespace TIPO {
+	const char LAPIDA = 0;
+	const char ESTRATEGIA_ENEMY = 1;
 }

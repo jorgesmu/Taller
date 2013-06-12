@@ -32,6 +32,10 @@ extern ChatWindow chat_window;
 extern int estadoMovimiento;
 extern std::vector<EntidadFija*> entidades_cargadas;
 
+extern bool enAtaque; // indica si se encuentra en ataque
+extern bool calcularAtaque; // indica si se debe calcular el camino minimo para un ataque
+extern Personaje* personajeObjetivo;
+
 bool ClientSocket::WSinit = false;
 size_t ClientSocket::ref_count = 0;
 ClientSocket::ClientSocket() {
@@ -498,7 +502,9 @@ void ClientSocket::listenDo() {
 				auto& p = pjm.getPje(nick);
 				p.mover(mapa.getTile(x, y));
 				p.set_posicion_actualizada(false);
-		
+				if(enAtaque && &p == personajeObjetivo) {
+					calcularAtaque = true;
+				}
 				if(pjm.getPjeLocal().getBolaDeCristal()){
 					std::vector<Tile*> exploradosEnemigo = p.getTilesExplorados();
 					for(auto it = exploradosEnemigo.begin(); it != exploradosEnemigo.end(); ++it){

@@ -89,6 +89,12 @@ config_general configuracion;
 bool choco;
 //Muerte que llega desde el personaje como aviso
 //bool murio;
+// Flags ataque
+bool enAtaque = false; // indica si se encuentra en ataque
+bool calcularAtaque = false; // indica si se debe calcular el camino minimo para un ataque
+// Variables especiales para ataque
+Personaje* personajeObjetivo = NULL;
+Tile* tilePersonajeObjetivo =  NULL;
 //Socket
 ClientSocket sock;
 // Cargo las entidades en un vector
@@ -362,12 +368,6 @@ int main(int argc, char* argv[]) {
 	int ultimoMovimientoY = NOSEMOVIO;// idem coordenada y
 	int ultimoDestinoX = NOSEMOVIO;//guarda el destino actual
 	int ultimoDestinoY = NOSEMOVIO;//guarda el destino actual
-	// Variables especiales para ataque
-	Personaje* personajeObjetivo = NULL;
-	Tile* tilePersonajeObjetivo =  NULL;
-	// Flags ataque
-	bool enAtaque = false; // indica si se encuentra en ataque
-	bool calcularAtaque = false; // indica si se debe calcular el camino minimo para un ataque
 	while((!quit ) && (sock.isOpen()) ) {
 
 		// Sync stuff
@@ -525,11 +525,12 @@ int main(int argc, char* argv[]) {
 								caminoMinimo = mapa.getCaminoMinimo(tilePersonaje, tileDestino);
 								indice = 1;
 								estadoMovimiento = MOV::MANDAR_POS;
+								enAtaque = false;
+								calcularAtaque = false;
 							} else if  (personajeAux -> getNick() != pjm.getPjeLocal().getNick()){
-								enAtaque = true;
+								calcularAtaque = true;
 								tilePersonajeObjetivo = tileDestino;
 								personajeObjetivo = personajeAux;
-								calcularAtaque = true;
 							}
 						}
 					}
@@ -572,7 +573,7 @@ int main(int argc, char* argv[]) {
 		}
 
 		// calculo de ataque
-		if ((calcularAtaque) && (enAtaque)) {
+		if (calcularAtaque) {
 			printf("\nCalculo del camino de ataque %s\n", pjm.getPjeLocal().getNick().c_str());
 			if (personajeObjetivo != NULL) {
 				Tile* tileActualLocal = mapa.getTilePorPixeles(pjm.getPjeLocal().getX(),pjm.getPjeLocal().getY());
@@ -583,6 +584,7 @@ int main(int argc, char* argv[]) {
 					estadoMovimiento = MOV::MANDAR_POS;
 					caminoMinimo.pop_back();
 					enAtaque = true;
+					std::cout << "enAtaque = true\n";
 				}else {
 					enAtaque = false;
 					personajeObjetivo = NULL;
@@ -786,7 +788,6 @@ int main(int argc, char* argv[]) {
 			if ((estadoPersonaje == Personaje::MOVER_COMPLETADO)) 
 				 {
 				puedeMoverse = true;
-				puedeMoverse = true;
 				// verifico si se encuentra en condiciones de atacar
 				if (enAtaque) {
 					// verifico que el personaje se encuentre en tile sobre el cual calcule el camino minimo
@@ -797,7 +798,6 @@ int main(int argc, char* argv[]) {
 							if (tileActualObjetivo != tilePersonajeObjetivo){
 								printf("\nSe determino que se debe recalcular camino %s\n",pjm.getPjeLocal().getNick().c_str());
 								calcularAtaque = true;
-								puedeMoverse = false;
 							} else {
 								// verifico si se llego al final de camino minimo
 								if (indice == caminoMinimo.size()){

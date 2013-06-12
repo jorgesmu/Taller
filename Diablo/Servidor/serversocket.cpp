@@ -660,6 +660,18 @@ void ServerSocket::acceptLastDo() {
 					}
 					send(it->second.sock, bs.str());
 				}
+			}else if(pt == PROTO::LEAVE_ITEM) {
+				char item;
+				int posItemX,posItemY;
+				bs >> item >> posItemX >> posItemY;
+				// Avisamos a los otros jugadores 
+				for(auto it = clients_map.begin();it != clients_map.end();it++) {
+					if(it->second.nick == new_nick) continue; // Salteamos a nuestro jugador
+					bs.clear();
+					bs << PROTO::LEAVE_ITEM << item << posItemX << posItemY;
+					send(it->second.sock, bs.str());
+					std::cout << "Update a " << it->second.nick << " item en pos (" << posItemX << "," << posItemY << ")" << endl;
+				}
 			}else if(pt == PROTO::BOMB_OFF) {
 				// Avisamos a los otros jugadores 
 				for(auto it = clients_map.begin();it != clients_map.end();it++) {

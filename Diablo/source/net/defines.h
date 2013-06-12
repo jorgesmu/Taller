@@ -89,6 +89,8 @@ const unsigned char ENEMY_DEAD = 'H';
 const unsigned char EN_MOVE_CMPLT = 'I';
 // Exploto una bomba
 const unsigned char BOMB_OFF = 'J';
+// Dejar item
+const unsigned char LEAVE_ITEM = 'L';
 }
 
 // Cosas de movimiento
@@ -104,9 +106,17 @@ namespace MOV {
 
 // Cosas de items
 namespace ITEM {
-	const char TERREMOTO = 0;
-	const char HIELO = 1;
-	const char BOMBA = 2;
+	const char TERREMOTO = 'a';
+	const char HIELO = 'b';
+	const char BOMBA = 'c';
+	const char LAMPARA = 'd';
+	const char MAPAITEM = 'e';
+	const char ZAPATOS = 'f';
+	const char ESCUDO = 'g';
+	const char BOLA_DE_CRISTAL = 'h';
+	const char GOLEM = 'i';
+	const char BOTELLA = 'j';
+	const char CORAZON = 'k';
 }
 
 // Cosas de atributos

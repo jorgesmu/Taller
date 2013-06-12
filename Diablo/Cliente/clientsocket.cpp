@@ -530,8 +530,7 @@ void ClientSocket::listenDo() {
 				mapa.getTile(x, y)->addEntidad(&p);
 				p.setTileActual(mapa.getTile(x, y));
 				p.revivir();
-				std::cout << "clientSocket leaving item in <" << posViejaU << ";" << posViejaV << "\n";
-				p.dejarItem(posViejaU, posViejaV, &resman);
+
 				std::cout << "Server requested revival of <" << nick << "> to " << x << ";" << y << "\n";
 			}
 		}else if(pt == PROTO::USE_ITEM) {
@@ -552,6 +551,83 @@ void ClientSocket::listenDo() {
 				pjm.getPje(nick_who).setBombaX(posBombaX);
 				pjm.getPje(nick_who).setBombaY(posBombaY);
 			}
+			// Hacemos algo, animaciones or something
+		}else if(pt == PROTO::LEAVE_ITEM) {
+			char tipoItem;
+			int posItemX,posItemY;
+			bs >> tipoItem >> posItemX >> posItemY;
+			//Coloca el item en el mapa
+
+			Item* item;
+			//case de todos los items y constructor
+			switch(tipoItem){
+				case(ITEM::LAMPARA):{
+					item = new Lampara ("cofre",1,1,true, posItemX ,posItemY,NULL,&mapa,resman,Imagen::COLOR_KEY );
+					mapa.getTile(posItemX, posItemY)->addEntidad(item,&mapa);
+					entidades_cargadas.push_back(item);
+					break;
+				}
+				case(ITEM::MAPAITEM):{
+					item = new MapaItem ("cofre",1,1,true, posItemX ,posItemY,NULL,&mapa,resman,Imagen::COLOR_KEY );
+					mapa.getTile(posItemX, posItemY)->addEntidad(item,&mapa);
+					entidades_cargadas.push_back(item);
+					break;
+				}
+				case(ITEM::ZAPATOS):{
+					item = new Zapatos ("cofre",1,1,true, posItemX ,posItemY,NULL,&mapa,resman,Imagen::COLOR_KEY );
+					mapa.getTile(posItemX, posItemY)->addEntidad(item,&mapa);
+					entidades_cargadas.push_back(item);
+					break;
+				}
+				case (ITEM::TERREMOTO):{
+					item = new Terremoto ("cofre",1,1,true, posItemX , posItemY, NULL,&mapa,resman,Imagen::COLOR_KEY );
+					mapa.getTile(posItemX, posItemY)->addEntidad(item,&mapa);
+					entidades_cargadas.push_back(item);
+					break;
+				}
+				case (ITEM::ESCUDO):{
+					item = new Escudo ("cofre",1,1,true, posItemX , posItemY, NULL,&mapa,resman,Imagen::COLOR_KEY );
+					mapa.getTile(posItemX, posItemY)->addEntidad(item,&mapa);
+					entidades_cargadas.push_back(item);
+					break;
+				}
+				case (ITEM::BOLA_DE_CRISTAL):{
+					item = new BolaDeCristal("cofre",1,1,true, posItemX , posItemY, NULL,&mapa,resman,Imagen::COLOR_KEY );
+					mapa.getTile(posItemX, posItemY)->addEntidad(item,&mapa);
+					entidades_cargadas.push_back(item);
+					break;
+				}
+				case (ITEM::GOLEM):{
+					item = new GolemItem ("cofre",1,1,true, posItemX ,posItemY,NULL,&mapa,resman,Imagen::COLOR_KEY );
+					mapa.getTile(posItemX, posItemY)->addEntidad(item,&mapa);
+					entidades_cargadas.push_back(item);
+					break;
+				}
+				case (ITEM::BOTELLA):{
+					item = new Botella ("cofre",1,1,true, posItemX , posItemX, NULL,&mapa,resman,Imagen::COLOR_KEY );
+					mapa.getTile(posItemX, posItemY)->addEntidad(item,&mapa);
+					entidades_cargadas.push_back(item);
+					break;
+				}
+				case (ITEM::CORAZON):{
+					item = new Corazon ("cofre",1,1,true, posItemX , posItemY, NULL,&mapa,resman,Imagen::COLOR_KEY );
+					mapa.getTile(posItemX, posItemY)->addEntidad(item,&mapa);
+					entidades_cargadas.push_back(item);
+					break;
+				}
+				case (ITEM::HIELO):{
+					item = new Hielo ("cofre",1,1,true, posItemX , posItemY, NULL,&mapa,resman,Imagen::COLOR_KEY );
+					mapa.getTile(posItemX, posItemY)->addEntidad(item,&mapa);
+					entidades_cargadas.push_back(item);
+					break;
+				}
+   				/*case (ITEM::BOMBA):{
+					ArmaBomba cofre("cofre",1,1,true, x , y, NULL,&mapa,*resman,Imagen::COLOR_KEY );
+				}*/
+
+			}
+			//mapa.getTile(posItemX, posItemY)->addEntidad(&cofre,&mapa);
+			//entidades_cargadas.push_back(&cofre);
 			// Hacemos algo, animaciones or something
 		}else if(pt == PROTO::BOMB_OFF) {
 			std::string nick_who;

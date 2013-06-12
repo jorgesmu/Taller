@@ -500,7 +500,6 @@ public:
 	void setBombaY(int pos) { posBombaY=pos; }
 
 	int getBombaY() { return posBombaY; }
->>>>>>> 60890607cf02ff7703fd20261ab2bf2c9846aafd
 
 protected:
 

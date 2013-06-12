@@ -14,6 +14,7 @@
 #include "bolaDeCristal.h"
 #include "hielo.h"
 #include "golemItem.h"
+#include "armaBomba.h"
 #include "bandera.h"
 #include "aux_func.h"
 #include "../net/bitstream.h"
@@ -527,35 +528,98 @@ void Personaje::dejarItem(int x, int y, ResMan* resman){
 		std::cout << "va a dejar el item del case " << rand << "\n";
 		switch(rand){
 			case 0:{
-				Lampara cofre("cofre",1,1,true, x , y, NULL,&mapa,*resman,Imagen::COLOR_KEY );
+				Lampara lampara("cofre",1,1,true, x , y, NULL,&mapa,*resman,Imagen::COLOR_KEY );
+				mapa.getTile(x, y)->addEntidad(&lampara,&mapa);
+				entidades_cargadas.push_back(&lampara);
+				BitStream bs;
+				bs << PROTO::LEAVE_ITEM << ITEM::LAMPARA << x << y;
+				sock.send(bs.str());
+				break;
 			}
 			case 1:{
-				MapaItem cofre("cofre",1,1,true, x , y, NULL,&mapa,*resman,Imagen::COLOR_KEY );
+				MapaItem mapaItem("cofre",1,1,true, x , y, NULL,&mapa,*resman,Imagen::COLOR_KEY );
+				mapa.getTile(x, y)->addEntidad(&mapaItem,&mapa);
+				entidades_cargadas.push_back(&mapaItem);
+				BitStream bs;
+				bs << PROTO::LEAVE_ITEM << ITEM::MAPAITEM << x << y;
+				sock.send(bs.str());
+				break;
 			}
 			case 2:{
-				Zapatos cofre("cofre",1,1,true, x , y, NULL,&mapa,*resman,Imagen::COLOR_KEY );
+				Zapatos zapato("cofre",1,1,true, x , y, NULL,&mapa,*resman,Imagen::COLOR_KEY );
+				mapa.getTile(x, y)->addEntidad(&zapato,&mapa);
+				entidades_cargadas.push_back(&zapato);
+				BitStream bs;
+				bs << PROTO::LEAVE_ITEM << ITEM::ZAPATOS << x << y;
+				sock.send(bs.str());
+				break;
 			}
    			case 3:{
-				Terremoto cofre("cofre",1,1,true, x , y, NULL,&mapa,*resman,Imagen::COLOR_KEY );
+				Terremoto terremoto("cofre",1,1,true, x , y, NULL,&mapa,*resman,Imagen::COLOR_KEY );
+				mapa.getTile(x, y)->addEntidad(&terremoto,&mapa);
+				entidades_cargadas.push_back(&terremoto);
+				BitStream bs;
+				bs << PROTO::LEAVE_ITEM << ITEM::TERREMOTO << x << y;
+				sock.send(bs.str());
+				break;
 			}
    			case 4:{
-				Escudo cofre("cofre",1,1,true, x , y, NULL,&mapa,*resman,Imagen::COLOR_KEY );
+				Escudo escudo("cofre",1,1,true, x , y, NULL,&mapa,*resman,Imagen::COLOR_KEY );
+				mapa.getTile(x, y)->addEntidad(&escudo,&mapa);
+				entidades_cargadas.push_back(&escudo);
+				BitStream bs;
+				bs << PROTO::LEAVE_ITEM << ITEM::ESCUDO << x << y;
+				sock.send(bs.str());
+				break;
 			}
    			case 5:{
-				BolaDeCristal cofre("cofre",1,1,true, x , y, NULL,&mapa,*resman,Imagen::COLOR_KEY );
+				BolaDeCristal bolaDeCristal("cofre",1,1,true, x , y, NULL,&mapa,*resman,Imagen::COLOR_KEY );
+				mapa.getTile(x, y)->addEntidad(&bolaDeCristal,&mapa);
+				entidades_cargadas.push_back(&bolaDeCristal);
+				BitStream bs;
+				bs << PROTO::LEAVE_ITEM << ITEM::BOLA_DE_CRISTAL << x << y;
+				sock.send(bs.str());
+				break;
 			}
    			case 6:{
-				GolemItem cofre("cofre",1,1,true, 6 ,13,NULL,&mapa,*resman,Imagen::COLOR_KEY );
+				GolemItem golem("cofre",1,1,true, 6 ,13,NULL,&mapa,*resman,Imagen::COLOR_KEY );
+				mapa.getTile(x, y)->addEntidad(&golem,&mapa);
+				entidades_cargadas.push_back(&golem);
+				BitStream bs;
+				bs << PROTO::LEAVE_ITEM << ITEM::GOLEM << x << y;
+				sock.send(bs.str());
+				break;
 			}
    			case 7:{
-				Botella cofre("cofre",1,1,true, x , y, NULL,&mapa,*resman,Imagen::COLOR_KEY );
+				Botella botella("cofre",1,1,true, x , y, NULL,&mapa,*resman,Imagen::COLOR_KEY );
+				mapa.getTile(x, y)->addEntidad(&botella,&mapa);
+				entidades_cargadas.push_back(&botella);
+				BitStream bs;
+				bs << PROTO::LEAVE_ITEM << ITEM::BOTELLA << x << y;
+				sock.send(bs.str());
+				break;
 			}
    			case 8:{
-				Corazon cofre("cofre",1,1,true, x , y, NULL,&mapa,*resman,Imagen::COLOR_KEY );
+				Corazon corazon("cofre",1,1,true, x , y, NULL,&mapa,*resman,Imagen::COLOR_KEY );
+				mapa.getTile(x, y)->addEntidad(&corazon,&mapa);
+				entidades_cargadas.push_back(&corazon);
+				BitStream bs;
+				bs << PROTO::LEAVE_ITEM << ITEM::CORAZON << x << y;
+				sock.send(bs.str());
+				break;
 			}
    			case 9:{
-				Hielo cofre("cofre",1,1,true, x , y, NULL,&mapa,*resman,Imagen::COLOR_KEY );
+				Hielo hielo("cofre",1,1,true, x , y, NULL,&mapa,*resman,Imagen::COLOR_KEY );
+				mapa.getTile(x, y)->addEntidad(&hielo,&mapa);
+				entidades_cargadas.push_back(&hielo);
+				BitStream bs;
+				bs << PROTO::LEAVE_ITEM << ITEM::HIELO << x << y;
+				sock.send(bs.str());
+				break;
 			}
+   			/*case 10:{
+				ArmaBomba cofre("cofre",1,1,true, x , y, NULL,&mapa,*resman,Imagen::COLOR_KEY );
+			}*/
 		}
 }
 

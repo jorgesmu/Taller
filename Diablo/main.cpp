@@ -528,8 +528,8 @@ int main(int argc, char* argv[]) {
 			// Veo si me tengo que relocalizar en el mapa
 			if (estadoMovimiento == MOV::OK_REV_RECV) {
 				std::cout << "Relocalizando al jugador..." << endl;
-				int posViejaU = pjm.getPjeLocal().getPosicion(&mapa)->getU();
-				int posViejaV = pjm.getPjeLocal().getPosicion(&mapa)->getV();
+				int x = pjm.getPjeLocal().getPosicion(&mapa)->getU();
+				int y = pjm.getPjeLocal().getPosicion(&mapa)->getV();
 				// Lo elimino de la posicion donde murio
 				mapa.getTile(pjm.getPjeLocal().getPosicion(&mapa)->getU(), pjm.getPjeLocal().getPosicion(&mapa)->getV())->deleteEntidad(&(pjm.getPjeLocal()));
 				// Posiciono el personaje
@@ -547,8 +547,106 @@ int main(int argc, char* argv[]) {
 				ultimoMovimientoX=NOSEMOVIO;
 				ultimoMovimientoY=NOSEMOVIO;
 
-				std::cout << "main leaving item in <" << posViejaU << ";" << posViejaV << "\n";
-				pjm.getPjeLocal().dejarItem(posViejaU, posViejaV, &resman);
+				//meto el item que deja cuando muere
+				int cant_items = 9;//cantidad de items que implementamos
+				int rand;
+				rand = intRand(0, cant_items);
+				Item* item;
+				switch(rand){
+					case 0:{
+						item = new Lampara("cofre",1,1,true, x , y, NULL,&mapa,resman,Imagen::COLOR_KEY );
+						mapa.getTile(x, y)->addEntidad(item,&mapa);
+						entidades_cargadas.push_back(item);
+						BitStream bs;
+						bs << PROTO::LEAVE_ITEM << ITEM::LAMPARA << x << y;
+						sock.send(bs.str());
+						break;
+					}
+					case 1:{
+						item = new MapaItem ("cofre",1,1,true, x , y, NULL,&mapa,resman,Imagen::COLOR_KEY );
+						mapa.getTile(x, y)->addEntidad(item,&mapa);
+						entidades_cargadas.push_back(item);
+						BitStream bs;
+						bs << PROTO::LEAVE_ITEM << ITEM::MAPAITEM << x << y;
+						sock.send(bs.str());
+						break;
+					}
+					case 2:{
+						item = new Zapatos ("cofre",1,1,true, x , y, NULL,&mapa,resman,Imagen::COLOR_KEY );
+						mapa.getTile(x, y)->addEntidad(item,&mapa);
+						entidades_cargadas.push_back(item);
+						BitStream bs;
+						bs << PROTO::LEAVE_ITEM << ITEM::ZAPATOS << x << y;
+						sock.send(bs.str());
+						break;
+					}
+   					case 3:{
+						item = new Terremoto ("cofre",1,1,true, x , y, NULL,&mapa,resman,Imagen::COLOR_KEY );
+						mapa.getTile(x, y)->addEntidad(item,&mapa);
+						entidades_cargadas.push_back(item);
+						BitStream bs;
+						bs << PROTO::LEAVE_ITEM << ITEM::TERREMOTO << x << y;
+						sock.send(bs.str());
+						break;
+					}
+   					case 4:{
+						item = new Escudo ("cofre",1,1,true, x , y, NULL,&mapa,resman,Imagen::COLOR_KEY );
+						mapa.getTile(x, y)->addEntidad(item,&mapa);
+						entidades_cargadas.push_back(item);
+						BitStream bs;
+						bs << PROTO::LEAVE_ITEM << ITEM::ESCUDO << x << y;
+						sock.send(bs.str());
+						break;
+					}
+   					case 5:{
+						item = new BolaDeCristal ("cofre",1,1,true, x , y, NULL,&mapa,resman,Imagen::COLOR_KEY );
+						mapa.getTile(x, y)->addEntidad(item,&mapa);
+						entidades_cargadas.push_back(item);
+						BitStream bs;
+						bs << PROTO::LEAVE_ITEM << ITEM::BOLA_DE_CRISTAL << x << y;
+						sock.send(bs.str());
+						break;
+					}
+   					case 6:{
+						item = new GolemItem ("cofre",1,1,true, 6 ,13,NULL,&mapa,resman,Imagen::COLOR_KEY );
+						mapa.getTile(x, y)->addEntidad(item,&mapa);
+						entidades_cargadas.push_back(item);
+						BitStream bs;
+						bs << PROTO::LEAVE_ITEM << ITEM::GOLEM << x << y;
+						sock.send(bs.str());
+						break;
+					}
+   					case 7:{
+						item = new Botella ("cofre",1,1,true, x , y, NULL,&mapa,resman,Imagen::COLOR_KEY );
+						mapa.getTile(x, y)->addEntidad(item,&mapa);
+						entidades_cargadas.push_back(item);
+						BitStream bs;
+						bs << PROTO::LEAVE_ITEM << ITEM::BOTELLA << x << y;
+						sock.send(bs.str());
+						break;
+					}
+   					case 8:{
+						item = new Corazon ("cofre",1,1,true, x , y, NULL,&mapa,resman,Imagen::COLOR_KEY );
+						mapa.getTile(x, y)->addEntidad(item,&mapa);
+						entidades_cargadas.push_back(item);
+						BitStream bs;
+						bs << PROTO::LEAVE_ITEM << ITEM::CORAZON << x << y;
+						sock.send(bs.str());
+						break;
+					}
+   					case 9:{
+						item = new Hielo ("cofre",1,1,true, x , y, NULL,&mapa,resman,Imagen::COLOR_KEY );
+						mapa.getTile(x, y)->addEntidad(item,&mapa);
+						entidades_cargadas.push_back(item);
+						BitStream bs;
+						bs << PROTO::LEAVE_ITEM << ITEM::HIELO << x << y;
+						sock.send(bs.str());
+						break;
+					}
+   					/*case 10:{
+						ArmaBomba cofre("cofre",1,1,true, x , y, NULL,&mapa,*resman,Imagen::COLOR_KEY );
+					}*/
+				}
 			}
 
 			// Actualiza la camara

@@ -19,7 +19,8 @@ SDL_Rect makeRect(int x, int y, int w, int h) {
 }
 
 int intRand(int min, int max) {
-    return min + (rand() % (int)(max - min + 1));
+    //return ((int)(rand()*max))+1;
+	return min + (rand() % (int)(max - min + 1));
 }
 
 float fRand(float v1, float v2) {

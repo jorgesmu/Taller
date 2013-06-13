@@ -471,7 +471,7 @@ void ServerSocket::acceptLastDo() {
 
 		//Le mandamos la velocidad que tenia		
 		bs.clear();
-		auto p=pm.getPlayer(new_nick); //alias shortcut
+		auto& p=pm.getPlayer(new_nick); //alias shortcut
 		bs << PROTO::OLD_ATT << (float)p.getVelocidad() << p.getEnergia() << p.getMagia() << p.getEnergiaEscudo() << p.getTerremoto() << p.getHielo() << (float)p.getRadio() << (bool)p.getBolaDeCristal() << (bool)p.tieneGolem() << p.getCantBombas(); 
 		send(cid, bs.str());
 

@@ -680,6 +680,7 @@ bool Personaje::isCaminable(){
 	por dicha instancia.
 */
 bool Personaje::isCaminable(Tile* tile){
+	return true;
 	return ( (tile != NULL) && (this -> tileAncla != NULL) && (tile == this -> tileAncla) );
 }
 
@@ -1150,7 +1151,7 @@ void Personaje::utilizarTerremoto(Mapa* mapa, PjeManager* pjm, ClientSocket* soc
 					if ((i==xPersonaje) && (j==yPersonaje)) {
 						srand (time(NULL));
 						dañoRealizado=rand()%(this->ENERGIA_TOTAL+1);
-						//dañoRealizado=100;
+						dañoRealizado=110;
 						it->second.dañar(dañoRealizado);
 						std::cout << "Se danio a " << it->first << " con terremoto, total de " << (int)dañoRealizado << endl;
 						bs.clear();
@@ -1302,8 +1303,10 @@ void Personaje::aumentarRadio(float proporcion) {
 }
 
 void Personaje::muere() {
+	bool murioLocal = false;
+	if (this->getNick() == pjm.getPjeLocal().getNick()) murioLocal = true;
 	if (vivo) {
-		this->animacionMuerte();
+		if (murioLocal) this->animacionMuerte();
 		std::cout << "Fui asesinado" << endl;
 		//Redirecciono a la posicion inicial nuevamente
 		this->vivo=false;
@@ -1311,7 +1314,7 @@ void Personaje::muere() {
 		BitStream bs;
 		bs << PROTO::DEAD << this->getNick();
 		sock.send(bs.str());
-		this->timerRevivir.start();
+		if (murioLocal) this->timerRevivir.start();
 	}
  }
 

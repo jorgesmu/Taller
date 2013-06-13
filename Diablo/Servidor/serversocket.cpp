@@ -1295,7 +1295,21 @@ void ServerSocket::acceptLastDo() {
 			}else if (pt == PROTO::DEAD){
 				std::string nick_who;
 				bs >> nick_who;
-				pm.getPlayer(nick_who).congelar();
+				cout << nick_who << " fue asesinado por " << new_nick;
+				if (pm.playerExists(nick_who)) {
+					pm.getPlayer(nick_who).congelar();
+				} else if (pm.enemyExists(nick_who)) {
+					// Lo borro
+					for (auto it = pm.getEnemies().begin(); it != pm.getEnemies().end(); it++) {
+						if (it->first == nick_who) pm.getEnemies().erase(it);
+					}
+					// Aviso a todos que esta muerto
+					bs.clear();
+					bs << PROTO::ENEMY_DEAD << nick_who;
+					for(auto it = clients_map.begin();it != clients_map.end();it++) {
+						send(it->second.sock, bs.str());
+					}
+				}
 			}else{
 				bs.clear();
 				bs << PROTO::TEXTMSG << std::string("Unknown packet type");

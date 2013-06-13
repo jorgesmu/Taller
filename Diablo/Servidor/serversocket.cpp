@@ -236,7 +236,7 @@ bool ServerSocket::receive(const std::string& cid, std::string& buff) {
 			tmp = queue_buf[cid];
 			//std::cout << "APPENDING FROM QUEUE (" << queue_buf.size() << ")\n";
 			bytes_read += queue_buf[cid].size();
-			queue_buf.clear();
+			queue_buf[cid].clear();
 		}
 		// If we have an empty packet, read the size first
 		if(packet_size == -1 && tmp.size() >= 2) {

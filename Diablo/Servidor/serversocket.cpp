@@ -739,10 +739,12 @@ void ServerSocket::acceptLastDo() {
 				//busco si se ataco a un enemigo
 				for(auto it = pm.getEnemies().begin();it != pm.getEnemies().end();it++) {
 					if(it->second->getNick() == nick_to){
+						cout << "Se ataco a enemigo " << nick_to  << " con danio" << (int)dmg << endl;
 						it->second->hacerDanio(dmg);
 						it->second->atacadoPor(nick_who);
 						if (!it->second->estaVivo()){
 							murioPersonaje = true;
+							cout << "Murio enemigo " << nick_to << endl;
 							if(mision.getTipo() == Misiones::MISION_ENEMIGO){
 								if (mision.enemigoMision() == it->second->getNick()){
 									//termino mision
@@ -1295,14 +1297,14 @@ void ServerSocket::acceptLastDo() {
 			}else if (pt == PROTO::DEAD){
 				std::string nick_who;
 				bs >> nick_who;
-				cout << nick_who << " fue asesinado por " << new_nick;
+				cout << nick_who << " fue asesinado por " << new_nick << endl;
 				if (pm.playerExists(nick_who)) {
 					pm.getPlayer(nick_who).congelar();
 				} else if (pm.enemyExists(nick_who)) {
-					// Lo borro
-					for (auto it = pm.getEnemies().begin(); it != pm.getEnemies().end(); it++) {
+					// Lo borro -->se borra en el damage
+					/*for (auto it = pm.getEnemies().begin(); it != pm.getEnemies().end(); it++) {
 						if (it->first == nick_who) pm.getEnemies().erase(it);
-					}
+					}*/
 					// Aviso a todos que esta muerto
 					bs.clear();
 					bs << PROTO::ENEMY_DEAD << nick_who;

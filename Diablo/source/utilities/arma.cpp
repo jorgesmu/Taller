@@ -511,6 +511,7 @@ bool Arma::isCaminable(){
 	por dicha instancia.
 */
 bool Arma::isCaminable(Tile* tile){
+	return true;
 	return ( (tile != NULL) && (this -> tileAncla != NULL) && (tile == this -> tileAncla) );
 }
 

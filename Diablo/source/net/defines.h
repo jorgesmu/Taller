@@ -101,6 +101,8 @@ const unsigned char DESTRANSMUT = 'N';
 const unsigned char DEAD = 'O';
 // Dejar item
 const unsigned char LEAVE_ITEM = 'P';
+// Atributos por default del cliente
+const unsigned char DEF_ATT = 'Q';
 
 }
 

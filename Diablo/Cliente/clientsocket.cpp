@@ -43,6 +43,7 @@ extern Console consola;
 extern ChatWindow chat_window;
 extern int estadoMovimiento;
 extern std::vector<EntidadFija*> entidades_cargadas;
+extern bool initAttCargados;
 
 extern bool enAtaque; // indica si se encuentra en ataque
 extern bool calcularAtaque; // indica si se debe calcular el camino minimo para un ataque
@@ -344,6 +345,7 @@ void ClientSocket::listenDo() {
 			init_bolaDeCristal = bolaDeCristal;
 			init_golem = golem;
 			init_bombas = cantBombas;
+			initAttCargados = true;
 		}else if(pt == PROTO::ESC_ID) {
 			bs >> escenario_elegido_id;
 			//std::cout << "RECEIVED ESC ID: (" << escenario_elegido_id << ")\n";
@@ -738,6 +740,30 @@ void ClientSocket::listenDo() {
 					} else if (tipoAtt==ATT::RADIO) {
 						it->second.setRadio(nuevoVal);
 					}
+					break;
+				}
+			}
+		}else if(pt == PROTO::DEF_ATT) {	
+			std::string nick_who;
+			bs >> nick_who;
+			float vel,radio;
+			char energia,magia,escudo,terremoto,hielo,bombas;
+			bool bolaCristal,golem;
+			bs >> vel >> energia >> magia >> escudo >> terremoto >> hielo >> radio >> bolaCristal >> golem >> bombas;
+			// Buscamos el personaje 
+			for(auto it = pjm.getPjes().begin();it != pjm.getPjes().end();it++) {
+				if(it->first == nick_who) {
+					auto&p = pjm.getPje(nick_who);
+					p.setVelocidad((double)vel);
+					p.setEnergia(energia);
+					p.setMagia(magia);
+					p.setEnergiaEscudo(escudo);
+					p.setTerremoto(terremoto);
+					p.setHielo(hielo);
+					p.setRadio(radio);
+					p.setBolaDeCristal(bolaCristal);
+					p.setGolem(golem);
+					p.setCantBombas(bombas);
 					break;
 				}
 			}

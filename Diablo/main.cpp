@@ -102,6 +102,8 @@ Tile* tilePersonajeObjetivo =  NULL;
 ClientSocket sock;
 // Cargo las entidades en un vector
 std::vector<EntidadFija*> entidades_cargadas;
+// Recibi todos los atributos default del server
+bool initAttCargados = false;
 
 int main(int argc, char* argv[]) {
 	// Verificamos que se pase el nick y el tipo
@@ -294,6 +296,9 @@ int main(int argc, char* argv[]) {
 	// Agrega el personaje(no esta tomando velocidad del YAML!!!)
 	pjm.getPjeLocal().init(pje_local_nick, pje_local_tipo , 1 , 1 , 50 , 5, 100, 100 ,	configuracion.get_vel_personaje(),	0 , 50 , NULL , resman , Imagen::COLOR_KEY);
 
+	while (!initAttCargados) {
+		Sleep(10);
+	}
 	//Si no me conecto por primera vez al servidor
 	if (init_vel!=0) {
 		std::cout << "Restaurando atributos..." << endl;
@@ -311,35 +316,10 @@ int main(int argc, char* argv[]) {
 	} else {
 		//Aviso al server mis valores por defecto de atributos
 		std::cout << "Avisando al server de mis attributos default..." << endl;
+		auto& p = pjm.getPjeLocal();
 		bs.clear();
-		bs << PROTO::UPDATE_ATT << ATT::VEL << (float)pjm.getPjeLocal().getVelocidad();
-		sock.send(bs.str());
-		bs.clear();
-		bs << PROTO::UPDATE_ATT << ATT::ENERGIA << pjm.getPjeLocal().getEnergia();
-		sock.send(bs.str());
-		bs.clear();
-		bs << PROTO::UPDATE_ATT << ATT::MAGIA << pjm.getPjeLocal().getEnergia();
-		sock.send(bs.str());
-		bs.clear();
-		bs << PROTO::UPDATE_ATT << ATT::ENERGIA_ESCUDO << pjm.getPjeLocal().getEnergiaEscudo();
-		sock.send(bs.str());
-		bs.clear();
-		bs << PROTO::UPDATE_ATT << ATT::CANT_TERREMOTO << pjm.getPjeLocal().getTerremoto();
-		sock.send(bs.str());
-		bs.clear();
-		bs << PROTO::UPDATE_ATT << ATT::CANT_HIELO << pjm.getPjeLocal().getHielo();
-		sock.send(bs.str());
-		bs.clear();
-		bs << PROTO::UPDATE_ATT << ATT::RADIO << pjm.getPjeLocal().getRadioY();
-		sock.send(bs.str());
-		bs.clear();
-		bs << PROTO::UPDATE_ATT << ATT::BOLA_DE_CRISTAL << pjm.getPjeLocal().getBolaDeCristal();
-		sock.send(bs.str());
-		bs.clear();
-		bs << PROTO::UPDATE_ATT << ATT::GOLEM << pjm.getPjeLocal().tieneGolem();
-		sock.send(bs.str());
-		bs.clear();
-		bs << PROTO::UPDATE_ATT << ATT::CANT_BOMBAS << pjm.getPjeLocal().getCantBombas();
+		bs << PROTO::DEF_ATT << (float)p.getVelocidad() << p.getEnergia() << p.getMagia() << p.getEnergiaEscudo() << p.getTerremoto() << p.getHielo();
+		bs << p.getRadioY() << p.getBolaDeCristal() << p.tieneGolem() << p.getCantBombas();
 		sock.send(bs.str());
 	}
 	

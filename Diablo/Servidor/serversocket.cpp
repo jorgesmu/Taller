@@ -236,7 +236,7 @@ bool ServerSocket::receive(const std::string& cid, std::string& buff) {
 			tmp = queue_buf[cid];
 			//std::cout << "APPENDING FROM QUEUE (" << queue_buf.size() << ")\n";
 			bytes_read += queue_buf[cid].size();
-			queue_buf.clear();
+			queue_buf[cid].clear();
 		}
 		// If we have an empty packet, read the size first
 		if(packet_size == -1 && tmp.size() >= 2) {
@@ -831,16 +831,18 @@ void ServerSocket::acceptLastDo() {
 				float nuevoVal;
 				char nuevoValor;
 				bool nuevoValorBool;
-				std::cout << "update_att \n";
 				if ((tipoAtt==ATT::VEL) || (tipoAtt==ATT::RADIO)) {
 					// Valor float: velocidad/radio
 					bs >> nuevoVal;
+					//cout << "att recv " << nuevoVal << " tipo " << (int)tipoAtt << endl;
 				}else if((tipoAtt==ATT::BOLA_DE_CRISTAL) || (tipoAtt==ATT::GOLEM)){
 					//valor bool: bola de cristal/golem
 					bs >> nuevoValorBool;
+					//cout << "att recv " << nuevoValorBool << " tipo " << (int)tipoAtt << endl;
 				} else {
 					// Valor char: energia/magia/escudo/terremoto/hielo/radio/bombas
 					bs >> nuevoValor;
+					//cout << "att recv " << (int)nuevoValor << " tipo " << (int)tipoAtt << endl;
 				}
 				// Avisamos a los otros jugadores 
 				for(auto it = clients_map.begin();it != clients_map.end();it++) {
@@ -861,6 +863,7 @@ void ServerSocket::acceptLastDo() {
 							pm.getPlayer(new_nick).setBolaDeCristal(nuevoValorBool);
 
 							if(nuevoValorBool){
+								cout << "mandando tiles de otros jugadores" << endl;;
 								//mando al jugador los tiles del resto
 								for(auto it = pm.getPlayers().begin(); it != pm.getPlayers().end();it++) {
 									if(it->first == new_nick) continue;
@@ -893,6 +896,49 @@ void ServerSocket::acceptLastDo() {
 					} else {
 						bs << PROTO::UPDATE_ATT << tipoAtt << new_nick << nuevoValor;
 					}
+					send(it->second.sock, bs.str());
+					
+				}
+			}else if(pt == PROTO::DEF_ATT) {	
+				float vel,radio;
+				char energia,magia,escudo,terremoto,hielo,bombas;
+				bool bolaCristal,golem;
+				bs >> vel >> energia >> magia >> escudo >> terremoto >> hielo >> radio >> bolaCristal >> golem >> bombas;
+				// Avisamos a los otros jugadores 
+				for(auto it = clients_map.begin();it != clients_map.end();it++) {
+					if(it->second.nick == new_nick) {
+						auto& p = pm.getPlayer(new_nick);
+						p.setVelocidad((double)vel);
+						p.setEnergia(energia);
+						p.setMagia(magia);
+						p.setEnergiaEscudo(escudo);
+						p.setTerremoto(terremoto);
+						p.setHielo(hielo);
+						p.setRadio(radio);
+						p.setBolaDeCristal(bolaCristal);
+						if(bolaCristal){
+							cout << "mandando tiles de otros jugadores" << endl;;
+							//mando al jugador los tiles del resto
+							for(auto it = pm.getPlayers().begin(); it != pm.getPlayers().end();it++) {
+								if(it->first == new_nick) continue;
+								if(it->second.getTilesRecorridos().size() > 0) {
+									bs.clear();
+									bs << PROTO::NIEBLA_LIST << short(it->second.getTilesRecorridos().size());
+									for(auto it2 = it->second.getTilesRecorridos().begin(); it2 != it->second.getTilesRecorridos().end();it2++) {
+										bs << it2->first << it2->second;
+										it->second.addTileRecorrido(it2->first, it2->second);
+									}
+									send(cid, bs.str());
+								}
+							}
+						}
+						p.setGolem(golem);
+						p.setCantBombas(bombas);
+						continue; // Salteamos a nuestro jugador de avisarle
+					}
+					bs.clear();
+					bs << PROTO::DEF_ATT << new_nick << (float)p.getVelocidad() << p.getEnergia() << p.getMagia() << p.getEnergiaEscudo() << p.getTerremoto();
+					bs << p.getHielo() << p.getRadio() << p.getBolaDeCristal() << p.tieneGolem() << p.getCantBombas();
 					send(it->second.sock, bs.str());
 					
 				}

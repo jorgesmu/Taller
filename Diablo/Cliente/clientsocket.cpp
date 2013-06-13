@@ -346,6 +346,7 @@ void ClientSocket::listenDo() {
 			init_golem = golem;
 			init_bombas = cantBombas;
 			initAttCargados = true;
+			cout << "Velocidad restaurada: " << init_vel << endl;
 		}else if(pt == PROTO::ESC_ID) {
 			bs >> escenario_elegido_id;
 			//std::cout << "RECEIVED ESC ID: (" << escenario_elegido_id << ")\n";
@@ -423,9 +424,7 @@ void ClientSocket::listenDo() {
 			bool bolaDeCristal, golem;
 			char energia,magia,energiaEscudo,cantTerremoto,cantHielo;
 			bs >> nick_who >> vel_recv >> energia >> magia >> energiaEscudo >> cantTerremoto >> cantHielo >> radio >> bolaDeCristal >> golem;
-			//double vel=(double)vel_recv;
-			double vel =0.01;//cambiar
-			cout <<"Velocidad  = "<< vel<<endl;
+			double vel=(double)vel_recv;
 			//Seteamos los atributos del jugador
 			pjm.getPje(nick_who).setVelocidad(vel);
 			pjm.getPje(nick_who).setEnergia(energia);

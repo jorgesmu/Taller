@@ -12,12 +12,14 @@ Player::Player() {
 	tipo_personaje = "uninit-pje";
 	isOnline = false;
 	x = y = 0;
-	velocidad = 105/1000;
+	velocidad = 0;
 	congelado = 0; //descongelado
 	xSiguiente = ySiguiente = -1;
 	bolaDeCristal = false;
 	seMovio = false;
 	energia = 100;
+	bolaDeCristal = golem = false;
+
 }
 
 Player::~Player() {

@@ -738,7 +738,7 @@ int main(int argc, char* argv[]) {
 					//cout << "pos " << unTile->getU() << "," <<unTile->getV() <<endl;
 					bs.clear();
 					bs << PROTO::EN_MOVE_CMPLT << it->second.getNick() << unTile->getU() << unTile ->getV() ;
-					//sock.send(bs.str()); 
+					sock.send(bs.str()); 
 					//std::cout << "Mandando termino de moverse personaje a servidor" << it->second.getNick() << "\n";
 					//estado de personaje es para el pje local y estoy en un loop de otros personajes
 					//estadoPersonaje = Personaje::ESPERANDO_ACCION;

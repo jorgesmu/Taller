@@ -726,6 +726,17 @@ void ServerSocket::acceptLastDo() {
 					send(it->second.sock, bs.str());
 					std::cout << "Update a " << it->second.nick << ": bomba explotada de " << new_nick <<endl;
 				}
+			}else if(pt == PROTO::ITEM_OFF) {
+				// Avisamos a los otros jugadores 
+				std::cout << "agarro item \n";
+				int x, y;
+				for(auto it = clients_map.begin();it != clients_map.end();it++) {
+					if(it->second.nick == new_nick) continue; // Salteamos a nuestro jugador
+					bs.clear();
+					bs << PROTO::ITEM_OFF << x << y;
+					send(it->second.sock, bs.str());
+					std::cout << "Update a " << it->second.nick << ": agarro item " << new_nick <<endl;
+				}
 			}else if(pt == PROTO::DAMAGE) {	
 				std::string nick_who, nick_to;
 				bs >> nick_who >> nick_to;

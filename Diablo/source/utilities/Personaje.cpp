@@ -1028,6 +1028,15 @@ void Personaje::chocarConLampara(Lampara* lampara) {
 	std::stringstream msj;
 	msj << "Agarro Lampara";
 	consola.log(msj.str());
+
+	//Aviso al server que agarro item para que lo desaparezca
+	int x,y;
+	x = this->getPosicion(&mapa)->getU();
+	y = this->getPosicion(&mapa)->getV();
+	BitStream bs;
+	bs << PROTO::ITEM_OFF << x << y;
+	sock.send(bs.str());
+	std::cout << "Aviso a server que agarre item" << endl;
 }
 
 //Mejorar: recorrer todos los tiles y colocarlos como visitados

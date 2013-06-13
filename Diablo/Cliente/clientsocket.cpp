@@ -649,6 +649,14 @@ void ClientSocket::listenDo() {
 			//Elimino bomba del mapa(FIX)
 			mapa.getTile(p.getBombaX(),p.getBombaY())->deleteEntidad(p.getBombaColocada());
 			std::cout << "eliminada" << endl;
+		}else if(pt == PROTO::ITEM_OFF) {
+			int x,y;
+			bs >> x >> y;
+			//auto &p = pjm.getPje(nick_who);
+			std::cout << "agarro item  en pos (" << x << "," << x << ")...";
+			//Elimino item del mapa(FIX)
+			mapa.getTile(x,y)->deleteEntidad(p.getBombaColocada());
+			std::cout << "eliminada" << endl;
 		}else if(pt == PROTO::DAMAGE) {	
 			std::string nick_who, nick_to;
 			bs >> nick_who >> nick_to;

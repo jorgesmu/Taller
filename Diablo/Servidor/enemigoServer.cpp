@@ -21,6 +21,10 @@ void Enemigo::init_Enemy(const std::string& nickname,const std::string& tipo,uns
 	this->pasosCaminados = 0;
 	this->ultimaAccionAtacar = false;
 	this->setVelocidad(0.105);
+	this->setBolaDeCristal(false);
+	this->setGolem(false);
+	this->setEnergia(100);
+	this->setEnergiaEscudo(0);
 }
 extern Misiones mision;
 

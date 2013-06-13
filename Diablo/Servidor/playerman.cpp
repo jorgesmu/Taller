@@ -18,8 +18,6 @@ Player::Player() {
 	bolaDeCristal = false;
 	seMovio = false;
 	energia = 100;
-	bolaDeCristal = golem = false;
-
 }
 
 Player::~Player() {
@@ -82,7 +80,7 @@ char Player::getEnergia() {
 	return this->energia;
 }
 bool Player::estaVivo() {
-	if (energia>= 0)
+	if (energia> 0)
 		return true;
 	return false;
 }

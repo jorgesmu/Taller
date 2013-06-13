@@ -1151,7 +1151,7 @@ void Personaje::utilizarTerremoto(Mapa* mapa, PjeManager* pjm, ClientSocket* soc
 					if ((i==xPersonaje) && (j==yPersonaje)) {
 						srand (time(NULL));
 						dañoRealizado=rand()%(this->ENERGIA_TOTAL+1);
-						dañoRealizado=110;
+						dañoRealizado=100;
 						it->second.dañar(dañoRealizado);
 						std::cout << "Se danio a " << it->first << " con terremoto, total de " << (int)dañoRealizado << endl;
 						bs.clear();

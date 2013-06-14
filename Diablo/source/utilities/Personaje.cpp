@@ -309,8 +309,8 @@ unsigned int Personaje::actualizarPosicion(Mapa* mapa) {
 		if( (this -> posX != tileDestino -> getX()) || (this -> posY != tileDestino -> getY())){
 			retorno = Personaje::MOVER_EN_CURSO;
 			// Calculo posicion siguiente (tomando en cuenta pixel de referencia y la posicion actual)
-			int posPixelSiguienteX = 0;
-			int posPixelSiguienteY = 0;
+			float posPixelSiguienteX = 0;
+			float posPixelSiguienteY = 0;
 			this -> calcularPosicionTentativa(direccion , &posPixelSiguienteX , &posPixelSiguienteY);
 			// Obtengo el tile siguiente
 			Tile* tileSiguiente = mapa -> getTilePorPixeles(posPixelSiguienteX , posPixelSiguienteY);
@@ -390,16 +390,16 @@ unsigned int Personaje::actualizarPosicion(Mapa* mapa) {
 	El offset X Y sin tener en cuenta el pixel de origen
 */
 void Personaje::calcularPosicionTentativa(unsigned int direccion , 
-	int* offsetTentativoX , int* offsetTentativoY){
+	float* offsetTentativoX , float* offsetTentativoY){
 		if(this->velocidad == 0){
 			this ->velocidad = 105/1000;
 		}
 	int vel = 3;
 	*offsetTentativoX = posX;
 	*offsetTentativoY = posY;
-	unsigned int avance;
+	float avance;
 	if(this ->velocidad != 0){
-	avance= ceil((this->velocidad)*(clock() - this->tiempoProximoUpdate + this ->deltaUpdatePosicion)
+	avance= ((this->velocidad)*(clock() - this->tiempoProximoUpdate + this ->deltaUpdatePosicion)
 							*this->velocidad);
 	}else{
 	avance= ((vel)*(clock() - this->tiempoProximoUpdate + this ->deltaUpdatePosicion)

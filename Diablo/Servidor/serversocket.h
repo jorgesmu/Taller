@@ -8,7 +8,7 @@
 
 #include <winsock2.h>
 #include <ws2tcpip.h>
-
+#include "itemservidor.h"
 #include "../source/net/bitstream.h"
 #include "../source/net/defines.h"
 
@@ -43,6 +43,12 @@ class ServerSocket {
 	std::queue<std::string> clients_queue;
 	// Tabla de clients
 	std::map<std::string, Client> clients_map;
+	// vector de items
+	std::vector<ItemServidor> items;
+	// Funcion que agrega items al vector
+	void addItem(unsigned char tipo, int x, int y);
+	// Funcion que agrega items al vector
+	void removeItem(int x, int y);
 	// Funcion que agrega un cliente en la tabla
 	void addClient(const sockaddr_in& tmp_st, const SOCKET& sock);
 	// Construye un ID basado en la informacion de sockaddr_in

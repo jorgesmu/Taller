@@ -42,9 +42,11 @@ class Entidad {
 
 		const static unsigned int ORDEN_PERSONAJE = 3;
 
-		const static unsigned int ORDEN_ARBOL = 4;
+		const static unsigned int ORDEN_BANDERA = 4;
 
-		const static unsigned int ORDEN_EDIFICIO = 5;
+		const static unsigned int ORDEN_ARBOL = 5;
+
+		const static unsigned int ORDEN_EDIFICIO = 6;
 
 	protected:
 		
@@ -249,6 +251,7 @@ public:
 	virtual bool isCaminable(Tile* tile);
 
 	virtual bool isCaminable();
+
 	/*
 		Pre: La instancia ha sido creada.
 		Post: Se retorna el tile donde se encuentra la instancia.
@@ -260,6 +263,8 @@ public:
 	int getY();
 
 	bool getDibujada();
+
+	bool isItem() { return this->esItem; };
 
 	virtual void setDibujada(bool seDibujo, Mapa* mapa , Personaje* personaje);
 

@@ -103,7 +103,8 @@ const unsigned char DEAD = 'O';
 const unsigned char LEAVE_ITEM = 'P';
 // Atributos por default del cliente
 const unsigned char DEF_ATT = 'Q';
-
+// Agarro el item
+const unsigned char ITEM_OFF = 'R';
 }
 
 // Cosas de movimiento

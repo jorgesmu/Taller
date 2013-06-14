@@ -21,6 +21,7 @@ class Granadas;
 class Varitas;
 class Escudo;
 class BolaDeCristal;
+class GolemItem;
 class Lampara;
 class MapaItem;
 class Terremoto;
@@ -29,6 +30,7 @@ class Bandera;
 class ClientSocket;
 class Arma;
 class ArmaBomba;
+#include "../display/bar.h"
 
 class Personaje : public Entidad {
 public:
@@ -168,6 +170,8 @@ protected:
 		Timer timerUpdateServidor;
 		// Arma default
 		Arma* espada;
+		// Barra de HP
+		Bar bar;
 				
 public:
 	
@@ -406,9 +410,9 @@ public:
 
 	void chocarConZapatos(Zapatos* zapatos);
 
-	void chocarConBolaDeCristal();
+	void chocarConBolaDeCristal(BolaDeCristal* bolaDeCristal);
 
-	void chocarConGolem();
+	void chocarConGolem(GolemItem* golem);
 
 	void chocarConHechizo() { }
 

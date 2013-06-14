@@ -138,6 +138,25 @@ bool ServerSocket::accept() {
 	}
 }
 
+// Agrega un item al vector
+void ServerSocket::addItem(unsigned char tipo, int x, int y){
+	ItemServidor item;
+	item.init(tipo, x, y);
+
+	items.push_back(item);
+}
+
+// Saca un item del vector
+void ServerSocket::removeItem(int x, int y){
+	std::vector<ItemServidor> new_items;
+	for(auto it = items.begin(); it != items.end(); ++it){
+		if((it->getX() != x) || (it->getY() != y)){
+			new_items.push_back(*it);			
+		}
+	}
+	items = new_items;
+}
+
 // Agrega un cliente a la tabla
 void ServerSocket::addClient(const sockaddr_in& tmp_st, const SOCKET& sock) {
 	EnterCriticalSection(&critSect);
@@ -575,6 +594,14 @@ void ServerSocket::acceptLastDo() {
 			}			
 		}
 
+		//Mandamos los items que habia en el mapa
+		for (auto it=items.begin(); it != items.end(); it++) {
+			bs.clear();
+			bs << PROTO::LEAVE_ITEM << it->getTipo() << it->getX() << it->getY();
+			send(cid,bs.str());
+			std::cout << "Sending item " << it->getTipo() << " pos (" << it->getX() << "," << it->getY() << ")" << endl;
+		}			
+
 		LeaveCriticalSection(&critSect);
 		//desbloqueo el loop
 		conectandose = false;
@@ -716,6 +743,7 @@ void ServerSocket::acceptLastDo() {
 					send(it->second.sock, bs.str());
 					std::cout << "Update a " << it->second.nick << " item en pos (" << posItemX << "," << posItemY << ")" << endl;
 				}
+				addItem(item, posItemX, posItemY);
 			}else if(pt == PROTO::BOMB_OFF) {
 				// Avisamos a los otros jugadores 
 				std::cout << "exploto \n";
@@ -728,15 +756,16 @@ void ServerSocket::acceptLastDo() {
 				}
 			}else if(pt == PROTO::ITEM_OFF) {
 				// Avisamos a los otros jugadores 
-				std::cout << "agarro item \n";
 				int x, y;
+				bs >> x >> y;
 				for(auto it = clients_map.begin();it != clients_map.end();it++) {
 					if(it->second.nick == new_nick) continue; // Salteamos a nuestro jugador
 					bs.clear();
 					bs << PROTO::ITEM_OFF << x << y;
 					send(it->second.sock, bs.str());
-					std::cout << "Update a " << it->second.nick << ": agarro item " << new_nick <<endl;
+					std::cout << " agarro item en pos " << x << y << "\n";
 				}
+				removeItem(x,y);
 			}else if(pt == PROTO::DAMAGE) {	
 				std::string nick_who, nick_to;
 				bs >> nick_who >> nick_to;

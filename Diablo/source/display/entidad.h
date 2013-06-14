@@ -249,6 +249,7 @@ public:
 	virtual bool isCaminable(Tile* tile);
 
 	virtual bool isCaminable();
+
 	/*
 		Pre: La instancia ha sido creada.
 		Post: Se retorna el tile donde se encuentra la instancia.
@@ -260,6 +261,8 @@ public:
 	int getY();
 
 	bool getDibujada();
+
+	bool isItem() { return this->esItem; };
 
 	virtual void setDibujada(bool seDibujo, Mapa* mapa , Personaje* personaje);
 

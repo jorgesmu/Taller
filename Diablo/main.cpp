@@ -645,7 +645,7 @@ int main(int argc, char* argv[]) {
 						break;
 					}
 					case 1:{
-						item = new MapaItem ("cofre",1,1,true, x , y, NULL,&mapa,resman,Imagen::COLOR_KEY );
+						item = new MapaItem ("cofre",1,1,true, -20 , 30, NULL,&mapa,resman,Imagen::COLOR_KEY );
 						mapa.getTile(x, y)->addEntidad(item,&mapa);
 						entidades_cargadas.push_back(item);
 						BitStream bs;
@@ -654,7 +654,7 @@ int main(int argc, char* argv[]) {
 						break;
 					}
 					case 2:{
-						item = new Zapatos ("cofre",1,1,true, x , y, NULL,&mapa,resman,Imagen::COLOR_KEY );
+						item = new Zapatos ("cofre",1,1,true, -20 , 30, NULL,&mapa,resman,Imagen::COLOR_KEY );
 						mapa.getTile(x, y)->addEntidad(item,&mapa);
 						entidades_cargadas.push_back(item);
 						BitStream bs;
@@ -663,7 +663,7 @@ int main(int argc, char* argv[]) {
 						break;
 					}
    					case 3:{
-						item = new Terremoto ("cofre",1,1,true, x , y, NULL,&mapa,resman,Imagen::COLOR_KEY );
+						item = new Terremoto ("cofre",1,1,true, -20 , 30, NULL,&mapa,resman,Imagen::COLOR_KEY );
 						mapa.getTile(x, y)->addEntidad(item,&mapa);
 						entidades_cargadas.push_back(item);
 						BitStream bs;
@@ -672,7 +672,7 @@ int main(int argc, char* argv[]) {
 						break;
 					}
    					case 4:{
-						item = new Escudo ("cofre",1,1,true, x , y, NULL,&mapa,resman,Imagen::COLOR_KEY );
+						item = new Escudo ("cofre",1,1,true, -20 , 30, NULL,&mapa,resman,Imagen::COLOR_KEY );
 						mapa.getTile(x, y)->addEntidad(item,&mapa);
 						entidades_cargadas.push_back(item);
 						BitStream bs;
@@ -681,7 +681,7 @@ int main(int argc, char* argv[]) {
 						break;
 					}
    					case 5:{
-						item = new BolaDeCristal ("cofre",1,1,true, x , y, NULL,&mapa,resman,Imagen::COLOR_KEY );
+						item = new BolaDeCristal ("cofre",1,1,true, -20 , 30, NULL,&mapa,resman,Imagen::COLOR_KEY );
 						mapa.getTile(x, y)->addEntidad(item,&mapa);
 						entidades_cargadas.push_back(item);
 						BitStream bs;
@@ -690,7 +690,7 @@ int main(int argc, char* argv[]) {
 						break;
 					}
    					case 6:{
-						item = new GolemItem ("cofre",1,1,true, 6 ,13,NULL,&mapa,resman,Imagen::COLOR_KEY );
+						item = new GolemItem ("cofre",1,1,true, -20 ,30,NULL,&mapa,resman,Imagen::COLOR_KEY );
 						mapa.getTile(x, y)->addEntidad(item,&mapa);
 						entidades_cargadas.push_back(item);
 						BitStream bs;
@@ -699,7 +699,7 @@ int main(int argc, char* argv[]) {
 						break;
 					}
    					case 7:{
-						item = new Botella ("cofre",1,1,true, x , y, NULL,&mapa,resman,Imagen::COLOR_KEY );
+						item = new Botella ("cofre",1,1,true, -20 , 30, NULL,&mapa,resman,Imagen::COLOR_KEY );
 						mapa.getTile(x, y)->addEntidad(item,&mapa);
 						entidades_cargadas.push_back(item);
 						BitStream bs;
@@ -708,7 +708,7 @@ int main(int argc, char* argv[]) {
 						break;
 					}
    					case 8:{
-						item = new Corazon ("cofre",1,1,true, x , y, NULL,&mapa,resman,Imagen::COLOR_KEY );
+						item = new Corazon ("cofre",1,1,true, -20 , 30, NULL,&mapa,resman,Imagen::COLOR_KEY );
 						mapa.getTile(x, y)->addEntidad(item,&mapa);
 						entidades_cargadas.push_back(item);
 						BitStream bs;
@@ -717,7 +717,7 @@ int main(int argc, char* argv[]) {
 						break;
 					}
    					case 9:{
-						item = new Hielo ("cofre",1,1,true, x , y, NULL,&mapa,resman,Imagen::COLOR_KEY );
+						item = new Hielo ("cofre",1,1,true, -20 , 30, NULL,&mapa,resman,Imagen::COLOR_KEY );
 						mapa.getTile(x, y)->addEntidad(item,&mapa);
 						entidades_cargadas.push_back(item);
 						BitStream bs;

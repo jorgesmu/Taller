@@ -947,6 +947,19 @@ void Personaje::animacionMuerte() {
 	}
 }
 
+
+/*
+*/
+void Personaje::animacionPiedra() {
+	printf("\n---------------------------------Piedra---------------------------------------\n");
+	ImagenPersonaje* imagenPersonaje = static_cast<ImagenPersonaje*> (this -> imagen);
+	this -> tileDestino = NULL;
+	if (imagenPersonaje != NULL){
+		printf("\n---------------------------------Piedra---------------------------------------\n");
+		imagenPersonaje -> setAccion(ImagenPersonaje::PIEDRA);
+	}
+}
+
 void Personaje::animacionRevivir() {
 	ImagenPersonaje* imagenPersonaje = static_cast<ImagenPersonaje*> (this -> imagen);
 	this -> tileDestino = NULL;
@@ -1550,8 +1563,8 @@ void Personaje::utilizarTransmutacion(std::string nick_enemigo) {
 	char cambio=rand()%2;
 	if (cambio == 0) {
 		//Se convierte en lapida
-		std::cout << "Convertiendo en lapida a " << nick_enemigo << endl;
-		pjm.getPje(nick_enemigo).animacionMuerte();
+		std::cout << "Convertiendo en piedra a " << nick_enemigo << endl;
+		pjm.getPje(nick_enemigo).animacionPiedra();
 		BitStream bs;
 		bs << PROTO::TRANSMUT << TIPO::LAPIDA << nick_enemigo;
 		sock.send(bs.str());
@@ -1575,5 +1588,23 @@ void Personaje::updateTransmutacion() {
 		bs << PROTO::DESTRANSMUT << tipoTransmut << transmutado;
 		sock.send(bs.str());
 		tTransmut.stop();
+	}
+}
+
+void Personaje::cambiarApariencia(const std::string& name,ResMan& rm , const int colorKey){
+	if(this -> imagen != NULL) {
+		ImagenPersonaje* imagenPersonaje = static_cast<ImagenPersonaje*>(this->imagen);
+		unsigned int fps = imagenPersonaje -> getFPS() ;
+		unsigned int delay = imagenPersonaje -> getDelay();
+		unsigned int altoSprite = imagenPersonaje -> getAlto();
+		unsigned int anchoSprite = imagenPersonaje -> getAncho();
+		unsigned int accionActual = imagenPersonaje->getAccionActual();
+		unsigned int accionSiguiente = imagenPersonaje ->getAccionSiguiente();
+		delete(this -> imagen);
+		this -> imagen	= new ImagenPersonaje(name.c_str() , altoSprite , 
+								anchoSprite , fps , delay , rm ,colorKey);	
+		imagenPersonaje = static_cast<ImagenPersonaje*>(this->imagen);
+		imagenPersonaje -> setAccionActual(accionActual);
+		imagenPersonaje -> setAccionSiguiente(accionSiguiente);
 	}
 }

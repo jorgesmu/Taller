@@ -286,6 +286,9 @@ public:
 
 	void animacionRevivir();
 
+	//Animaciones
+	void animacionPiedra();
+
 	/*
 		Pre: La instancia ha sido creada.
 		Post: Se setea el Tile destino.
@@ -610,6 +613,6 @@ protected:
 	//Muerte del personaje
 	void muere();
 
-	
+	void cambiarApariencia(const std::string& name,ResMan& rm , const int colorKey);
 
 };

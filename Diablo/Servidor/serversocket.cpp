@@ -1257,19 +1257,20 @@ void ServerSocket::acceptLastDo() {
 				bs >> nickDuenio >> xDuenio >> yDuenio;
 				string nickGolem = "Golem";
 				stringstream indice;
-				indice << pm.getGolems().size();
+				indice << pm.get_cant_golems_historicos();
 				nickGolem = nickGolem + indice.str();
 				pm.addGolem(nickGolem,"orco",mapa,1,nickDuenio,xDuenio,yDuenio);
+				pm.sumar_un_golem();
 				//mando el golem a todos
 				Golem* unGolem = pm.getGolem(nickGolem);
 				for(auto it = clients_map.begin();it != clients_map.end();it++) {
 					bs.clear();
 					bs << PROTO::NEW_PLAYER << unGolem->getNick() << unGolem->getTipo() << unGolem->getX() << unGolem->getY() << unGolem-> isOn();
-					send(cid, bs.str());
+					send(it->second.sock, bs.str());
 					//Mando los atributos principales del jugador
 					bs.clear();
 					bs << PROTO::INIT_ATT << unGolem->getNick() << (float)unGolem->getVelocidad() << unGolem->getEnergia() << unGolem->getMagia() << unGolem->getEnergiaEscudo() << unGolem->getTerremoto() << unGolem->getHielo() << (float)unGolem->getRadio();
-					send(cid,bs.str());
+					send(it->second.sock,bs.str());
 				}
 			
 
@@ -1351,7 +1352,14 @@ void ServerSocket::acceptLastDo() {
 					for(auto it = clients_map.begin();it != clients_map.end();it++) {
 						send(it->second.sock, bs.str());
 					}
-				}
+
+				}/*else if(pm.golemExists(nick_who)){
+					bs.clear();
+					bs << PROTO::ENEMY_DEAD << nick_who;
+					for(auto it = clients_map.begin();it != clients_map.end();it++) {
+						send(it->second.sock, bs.str());
+					}
+				}*/
 			}else{
 				bs.clear();
 				bs << PROTO::TEXTMSG << std::string("Unknown packet type");

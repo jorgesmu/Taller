@@ -127,7 +127,9 @@ bool Player::tieneBandera(int x, int y) {
 }
 
 //////////////
-
+PlayerManager::PlayerManager(){
+	golem_count = 0;
+}
 
 // Devuelve si un player existe
 bool PlayerManager::playerExists(const std::string& nick) const {

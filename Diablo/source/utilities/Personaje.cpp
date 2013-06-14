@@ -1306,7 +1306,7 @@ void Personaje::muere() {
 	bool murioLocal = false;
 	if (this->getNick() == pjm.getPjeLocal().getNick()) murioLocal = true;
 	if (vivo) {
-		if (murioLocal) this->animacionMuerte();
+		this->animacionMuerte();
 		std::cout << "Fui asesinado" << endl;
 		//Redirecciono a la posicion inicial nuevamente
 		this->vivo=false;
@@ -1314,7 +1314,7 @@ void Personaje::muere() {
 		BitStream bs;
 		bs << PROTO::DEAD << this->getNick();
 		sock.send(bs.str());
-		if (murioLocal) this->timerRevivir.start();
+		this->timerRevivir.start();
 	}
  }
 

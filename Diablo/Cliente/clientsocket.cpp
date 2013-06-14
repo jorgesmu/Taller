@@ -569,6 +569,10 @@ void ClientSocket::listenDo() {
 			int posItemX,posItemY;
 			bs >> tipoItem >> posItemX >> posItemY;
 			//Coloca el item en el mapa
+	
+			while(!cargoMapa) {
+				Sleep(10);
+			}
 
 			Item* item;
 			//case de todos los items y constructor
@@ -649,6 +653,21 @@ void ClientSocket::listenDo() {
 			//Elimino bomba del mapa(FIX)
 			mapa.getTile(p.getBombaX(),p.getBombaY())->deleteEntidad(p.getBombaColocada());
 			std::cout << "eliminada" << endl;
+		}else if(pt == PROTO::ITEM_OFF) {
+			int x,y;
+			bs >> x >> y;
+			//Elimino item del mapa(FIX)
+			Tile* tile = mapa.getTile(x,y);
+			Entidad* entidadEliminada = NULL;
+			std::cout << "item off " << x << " , " << y << "\n";
+			std::vector<Entidad*> entidades = tile->getEntidades();
+			for (auto it = entidades.begin(); it != entidades.end(); ++it){
+				if((*it)->isItem()){
+					entidadEliminada = (*it);
+					break;
+				}
+			}
+			tile->deleteEntidad(entidadEliminada);
 		}else if(pt == PROTO::DAMAGE) {	
 			std::string nick_who, nick_to;
 			bs >> nick_who >> nick_to;

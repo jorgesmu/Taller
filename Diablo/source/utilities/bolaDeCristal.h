@@ -14,6 +14,6 @@ class BolaDeCristal: public Item {
 			ResMan& rm , const int colorKey):Item(name,wTiles,hTiles,caminable,pixel_ref_x,pixel_ref_y,tile,mapa,rm,colorKey) {}
 
 		void chocarCon(Personaje* personaje) {
-			personaje->chocarConBolaDeCristal();
+			personaje->chocarConBolaDeCristal(this);
 		}
 };

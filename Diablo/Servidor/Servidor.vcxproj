@@ -29,6 +29,7 @@
     <ClCompile Include="config_servidor.cpp" />
     <ClCompile Include="enemigoServer.cpp" />
     <ClCompile Include="golem.cpp" />
+    <ClCompile Include="itemservidor.cpp" />
     <ClCompile Include="logErroresServer.cpp" />
     <ClCompile Include="mapaservidor.cpp" />
     <ClCompile Include="misiones.cpp" />
@@ -59,6 +60,7 @@
     <ClInclude Include="config_servidor.h" />
     <ClInclude Include="enemigoServer.h" />
     <ClInclude Include="golem.h" />
+    <ClInclude Include="itemservidor.h" />
     <ClInclude Include="logErroresServer.h" />
     <ClInclude Include="mapaservidor.h" />
     <ClInclude Include="misiones.h" />

@@ -1039,6 +1039,14 @@ void Personaje::chocarConLampara(Lampara* lampara) {
 	std::stringstream msj;
 	msj << "Agarro Lampara";
 	consola.log(msj.str());
+
+	//Aviso al server que agarro item para que lo desaparezca
+	int x,y;
+	x = this->getPosicion(&mapa)->getU();
+	y = this->getPosicion(&mapa)->getV();
+	BitStream bs;
+	bs << PROTO::ITEM_OFF << x << y;
+	sock.send(bs.str());
 }
 
 //Mejorar: recorrer todos los tiles y colocarlos como visitados
@@ -1058,6 +1066,15 @@ void Personaje::chocarConMapa(MapaItem* mapaItem) {
 	std::stringstream msj;
 	msj << "Agarro Mapa";
 	consola.log(msj.str());
+
+	//Aviso al server que agarro item para que lo desaparezca
+	int x,y;
+	x = this->getPosicion(&mapa)->getU();
+	y = this->getPosicion(&mapa)->getV();
+	BitStream bs;
+	bs << PROTO::ITEM_OFF << x << y;
+	sock.send(bs.str());
+
 }
 
 void Personaje::aumentarVelocidad(char porcentaje) {
@@ -1077,10 +1094,19 @@ void Personaje::chocarConZapatos(Zapatos* zapatos) {
 	std::stringstream msj;
 	msj << "Agarro Zapatos";
 	consola.log(msj.str());
+
+	//Aviso al server que agarro item para que lo desaparezca
+	int x,y;
+	x = this->getPosicion(&mapa)->getU();
+	y = this->getPosicion(&mapa)->getV();
+	bs.clear();
+	bs << PROTO::ITEM_OFF << x << y;
+	sock.send(bs.str());
 }
 
-void Personaje::chocarConBolaDeCristal() {
+void Personaje::chocarConBolaDeCristal(BolaDeCristal* bolaDeCristal) {
 
+	this->getPosicion(&mapa)->deleteEntidad(bolaDeCristal);
 	if(this->magia >= MAGIA_HECHIZO){
 		std::cout << "veo niebla de los enemigos \n";
 
@@ -1093,17 +1119,26 @@ void Personaje::chocarConBolaDeCristal() {
 		bs.clear();
 		bs << PROTO::UPDATE_ATT << ATT::BOLA_DE_CRISTAL << true;
 		sock.send(bs.str());
+
+		//Aviso al server que agarro item para que lo desaparezca
+		int x,y;
+		x = this->getPosicion(&mapa)->getU();
+		y = this->getPosicion(&mapa)->getV();
+		bs.clear();
+		bs << PROTO::ITEM_OFF << x << y;
+		sock.send(bs.str());
+
+		std::stringstream msj;
+		msj << "Agarro Bola de cristal";
+		consola.log(msj.str());
 	}else{
 		std::cout << "magia insuficiente para bola de cristal \n";	
 	}
-	std::stringstream msj;
-	msj << "Agarro Bola de cristal";
-	consola.log(msj.str());
-
 }
 
-void Personaje::chocarConGolem() {
+void Personaje::chocarConGolem(GolemItem* golem) {
 
+	this->getPosicion(&mapa)->deleteEntidad(golem);
 	this->golem = true;
 	BitStream bs;
 	bs << PROTO::UPDATE_ATT << ATT::GOLEM << true;
@@ -1111,6 +1146,14 @@ void Personaje::chocarConGolem() {
 	std::stringstream msj;
 	msj << "Agarro Golem";
 	consola.log(msj.str());
+
+	//Aviso al server que agarro item para que lo desaparezca
+	int x,y;
+	x = this->getPosicion(&mapa)->getU();
+	y = this->getPosicion(&mapa)->getV();
+	bs.clear();
+	bs << PROTO::ITEM_OFF << x << y;
+	sock.send(bs.str());
 }
 
 void Personaje::chocarConTerremoto(Terremoto* terremoto) {
@@ -1122,6 +1165,14 @@ void Personaje::chocarConTerremoto(Terremoto* terremoto) {
 	std::stringstream msj;
 	msj << "Agarro Terremoto";
 	consola.log(msj.str());
+
+	//Aviso al server que agarro item para que lo desaparezca
+	int x,y;
+	x = this->getPosicion(&mapa)->getU();
+	y = this->getPosicion(&mapa)->getV();
+	bs.clear();
+	bs << PROTO::ITEM_OFF << x << y;
+	sock.send(bs.str());
 }
 
 void Personaje::chocarConHielo(Hielo* hielo) {
@@ -1133,6 +1184,14 @@ void Personaje::chocarConHielo(Hielo* hielo) {
 	std::stringstream msj;
 	msj << "Agarro Hielo";
 	consola.log(msj.str());
+
+	//Aviso al server que agarro item para que lo desaparezca
+	int x,y;
+	x = this->getPosicion(&mapa)->getU();
+	y = this->getPosicion(&mapa)->getV();
+	bs.clear();
+	bs << PROTO::ITEM_OFF << x << y;
+	sock.send(bs.str());
 }
 
 void Personaje::utilizarTerremoto(Mapa* mapa, PjeManager* pjm, ClientSocket* sock) {
@@ -1161,7 +1220,6 @@ void Personaje::utilizarTerremoto(Mapa* mapa, PjeManager* pjm, ClientSocket* soc
 					if ((i==xPersonaje) && (j==yPersonaje)) {
 						srand (time(NULL));
 						dañoRealizado=rand()%(this->ENERGIA_TOTAL+1);
-						dañoRealizado=100;
 						it->second.dañar(dañoRealizado);
 						std::cout << "Se danio a " << it->first << " con terremoto, total de " << (int)dañoRealizado << endl;
 						bs.clear();
@@ -1241,6 +1299,14 @@ void Personaje::updateHielo() {
 	std::stringstream msj;
 	msj << "Agarro Corazon";
 	consola.log(msj.str());
+
+ 	//Aviso al server que agarro item para que lo desaparezca
+	int x,y;
+	x = this->getPosicion(&mapa)->getU();
+	y = this->getPosicion(&mapa)->getV();
+	bs.clear();
+	bs << PROTO::ITEM_OFF << x << y;
+	sock.send(bs.str());
 }
 
  void Personaje::chocarConBotella(Botella* botella) {
@@ -1254,6 +1320,14 @@ void Personaje::updateHielo() {
 	std::stringstream msj;
 	msj << "Agarro Flechas";
 	consola.log(msj.str());
+
+	//Aviso al server que agarro item para que lo desaparezca
+	int x,y;
+	x = this->getPosicion(&mapa)->getU();
+	y = this->getPosicion(&mapa)->getV();
+	bs.clear();
+	bs << PROTO::ITEM_OFF << x << y;
+	sock.send(bs.str());
  }
 
  void Personaje::chocarConFlechas(Flechas* flechas) {
@@ -1286,6 +1360,14 @@ void Personaje::updateHielo() {
 	 std::stringstream msj;
      msj << "Agarro Escudo";
  	 consola.log(msj.str());
+
+	//Aviso al server que agarro item para que lo desaparezca
+	int x,y;
+	x = this->getPosicion(&mapa)->getU();
+	y = this->getPosicion(&mapa)->getV();
+	bs.clear();
+	bs << PROTO::ITEM_OFF << x << y;
+	sock.send(bs.str());
  }
 
  void Personaje::chocarConBandera(Bandera* bandera) {

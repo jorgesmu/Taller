@@ -21,6 +21,7 @@ class Granadas;
 class Varitas;
 class Escudo;
 class BolaDeCristal;
+class GolemItem;
 class Lampara;
 class MapaItem;
 class Terremoto;
@@ -409,9 +410,9 @@ public:
 
 	void chocarConZapatos(Zapatos* zapatos);
 
-	void chocarConBolaDeCristal();
+	void chocarConBolaDeCristal(BolaDeCristal* bolaDeCristal);
 
-	void chocarConGolem();
+	void chocarConGolem(GolemItem* golem);
 
 	void chocarConHechizo() { }
 

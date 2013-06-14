@@ -228,6 +228,9 @@ Entidad::~Entidad() {
 		delete(this -> imagen);
 		this -> imagen = NULL;
 	}
+	if(this ->tileAncla != NULL){
+		this ->tileAncla->deleteEntidad(this);
+	}
 	this -> surf = NULL;
 	this -> tileAncla = NULL;
 }

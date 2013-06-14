@@ -102,8 +102,9 @@ class PlayerManager {
 	PlayerMapT player_map;
 	map<std::string, Enemigo*> enemy_map;
 	map<std::string, Golem*> golem_map;
-
+	unsigned int golem_count;
 	public:
+	PlayerManager();
 	// Devuelve si un player existe
 	bool playerExists(const std::string& nick) const;
 	// Agrega un jugador
@@ -134,4 +135,12 @@ class PlayerManager {
 	Golem* getGolem(const std::string& nick);
 	// Devuelve el mapa de golems
 	GolemMapT& getGolems();
+	//devuelve la cantidad de golems que hubo
+	unsigned int get_cant_golems_historicos(){
+		return golem_count;
+	}
+	//suma un golem al golem count
+	void sumar_un_golem(){
+		golem_count++;
+	}
 };

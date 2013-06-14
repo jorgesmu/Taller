@@ -90,6 +90,9 @@
     <ClCompile Include="..\source\utilities\vertice.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="itemservidor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="serversocket.h">
@@ -171,6 +174,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\source\utilities\vertice.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="itemservidor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

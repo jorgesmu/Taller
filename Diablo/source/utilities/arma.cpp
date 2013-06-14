@@ -119,6 +119,9 @@ Arma::~Arma() {
 		delete(this -> imagen);
 		this -> imagen = NULL;
 	}
+	if(this ->tileAncla != NULL){
+		this ->tileAncla->deleteEntidad(this);
+	}
 	this -> surf = NULL;
 	this -> tileAncla = NULL;
 }
@@ -279,7 +282,7 @@ unsigned int Arma::actualizarPosicion(Mapa* mapa) {
 							this -> tileAncla -> deleteEntidad(this);
 						}
 						this -> tileAncla = tileAnclaSiguiente;
-						this -> tileAncla -> addEntidad(this);	
+						//this -> tileAncla -> addEntidad(this);	
 					} 
 					// agregado de entidad al tile nuevo
 					if (tileSiguiente != tileActual) {	
@@ -288,11 +291,11 @@ unsigned int Arma::actualizarPosicion(Mapa* mapa) {
 								tileActual -> deleteEntidad(this);
 							} 
 							if (this -> tileAncla != tileSiguiente){
-								tileSiguiente -> addEntidad(this);
+								//tileSiguiente -> addEntidad(this);
 							}
 						} else {
 							if (this -> tileAncla != tileSiguiente){
-								tileSiguiente -> addEntidad(this);
+								//tileSiguiente -> addEntidad(this);
 							}
 						}	
 					}
@@ -307,7 +310,7 @@ unsigned int Arma::actualizarPosicion(Mapa* mapa) {
 					}
 					// seteo como tileAncla el tileSiguiente
 					this -> tileAncla = tileSiguiente;
-					this -> tileAncla -> addEntidad(this);
+					//this -> tileAncla -> addEntidad(this);
 					// agregado de entidad al tile nuevo
 					if (tileSiguiente != tileActual) {	
 						if (tileActual != NULL) {

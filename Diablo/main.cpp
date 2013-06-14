@@ -44,6 +44,9 @@
 #include "../../source/utilities/arma.h"
 #include "../../source/display/boton.h"
 #include "../../source/utilities/console.h"
+#include <stdlib.h> 
+#include <time.h> 
+
 using namespace std;
 
 logErrores err_log("log_cliente.txt");
@@ -136,11 +139,19 @@ int main(int argc, char* argv[]) {
 	SDL_WarpMouse(800/2, 600/2);
 	SDL_WM_SetCaption("Diablo", NULL);
 
+	Camara camara;
+
+	// SoundMan
+	if(!soundman.init(&camara, &pjm.getPjeLocal())) return -3;
+	soundman.addSound("sword", "../resources/static/sounds/sword.wav");
+	soundman.playMusic();
+
+
 	// MENU
 	//////////////////////////
 	Boton sp, mp;
-	sp.init(&resman, 10, 10, "boton_sp");
-	mp.init(&resman, 10, 40, "boton_mp");
+	sp.init(&resman, 800/2 - 100, 600/2 - 100, "boton_sp");
+	mp.init(&resman, 800/2 - 100, 600/2 - 100 + 70, "boton_mp");
 	int opcion_menu = -1;
 	// 1 = sp, 2 = mp, 3 = exit
 	while(opcion_menu == -1) {
@@ -203,12 +214,7 @@ int main(int argc, char* argv[]) {
 	mapa.resize(escenarios[escenario_elegido_id].get_tam_x(), escenarios[escenario_elegido_id].get_tam_x());
 
 	// Camara
-	Camara camara;
 	camara.init(pantalla->get_ancho(), pantalla->get_alto(), configuracion.get_margen_scroll(), mapa);
-	
-	// SoundMan
-	if(!soundman.init(&camara, &pjm.getPjeLocal())) return -3;
-	soundman.addSound("sword", "../resources/static/sounds/sword.wav");
 
 	// Ventana de chat
 	chat_window.init(&resman, 40, 40, Font::SIZE_NORMAL, 250, 500, COLOR::WHITE);
@@ -335,7 +341,6 @@ int main(int argc, char* argv[]) {
 	estadoMovimiento = MOV::IDLE;
 	// Centro la camara
 	camara.center(mapa.getTile(start_pos_x, start_pos_y)->getX(), mapa.getTile(start_pos_x, start_pos_y)->getY());
-
 	// Variables para el game-loop
 	double curr_time = SDL_GetTicks();
     double accum = 0.0;
@@ -421,6 +426,9 @@ int main(int argc, char* argv[]) {
 								pjm.getPjeLocal().utilizarGolem();
 							}
 							break;
+						}
+						case 'p' : {
+							soundman.toggleMusicMute();
 						}
 						case 'd' : {
 							pjm.getPjeLocal().defender(NULL , &mapa);
@@ -626,14 +634,14 @@ int main(int argc, char* argv[]) {
 
 				//meto el item que deja cuando muere
 				int cant_items = 9;//cantidad de items que implementamos
-				int rand;
-				rand = intRand(0, cant_items);
+				int random;
+				srand (time(NULL));
+				random=rand()%(cant_items+1);
 				Tile* tile = mapa.getTile(x,y);
 				Item* item;
-				rand = 0;
-				switch(rand){
+				switch(random){
 					case 0:{
-						item = new Lampara("cofre",1,1,true, -13 , 20, tile,&mapa,resman,Imagen::COLOR_KEY );
+						item = new Lampara("cofre",1,1,true, -20 , 30, tile,&mapa,resman,Imagen::COLOR_KEY );
 						mapa.getTile(x, y)->addEntidad(item,&mapa);
 						entidades_cargadas.push_back(item);
 						BitStream bs;
@@ -642,7 +650,7 @@ int main(int argc, char* argv[]) {
 						break;
 					}
 					case 1:{
-						item = new MapaItem ("cofre",1,1,true, x , y, NULL,&mapa,resman,Imagen::COLOR_KEY );
+						item = new MapaItem ("cofre",1,1,true, -20 , 30, NULL,&mapa,resman,Imagen::COLOR_KEY );
 						mapa.getTile(x, y)->addEntidad(item,&mapa);
 						entidades_cargadas.push_back(item);
 						BitStream bs;
@@ -651,7 +659,7 @@ int main(int argc, char* argv[]) {
 						break;
 					}
 					case 2:{
-						item = new Zapatos ("cofre",1,1,true, x , y, NULL,&mapa,resman,Imagen::COLOR_KEY );
+						item = new Zapatos ("cofre",1,1,true, -20 , 30, NULL,&mapa,resman,Imagen::COLOR_KEY );
 						mapa.getTile(x, y)->addEntidad(item,&mapa);
 						entidades_cargadas.push_back(item);
 						BitStream bs;
@@ -660,7 +668,7 @@ int main(int argc, char* argv[]) {
 						break;
 					}
    					case 3:{
-						item = new Terremoto ("cofre",1,1,true, x , y, NULL,&mapa,resman,Imagen::COLOR_KEY );
+						item = new Terremoto ("cofre",1,1,true, -20 , 30, NULL,&mapa,resman,Imagen::COLOR_KEY );
 						mapa.getTile(x, y)->addEntidad(item,&mapa);
 						entidades_cargadas.push_back(item);
 						BitStream bs;
@@ -669,7 +677,7 @@ int main(int argc, char* argv[]) {
 						break;
 					}
    					case 4:{
-						item = new Escudo ("cofre",1,1,true, x , y, NULL,&mapa,resman,Imagen::COLOR_KEY );
+						item = new Escudo ("cofre",1,1,true, -20 , 30, NULL,&mapa,resman,Imagen::COLOR_KEY );
 						mapa.getTile(x, y)->addEntidad(item,&mapa);
 						entidades_cargadas.push_back(item);
 						BitStream bs;
@@ -678,7 +686,7 @@ int main(int argc, char* argv[]) {
 						break;
 					}
    					case 5:{
-						item = new BolaDeCristal ("cofre",1,1,true, x , y, NULL,&mapa,resman,Imagen::COLOR_KEY );
+						item = new BolaDeCristal ("cofre",1,1,true, -20 , 30, NULL,&mapa,resman,Imagen::COLOR_KEY );
 						mapa.getTile(x, y)->addEntidad(item,&mapa);
 						entidades_cargadas.push_back(item);
 						BitStream bs;
@@ -687,7 +695,7 @@ int main(int argc, char* argv[]) {
 						break;
 					}
    					case 6:{
-						item = new GolemItem ("cofre",1,1,true, 6 ,13,NULL,&mapa,resman,Imagen::COLOR_KEY );
+						item = new GolemItem ("cofre",1,1,true, -20 ,30,NULL,&mapa,resman,Imagen::COLOR_KEY );
 						mapa.getTile(x, y)->addEntidad(item,&mapa);
 						entidades_cargadas.push_back(item);
 						BitStream bs;
@@ -696,7 +704,7 @@ int main(int argc, char* argv[]) {
 						break;
 					}
    					case 7:{
-						item = new Botella ("cofre",1,1,true, x , y, NULL,&mapa,resman,Imagen::COLOR_KEY );
+						item = new Botella ("cofre",1,1,true, -20 , 30, NULL,&mapa,resman,Imagen::COLOR_KEY );
 						mapa.getTile(x, y)->addEntidad(item,&mapa);
 						entidades_cargadas.push_back(item);
 						BitStream bs;
@@ -705,7 +713,7 @@ int main(int argc, char* argv[]) {
 						break;
 					}
    					case 8:{
-						item = new Corazon ("cofre",1,1,true, x , y, NULL,&mapa,resman,Imagen::COLOR_KEY );
+						item = new Corazon ("cofre",1,1,true, -20 , 30, NULL,&mapa,resman,Imagen::COLOR_KEY );
 						mapa.getTile(x, y)->addEntidad(item,&mapa);
 						entidades_cargadas.push_back(item);
 						BitStream bs;
@@ -714,7 +722,7 @@ int main(int argc, char* argv[]) {
 						break;
 					}
    					case 9:{
-						item = new Hielo ("cofre",1,1,true, x , y, NULL,&mapa,resman,Imagen::COLOR_KEY );
+						item = new Hielo ("cofre",1,1,true, -20 , 30, NULL,&mapa,resman,Imagen::COLOR_KEY );
 						mapa.getTile(x, y)->addEntidad(item,&mapa);
 						entidades_cargadas.push_back(item);
 						BitStream bs;
@@ -747,7 +755,7 @@ int main(int argc, char* argv[]) {
 					//cout << "pos " << unTile->getU() << "," <<unTile->getV() <<endl;
 					bs.clear();
 					bs << PROTO::EN_MOVE_CMPLT << it->second.getNick() << unTile->getU() << unTile ->getV() ;
-					//sock.send(bs.str()); 
+					sock.send(bs.str()); 
 					//std::cout << "Mandando termino de moverse personaje a servidor" << it->second.getNick() << "\n";
 					//estado de personaje es para el pje local y estoy en un loop de otros personajes
 					//estadoPersonaje = Personaje::ESPERANDO_ACCION;
@@ -983,7 +991,6 @@ int main(int argc, char* argv[]) {
 		consola.show(screen);
 
 		ui.blitInterface(screen);
-
 		// Actualizar la pantalla
 		SDL_Flip(screen);
 

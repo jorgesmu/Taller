@@ -8,6 +8,9 @@
 #include "../utilities/aux_func.h"
 #include "../utilities/logErrores.h"
 
+// Constates de musica
+const std::string music_path = "../resources/static/sounds/music.ogg";
+
 // Ctor
 SoundMan::SoundMan() {
 
@@ -40,6 +43,14 @@ bool SoundMan::init(Camara* cam, Personaje* pjl) {
 	std::cout << "MAX_AUDIBLE_DISTANCE: " << MAX_AUDIBLE_DISTANCE << "\n";
 	// Linkeamos al personaje
 	this->pjl = pjl;
+	// Cargamos la musica
+	music = Mix_LoadMUS(music_path.c_str());
+	if(!music) {
+		std::cerr << "Error loading music: " << Mix_GetError() << "\n";
+		return false;
+	}
+	music_muted = false;
+	// :exito:
 	return true;
 }
 
@@ -72,11 +83,11 @@ void SoundMan::playSound(const std::string& name, int source_x, int source_y) co
 		// Cambiamos el volumen de acuerdo a la distancia con el personaje
 		int v = int(MIX_MAX_VOLUME - ( float(MIX_MAX_VOLUME) / float(this->MAX_AUDIBLE_DISTANCE) *
 			::distance<float>(source_x, source_y, pjl->getX(), pjl->getY()) ));
-		if(v < 0) v = 0;
-		std::cout << "Source: (" << source_x << "," << source_y << ")\n";
-		std::cout << "Listener: (" << pjl->getX() << "," << pjl->getY() << ")\n";
-		std::cout << "Distance: " << ::distance<float>(source_x, source_y, pjl->getX(), pjl->getY()) << "\n";
-		std::cout << "Sound volume: " << v << "\n";
+		if(v < 0) v = 0; // Cap por menor
+		//std::cout << "Source: (" << source_x << "," << source_y << ")\n";
+		//std::cout << "Listener: (" << pjl->getX() << "," << pjl->getY() << ")\n";
+		//std::cout << "Distance: " << ::distance<float>(source_x, source_y, pjl->getX(), pjl->getY()) << "\n";
+		//std::cout << "Sound volume: " << v << "\n";
 		Mix_VolumeChunk(m, v);
 		// Play
 		Mix_PlayChannel(-1, m, 0);
@@ -94,8 +105,47 @@ void SoundMan::clean() {
 	}
 	// Borramos el mapa
 	sound_map.clear();
+	// Liberamos la musica
+	Mix_FreeMusic(music);
 	// Cerramos el canal de audio
 	Mix_CloseAudio();
 	// Force quit SDL_mixer
 	while(Mix_Init(0)) Mix_Quit();
+}
+
+// Play de un sonido no localizado (volumen constante)
+void SoundMan::playSound(const std::string& name) const {
+	if(soundExists(name)) {
+		Mix_Chunk* m = sound_map.find(name)->second;
+		Mix_VolumeChunk(m, MIX_MAX_VOLUME); // Setteamos el volumen
+		// Play
+		Mix_PlayChannel(-1, m, 0);
+	}else{
+		std::stringstream ss;
+		ss << "Error, invalid sound <" << name << "> requested\n";
+		err_log.escribir(ss.str());
+	}
+}
+
+// Play de la musica
+void SoundMan::playMusic() const {
+	if(Mix_PlayMusic(music, -1) == -1) {
+		std::cerr << "Error @ playMusic(): " << Mix_GetError() << "\n";
+	}
+}
+
+// Stop musica
+void SoundMan::stopMusic() const {
+	Mix_HaltMusic();
+}
+
+// Toggle de mute para musica
+void SoundMan::toggleMusicMute() {
+	if(!music_muted) {
+		Mix_VolumeMusic(0);
+	}else{
+		Mix_VolumeMusic(MIX_MAX_VOLUME);
+	}
+	// Toggle
+	music_muted = !music_muted;
 }

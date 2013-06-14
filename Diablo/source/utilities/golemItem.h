@@ -17,6 +17,6 @@ class GolemItem: public Item {
 		}
 
 		void chocarCon(Personaje* personaje) {
-			personaje->chocarConGolem();
+			personaje->chocarConGolem(this);
 		}
 };

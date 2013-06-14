@@ -555,6 +555,15 @@ int main(int argc, char* argv[]) {
 			}
 		}
 
+		// debugueando estado
+		{
+			static int estadoAnterior = Personaje::ESPERANDO_ACCION;
+			if (estadoAnterior != estadoPersonaje){
+				estadoAnterior = estadoPersonaje;
+				printf("\nEstado Personaje %i\n",estadoAnterior);
+			}
+		}
+
 		// calculo de ataque
 		if (calcularAtaque) {
 			printf("\nCalculo del camino de ataque %s\n", pjm.getPjeLocal().getNick().c_str());
@@ -858,7 +867,9 @@ int main(int argc, char* argv[]) {
 					estadoMovimiento == MOV::IDLE;
 				}
 			}
+			//unsigned int old = estadoPersonaje;
 			estadoPersonaje = pjm.getPjeLocal().update(&mapa);
+			//if (estadoPersonaje != old) cout << "estado nuevo: " << estadoPersonaje << endl;
 
 			/*
 			if ( (estadoPersonaje == Personaje::MOVER_COMPLETADO) || 

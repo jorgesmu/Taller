@@ -435,6 +435,7 @@ void ClientSocket::listenDo() {
 			pjm.getPje(nick_who).setRadio(radio);
 			pjm.getPje(nick_who).setBolaDeCristal(bolaDeCristal);
 			pjm.getPje(nick_who).setGolem(golem);
+			cout << "Vel de player " << nick_who << " es " << vel << endl;
 		}else if(pt == PROTO::PLAYER_EXIT) {
 			// Esperamos a que cargue el mapa
 			while(!cargoMapa) {
@@ -750,6 +751,7 @@ void ClientSocket::listenDo() {
 			bool bolaCristal,golem;
 			bs >> vel >> energia >> magia >> escudo >> terremoto >> hielo >> radio >> bolaCristal >> golem >> bombas;
 			// Buscamos el personaje 
+			cout << "Update def att de " << nick_who << " a " << vel;
 			for(auto it = pjm.getPjes().begin();it != pjm.getPjes().end();it++) {
 				if(it->first == nick_who) {
 					auto&p = pjm.getPje(nick_who);

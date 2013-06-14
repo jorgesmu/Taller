@@ -30,6 +30,7 @@ class Bandera;
 class ClientSocket;
 class Arma;
 class ArmaBomba;
+#include "../display/bar.h"
 
 class Personaje : public Entidad {
 public:
@@ -169,6 +170,8 @@ protected:
 		Timer timerUpdateServidor;
 		// Arma default
 		Arma* espada;
+		// Barra de HP
+		Bar bar;
 				
 public:
 	

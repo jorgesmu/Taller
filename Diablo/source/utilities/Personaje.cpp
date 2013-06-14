@@ -1,3 +1,4 @@
+#include "../display/bar.h"
 #include "Personaje.h"
 #include "../net/PjeManager.h"
 #include "corazon.h"
@@ -228,6 +229,9 @@ void Personaje::init(const std::string& nickname, const std::string& name,
 	this -> espada = new Arma("espada" , 2 , 500 , 11,
 		Arma::PIXEL_REF_SPRITES_PRIMARIO_X , Arma::PIXEL_REF_SPRITES_PRIMARIO_Y,
 		tile , rm , Imagen::COLOR_KEY , Arma::DANIO_MAXIMO_DEFAULT , this);
+	// Inicializo la barra de energia
+	bar.setColor(COLOR::YELLOW);
+	bar.setSize(50, 6);
 }
 
 /*
@@ -1507,8 +1511,13 @@ void Personaje::blit(SDL_Surface* dest , Camara* camara , Mapa* mapa,
 			if (!colorAux || entidadDesconectada) {
 				this -> surf -> blitGris(dest , posX ,posY);	
 			} else {
-				this -> surf -> blit(dest , posX ,posY);		
+				this -> surf -> blit(dest , posX ,posY);
 			}
+			if(estaVivo() && !entidadDesconectada) {
+				bar.setPerc(this->getEnergia());
+				bar.blit(dest, posX+24, posY-8);
+			}
+			resman.getFont()->blitCentered(dest, posX+46, posY+9, this->getNick(), COLOR::WHITE);
 			// bliteo de la espada
 			if (this -> getArmaActiva() != NULL) {
 				this -> getArmaActiva() -> blit(dest,camara,mapa,tileX,tileY,colorAux);

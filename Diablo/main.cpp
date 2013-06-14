@@ -139,11 +139,19 @@ int main(int argc, char* argv[]) {
 	SDL_WarpMouse(800/2, 600/2);
 	SDL_WM_SetCaption("Diablo", NULL);
 
+	Camara camara;
+
+	// SoundMan
+	if(!soundman.init(&camara, &pjm.getPjeLocal())) return -3;
+	soundman.addSound("sword", "../resources/static/sounds/sword.wav");
+	soundman.playMusic();
+
+
 	// MENU
 	//////////////////////////
 	Boton sp, mp;
-	sp.init(&resman, 10, 10, "boton_sp");
-	mp.init(&resman, 10, 40, "boton_mp");
+	sp.init(&resman, 800/2 - 100, 600/2 - 100, "boton_sp");
+	mp.init(&resman, 800/2 - 100, 600/2 - 100 + 70, "boton_mp");
 	int opcion_menu = -1;
 	// 1 = sp, 2 = mp, 3 = exit
 	while(opcion_menu == -1) {
@@ -206,12 +214,7 @@ int main(int argc, char* argv[]) {
 	mapa.resize(escenarios[escenario_elegido_id].get_tam_x(), escenarios[escenario_elegido_id].get_tam_x());
 
 	// Camara
-	Camara camara;
 	camara.init(pantalla->get_ancho(), pantalla->get_alto(), configuracion.get_margen_scroll(), mapa);
-	
-	// SoundMan
-	if(!soundman.init(&camara, &pjm.getPjeLocal())) return -3;
-	soundman.addSound("sword", "../resources/static/sounds/sword.wav");
 
 	// Ventana de chat
 	chat_window.init(&resman, 40, 40, Font::SIZE_NORMAL, 250, 500, COLOR::WHITE);
@@ -338,7 +341,6 @@ int main(int argc, char* argv[]) {
 	estadoMovimiento = MOV::IDLE;
 	// Centro la camara
 	camara.center(mapa.getTile(start_pos_x, start_pos_y)->getX(), mapa.getTile(start_pos_x, start_pos_y)->getY());
-
 	// Variables para el game-loop
 	double curr_time = SDL_GetTicks();
     double accum = 0.0;
@@ -424,6 +426,9 @@ int main(int argc, char* argv[]) {
 								pjm.getPjeLocal().utilizarGolem();
 							}
 							break;
+						}
+						case 'p' : {
+							soundman.toggleMusicMute();
 						}
 						case 'd' : {
 							pjm.getPjeLocal().defender(NULL , &mapa);
@@ -986,7 +991,6 @@ int main(int argc, char* argv[]) {
 		consola.show(screen);
 
 		ui.blitInterface(screen);
-
 		// Actualizar la pantalla
 		SDL_Flip(screen);
 

@@ -156,6 +156,9 @@
     <ClCompile Include="source\display\boton.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="source\display\bar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\utilities\timer.h">
@@ -351,6 +354,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="source\utilities\armaBomba.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\display\bar.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

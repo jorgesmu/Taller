@@ -365,10 +365,12 @@ unsigned int Personaje::actualizarPosicion(Mapa* mapa) {
 				}
 			}
 		}
+		// si se completo el movimiento
 		if ((direccion == CENTRO) || 
 			((this -> posX == tileDestino -> getX()) && 
 			(this -> posY == tileDestino -> getY()))) {
 			retorno = Personaje::MOVER_COMPLETADO;
+			//seteo tile destino en nulo
 			this -> tileDestino = NULL;
 			// Se pasa centro para que se ponga estatico en la direccion actual
 			this -> actualizarImagen(Personaje::CENTRO);
@@ -714,7 +716,7 @@ Tile* Personaje::getPosicion(Mapa* mapa){
 
 // Actualiza las cosas internas, si hubiese
 unsigned int Personaje::update(Mapa* mapa) {
-	unsigned int retorno = Personaje::MOVER_EN_CURSO;
+	unsigned int retorno = Personaje::MOVER_COMPLETADO;
 	if (this -> imagen != NULL) {		
 		ImagenPersonaje* imagenPersonaje = static_cast<ImagenPersonaje*> (this -> imagen);
 		if (imagenPersonaje != NULL){
@@ -729,6 +731,10 @@ unsigned int Personaje::update(Mapa* mapa) {
 						retorno = Personaje::MOVER_COMPLETADO; // ESPERANDO_ACCION
 					}
 					this -> tiempoProximoUpdate = clock() + this -> deltaUpdatePosicion;
+				} else {
+					if (this -> tileDestino != NULL) {
+						retorno = Personaje::MOVER_EN_CURSO;
+					}
 				}
 			}
 		}
@@ -1388,7 +1394,7 @@ void Personaje::muere() {
 	bool murioLocal = false;
 	if (this->getNick() == pjm.getPjeLocal().getNick()) murioLocal = true;
 	if (vivo) {
-		if (murioLocal) this->animacionMuerte();
+		this->animacionMuerte();
 		std::cout << "Fui asesinado" << endl;
 		//Redirecciono a la posicion inicial nuevamente
 		this->vivo=false;
@@ -1396,7 +1402,7 @@ void Personaje::muere() {
 		BitStream bs;
 		bs << PROTO::DEAD << this->getNick();
 		sock.send(bs.str());
-		if (murioLocal) this->timerRevivir.start();
+		this->timerRevivir.start();
 	}
  }
 

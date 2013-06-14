@@ -346,6 +346,7 @@ void ClientSocket::listenDo() {
 			init_golem = golem;
 			init_bombas = cantBombas;
 			initAttCargados = true;
+			cout << "Velocidad restaurada: " << init_vel << endl;
 		}else if(pt == PROTO::ESC_ID) {
 			bs >> escenario_elegido_id;
 			//std::cout << "RECEIVED ESC ID: (" << escenario_elegido_id << ")\n";
@@ -423,9 +424,7 @@ void ClientSocket::listenDo() {
 			bool bolaDeCristal, golem;
 			char energia,magia,energiaEscudo,cantTerremoto,cantHielo;
 			bs >> nick_who >> vel_recv >> energia >> magia >> energiaEscudo >> cantTerremoto >> cantHielo >> radio >> bolaDeCristal >> golem;
-			//double vel=(double)vel_recv;
-			double vel =0.01;//cambiar
-			cout <<"Velocidad  = "<< vel<<endl;
+			double vel=(double)vel_recv;
 			//Seteamos los atributos del jugador
 			pjm.getPje(nick_who).setVelocidad(vel);
 			pjm.getPje(nick_who).setEnergia(energia);
@@ -436,6 +435,7 @@ void ClientSocket::listenDo() {
 			pjm.getPje(nick_who).setRadio(radio);
 			pjm.getPje(nick_who).setBolaDeCristal(bolaDeCristal);
 			pjm.getPje(nick_who).setGolem(golem);
+			cout << "Vel de player " << nick_who << " es " << vel << endl;
 		}else if(pt == PROTO::PLAYER_EXIT) {
 			// Esperamos a que cargue el mapa
 			while(!cargoMapa) {
@@ -770,6 +770,7 @@ void ClientSocket::listenDo() {
 			bool bolaCristal,golem;
 			bs >> vel >> energia >> magia >> escudo >> terremoto >> hielo >> radio >> bolaCristal >> golem >> bombas;
 			// Buscamos el personaje 
+			cout << "Update def att de " << nick_who << " a " << vel;
 			for(auto it = pjm.getPjes().begin();it != pjm.getPjes().end();it++) {
 				if(it->first == nick_who) {
 					auto&p = pjm.getPje(nick_who);

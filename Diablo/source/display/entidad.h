@@ -42,9 +42,11 @@ class Entidad {
 
 		const static unsigned int ORDEN_PERSONAJE = 3;
 
-		const static unsigned int ORDEN_ARBOL = 4;
+		const static unsigned int ORDEN_BANDERA = 4;
 
-		const static unsigned int ORDEN_EDIFICIO = 5;
+		const static unsigned int ORDEN_ARBOL = 5;
+
+		const static unsigned int ORDEN_EDIFICIO = 6;
 
 	protected:
 		

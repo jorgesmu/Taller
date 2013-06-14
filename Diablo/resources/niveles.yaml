@@ -104,8 +104,8 @@ entidades:
 
 escenarios:
   - nombre: bosque_encantado
-    size_x: 15
-    size_y: 15
+    size_x: 26
+    size_y: 26
     entidadesDef:
       
   - nombre: bosque_encantado2

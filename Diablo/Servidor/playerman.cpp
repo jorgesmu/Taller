@@ -12,7 +12,7 @@ Player::Player() {
 	tipo_personaje = "uninit-pje";
 	isOnline = false;
 	x = y = 0;
-	velocidad = 105/1000;
+	velocidad = 0;
 	congelado = 0; //descongelado
 	xSiguiente = ySiguiente = -1;
 	bolaDeCristal = false;
@@ -80,7 +80,7 @@ char Player::getEnergia() {
 	return this->energia;
 }
 bool Player::estaVivo() {
-	if (energia>= 0)
+	if (energia> 0)
 		return true;
 	return false;
 }

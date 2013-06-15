@@ -146,6 +146,7 @@ int main(int argc, char* argv[]) {
 	if(!soundman.init(&camara, &pjm.getPjeLocal())) return -3;
 	soundman.addSound("sword", "../resources/static/sounds/sword.wav");
 	soundman.addSound("death", "../resources/static/sounds/death.wav");
+	soundman.addSound("quake", "../resources/static/sounds/quake.wav");
 	soundman.playMusic();
 
 

@@ -1224,6 +1224,7 @@ void Personaje::utilizarTerremoto(Mapa* mapa, PjeManager* pjm, ClientSocket* soc
 		bs.clear();
 		bs << PROTO::UPDATE_ATT << ATT::MAGIA << this->getMagia();
 		sock->send(bs.str());
+		soundman.playSound("quake", this->getX(), this->getY());
 		int xActual = this->getPosicion(mapa)->getU();
 		int yActual = this->getPosicion(mapa)->getV();
 		for (int i=xActual-radio;i<=xActual+radio;i++) {

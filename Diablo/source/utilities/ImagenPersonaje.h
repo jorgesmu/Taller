@@ -46,19 +46,23 @@ public:
 	const static unsigned int DEF_NOROESTE = 30;
 	const static unsigned int DEF_OESTE = 31;
 	const static unsigned int DEF_SUROESTE = 32;
+
+	// Piedra
+	const static unsigned int PIEDRA = 33;
+
 	//Avanzar direccion actual
-	const static unsigned int AVANCE_DIRECCION_ACTUAL = 33;
+	const static unsigned int AVANCE_DIRECCION_ACTUAL = 34;
 	//Atacar en direccion actual
-	const static unsigned int ATAQUE_DIRECCION_ACTUAL = 34;
+	const static unsigned int ATAQUE_DIRECCION_ACTUAL = 35;
 	//Quieto en direccion actual
-	const static unsigned int ESTATICO_DIRECCION_ACTUAL = 35;
+	const static unsigned int ESTATICO_DIRECCION_ACTUAL = 36;
 	//Defender direccion actual
-	const static unsigned int DEFENSA_DIRECCION_ACTUAL = 36;
+	const static unsigned int DEFENSA_DIRECCION_ACTUAL = 37;
 	//Freezar accion actual
-	const static unsigned int FREEZAR_ACCION_ACTUAL = 37;
-	const static unsigned int DESFREEZAR_ACCION_ACTUAL = 38;
+	const static unsigned int FREEZAR_ACCION_ACTUAL = 38;
+	const static unsigned int DESFREEZAR_ACCION_ACTUAL = 39;
 	//Continua con la accion actual
-	const static unsigned int CONTINUAR_CON_ACCION_ACTUAL = 39;
+	const static unsigned int CONTINUAR_CON_ACCION_ACTUAL = 40;
 
 private:
 
@@ -67,6 +71,8 @@ private:
 	unsigned int accionSiguiente;
 
 	bool freezado;
+
+	unsigned int fps;
 
 public:	
 
@@ -140,9 +146,26 @@ public:
 
 	virtual bool isImagenFreezada();
 
+	unsigned int getFPS();
+
+	unsigned int getAccionActual() {
+		return this -> accionActual;
+	}
+
+	unsigned int getAccionSiguiente(){
+		return this -> accionSiguiente;
+	}
+	void setAccionActual(unsigned int accionActual) {
+		this -> accionActual = accionActual;
+	}
+
+	void setAccionSiguiente(unsigned int accionSiguiente){
+		this -> accionSiguiente = accionSiguiente;
+	}
+	
 private:
 
-	/*
+/*
 		Pre: La instancia ha sido creada y el parametro es una accion entre 0 y 24.
 
 		Post: Se ha seteado la accion.

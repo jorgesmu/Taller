@@ -24,6 +24,7 @@ ImagenPersonaje::ImagenPersonaje(const char* name , const int altoSprite ,
 	this -> accionActual = ImagenPersonaje::EST_SUR;
 	this -> setAccion(ImagenPersonaje::EST_SUR);
 	this -> freezado = false;
+	this -> fps = fps;
 }
 
 /**
@@ -51,6 +52,7 @@ ImagenPersonaje::ImagenPersonaje(const char* path , const int altoSprite , const
 	this -> accionActual = ImagenPersonaje::EST_SUR;
 	this -> setAccion(ImagenPersonaje::EST_SUR);
 	this -> freezado = false;
+	this -> fps = fps;
 }
 
 
@@ -74,7 +76,7 @@ ImagenPersonaje::~ImagenPersonaje() {
 	Post: Se ha seteado la accion.
 */
 void ImagenPersonaje::setAccionEfectiva(unsigned int accion) {
-	if ((accion < (unsigned int) this -> maxFilas) && (accion <= ImagenPersonaje::DEF_SUROESTE)) {
+	if ((accion < (unsigned int) this -> maxFilas) && (accion <= ImagenPersonaje::PIEDRA)) {
 		this -> accionSiguiente = accion;
 		int delta = this -> accionSiguiente	- this -> accionActual;	
 		if (delta != 0) {
@@ -123,6 +125,9 @@ void ImagenPersonaje::setAccionEfectiva(unsigned int accion) {
 								if ( (accionActual >= DEF_SUR) && (accionActual <= DEF_SUROESTE)){
 									this -> accionActual-= 9;
 									this -> columnaActual = 0;
+									//Siguiente Desplazamiento y Actual Piedra
+								} else {
+									this -> accionActual = accion;
 								}
 							}
 						}
@@ -176,6 +181,9 @@ void ImagenPersonaje::setAccionEfectiva(unsigned int accion) {
 									if ( (accionActual >= DEF_SUR) && (accionActual <= DEF_SUROESTE)){
 										this -> accionActual-= 17;
 										this -> columnaActual = 0;
+										//Siguiente Ataque actual piedra
+									} else {
+										this -> accionActual = accion;
 									}
 								}
 							}
@@ -224,8 +232,14 @@ void ImagenPersonaje::setAccionEfectiva(unsigned int accion) {
 										this -> columnaActual = 0;
 									} else {
 										//Siguiente Estatico actual defensa
-										this -> accionActual -= 9;
-										this -> columnaActual = 0;
+										if ((this -> accionActual >= ImagenPersonaje::DEF_SUR) &&
+											(this -> accionActual <= ImagenPersonaje::DEF_SUROESTE)) {
+											this -> accionActual -= 9;
+											this -> columnaActual = 0;
+											//Siguiente estatico actual piedra
+										} else {
+											this -> accionActual = accion;
+										}
 									}
 								}
 							}
@@ -248,22 +262,33 @@ void ImagenPersonaje::setAccionEfectiva(unsigned int accion) {
 										this -> accionActual += 9;
 										this -> columnaActual = 0;
 									} else {
+										//Siguiente Defensa y Actual Muerte
 										if ( this ->accionActual == ImagenPersonaje::MUERTE) {
 											this -> accionActual = ImagenPersonaje::MUERTE;
-										}									
+										} else {
+											this -> accionActual = accion;
+										}
 									}
 								}
 							}
-							// Siguiente Muerte
+							// Siguiente Muerte actual lo que sea
 						} else {
-							this -> accionActual = ImagenPersonaje::MUERTE;
-							this -> columnaActual = 0;
+						
+							if (accion == ImagenPersonaje::MUERTE){
+								this -> accionActual = ImagenPersonaje::MUERTE;
+								this -> columnaActual = 0;
+								// Siguiente piedra actual lo que sea
+							} else {
+								
+								this -> accionActual = ImagenPersonaje::PIEDRA;
+							}
 						}
 					}
 				}
 			}
 		}
 		//seteo de fila
+		
 		this -> filaActual = this -> accionActual;
 	}
 }
@@ -275,7 +300,7 @@ void ImagenPersonaje::setAccionEfectiva(unsigned int accion) {
 */
 bool ImagenPersonaje::setAccion(unsigned int accion){
 	bool retorno = false;
-	if (accion > ImagenPersonaje::DEF_SUROESTE) {
+	if (accion > ImagenPersonaje::PIEDRA) {
 		if (accion < ImagenPersonaje::CONTINUAR_CON_ACCION_ACTUAL) {
 			switch (accion) {
 				case ImagenPersonaje::AVANCE_DIRECCION_ACTUAL : {
@@ -296,6 +321,9 @@ bool ImagenPersonaje::setAccion(unsigned int accion){
 									// Si accion actual defensa
 									if ( (accionActual >= DEF_SUR) && (accionActual <= DEF_SUROESTE)){
 										this -> setAccionEfectiva(this -> accionActual-25);
+									} else {
+										// Accion actual piedra
+										this -> setAccionEfectiva(ImagenPersonaje::DES_SUR);
 									}
 								}
 							}
@@ -320,6 +348,9 @@ bool ImagenPersonaje::setAccion(unsigned int accion){
 								// Accion actual defensa
 								if ( (accionActual >= DEF_SUR) && (accionActual <= DEF_SUROESTE) ) {
 									this -> setAccionEfectiva( this -> accionActual-17);
+								} else {
+									// Actual piedra
+									this -> setAccionEfectiva(ImagenPersonaje::AT_SUR);
 								}
 							}
 						}
@@ -343,6 +374,9 @@ bool ImagenPersonaje::setAccion(unsigned int accion){
 								if ( (this ->accionActual >= ImagenPersonaje::DEF_SUR) &&
 									 (this ->accionActual <= ImagenPersonaje::DEF_SUROESTE)) {
 									this -> setAccionEfectiva(this -> accionActual - 9);
+								} else {
+									// Accion actual piedra
+									this -> setAccionEfectiva( ImagenPersonaje::DEF_SUR);
 								}
 							}
 						}
@@ -364,6 +398,9 @@ bool ImagenPersonaje::setAccion(unsigned int accion){
 							} else {
 								// Accion actual muerte
 								if ( this -> accionActual == ImagenPersonaje::MUERTE) {
+									this -> setAccionEfectiva(ImagenPersonaje::DEF_SUR);
+								} else {
+									// Accion actual piedra
 									this -> setAccionEfectiva(ImagenPersonaje::DEF_SUR);
 								}
 							}
@@ -462,4 +499,8 @@ unsigned int ImagenPersonaje::getTipoAccion() {
 
 bool ImagenPersonaje::isImagenFreezada(){
 	return this -> freezado;
+}
+
+unsigned int ImagenPersonaje::getFPS(){
+	return this -> fps;
 }

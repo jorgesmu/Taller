@@ -831,11 +831,11 @@ void ClientSocket::listenDo() {
 			bs >> nick;
 			if (tipo == TIPO::LAPIDA) {
 				if (pjm.getPjeLocal().getNick() == nick) {
-					pjm.getPjeLocal().animacionMuerte();
+					pjm.getPjeLocal().animacionPiedra();
 				} else {
-					pjm.getPje(nick).animacionMuerte();
+					pjm.getPje(nick).animacionPiedra();
 				}				
-				std::cout << "Convirtiendo a " << nick << " en lapida" << endl;
+				std::cout << "Convirtiendo a " << nick << " en piedra" << endl;
 			} else if (tipo == TIPO::ESTRATEGIA_ENEMY) {
 				std::cout << "Enemigo " << nick << "cambiando de estrategia" << endl;
 			}				

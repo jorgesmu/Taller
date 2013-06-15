@@ -309,8 +309,8 @@ unsigned int Personaje::actualizarPosicion(Mapa* mapa) {
 		if( (this -> posX != tileDestino -> getX()) || (this -> posY != tileDestino -> getY())){
 			retorno = Personaje::MOVER_EN_CURSO;
 			// Calculo posicion siguiente (tomando en cuenta pixel de referencia y la posicion actual)
-			int posPixelSiguienteX = 0;
-			int posPixelSiguienteY = 0;
+			float posPixelSiguienteX = 0;
+			float posPixelSiguienteY = 0;
 			this -> calcularPosicionTentativa(direccion , &posPixelSiguienteX , &posPixelSiguienteY);
 			// Obtengo el tile siguiente
 			Tile* tileSiguiente = mapa -> getTilePorPixeles(posPixelSiguienteX , posPixelSiguienteY);
@@ -390,16 +390,16 @@ unsigned int Personaje::actualizarPosicion(Mapa* mapa) {
 	El offset X Y sin tener en cuenta el pixel de origen
 */
 void Personaje::calcularPosicionTentativa(unsigned int direccion , 
-	int* offsetTentativoX , int* offsetTentativoY){
+	float* offsetTentativoX , float* offsetTentativoY){
 		if(this->velocidad == 0){
 			this ->velocidad = 105/1000;
 		}
 	int vel = 3;
 	*offsetTentativoX = posX;
 	*offsetTentativoY = posY;
-	unsigned int avance;
+	float avance;
 	if(this ->velocidad != 0){
-	avance= ceil((this->velocidad)*(clock() - this->tiempoProximoUpdate + this ->deltaUpdatePosicion)
+	avance= ((this->velocidad)*(clock() - this->tiempoProximoUpdate + this ->deltaUpdatePosicion)
 							*this->velocidad);
 	}else{
 	avance= ((vel)*(clock() - this->tiempoProximoUpdate + this ->deltaUpdatePosicion)
@@ -948,6 +948,19 @@ void Personaje::animacionMuerte() {
 	this -> tileDestino = NULL;
 	if (imagenPersonaje != NULL){
 		imagenPersonaje -> setAccion(ImagenPersonaje::MUERTE);
+	}
+}
+
+
+/*
+*/
+void Personaje::animacionPiedra() {
+	printf("\n---------------------------------Piedra---------------------------------------\n");
+	ImagenPersonaje* imagenPersonaje = static_cast<ImagenPersonaje*> (this -> imagen);
+	this -> tileDestino = NULL;
+	if (imagenPersonaje != NULL){
+		printf("\n---------------------------------Piedra---------------------------------------\n");
+		imagenPersonaje -> setAccion(ImagenPersonaje::PIEDRA);
 	}
 }
 
@@ -1641,8 +1654,8 @@ void Personaje::utilizarTransmutacion(std::string nick_enemigo) {
 	char cambio=rand()%2;
 	if (cambio == 0) {
 		//Se convierte en lapida
-		std::cout << "Convertiendo en lapida a " << nick_enemigo << endl;
-		pjm.getPje(nick_enemigo).animacionMuerte();
+		std::cout << "Convertiendo en piedra a " << nick_enemigo << endl;
+		pjm.getPje(nick_enemigo).animacionPiedra();
 		BitStream bs;
 		bs << PROTO::TRANSMUT << TIPO::LAPIDA << nick_enemigo;
 		sock.send(bs.str());
@@ -1666,5 +1679,23 @@ void Personaje::updateTransmutacion() {
 		bs << PROTO::DESTRANSMUT << tipoTransmut << transmutado;
 		sock.send(bs.str());
 		tTransmut.stop();
+	}
+}
+
+void Personaje::cambiarApariencia(const std::string& name,ResMan& rm , const int colorKey){
+	if(this -> imagen != NULL) {
+		ImagenPersonaje* imagenPersonaje = static_cast<ImagenPersonaje*>(this->imagen);
+		unsigned int fps = imagenPersonaje -> getFPS() ;
+		unsigned int delay = imagenPersonaje -> getDelay();
+		unsigned int altoSprite = imagenPersonaje -> getAlto();
+		unsigned int anchoSprite = imagenPersonaje -> getAncho();
+		unsigned int accionActual = imagenPersonaje->getAccionActual();
+		unsigned int accionSiguiente = imagenPersonaje ->getAccionSiguiente();
+		delete(this -> imagen);
+		this -> imagen	= new ImagenPersonaje(name.c_str() , altoSprite , 
+								anchoSprite , fps , delay , rm ,colorKey);	
+		imagenPersonaje = static_cast<ImagenPersonaje*>(this->imagen);
+		imagenPersonaje -> setAccionActual(accionActual);
+		imagenPersonaje -> setAccionSiguiente(accionSiguiente);
 	}
 }

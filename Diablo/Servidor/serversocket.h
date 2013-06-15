@@ -25,6 +25,9 @@ struct Client {
 	// Members
 	SOCKET sock; // Socket de conexion
 	std::string nick; // Nick del usuario
+	std::string queue_buf;
+	std::string packet, tmp;
+	int bytes_read, packet_size;
 };
 
 class ServerSocket {
@@ -36,7 +39,6 @@ class ServerSocket {
 	// Variables para manejo del socket
 	SOCKET ListenSocket;
 	char recvbuf[DEFAULT_BUFLEN];
-	std::map<std::string, std::string> queue_buf;
 	// Mutex para el acceso a la data de clientes
 	CRITICAL_SECTION critSect;
 	// Queue de clientes aceptados pero que no estan siendo escuchados

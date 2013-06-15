@@ -238,63 +238,66 @@ bool ServerSocket::sendAll(const std::string& msg) {
 
 // Funcion de receive
 bool ServerSocket::receive(const std::string& cid, std::string& buff) {
-	SOCKET sock = getClient(cid).sock;
+	EnterCriticalSection(&critSect);
+	auto& c = getClient(cid);
+	SOCKET sock = c.sock;
 	if(sock == SOCKET_ERROR) {
 		std::cerr << "Cliente invalid pasado a receive(): " << cid << "\n";
+		LeaveCriticalSection(&critSect);
 		return false;
 	}
-	std::string packet;
-	int packet_size = -1;
-	int bytes_read = 0;
+	c.packet.clear();
+	c.packet_size = -1;
+	c.bytes_read = 0;
 	// Loop until we read a full packet
-	EnterCriticalSection(&critSect);
+	
 	while(true) {
-		std::string tmp;
+		c.tmp.clear();
 		// If we have something in the queue, push it it
-		if(queue_buf[cid].size() > 0) {
-			tmp.append(queue_buf[cid]);
-			std::cout << "APPENDING FROM QUEUE (" << queue_buf[cid].size() << ")\n";
-			bytes_read += queue_buf[cid].size();
-			queue_buf[cid].clear();
+		if(c.queue_buf.size() > 0) {
+			c.tmp.append(c.queue_buf);
+			//std::cout << "APPENDING FROM QUEUE (" << c.queue_buf.size() << ")\n";
+			c.bytes_read += c.queue_buf.size();
+			c.queue_buf.clear();
 		}
 		// If we have an empty packet, read the size first
-		if(packet_size == -1 && tmp.size() >= 2) {
+		if(c.packet_size == -1 && c.tmp.size() >= 2) {
 			// First 2 bytes 
 			unsigned char buf[sizeof(short)];
-			std::copy(tmp.begin(), tmp.begin()+sizeof(short), buf);
-			packet_size = *(reinterpret_cast<short*>(&buf));
-			packet_size += sizeof(short); // Add the size size
-			std::cout << "Got a packet with size: " << packet_size << "\n";
+			std::copy(c.tmp.begin(), c.tmp.begin()+sizeof(short), buf);
+			c.packet_size = *(reinterpret_cast<short*>(&buf));
+			c.packet_size += sizeof(short); // Add the size size
+			//std::cout << "Got a packet with size: " << c.packet_size << "\n";
 			//std::cout << tmp << "\n";
-			tmp = tmp.substr(sizeof(short)); // Remove the 2 byte prefix		
+			c.tmp = c.tmp.substr(sizeof(short)); // Remove the 2 byte prefix		
 		}
 
 		// We finish the loop if we've read our packet size and we've already reached it
-		if(packet_size != -1 ) {
-			if(bytes_read > packet_size) {
-				std::cout << "Got more: " << bytes_read << "," << packet_size << "-----------------------------------\n";
+		if(c.packet_size != -1 ) {
+			if(c.bytes_read > c.packet_size) {
+				//std::cout << "Got more: " << c.bytes_read << "," << c.packet_size << "-----------------------------------\n";
 				// Trim and store
-				std::cout << "Delta: " << bytes_read - packet_size << "\n";
-				queue_buf[cid] = tmp.substr(tmp.size() - (bytes_read - packet_size));
-				std::cout << "STORING EXTRA (" << queue_buf[cid].size() << ")\n";
-				packet.append(tmp.substr(0, packet_size-sizeof(short)));
-				std::cout << "APPENDING " << packet_size << "\n";
-				buff = packet;
-				std::cout << "DONE WITH PACKET\n";
+				//std::cout << "Delta: " << c.bytes_read - c.packet_size << "\n";
+				c.queue_buf = c.tmp.substr(c.tmp.size() - (c.bytes_read - c.packet_size));
+				//std::cout << "STORING EXTRA (" << c.queue_buf.size() << ")\n";
+				c.packet.append(c.tmp.substr(0, c.packet_size-sizeof(short)));
+				//std::cout << "APPENDING " << c.packet_size << "\n";
+				buff = c.packet;
+				//std::cout << "DONE WITH PACKET\n";
 				//std::cout << buff << "\n";
 				LeaveCriticalSection(&critSect);
 				return true;
-			}else if(bytes_read == packet_size) {
-				packet.append(tmp);
-				buff = packet;
-				std::cout << "Got exact\n";
-				std::cout << "DONE WITH PACKET\n";
+			}else if(c.bytes_read == c.packet_size) {
+				c.packet.append(c.tmp);
+				buff = c.packet;
+				//std::cout << "Got exact\n";
+				//std::cout << "DONE WITH PACKET\n";
 				//std::cout << buff << "\n";
 				LeaveCriticalSection(&critSect);
 				return true;
-			}else if(bytes_read < packet_size) {
-				std::cout << "Got less||||||||||||||||||||||||||||||||||||||||\n";
-				packet.append(tmp);
+			}else if(c.bytes_read < c.packet_size) {
+				//std::cout << "Got less||||||||||||||||||||||||||||||||||||||||\n";
+				c.packet.append(c.tmp);
 			}
 		}
 		LeaveCriticalSection(&critSect);
@@ -302,10 +305,10 @@ bool ServerSocket::receive(const std::string& cid, std::string& buff) {
 		EnterCriticalSection(&critSect);
 		if(res > 0) {
 			//bytes_read += res;
-			std::cout << "Read " << res << " bytes\n";
-			std::cout << "BytesRead: " << bytes_read << "\n";
-			queue_buf[cid].append(recvbuf, res);
-			std::cout << "(" << queue_buf[cid].size() << ") " << queue_buf[cid] << "\n";
+			//std::cout << "Read " << res << " bytes\n";
+			//std::cout << "BytesRead: " << c.bytes_read << "\n";
+			c.queue_buf.append(recvbuf, res);
+			//std::cout << "(" << c.queue_buf.size() << ") " << c.queue_buf << "\n";
 		}else if(res == 0) {
 			std::cout << "Connection closed\n";
 			LeaveCriticalSection(&critSect);
@@ -339,7 +342,6 @@ bool ServerSocket::removeClient(const std::string& str_id) {
 		}
 		// Borramos
 		clients_map.erase(str_id);
-		queue_buf.erase(str_id);
 		ret = true;
 		//actualizo estado de enemigos  y golem si no quedo ningun cliente
 		if(clients_map.empty()){
@@ -520,7 +522,7 @@ void ServerSocket::acceptLastDo() {
 		}		
 
 		// Para tipear menos, p_local = referencia al player de este thread
-		const auto p_local = pm.getPlayer(new_nick);
+		const auto& p_local = pm.getPlayer(new_nick);
 
 		// Avisamos a los otros jugadores del nuevo jugador
 		for(auto it = clients_map.begin();it != clients_map.end();it++) {
@@ -545,7 +547,7 @@ void ServerSocket::acceptLastDo() {
 		// Mandamos todos los otros players al que se unio
 		for(auto it = pm.getPlayers().begin();it != pm.getPlayers().end();it++) {
 			if(it->second.getNick() == new_nick) continue; // Salteamos a nuestro jugador			
-			auto p = pm.getPlayer(it->second.getNick());
+			auto& p = pm.getPlayer(it->second.getNick());
 			bs.clear();
 			bs << PROTO::NEW_PLAYER << it->second.getNick() << p.getTipo() << p.getX() << p.getY() << p.isOn();
 			send(cid, bs.str());

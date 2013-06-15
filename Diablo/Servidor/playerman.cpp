@@ -87,7 +87,7 @@ bool Player::estaVivo() {
 
 void Player::addTileRecorrido(short x, short y) {
 	// ToDo: Esto se puede mejorar usando sort+binary search
-	auto p = std::make_pair(x, y);
+	auto& p = std::make_pair(x, y);
 	if(std::find(tiles_recorridos.begin(), tiles_recorridos.end(), p) == tiles_recorridos.end()) {
 		this->tiles_recorridos.push_back(p);
 	}
@@ -95,7 +95,7 @@ void Player::addTileRecorrido(short x, short y) {
 
 bool Player::existsTileRecorrido(short x, short y) {
 	// ToDo: Esto se puede mejorar usando sort+binary search
-	auto p = std::make_pair(x, y);
+	auto& p = std::make_pair(x, y);
 	if(std::find(tiles_recorridos.begin(), tiles_recorridos.end(), p) == tiles_recorridos.end()) {
 		return false;
 	}

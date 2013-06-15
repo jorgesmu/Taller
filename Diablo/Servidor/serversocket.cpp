@@ -252,8 +252,8 @@ bool ServerSocket::receive(const std::string& cid, std::string& buff) {
 		std::string tmp;
 		// If we have something in the queue, push it it
 		if(queue_buf[cid].size() > 0) {
-			tmp = queue_buf[cid];
-			//std::cout << "APPENDING FROM QUEUE (" << queue_buf.size() << ")\n";
+			tmp.append(queue_buf[cid]);
+			std::cout << "APPENDING FROM QUEUE (" << queue_buf[cid].size() << ")\n";
 			bytes_read += queue_buf[cid].size();
 			queue_buf[cid].clear();
 		}
@@ -264,7 +264,7 @@ bool ServerSocket::receive(const std::string& cid, std::string& buff) {
 			std::copy(tmp.begin(), tmp.begin()+sizeof(short), buf);
 			packet_size = *(reinterpret_cast<short*>(&buf));
 			packet_size += sizeof(short); // Add the size size
-			//std::cout << "Got a packet with size: " << packet_size << "\n";
+			std::cout << "Got a packet with size: " << packet_size << "\n";
 			//std::cout << tmp << "\n";
 			tmp = tmp.substr(sizeof(short)); // Remove the 2 byte prefix		
 		}
@@ -272,28 +272,28 @@ bool ServerSocket::receive(const std::string& cid, std::string& buff) {
 		// We finish the loop if we've read our packet size and we've already reached it
 		if(packet_size != -1 ) {
 			if(bytes_read > packet_size) {
-				//std::cout << "Got more: " << bytes_read << "," << packet_size << "-----------------------------------\n";
+				std::cout << "Got more: " << bytes_read << "," << packet_size << "-----------------------------------\n";
 				// Trim and store
-				//std::cout << "Delta: " << bytes_read - packet_size << "\n";
+				std::cout << "Delta: " << bytes_read - packet_size << "\n";
 				queue_buf[cid] = tmp.substr(tmp.size() - (bytes_read - packet_size));
-				//std::cout << "STORING EXTRA (" << queue_buf.size() << ")\n";
-				packet.append(tmp.substr(0, packet_size));
-				//std::cout << "APPENDING " << packet_size << "\n";
+				std::cout << "STORING EXTRA (" << queue_buf[cid].size() << ")\n";
+				packet.append(tmp.substr(0, packet_size-sizeof(short)));
+				std::cout << "APPENDING " << packet_size << "\n";
 				buff = packet;
-				//std::cout << "DONE WITH PACKET\n";
+				std::cout << "DONE WITH PACKET\n";
 				//std::cout << buff << "\n";
 				LeaveCriticalSection(&critSect);
 				return true;
 			}else if(bytes_read == packet_size) {
 				packet.append(tmp);
 				buff = packet;
-				//std::cout << "Got exact\n";
-				//std::cout << "DONE WITH PACKET\n";
+				std::cout << "Got exact\n";
+				std::cout << "DONE WITH PACKET\n";
 				//std::cout << buff << "\n";
 				LeaveCriticalSection(&critSect);
 				return true;
 			}else if(bytes_read < packet_size) {
-				//std::cout << "Got less||||||||||||||||||||||||||||||||||||||||\n";
+				std::cout << "Got less||||||||||||||||||||||||||||||||||||||||\n";
 				packet.append(tmp);
 			}
 		}
@@ -302,10 +302,10 @@ bool ServerSocket::receive(const std::string& cid, std::string& buff) {
 		EnterCriticalSection(&critSect);
 		if(res > 0) {
 			//bytes_read += res;
-			//std::cout << "Read " << res << " bytes\n";
-			//std::cout << "BytesRead: " << bytes_read << "\n";
+			std::cout << "Read " << res << " bytes\n";
+			std::cout << "BytesRead: " << bytes_read << "\n";
 			queue_buf[cid].append(recvbuf, res);
-			//std::cout << "(" << queue_buf.size() << ") " << queue_buf << "\n";
+			std::cout << "(" << queue_buf[cid].size() << ") " << queue_buf[cid] << "\n";
 		}else if(res == 0) {
 			std::cout << "Connection closed\n";
 			LeaveCriticalSection(&critSect);

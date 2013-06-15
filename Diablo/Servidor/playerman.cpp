@@ -154,7 +154,7 @@ void PlayerManager::addPlayer(const std::string& nick, const std::string& tipo_p
 		rand_x = intRand(0, w-1);
 		rand_y = intRand(0, h-1);
 		//std::cout << rand_x << "," << rand_y << "\n";
-		if(mapa.getTile(rand_x, rand_y)->isCaminable()) {
+		if(mapa.getTile(rand_x, rand_y)->isCaminable() && !mapa.tile_esta_ocupado(rand_x, rand_y)) {
 			found = true;
 		}
 		x++;

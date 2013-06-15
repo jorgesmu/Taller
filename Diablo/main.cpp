@@ -133,6 +133,7 @@ int main(int argc, char* argv[]) {
 	if(!resman.init()) return -2;
 	resman.addRes("boton_sp", "../resources/static/boton_sp.png");
 	resman.addRes("boton_mp", "../resources/static/boton_mp.png");
+	resman.addRes("fondo_menu", "../resources/static/fondo_menu.jpg");
 	// Para confinar el mouse a la ventana
 	//SDL_WM_GrabInput(SDL_GRAB_ON);
 	// Lo movemos al medio
@@ -159,6 +160,7 @@ int main(int argc, char* argv[]) {
 		if(sp.handleInput(event)) opcion_menu = 1;
 		if(mp.handleInput(event)) opcion_menu = 2;
 		if(event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE || event.type == SDL_QUIT) opcion_menu = 3;
+		resman.getRes("fondo_menu")->blit(screen, 0, 0);
 		sp.show(screen);
 		mp.show(screen);
 		SDL_Flip(screen);
@@ -460,9 +462,9 @@ int main(int argc, char* argv[]) {
 							break;
 						}
 						case 'g' : {
-							//if (pjm.getPjeLocal().tieneGolem()) {
+							if (pjm.getPjeLocal().tieneGolem()) {
 								pjm.getPjeLocal().utilizarGolem();
-							//}
+							}
 							break;
 						}
 						case 'p' : {

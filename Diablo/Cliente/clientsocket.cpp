@@ -575,64 +575,65 @@ void ClientSocket::listenDo() {
 			}
 
 			Item* item;
+			Tile* tile = mapa.getTile(posItemX, posItemY);
 			//case de todos los items y constructor
 			switch(tipoItem){
 				case(ITEM::LAMPARA):{
-					item = new Lampara ("cofre",1,1,true, posItemX ,posItemY,NULL,&mapa,resman,Imagen::COLOR_KEY );
+					item = new Lampara ("cofre",1,1,true, -20 ,30,tile,&mapa,resman,Imagen::COLOR_KEY );
 					mapa.getTile(posItemX, posItemY)->addEntidad(item,&mapa);
 					entidades_cargadas.push_back(item);
 					break;
 				}
 				case(ITEM::MAPAITEM):{
-					item = new MapaItem ("cofre",1,1,true, posItemX ,posItemY,NULL,&mapa,resman,Imagen::COLOR_KEY );
+					item = new MapaItem ("cofre",1,1,true, -20 ,30,tile,&mapa,resman,Imagen::COLOR_KEY );
 					mapa.getTile(posItemX, posItemY)->addEntidad(item,&mapa);
 					entidades_cargadas.push_back(item);
 					break;
 				}
 				case(ITEM::ZAPATOS):{
-					item = new Zapatos ("cofre",1,1,true, posItemX ,posItemY,NULL,&mapa,resman,Imagen::COLOR_KEY );
+					item = new Zapatos ("cofre",1,1,true, -20 ,30,tile,&mapa,resman,Imagen::COLOR_KEY );
 					mapa.getTile(posItemX, posItemY)->addEntidad(item,&mapa);
 					entidades_cargadas.push_back(item);
 					break;
 				}
 				case (ITEM::TERREMOTO):{
-					item = new Terremoto ("cofre",1,1,true, posItemX , posItemY, NULL,&mapa,resman,Imagen::COLOR_KEY );
+					item = new Terremoto ("cofre",1,1,true, -20 , 30, tile,&mapa,resman,Imagen::COLOR_KEY );
 					mapa.getTile(posItemX, posItemY)->addEntidad(item,&mapa);
 					entidades_cargadas.push_back(item);
 					break;
 				}
 				case (ITEM::ESCUDO):{
-					item = new Escudo ("cofre",1,1,true, posItemX , posItemY, NULL,&mapa,resman,Imagen::COLOR_KEY );
+					item = new Escudo ("cofre",1,1,true, -20 , 30, tile,&mapa,resman,Imagen::COLOR_KEY );
 					mapa.getTile(posItemX, posItemY)->addEntidad(item,&mapa);
 					entidades_cargadas.push_back(item);
 					break;
 				}
 				case (ITEM::BOLA_DE_CRISTAL):{
-					item = new BolaDeCristal("cofre",1,1,true, posItemX , posItemY, NULL,&mapa,resman,Imagen::COLOR_KEY );
+					item = new BolaDeCristal("cofre",1,1,true, -20 , 30, tile,&mapa,resman,Imagen::COLOR_KEY );
 					mapa.getTile(posItemX, posItemY)->addEntidad(item,&mapa);
 					entidades_cargadas.push_back(item);
 					break;
 				}
 				case (ITEM::GOLEM):{
-					item = new GolemItem ("cofre",1,1,true, posItemX ,posItemY,NULL,&mapa,resman,Imagen::COLOR_KEY );
+					item = new GolemItem ("cofre",1,1,true, -20 ,30,tile,&mapa,resman,Imagen::COLOR_KEY );
 					mapa.getTile(posItemX, posItemY)->addEntidad(item,&mapa);
 					entidades_cargadas.push_back(item);
 					break;
 				}
 				case (ITEM::BOTELLA):{
-					item = new Botella ("cofre",1,1,true, posItemX , posItemX, NULL,&mapa,resman,Imagen::COLOR_KEY );
+					item = new Botella ("cofre",1,1,true, -20 , 30, tile,&mapa,resman,Imagen::COLOR_KEY );
 					mapa.getTile(posItemX, posItemY)->addEntidad(item,&mapa);
 					entidades_cargadas.push_back(item);
 					break;
 				}
 				case (ITEM::CORAZON):{
-					item = new Corazon ("cofre",1,1,true, posItemX , posItemY, NULL,&mapa,resman,Imagen::COLOR_KEY );
+					item = new Corazon ("cofre",1,1,true, -20 , 30, tile,&mapa,resman,Imagen::COLOR_KEY );
 					mapa.getTile(posItemX, posItemY)->addEntidad(item,&mapa);
 					entidades_cargadas.push_back(item);
 					break;
 				}
 				case (ITEM::HIELO):{
-					item = new Hielo ("cofre",1,1,true, posItemX , posItemY, NULL,&mapa,resman,Imagen::COLOR_KEY );
+					item = new Hielo ("cofre",1,1,true, -20 , 30, tile,&mapa,resman,Imagen::COLOR_KEY );
 					mapa.getTile(posItemX, posItemY)->addEntidad(item,&mapa);
 					entidades_cargadas.push_back(item);
 					break;

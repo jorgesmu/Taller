@@ -94,7 +94,7 @@ void Personaje::inicializarAtributosEnValoresDefault() {
 	this->energia=this->ENERGIA_TOTAL;
 	this->magia=this->MAGIA_TOTAL;
 	this->flechas=0;
-	this->bombas=0; //DESCOMENTAR
+	this->bombas=0;
 	this->granadas=0;
 	this->varita=false;
 	this->energiaEscudo=0;

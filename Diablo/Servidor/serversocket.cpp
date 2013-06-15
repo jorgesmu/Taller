@@ -63,9 +63,9 @@ bool ServerSocket::init() {
     ListenSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	BOOL val_true = TRUE;
 	int buff_size = 0;
-	/*if(setsockopt(ListenSocket, IPPROTO_TCP, TCP_NODELAY, (char*)&val_true, sizeof(BOOL)) != 0) {
+	if(setsockopt(ListenSocket, IPPROTO_TCP, TCP_NODELAY, (char*)&val_true, sizeof(BOOL)) != 0) {
 		std::cerr << "ERROR SETTING SOCK OPTIONS TCP_NODELAY\n";
-	}
+	}/*
 	//if(setsockopt(ListenSocket, SOL_SOCKET, SO_RCVBUF, (char*)&buff_size, sizeof(int)) != 0) {
 		//std::cerr << "ERROR SETTING SOCK OPTIONS SO_RCVBUF\n";
 	//}
@@ -119,9 +119,9 @@ bool ServerSocket::accept() {
 	}else{
 		BOOL val_true = TRUE;
 		int buff_size = 0;
-		/*if(setsockopt(tmp_sck, IPPROTO_TCP, TCP_NODELAY, (char*)&val_true, sizeof(BOOL)) != 0) {
+		if(setsockopt(tmp_sck, IPPROTO_TCP, TCP_NODELAY, (char*)&val_true, sizeof(BOOL)) != 0) {
 			std::cerr << "ERROR SETTING SOCK OPTIONS TCP_NODELAY\n";
-		}
+		}/*
 		//if(setsockopt(tmp_sck, SOL_SOCKET, SO_RCVBUF, (char*)&buff_size, sizeof(int)) != 0) {
 			//std::cerr << "ERROR SETTING SOCK OPTIONS SO_RCVBUF\n";
 		//}
@@ -341,6 +341,15 @@ bool ServerSocket::removeClient(const std::string& str_id) {
 		clients_map.erase(str_id);
 		queue_buf.erase(str_id);
 		ret = true;
+		//actualizo estado de enemigos  y golem si no quedo ningun cliente
+		if(clients_map.empty()){
+			for(auto it=pm.getEnemies().begin();it!=pm.getEnemies().end();it++){
+				it ->second->setPos(it->second->getXSiguiente(),it->second->getYSiguiente());
+			}
+			for(auto it=pm.getGolems().begin();it!=pm.getGolems().end();it++){
+				it ->second->setPos(it->second->getXSiguiente(),it->second->getYSiguiente());
+			}
+		}
 	}
 	LeaveCriticalSection(&critSect);
 	return ret;
@@ -633,7 +642,7 @@ void ServerSocket::acceptLastDo() {
 		// Receive loop
 		while(this->receive(cid, buff)) {
 			Sleep(50);
-			//EnterCriticalSection(&critSect);
+			EnterCriticalSection(&critSect);
 
 			// This is for debugging purposes
 			std::stringstream ss;
@@ -688,6 +697,7 @@ void ServerSocket::acceptLastDo() {
 
 				//std::cout << "RECEIVED NIEBLA SYNC: " << new_tile_x << "," << new_tile_y << "\n";
 			}else if(pt == PROTO::ATACAR) {
+				std::cout << "RECV: ATACAR\n";
 				std::string nick_atacante;
 				bs >> nick_atacante;
 				// Avisamos a los otros jugadores del nuevo jugador
@@ -1149,7 +1159,7 @@ void ServerSocket::acceptLastDo() {
 										bs.clear();
 										bs << PROTO::MOVE_PLAYER << nickPersonajeActualizado << proxTile->get_x() << proxTile->get_y() ;
 										send(it->second.sock, bs.str());
-										std::cout << "Mandando update de enemigo a " << it->second.nick << "\n";
+										//std::cout << "Mandando update de enemigo a " << it->second.nick << "\n";
 								}
 							}
 						}
@@ -1431,11 +1441,12 @@ void ServerSocket::acceptLastDo() {
 					}
 				}*/
 			}else{
+				assert(false);
 				bs.clear();
 				bs << PROTO::TEXTMSG << std::string("Unknown packet type");
 				this->send(cid, bs.str());
 			}
-			//LeaveCriticalSection(&critSect);
+			LeaveCriticalSection(&critSect);
 		}
 
 		// Cuando hay una desconexion loggeamos e informamos al resto

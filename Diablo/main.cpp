@@ -133,6 +133,7 @@ int main(int argc, char* argv[]) {
 	if(!resman.init()) return -2;
 	resman.addRes("boton_sp", "../resources/static/boton_sp.png");
 	resman.addRes("boton_mp", "../resources/static/boton_mp.png");
+	resman.addRes("fondo_menu", "../resources/static/fondo_menu.jpg");
 	// Para confinar el mouse a la ventana
 	//SDL_WM_GrabInput(SDL_GRAB_ON);
 	// Lo movemos al medio
@@ -144,6 +145,8 @@ int main(int argc, char* argv[]) {
 	// SoundMan
 	if(!soundman.init(&camara, &pjm.getPjeLocal())) return -3;
 	soundman.addSound("sword", "../resources/static/sounds/sword.wav");
+	soundman.addSound("death", "../resources/static/sounds/death.wav");
+	soundman.addSound("quake", "../resources/static/sounds/quake.wav");
 	soundman.playMusic();
 
 
@@ -159,6 +162,7 @@ int main(int argc, char* argv[]) {
 		if(sp.handleInput(event)) opcion_menu = 1;
 		if(mp.handleInput(event)) opcion_menu = 2;
 		if(event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE || event.type == SDL_QUIT) opcion_menu = 3;
+		resman.getRes("fondo_menu")->blit(screen, 0, 0);
 		sp.show(screen);
 		mp.show(screen);
 		SDL_Flip(screen);
@@ -172,7 +176,20 @@ int main(int argc, char* argv[]) {
 		// Multiplayer, no hace nada
 	}else if(opcion_menu == 3) {
 		// Salir
-		return 1;
+		mapa.clean();
+		resman.clean();
+		soundman.clean();
+		err_log.cerrarConexion();
+		//Test::test();
+		TTF_Quit();
+		SDL_Quit();
+		if(!sock.isOpen()){
+			cout << "Conexion cerrada por el servidor" << endl;
+			system ("PAUSE");
+		}
+		sock.close();
+		return 0;
+
 	}
 
 
@@ -182,15 +199,40 @@ int main(int argc, char* argv[]) {
 	InitializeCriticalSection(&cs_main);
 	// Socket de cliente
 	if(!sock.init(&cs_main)) {
+		mapa.clean();
+		resman.clean();
+		soundman.clean();
+		err_log.cerrarConexion();
+		//Test::test();
+		TTF_Quit();
+		SDL_Quit();
+		if(!sock.isOpen()){
+			cout << "Conexion cerrada por el servidor" << endl;
+			system ("PAUSE");
+		}
+		sock.close();
 		return 1;
 	}
 
 	//cargo ip servidor y puerto
 	config_cliente configuracion_red = parsear_red("../resources/static/red.yaml");
 	// Conectamos
-	if(!sock.connect(configuracion_red.get_ip_servidor(),configuracion_red.get_puerto()))
+	if(!sock.connect(configuracion_red.get_ip_servidor(),configuracion_red.get_puerto())){
+		mapa.clean();
+		resman.clean();
+		soundman.clean();
+		err_log.cerrarConexion();
+		//Test::test();
+		TTF_Quit();
+		SDL_Quit();
+		if(!sock.isOpen()){
+			cout << "Conexion cerrada por el servidor" << endl;
+			system ("PAUSE");
+		}
+		sock.close();
+
 		return 1;
-	
+	}
 	// Creamos el thread de listen
 	HANDLE hth1 = (HANDLE)_beginthreadex(NULL, 0, ClientSocket::listenEntry, (void*)&sock, 0, NULL);
 	// Mandamos el nick
@@ -215,6 +257,7 @@ int main(int argc, char* argv[]) {
 
 	// Camara
 	camara.init(pantalla->get_ancho(), pantalla->get_alto(), configuracion.get_margen_scroll(), mapa);
+	soundman.calcInit();
 
 	// Ventana de chat
 	chat_window.init(&resman, 40, 40, Font::SIZE_NORMAL, 250, 500, COLOR::WHITE);
@@ -747,7 +790,7 @@ int main(int argc, char* argv[]) {
 				int control;
 				control = it->second.update(&mapa);
 				//reseteo update de personajes por si se freno
-				if(it->second.get_timer_update().getTicks() > 500)
+				if(it->second.get_timer_update().getTicks() > 600)
 						it->second.set_posicion_actualizada(false);
 				if (control == Personaje::MOVER_COMPLETADO && it->second.get_posicion_actualizada()==false){
 					//aviso al server que se termino de mover un personaje para si es un enemigo actualizarlo
@@ -999,7 +1042,6 @@ int main(int argc, char* argv[]) {
 		Sleep(10);
 
 	}
-	
 	mapa.clean();
 	resman.clean();
 	soundman.clean();

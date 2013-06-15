@@ -87,9 +87,9 @@ bool ClientSocket::init(CRITICAL_SECTION* main_cs) {
     ConnectSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	BOOL val_true = TRUE;
 	int buff_size = 0;
-	/*if(setsockopt(ConnectSocket, IPPROTO_TCP, TCP_NODELAY, (char*)&val_true, sizeof(BOOL)) != 0) {
+	if(setsockopt(ConnectSocket, IPPROTO_TCP, TCP_NODELAY, (char*)&val_true, sizeof(BOOL)) != 0) {
 		std::cerr << "ERROR SETTING SOCK OPTIONS TCP_NODELAY\n";
-	}
+	}/*
 	//if(setsockopt(ConnectSocket, SOL_SOCKET, SO_RCVBUF, (char*)&buff_size, sizeof(int)) != 0) {
 		//std::cerr << "ERROR SETTING SOCK OPTIONS SO_RCVBUF\n";
 	//}

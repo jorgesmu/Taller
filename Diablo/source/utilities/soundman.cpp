@@ -39,8 +39,6 @@ bool SoundMan::init(Camara* cam, Personaje* pjl) {
 	}
 	// Linkeamos a la camara
 	cam_link = cam;
-	MAX_AUDIBLE_DISTANCE = std::min(cam_link->getW(), cam_link->getH());
-	std::cout << "MAX_AUDIBLE_DISTANCE: " << MAX_AUDIBLE_DISTANCE << "\n";
 	// Linkeamos al personaje
 	this->pjl = pjl;
 	// Cargamos la musica
@@ -148,4 +146,9 @@ void SoundMan::toggleMusicMute() {
 	}
 	// Toggle
 	music_muted = !music_muted;
+}
+
+void SoundMan::calcInit() {
+	MAX_AUDIBLE_DISTANCE = std::min(cam_link->getW(), cam_link->getH());
+	std::cout << "MAX_AUDIBLE_DISTANCE: " << MAX_AUDIBLE_DISTANCE << "\n";
 }

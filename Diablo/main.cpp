@@ -255,6 +255,7 @@ int main(int argc, char* argv[]) {
 
 	// Camara
 	camara.init(pantalla->get_ancho(), pantalla->get_alto(), configuracion.get_margen_scroll(), mapa);
+	soundman.calcInit();
 
 	// Ventana de chat
 	chat_window.init(&resman, 40, 40, Font::SIZE_NORMAL, 250, 500, COLOR::WHITE);

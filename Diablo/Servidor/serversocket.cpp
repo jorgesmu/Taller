@@ -1371,6 +1371,7 @@ void ServerSocket::acceptLastDo() {
 					}
 				}*/
 			}else{
+				assert(false);
 				bs.clear();
 				bs << PROTO::TEXTMSG << std::string("Unknown packet type");
 				this->send(cid, bs.str());

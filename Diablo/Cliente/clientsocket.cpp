@@ -498,7 +498,7 @@ void ClientSocket::listenDo() {
 				std::cout << "Received POS_REQUEST_REV_REPLY without MOV::ESPERANDO_OK\n";
 			}else{
 				if(reply) {
-					pjm.getPjeLocal().revivir();
+					//pjm.getPjeLocal().revivir();
 					estadoMovimiento = MOV::OK_REV_RECV;
 					std::cout << "GOT OK REV FROM SERVER\n";					
 				}else{

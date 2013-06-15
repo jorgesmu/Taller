@@ -1375,15 +1375,56 @@ void ServerSocket::acceptLastDo() {
 						pm.getPlayer(nick).congelar();
 					}
 				} else if (tipo == TIPO::ESTRATEGIA_ENEMY) {
-					if (pm.enemyExists(nick)) {
-						std::cout << "Enemigo " << nick << "cambiando de estrategia" << endl;
-						pm.getEnemy(nick)->cambiarEstrategia();
-					} else {
+					bool bajaVel;
+					bs >> bajaVel;
+					if (pm.playerExists(nick)) {
+						pm.getPlayer(nick).setVelocidadAnterior(pm.getPlayer(nick).getVelocidad());
+						if(bajaVel){
+							std::cout << "Enemigo " << nick << "bajando velocidad" << endl;
+							pm.getPlayer(nick).setVelocidad(pm.getPlayer(nick).getVelocidad()*0.75);
+						}else{
+							std::cout << "Enemigo " << nick << "subiendo velocidad" << endl;
+							pm.getPlayer(nick).setVelocidad(pm.getPlayer(nick).getVelocidad()*1.25);						
+						}
+
 						bs.clear();
-						bs << PROTO::TEXTMSG << std::string("Tipo de transmut solo valida con enemigos autonomos");
-						send(cid,bs.str());
+						bs << PROTO::UPDATE_ATT << ATT::VEL << nick << (float)pm.getPlayer(nick).getVelocidad();
+						for(auto it = clients_map.begin();it != clients_map.end();it++) {
+							send(it->second.sock, bs.str());
+						}
 					}
-					
+					if (pm.enemyExists(nick)) {
+						pm.getEnemy(nick)->setVelocidadAnterior(pm.getEnemy(nick)->getVelocidad());
+						if(bajaVel){
+							std::cout << "Enemigo " << nick << "bajando velocidad" << endl;
+							pm.getEnemy(nick)->setVelocidad(pm.getEnemy(nick)->getVelocidad()*0.75);
+						}else{
+							std::cout << "Enemigo " << nick << "subiendo velocidad" << endl;
+							pm.getEnemy(nick)->setVelocidad(pm.getEnemy(nick)->getVelocidad()*1.25);						
+						}
+
+						bs.clear();
+						bs << PROTO::UPDATE_ATT << ATT::VEL << nick << (float)pm.getEnemy(nick)->getVelocidad();
+						for(auto it = clients_map.begin();it != clients_map.end();it++) {
+							send(it->second.sock, bs.str());
+						}
+					}
+					if (pm.golemExists(nick)) {
+						pm.getGolem(nick)->setVelocidadAnterior(pm.getGolem(nick)->getVelocidad());
+						if(bajaVel){
+							std::cout << "Enemigo " << nick << "bajando velocidad" << endl;
+							pm.getGolem(nick)->setVelocidad(pm.getGolem(nick)->getVelocidad()*0.75);
+						}else{
+							std::cout << "Enemigo " << nick << "subiendo velocidad" << endl;
+							pm.getGolem(nick)->setVelocidad(pm.getGolem(nick)->getVelocidad()*1.25);						
+						}
+
+						bs.clear();
+						bs << PROTO::UPDATE_ATT << ATT::VEL << nick << (float)pm.getGolem(nick)->getVelocidad();
+						for(auto it = clients_map.begin();it != clients_map.end();it++) {
+							send(it->second.sock, bs.str());
+						}
+					}
 				}
 			}else if (pt == PROTO::DESTRANSMUT){
 				char tipo;
@@ -1406,13 +1447,35 @@ void ServerSocket::acceptLastDo() {
 						pm.getPlayer(nick).descongelar();
 					}
 				} else if (tipo == TIPO::ESTRATEGIA_ENEMY) {
+					if (pm.playerExists(nick)) {
+						pm.getPlayer(nick).setVelocidad(pm.getPlayer(nick).getVelocidadAnterior());
+						std::cout << "Enemigo " << nick << "destrsansmut velocidad" << endl;
+
+						bs.clear();
+						bs << PROTO::UPDATE_ATT << ATT::VEL << nick << (float)pm.getPlayer(nick).getVelocidad();
+						for(auto it = clients_map.begin();it != clients_map.end();it++) {
+							send(it->second.sock, bs.str());
+						}
+					}
 					if (pm.enemyExists(nick)) {
-						std::cout << "Enemigo " << nick << " volviendo a vieja estrategia" << endl;
-						pm.getEnemy(nick)->cambiarEstrategia();
-					} else {
-						/*bs.clear();
-						bs << PROTO::TEXTMSG << std::string("Tipo de transmut solo valida con enemigos autonomos");
-						send(cid,bs.str());*/
+						pm.getEnemy(nick)->setVelocidad(pm.getEnemy(nick)->getVelocidadAnterior());
+						std::cout << "Enemigo " << nick << "destrsansmut velocidad" << endl;
+
+						bs.clear();
+						bs << PROTO::UPDATE_ATT << ATT::VEL << nick << (float)pm.getEnemy(nick)->getVelocidad();
+						for(auto it = clients_map.begin();it != clients_map.end();it++) {
+							send(it->second.sock, bs.str());
+						}
+					}
+					if (pm.golemExists(nick)) {
+						pm.getGolem(nick)->setVelocidad(pm.getGolem(nick)->getVelocidadAnterior());
+						std::cout << "Enemigo " << nick << "destrsansmut velocidad" << endl;
+
+						bs.clear();
+						bs << PROTO::UPDATE_ATT << ATT::VEL << nick << (float)pm.getGolem(nick)->getVelocidad();
+						for(auto it = clients_map.begin();it != clients_map.end();it++) {
+							send(it->second.sock, bs.str());
+						}
 					}
 				}
 			}else if (pt == PROTO::DEAD){

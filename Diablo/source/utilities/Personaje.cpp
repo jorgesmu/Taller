@@ -1215,8 +1215,7 @@ void Personaje::utilizarTerremoto(Mapa* mapa, PjeManager* pjm, ClientSocket* soc
 	char dañoRealizado;
 	Tile* tilePersonaje;
 	int xPersonaje,yPersonaje;
-	if ((this->tieneTerremoto()) && (this->getMagia()>=this->MAGIA_HECHIZO)) {
-		std::cout << "Uso terremoto\n";
+	if (/*(this->tieneTerremoto()) && (this->getMagia()>=this->MAGIA_HECHIZO)*/true) {
 		BitStream bs;
 		bs << PROTO::USE_ITEM << this->nickname << ITEM::TERREMOTO;
 		sock->send(bs.str());
@@ -1679,11 +1678,21 @@ void Personaje::utilizarTransmutacion(std::string nick_enemigo) {
 		bs << PROTO::TRANSMUT << TIPO::LAPIDA << nick_enemigo;
 		sock.send(bs.str());
 	} else {
-		//Se convierte en un enemigo con distinta estrategia
+		//le baja/sube la velocidad
 		std::cout << "Convertido en otro tipo de enemigo" << endl;
-		BitStream bs;
-		bs << PROTO::TRANSMUT << TIPO::ESTRATEGIA_ENEMY << nick_enemigo;
-		sock.send(bs.str());
+		srand (time(NULL));
+		char alter=rand()%2;
+		if(alter == 0){
+			//bajo la velocidad
+			BitStream bs;
+			bs << PROTO::TRANSMUT << TIPO::ESTRATEGIA_ENEMY << nick_enemigo << true;
+			sock.send(bs.str());
+		}else{
+			//subo velocidad
+			BitStream bs;
+			bs << PROTO::TRANSMUT << TIPO::ESTRATEGIA_ENEMY << nick_enemigo << false;
+			sock.send(bs.str());		
+		}
 	}
 	tipoTransmut = cambio;
 	transmutado = nick_enemigo;

@@ -23,6 +23,7 @@ class Player {
 	bool seMovio;
 	TilesRecorridos tiles_recorridos;
 	double velocidad;
+	double velocidadAnterior;
 	float radio;
 	char energia,magia,energiaEscudo;
 	char congelado; //1=congelado,0=no congelado
@@ -47,6 +48,8 @@ class Player {
 	std::string getNick() const;
 	double getVelocidad() { return velocidad; }
 	void setVelocidad(double newVel) { velocidad=newVel; }
+	double getVelocidadAnterior() { return velocidadAnterior; }
+	void setVelocidadAnterior(double newVel) { velocidadAnterior=newVel; }
 	int getXSiguiente() const ;
 	int getYSiguiente() const ;
 	void setPosSiguiente( int XAntiguo,int YAntiguo);

@@ -1306,9 +1306,11 @@ void Personaje::updateHielo() {
 
  void Personaje::chocarConCorazon(Corazon* corazon) {
 	this->getPosicion(&mapa)->deleteEntidad(corazon);
-	this->energia+=corazon->getEnergiaGanada();
-	if (this->energia>this->ENERGIA_TOTAL)
+	int futura = int(this->energia)+int(corazon->getEnergiaGanada());
+	if (futura>this->ENERGIA_TOTAL)
 		this->energia=this->ENERGIA_TOTAL;
+	else 
+		this->energia=(char)futura;
 	BitStream bs;
 	bs << PROTO::UPDATE_ATT << ATT::ENERGIA << pjm.getPjeLocal().getEnergia();
 	sock.send(bs.str());

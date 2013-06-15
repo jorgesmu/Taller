@@ -788,6 +788,11 @@ void ClientSocket::listenDo() {
 					break;
 				}
 			}
+			if (pjm.getPjeLocal().getNick() == nick_who) {
+				if (tipoAtt == ATT::VEL) {
+					pjm.getPjeLocal().setVelocidad((double)nuevoVal);
+				}
+			}
 		}else if(pt == PROTO::DEF_ATT) {	
 			std::string nick_who;
 			bs >> nick_who;

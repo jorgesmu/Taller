@@ -145,6 +145,7 @@ int main(int argc, char* argv[]) {
 	// SoundMan
 	if(!soundman.init(&camara, &pjm.getPjeLocal())) return -3;
 	soundman.addSound("sword", "../resources/static/sounds/sword.wav");
+	soundman.addSound("death", "../resources/static/sounds/death.wav");
 	soundman.playMusic();
 
 
@@ -788,7 +789,7 @@ int main(int argc, char* argv[]) {
 				int control;
 				control = it->second.update(&mapa);
 				//reseteo update de personajes por si se freno
-				if(it->second.get_timer_update().getTicks() > 500)
+				if(it->second.get_timer_update().getTicks() > 600)
 						it->second.set_posicion_actualizada(false);
 				if (control == Personaje::MOVER_COMPLETADO && it->second.get_posicion_actualizada()==false){
 					//aviso al server que se termino de mover un personaje para si es un enemigo actualizarlo

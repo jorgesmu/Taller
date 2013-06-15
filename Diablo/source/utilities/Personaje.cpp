@@ -23,6 +23,7 @@
 #include "../../Cliente/clientsocket.h"
 #include "../utilities/Arma.h"
 #include "../utilities/console.h"
+#include "soundman.h"
 #include "armaBomba.h"
 #include "aux_func.h"
 #include <sstream>
@@ -34,6 +35,7 @@ extern Mapa mapa;
 extern std::vector<EntidadFija*> entidades_cargadas;
 extern ResMan resman;
 extern Console consola;
+extern SoundMan soundman;
 
 /*
 	Pre:- 
@@ -772,6 +774,7 @@ void Personaje::updateRevivir() {
 
 */
 unsigned int Personaje::ataque(Tile* tileDestino , Mapa* mapa) {
+	soundman.playSound("sword", this->getX(), this->getY());
 	return this -> ataque(tileDestino , mapa, NULL);
 }
 
@@ -1411,6 +1414,7 @@ void Personaje::muere() {
 	bool murioLocal = false;
 	if (this->getNick() == pjm.getPjeLocal().getNick()) murioLocal = true;
 	if (vivo) {
+		soundman.playSound("death", this->getX(), this->getY());
 		this->animacionMuerte();
 		std::cout << "Fui asesinado" << endl;
 		//Redirecciono a la posicion inicial nuevamente

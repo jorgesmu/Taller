@@ -642,7 +642,7 @@ void ServerSocket::acceptLastDo() {
 		// Receive loop
 		while(this->receive(cid, buff)) {
 			Sleep(50);
-			//EnterCriticalSection(&critSect);
+			EnterCriticalSection(&critSect);
 
 			// This is for debugging purposes
 			std::stringstream ss;
@@ -697,6 +697,7 @@ void ServerSocket::acceptLastDo() {
 
 				//std::cout << "RECEIVED NIEBLA SYNC: " << new_tile_x << "," << new_tile_y << "\n";
 			}else if(pt == PROTO::ATACAR) {
+				std::cout << "RECV: ATACAR\n";
 				std::string nick_atacante;
 				bs >> nick_atacante;
 				// Avisamos a los otros jugadores del nuevo jugador
@@ -1121,7 +1122,7 @@ void ServerSocket::acceptLastDo() {
 										bs.clear();
 										bs << PROTO::MOVE_PLAYER << nickPersonajeActualizado << proxTile->get_x() << proxTile->get_y() ;
 										send(it->second.sock, bs.str());
-										std::cout << "Mandando update de enemigo a " << it->second.nick << "\n";
+										//std::cout << "Mandando update de enemigo a " << it->second.nick << "\n";
 								}
 							}
 						}
@@ -1374,7 +1375,7 @@ void ServerSocket::acceptLastDo() {
 				bs << PROTO::TEXTMSG << std::string("Unknown packet type");
 				this->send(cid, bs.str());
 			}
-			//LeaveCriticalSection(&critSect);
+			LeaveCriticalSection(&critSect);
 		}
 
 		// Cuando hay una desconexion loggeamos e informamos al resto

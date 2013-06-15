@@ -82,10 +82,11 @@ void SoundMan::playSound(const std::string& name, int source_x, int source_y) co
 		int v = int(MIX_MAX_VOLUME - ( float(MIX_MAX_VOLUME) / float(this->MAX_AUDIBLE_DISTANCE) *
 			::distance<float>(source_x, source_y, pjl->getX(), pjl->getY()) ));
 		if(v < 0) v = 0; // Cap por menor
-		//std::cout << "Source: (" << source_x << "," << source_y << ")\n";
-		//std::cout << "Listener: (" << pjl->getX() << "," << pjl->getY() << ")\n";
-		//std::cout << "Distance: " << ::distance<float>(source_x, source_y, pjl->getX(), pjl->getY()) << "\n";
-		//std::cout << "Sound volume: " << v << "\n";
+		std::cout << "Sound: " << name << "\n";
+		std::cout << "Source: (" << source_x << "," << source_y << ")\n";
+		std::cout << "Listener: (" << pjl->getX() << "," << pjl->getY() << ")\n";
+		std::cout << "Distance: " << ::distance<float>(source_x, source_y, pjl->getX(), pjl->getY()) << "\n";
+		std::cout << "Sound volume: " << v << "\n";
 		Mix_VolumeChunk(m, v);
 		// Play
 		Mix_PlayChannel(-1, m, 0);

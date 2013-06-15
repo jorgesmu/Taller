@@ -63,7 +63,7 @@ class Entidad {
 		int pixel_ref_x , pixel_ref_y; // Pixel de referencia dentro del espacio de la imagen
 										//de la entidad.
 	
-		int posX,  posY; //posicion en pixeles
+		float posX,  posY; //posicion en pixeles
 
 		bool compartido; //si es compartido por varios tiles
 
@@ -258,9 +258,9 @@ public:
 	*/
 	virtual Tile* getPosicion(Mapa* mapa);
 
-	int getX();
+	float getX();
 
-	int getY();
+	float getY();
 
 	bool getDibujada();
 

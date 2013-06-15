@@ -70,7 +70,7 @@ public:
 		const static unsigned int ESPERANDO_ACCION = 12;
 
 		//Velocidad por defecto
-		const static unsigned int VELOCIDAD_DEFAULT = 105; // En pixeles por segundo
+		const static unsigned int VELOCIDAD_DEFAULT = 180; // En pixeles por segundo
 		
 		//Radio de los hechizos
 		const static unsigned int RADIO_HECHIZO = 4; //en tiles
@@ -569,7 +569,7 @@ protected:
 
 	
 	virtual void calcularPosicionTentativa(unsigned int direccion , 
-									int* offsetTentativoX , int* offsetTentativoY);
+									float* offsetTentativoX , float* offsetTentativoY);
 		
 	virtual void actualizarImagen(const unsigned int direccion);
 

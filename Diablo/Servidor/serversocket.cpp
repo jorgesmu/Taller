@@ -63,9 +63,9 @@ bool ServerSocket::init() {
     ListenSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	BOOL val_true = TRUE;
 	int buff_size = 0;
-	/*if(setsockopt(ListenSocket, IPPROTO_TCP, TCP_NODELAY, (char*)&val_true, sizeof(BOOL)) != 0) {
+	if(setsockopt(ListenSocket, IPPROTO_TCP, TCP_NODELAY, (char*)&val_true, sizeof(BOOL)) != 0) {
 		std::cerr << "ERROR SETTING SOCK OPTIONS TCP_NODELAY\n";
-	}
+	}/*
 	//if(setsockopt(ListenSocket, SOL_SOCKET, SO_RCVBUF, (char*)&buff_size, sizeof(int)) != 0) {
 		//std::cerr << "ERROR SETTING SOCK OPTIONS SO_RCVBUF\n";
 	//}
@@ -119,9 +119,9 @@ bool ServerSocket::accept() {
 	}else{
 		BOOL val_true = TRUE;
 		int buff_size = 0;
-		/*if(setsockopt(tmp_sck, IPPROTO_TCP, TCP_NODELAY, (char*)&val_true, sizeof(BOOL)) != 0) {
+		if(setsockopt(tmp_sck, IPPROTO_TCP, TCP_NODELAY, (char*)&val_true, sizeof(BOOL)) != 0) {
 			std::cerr << "ERROR SETTING SOCK OPTIONS TCP_NODELAY\n";
-		}
+		}/*
 		//if(setsockopt(tmp_sck, SOL_SOCKET, SO_RCVBUF, (char*)&buff_size, sizeof(int)) != 0) {
 			//std::cerr << "ERROR SETTING SOCK OPTIONS SO_RCVBUF\n";
 		//}

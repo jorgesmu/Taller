@@ -21,6 +21,9 @@
 #include "../../source/utilities/Corazon.h"
 #include "../../source/utilities/Hielo.h"
 #include "../source/utilities/armaBomba.h"
+#include "../source/utilities/transmutItem.h"
+#include "../source/utilities/bombas.h"
+
 #include <iostream>
 #include <fstream>
 
@@ -663,9 +666,18 @@ void ClientSocket::listenDo() {
 					entidades_cargadas.push_back(item);
 					break;
 				}
-   				/*case (ITEM::BOMBA):{
-					ArmaBomba cofre("cofre",1,1,true, x , y, NULL,&mapa,*resman,Imagen::COLOR_KEY );
-				}*/
+   				case (ITEM::TRANSMUT):{
+					item = new TransmutItem ("cofre",1,1,true, -20 , 30, NULL,&mapa,resman,Imagen::COLOR_KEY );
+					mapa.getTile(posItemX, posItemY)->addEntidad(item,&mapa);
+					entidades_cargadas.push_back(item);
+					break;
+				}
+				case (ITEM::BOMBAS):{
+					item = new Bombas ("cofre",1,1,true, -20 , 30, NULL,&mapa,resman,Imagen::COLOR_KEY );
+					mapa.getTile(posItemX, posItemY)->addEntidad(item,&mapa);
+					entidades_cargadas.push_back(item);
+					break;
+				}
 
 			}
 			//mapa.getTile(posItemX, posItemY)->addEntidad(&cofre,&mapa);

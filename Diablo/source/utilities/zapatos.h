@@ -14,7 +14,7 @@ class Zapatos: public Item {
 			const int pixel_ref_x , const int pixel_ref_y,
 			Tile* tile , Mapa* mapa,
 			ResMan& rm , const int colorKey):Item(name,wTiles,hTiles,caminable,pixel_ref_x,pixel_ref_y,tile,mapa,rm,colorKey) {
-				this->aumentoVelocidad=25;
+				this->aumentoVelocidad=50;
 		}
 
 		void chocarCon(Personaje* personaje) {

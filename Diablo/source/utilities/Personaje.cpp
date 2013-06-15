@@ -25,6 +25,7 @@
 #include "../utilities/console.h"
 #include "soundman.h"
 #include "armaBomba.h"
+#include "transmutItem.h"
 #include "aux_func.h"
 #include <sstream>
 extern PjeManager pjm;
@@ -91,7 +92,7 @@ void Personaje::inicializarAtributosEnValoresDefault() {
 	this -> actualizandoPosicion = false;
 	this -> ordenBliteo = Entidad::ORDEN_PERSONAJE;
 	this->setRadio(125);
-	this->terremoto=10; //DESCOMENTAR
+	this->terremoto=0; //DESCOMENTAR
 	this->hielo=0; //DESCOMENTAR
 	this->energia=this->ENERGIA_TOTAL;
 	this->magia=this->MAGIA_TOTAL;
@@ -105,7 +106,7 @@ void Personaje::inicializarAtributosEnValoresDefault() {
 	this -> cambioDireccionHabilitado = true;
 	this -> bolaDeCristal = false;
 	this -> espada = NULL;
-	this->transmutacion = true; //DESCOMENTAR
+	this->transmutacion = false; //DESCOMENTAR
 }
 /*
 	Pre:-
@@ -1093,49 +1094,28 @@ void Personaje::chocarConMapa(MapaItem* mapaItem) {
 
 }
 
-void Personaje::aumentarVelocidad(char porcentaje) {
-	if(this->velocidad == this->VELOCIDAD_DEFAULT){
+bool Personaje::aumentarVelocidad(char porcentaje) {
+	bool sePuede = false;
+	unsigned int constVel = velocidad*1000;
+	if(constVel == Personaje::VELOCIDAD_DEFAULT){
 		double aumento = porcentaje+100;
 		this->velocidad*=(aumento/100);
+		sePuede = true;
 	}
+	return sePuede;
 }
 
 void Personaje::chocarConZapatos(Zapatos* zapatos) {
-	std::cout << "Aumento la velocidad un " << (int)zapatos->getAumentoVelocidad() << "%\n";
-	this->getPosicion(&mapa)->deleteEntidad(zapatos);
-	this->aumentarVelocidad(zapatos->getAumentoVelocidad());
-	BitStream bs;
-	bs << PROTO::UPDATE_ATT << ATT::VEL << (float)pjm.getPjeLocal().getVelocidad();
-	sock.send(bs.str());
-	std::stringstream msj;
-	msj << "Agarro Zapatos";
-	consola.log(msj.str());
-
-	//Aviso al server que agarro item para que lo desaparezca
-	int x,y;
-	x = this->getPosicion(&mapa)->getU();
-	y = this->getPosicion(&mapa)->getV();
-	bs.clear();
-	bs << PROTO::ITEM_OFF << x << y;
-	sock.send(bs.str());
-}
-
-void Personaje::chocarConBolaDeCristal(BolaDeCristal* bolaDeCristal) {
-
-	this->getPosicion(&mapa)->deleteEntidad(bolaDeCristal);
-	if(this->magia >= MAGIA_HECHIZO){
-		std::cout << "veo niebla de los enemigos \n";
-
+	//std::cout << "Aumento la velocidad un " << (int)zapatos->getAumentoVelocidad() << "%\n";
+	bool sePuede = this->aumentarVelocidad(zapatos->getAumentoVelocidad());
+	if (sePuede) {
+		this->getPosicion(&mapa)->deleteEntidad(zapatos);	
 		BitStream bs;
-		this->magia-=this->MAGIA_HECHIZO;
-		bs << PROTO::UPDATE_ATT << ATT::MAGIA << this->getMagia();
+		bs << PROTO::UPDATE_ATT << ATT::VEL << (float)pjm.getPjeLocal().getVelocidad();
 		sock.send(bs.str());
-
-		this->bolaDeCristal = true;
-		bs.clear();
-		bs << PROTO::UPDATE_ATT << ATT::BOLA_DE_CRISTAL << true;
-		sock.send(bs.str());
-
+		std::stringstream msj;
+		msj << "Agarro Zapatos";
+		consola.log(msj.str());
 		//Aviso al server que agarro item para que lo desaparezca
 		int x,y;
 		x = this->getPosicion(&mapa)->getU();
@@ -1143,17 +1123,43 @@ void Personaje::chocarConBolaDeCristal(BolaDeCristal* bolaDeCristal) {
 		bs.clear();
 		bs << PROTO::ITEM_OFF << x << y;
 		sock.send(bs.str());
+	} else {
+		std::stringstream msj;
+		msj << "Ya tenes los zapatos";
+		consola.log(msj.str());
+	}
+}
 
+void Personaje::chocarConBolaDeCristal(BolaDeCristal* bolaDeCristal) {
+	if(this->magia >= MAGIA_HECHIZO){
+		//std::cout << "veo niebla de los enemigos \n";
+		this->getPosicion(&mapa)->deleteEntidad(bolaDeCristal);
+		BitStream bs;
+		this->magia-=this->MAGIA_HECHIZO;
+		bs << PROTO::UPDATE_ATT << ATT::MAGIA << this->getMagia();
+		sock.send(bs.str());
+		this->bolaDeCristal = true;
+		bs.clear();
+		bs << PROTO::UPDATE_ATT << ATT::BOLA_DE_CRISTAL << true;
+		sock.send(bs.str());
+		//Aviso al server que agarro item para que lo desaparezca
+		int x,y;
+		x = this->getPosicion(&mapa)->getU();
+		y = this->getPosicion(&mapa)->getV();
+		bs.clear();
+		bs << PROTO::ITEM_OFF << x << y;
+		sock.send(bs.str());
 		std::stringstream msj;
 		msj << "Agarro Bola de cristal";
 		consola.log(msj.str());
 	}else{
-		std::cout << "magia insuficiente para bola de cristal \n";	
+		std::stringstream msj;
+		msj << "Magia insuficiente para bola de cristal";
+		consola.log(msj.str());
 	}
 }
 
 void Personaje::chocarConGolem(GolemItem* golem) {
-
 	this->getPosicion(&mapa)->deleteEntidad(golem);
 	this->golem = true;
 	BitStream bs;
@@ -1162,7 +1168,6 @@ void Personaje::chocarConGolem(GolemItem* golem) {
 	std::stringstream msj;
 	msj << "Agarro Golem";
 	consola.log(msj.str());
-
 	//Aviso al server que agarro item para que lo desaparezca
 	int x,y;
 	x = this->getPosicion(&mapa)->getU();
@@ -1210,37 +1215,39 @@ void Personaje::chocarConHielo(Hielo* hielo) {
 	sock.send(bs.str());
 }
 
-void Personaje::utilizarTerremoto(Mapa* mapa, PjeManager* pjm, ClientSocket* sock) {
+void Personaje::utilizarTerremoto() {
 	int radio=this->RADIO_HECHIZO;
 	char dañoRealizado;
 	Tile* tilePersonaje;
 	int xPersonaje,yPersonaje;
-	if (/*(this->tieneTerremoto()) && (this->getMagia()>=this->MAGIA_HECHIZO)*/true) {
+	if ((this->tieneTerremoto()) && (this->getMagia()>=this->MAGIA_HECHIZO)) {
+		std::stringstream msj;
+		msj << "Terremoto!!!";
+		consola.log(msj.str());
 		BitStream bs;
 		bs << PROTO::USE_ITEM << this->nickname << ITEM::TERREMOTO;
-		sock->send(bs.str());
+		sock.send(bs.str());
 		this->magia-=this->MAGIA_HECHIZO;
 		bs.clear();
 		bs << PROTO::UPDATE_ATT << ATT::MAGIA << this->getMagia();
-		sock->send(bs.str());
+		sock.send(bs.str());
 		soundman.playSound("quake", this->getX(), this->getY());
-		int xActual = this->getPosicion(mapa)->getU();
-		int yActual = this->getPosicion(mapa)->getV();
+		int xActual = this->getPosicion(&mapa)->getU();
+		int yActual = this->getPosicion(&mapa)->getV();
 		for (int i=xActual-radio;i<=xActual+radio;i++) {
 			for (int j=yActual-radio;j<=yActual+radio;j++) {
 				//Veo si algun personaje se encuentra en el radio
-				for (auto it=pjm->getPjes().begin();it!=pjm->getPjes().end();it++) {
-					tilePersonaje=it->second.getPosicion(mapa);
+				for (auto it=pjm.getPjes().begin();it!=pjm.getPjes().end();it++) {
+					tilePersonaje=it->second.getPosicion(&mapa);
 					xPersonaje=tilePersonaje->getU();
 					yPersonaje=tilePersonaje->getV();
 					if ((i==xPersonaje) && (j==yPersonaje)) {
 						srand (time(NULL));
 						dañoRealizado=rand()%(this->ENERGIA_TOTAL+1);
 						it->second.dañar(dañoRealizado);
-						std::cout << "Se danio a " << it->first << " con terremoto, total de " << (int)dañoRealizado << endl;
 						bs.clear();
 						bs << PROTO::DAMAGE << this->getNick() << it->first << dañoRealizado;
-						sock->send(bs.str());
+						sock.send(bs.str());
 					}
 				}
 			}
@@ -1249,12 +1256,14 @@ void Personaje::utilizarTerremoto(Mapa* mapa, PjeManager* pjm, ClientSocket* soc
 	}
 }
 
-void Personaje::utilizarHielo(Mapa* mapa, PjeManager* pjm) {
+void Personaje::utilizarHielo() {
 	int radio=this->RADIO_HECHIZO;
 	Tile* tilePersonaje;
 	int xPersonaje,yPersonaje;
 	if ((this->tieneHielo()) && (this->magia>=this->MAGIA_HECHIZO)) {
-		std::cout << "Uso hechizo hielo\n";
+		std::stringstream msj;
+		msj << "Hielo!!!";
+		consola.log(msj.str());
 		BitStream bs;
 		bs << PROTO::USE_ITEM << this->nickname << ITEM::HIELO;
 		sock.send(bs.str());
@@ -1262,13 +1271,13 @@ void Personaje::utilizarHielo(Mapa* mapa, PjeManager* pjm) {
 		bs.clear();
 		bs << PROTO::UPDATE_ATT << ATT::MAGIA << this->getMagia();
 		sock.send(bs.str());
-		int xActual = this->getPosicion(mapa)->getU();
-		int yActual = this->getPosicion(mapa)->getV();
+		int xActual = this->getPosicion(&mapa)->getU();
+		int yActual = this->getPosicion(&mapa)->getV();
 		for (int i=xActual-radio;i<=xActual+radio;i++) {
 			for (int j=yActual-radio;j<=yActual+radio;j++) {
 				//Veo si algun personaje se encuentra en el radio
-				for (auto it=pjm->getPjes().begin();it!=pjm->getPjes().end();it++) {
-					tilePersonaje=it->second.getPosicion(mapa);
+				for (auto it=pjm.getPjes().begin();it!=pjm.getPjes().end();it++) {
+					tilePersonaje=it->second.getPosicion(&mapa);
 					xPersonaje=tilePersonaje->getU();
 					yPersonaje=tilePersonaje->getV();
 					if ((i==xPersonaje) && (j==yPersonaje)) {
@@ -1276,7 +1285,6 @@ void Personaje::utilizarHielo(Mapa* mapa, PjeManager* pjm) {
 						//Lo agrego a la lista de congelados
 						nicks_congelados.push_back(it->first);
 						tHielo.start();
-						std::cout << "Se congelo a " << it->first << endl;
 						bs.clear();
 						bs << PROTO::CONGELAR << this->getNick() << it->first;
 						sock.send(bs.str());
@@ -1290,15 +1298,17 @@ void Personaje::utilizarHielo(Mapa* mapa, PjeManager* pjm) {
 
 void Personaje::updateHielo() {
 	if (tHielo.isStarted() && tHielo.getTicks()>Personaje::TIEMPO_DESCONGELAR) {
-		std::cout << "Pidiendo al server que descongele a los que congele \n";
+		//std::cout << "Pidiendo al server que descongele a los que congele \n";
 		//Descongelo los que habia hechizado
 		for (auto it = nicks_congelados.begin(); it != nicks_congelados.end(); it++) {
 			std::string nick = (*it);
-			std::cout << "Descongelando a " << nick << endl;
-			pjm.getPje(nick).freezar(false);
-			BitStream bs;
-			bs << PROTO::DESCONGELAR << nick;
-			sock.send(bs.str());
+			//std::cout << "Descongelando a " << nick << endl;
+			if (pjm.PjeExiste(nick)) {
+				pjm.getPje(nick).freezar(false);
+				BitStream bs;
+				bs << PROTO::DESCONGELAR << nick;
+				sock.send(bs.str());
+			}
 		}
 		tHielo.stop();
 	}
@@ -1328,15 +1338,17 @@ void Personaje::updateHielo() {
 }
 
  void Personaje::chocarConBotella(Botella* botella) {
-	 this->getPosicion(&mapa)->deleteEntidad(botella);
-	 this->magia+=botella->getMagiaGanada();
-	 if (this->magia>this->MAGIA_TOTAL)
-		 this->magia=this->MAGIA_TOTAL;
+	this->getPosicion(&mapa)->deleteEntidad(botella);
+	int futura = int(this->magia)+int(botella->getMagiaGanada());
+	if (futura>=this->MAGIA_TOTAL)
+		this->magia = this->MAGIA_TOTAL;
+	else
+		this->magia = char(futura);
 	BitStream bs;
 	bs << PROTO::UPDATE_ATT << ATT::MAGIA << pjm.getPjeLocal().getMagia();
 	sock.send(bs.str());
 	std::stringstream msj;
-	msj << "Agarro Flechas";
+	msj << "Agarro botella";
 	consola.log(msj.str());
 
 	//Aviso al server que agarro item para que lo desaparezca
@@ -1348,22 +1360,57 @@ void Personaje::updateHielo() {
 	sock.send(bs.str());
  }
 
+ //Flechas no implementadas
  void Personaje::chocarConFlechas(Flechas* flechas) {
 	 this->getPosicion(&mapa)->deleteEntidad(flechas);
 	 this->flechas+=flechas->getCantFlechas();
  }
- /*
+ 
  void Personaje::chocarConBombas(Bombas* bombas) {
-	 this->getPosicion(&mapa)->deleteEntidad(bombas);
-	 this->bombas+=bombas->getCantBombas();
- }*/
+	this->getPosicion(&mapa)->deleteEntidad(bombas);
+	this->bombas+=bombas->getBombasGanadas();
+	BitStream bs;
+	bs << PROTO::UPDATE_ATT << ATT::CANT_BOMBAS << pjm.getPjeLocal().getCantBombas();
+	sock.send(bs.str());
+	std::stringstream msj;
+	msj << "Agarro bombas";
+	consola.log(msj.str());
 
+	//Aviso al server que agarro item para que lo desaparezca
+	int x,y;
+	x = this->getPosicion(&mapa)->getU();
+	y = this->getPosicion(&mapa)->getV();
+	bs.clear();
+	bs << PROTO::ITEM_OFF << x << y;
+	sock.send(bs.str());
+ }
+
+ void Personaje::chocarConTransmut(TransmutItem* transmut) {
+	getPosicion(&mapa)->deleteEntidad(transmut);
+	transmutacion = true;
+	BitStream bs;
+	bs << PROTO::UPDATE_ATT << ATT::TRANSMUT << true;
+	sock.send(bs.str());
+	std::stringstream msj;
+	msj << "Podes transmutar";
+	consola.log(msj.str());
+	//Aviso al server que agarro item para que lo desaparezca
+	int x,y;
+	x = this->getPosicion(&mapa)->getU();
+	y = this->getPosicion(&mapa)->getV();
+	bs.clear();
+	bs << PROTO::ITEM_OFF << x << y;
+	sock.send(bs.str());
+ }
+
+
+ //No estan implementadas
  void Personaje::chocarConGranadas(Granadas* granadas) {
 	 this->getPosicion(&mapa)->deleteEntidad(granadas);
 	 this->granadas+=granadas->getCantGranadas();
  }
 
- //Podria no recibir la varita, lo dejamos por si es necesario en un futuro
+ //No estan implementadas
  void Personaje::chocarConVaritas(Varitas* varitas) {
 	 this->getPosicion(&mapa)->deleteEntidad(varitas);
 	 this->varita=true;
@@ -1371,7 +1418,11 @@ void Personaje::updateHielo() {
 
  void Personaje::chocarConEscudo(Escudo* escudo) {
 	 this->getPosicion(&mapa)->deleteEntidad(escudo);
-	 this->energiaEscudo+=escudo->getEnergiaEscudo();
+	 int futura = int(this->energiaEscudo)+int(escudo->getEnergiaEscudo());
+	 if (futura >= Personaje::ENERGIA_TOTAL)
+		 setEnergiaEscudo(Personaje::ENERGIA_TOTAL);
+	 else 
+		 setEnergiaEscudo(char(futura));
 	 BitStream bs;
 	 bs << PROTO::UPDATE_ATT << ATT::ENERGIA_ESCUDO << pjm.getPjeLocal().getEnergiaEscudo();
 	 sock.send(bs.str());
@@ -1414,16 +1465,18 @@ void Personaje::aumentarRadio(float proporcion) {
 
 void Personaje::muere() {
 	bool murioLocal = false;
-	if (this->getNick() == pjm.getPjeLocal().getNick()) murioLocal = true;
+	if (getNick() == pjm.getPjeLocal().getNick()) murioLocal = true;
 	if (vivo) {
 		soundman.playSound("death", this->getX(), this->getY());
 		this->animacionMuerte();
-		std::cout << "Fui asesinado" << endl;
+		std::stringstream msj;
+ 		msj << "Ouch! Me mataron!";
+ 		if (murioLocal) consola.log(msj.str());
 		//Redirecciono a la posicion inicial nuevamente
-		this->vivo=false;
+		vivo=false;
 		//Aviso al server que me mori
 		BitStream bs;
-		bs << PROTO::DEAD << this->getNick();
+		bs << PROTO::DEAD << getNick();
 		sock.send(bs.str());
 		this->timerRevivir.start();
 	}
@@ -1696,6 +1749,7 @@ void Personaje::utilizarTransmutacion(std::string nick_enemigo) {
 			sock.send(bs.str());		
 		}
 	}
+	setTransmutacion(false);
 	tipoTransmut = cambio;
 	transmutado = nick_enemigo;
 	tTransmut.start();

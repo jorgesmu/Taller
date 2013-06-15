@@ -133,6 +133,8 @@ namespace ITEM {
 	const char GOLEM = 'i';
 	const char BOTELLA = 'j';
 	const char CORAZON = 'k';
+	const char BOMBAS = 'l';
+	const char TRANSMUT = 'm';
 }
 
 // Cosas de atributos
@@ -148,6 +150,7 @@ namespace ATT {
 	const char BOLA_DE_CRISTAL = 8;
 	const char GOLEM = 9;
 	const char CANT_BOMBAS = 10;
+	const char TRANSMUT = 11;
 }
 
 // Cosas a las que se puede transmutar

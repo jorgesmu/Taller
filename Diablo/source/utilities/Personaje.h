@@ -16,7 +16,7 @@ class Corazon;
 class Botella;
 class Zapatos;
 class Flechas;
-//class Bombas;
+class Bombas;
 class Granadas;
 class Varitas;
 class Escudo;
@@ -30,6 +30,7 @@ class Bandera;
 class ClientSocket;
 class Arma;
 class ArmaBomba;
+class TransmutItem;
 #include "../display/bar.h"
 
 class Personaje : public Entidad {
@@ -73,7 +74,7 @@ public:
 		const static unsigned int VELOCIDAD_DEFAULT = 180; // En pixeles por segundo
 		
 		//Radio de los hechizos
-		const static unsigned int RADIO_HECHIZO = 4; //en tiles
+		const static unsigned int RADIO_HECHIZO = 3; //en tiles
 
 		//Revivir tiempo
 		const static unsigned int TIEMPO_REVIVIR = 3000;
@@ -89,7 +90,7 @@ public:
 		const static char DAÑO_TERREMOTO = 100;
 
 		//Magia necesaria para un hechizo
-		const static char MAGIA_HECHIZO = 50;
+		const static char MAGIA_HECHIZO = 20;
 
 		//Vida inicial
 		const static char ENERGIA_TOTAL = 100;
@@ -98,7 +99,7 @@ public:
 		const static char MAGIA_TOTAL = 100;
 
 		//Precision
-		const static char PRECISION_PERSONAJE = 30;
+		const static char PRECISION_PERSONAJE = 10;
 
 	//	const static int DELTA_TIEMPO_UPDATE_POSICION = 20; // Tiempo entre cada update en clocks
 
@@ -409,7 +410,7 @@ public:
 
 	void chocarConMapa(MapaItem* mapaItem);
 
-	void aumentarVelocidad(char porcentaje);
+	bool aumentarVelocidad(char porcentaje);
 
 	void chocarConZapatos(Zapatos* zapatos);
 
@@ -429,7 +430,7 @@ public:
 
 	void chocarConFlechas(Flechas* flechas);
 
-//	void chocarConBombas(Bombas* bombas);
+	void chocarConBombas(Bombas* bombas);
 
 	void chocarConGranadas(Granadas* granadas);
 
@@ -439,13 +440,15 @@ public:
 
 	void chocarConBandera(Bandera* bandera);
 
+	void chocarConTransmut(TransmutItem* transmut);
+
 	void setTerremoto(char valor) { this->terremoto=valor; }
 
 	char getTerremoto() { return this->terremoto; }
 
 	bool tieneTerremoto() { return this->terremoto>0; }
 	
-	void utilizarTerremoto(Mapa* mapa, PjeManager* pjm, ClientSocket* sock);
+	void utilizarTerremoto();
 
 	void setHielo(char valor) { this->hielo=valor; }
 
@@ -453,7 +456,7 @@ public:
 
 	bool tieneHielo() { return this->hielo>0; }
 
-	void utilizarHielo(Mapa* mapa, PjeManager* pjm);
+	void utilizarHielo();
 
 	void updateHielo();
 

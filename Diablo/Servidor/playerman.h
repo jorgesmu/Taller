@@ -19,7 +19,7 @@ class Player {
 	std::string tipo_personaje;
 	bool isOnline;
 	int x, y,xSiguiente,ySiguiente,xInicial,yInicial; // Pos en tiles logicos en el mapa
-	bool bolaDeCristal, golem;
+	bool bolaDeCristal, golem, transmut;
 	bool seMovio;
 	TilesRecorridos tiles_recorridos;
 	double velocidad;
@@ -79,6 +79,8 @@ class Player {
 	void setSeMovio(bool yaSeMovio) { seMovio = yaSeMovio; }
 	char getCantBombas() { return bombas; }
 	void setCantBombas(char valor) { bombas = valor; }
+	bool tieneTransmut() { return transmut; }
+	void setTransmut(bool valor) { transmut = valor; }
 	//Agrega una nueva bandera atrapada por el jugador
 	void atrapoBandera(int x, int y);
 	//Se fija si ya atrapo la bandera dada

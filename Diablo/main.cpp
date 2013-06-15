@@ -42,6 +42,8 @@
 #include "../../source/utilities/Hielo.h"
 #include "../../source/utilities/bandera.h"
 #include "../../source/utilities/arma.h"
+#include "../../source/utilities/transmutItem.h"
+#include "../../source/utilities/bombas.h"
 #include "../../source/display/boton.h"
 #include "../../source/utilities/console.h"
 #include <stdlib.h> 
@@ -368,7 +370,7 @@ int main(int argc, char* argv[]) {
 		auto& p = pjm.getPjeLocal();
 		bs.clear();
 		bs << PROTO::DEF_ATT << (float)p.getVelocidad() << p.getEnergia() << p.getMagia() << p.getEnergiaEscudo() << p.getTerremoto() << p.getHielo();
-		bs << p.getRadioY() << p.getBolaDeCristal() << p.tieneGolem() << p.getCantBombas();
+		bs << p.getRadioY() << p.getBolaDeCristal() << p.tieneGolem() << p.getCantBombas() << p.tieneTransmutacion();
 		sock.send(bs.str());
 	}
 	
@@ -491,11 +493,11 @@ int main(int argc, char* argv[]) {
 							break;
 						}
 						case 't' : {
-							pjm.getPjeLocal().utilizarTerremoto(&mapa,&pjm, &sock);
+							pjm.getPjeLocal().utilizarTerremoto();
 							break;
 						}
 						case 'h' : {
-							pjm.getPjeLocal().utilizarHielo(&mapa,&pjm);
+							pjm.getPjeLocal().utilizarHielo();
 							break;
 						}
 						case 'x' : {
@@ -682,6 +684,7 @@ int main(int argc, char* argv[]) {
 				random=rand()%(cant_items+1);
 				Tile* tile = mapa.getTile(x,y);
 				Item* item;
+				//random = 11;
 				switch(random){
 					case 0:{
 						item = new Lampara("cofre",1,1,true, -20 , 30, tile,&mapa,resman,Imagen::COLOR_KEY );
@@ -773,9 +776,24 @@ int main(int argc, char* argv[]) {
 						sock.send(bs.str());
 						break;
 					}
-   					/*case 10:{
-						ArmaBomba cofre("cofre",1,1,true, x , y, NULL,&mapa,*resman,Imagen::COLOR_KEY );
-					}*/
+   					case 10:{
+						item = new TransmutItem ("cofre",1,1,true, -20 , 30, NULL,&mapa,resman,Imagen::COLOR_KEY );
+						mapa.getTile(x, y)->addEntidad(item,&mapa);
+						entidades_cargadas.push_back(item);
+						BitStream bs;
+						bs << PROTO::LEAVE_ITEM << ITEM::TRANSMUT << x << y;
+						sock.send(bs.str());
+						break;
+					}
+					case 11:{
+						item = new Bombas ("cofre",1,1,true, -20 , 30, NULL,&mapa,resman,Imagen::COLOR_KEY );
+						mapa.getTile(x, y)->addEntidad(item,&mapa);
+						entidades_cargadas.push_back(item);
+						BitStream bs;
+						bs << PROTO::LEAVE_ITEM << ITEM::BOMBAS << x << y;
+						sock.send(bs.str());
+						break;
+					}
 				}
 			}
 

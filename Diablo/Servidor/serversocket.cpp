@@ -534,8 +534,8 @@ void ServerSocket::acceptLastDo() {
 			//Mando los atributos principales del jugador
 			bs.clear();
 			auto& p=pm.getPlayer(new_nick);
-			cout << "Send a " << it->second.nick << " vel de " << new_nick << " " << p.getVelocidad() << endl;
-			bs << PROTO::INIT_ATT << new_nick << (float)p.getVelocidad() << p.getEnergia() << p.getMagia() << p.getEnergiaEscudo() << p.getTerremoto() << p.getHielo() << (float)p.getRadio() << (bool)p.getBolaDeCristal() << (bool)p.tieneGolem();
+			//cout << "Send a " << it->second.nick << " vel de " << new_nick << " " << p.getVelocidad() << endl;
+			bs << PROTO::INIT_ATT << new_nick << (float)p.getVelocidad() << p.getEnergia() << p.getMagia() << p.getEnergiaEscudo() << p.getTerremoto() << p.getHielo() << (float)p.getRadio() << (bool)p.getBolaDeCristal() << (bool)p.tieneGolem() << p.tieneTransmut();
 			send(it->second.sock,bs.str());
 			if (pm.getPlayer(new_nick).isCongelado()) {
 				bs.clear();
@@ -927,8 +927,8 @@ void ServerSocket::acceptLastDo() {
 					// Valor float: velocidad/radio
 					bs >> nuevoVal;
 					//cout << "att recv " << nuevoVal << " tipo " << (int)tipoAtt << endl;
-				}else if((tipoAtt==ATT::BOLA_DE_CRISTAL) || (tipoAtt==ATT::GOLEM)){
-					//valor bool: bola de cristal/golem
+				}else if((tipoAtt==ATT::BOLA_DE_CRISTAL) || (tipoAtt==ATT::GOLEM) || (tipoAtt==ATT::TRANSMUT)){
+					//valor bool: bola de cristal/golem/transmutacion
 					bs >> nuevoValorBool;
 					//cout << "att recv " << nuevoValorBool << " tipo " << (int)tipoAtt << endl;
 				} else {
@@ -972,6 +972,8 @@ void ServerSocket::acceptLastDo() {
 							}
 						} else if (tipoAtt==ATT::GOLEM) {
 							pm.getPlayer(new_nick).setGolem(nuevoValorBool);
+						} else if (tipoAtt==ATT::TRANSMUT) {
+							pm.getPlayer(new_nick).setTransmut(nuevoValorBool);
 						} else if (tipoAtt==ATT::RADIO) {
 							pm.getPlayer(new_nick).setRadio(nuevoVal);
 						} else if (tipoAtt==ATT::CANT_BOMBAS) {
@@ -983,7 +985,7 @@ void ServerSocket::acceptLastDo() {
 					bs.clear();
 					if ((tipoAtt==ATT::VEL) || (tipoAtt==ATT::RADIO)) {
 						bs << PROTO::UPDATE_ATT << tipoAtt << new_nick << nuevoVal;
-					} else if((tipoAtt==ATT::BOLA_DE_CRISTAL) || (tipoAtt==ATT::GOLEM)){
+					} else if((tipoAtt==ATT::BOLA_DE_CRISTAL) || (tipoAtt==ATT::GOLEM) || (tipoAtt==ATT::TRANSMUT)){
 						bs << PROTO::UPDATE_ATT << tipoAtt << new_nick << nuevoValorBool;					
 					} else {
 						bs << PROTO::UPDATE_ATT << tipoAtt << new_nick << nuevoValor;
@@ -994,8 +996,8 @@ void ServerSocket::acceptLastDo() {
 			}else if(pt == PROTO::DEF_ATT) {	
 				float vel,radio;
 				char energia,magia,escudo,terremoto,hielo,bombas;
-				bool bolaCristal,golem;
-				bs >> vel >> energia >> magia >> escudo >> terremoto >> hielo >> radio >> bolaCristal >> golem >> bombas;
+				bool bolaCristal,golem,transmut;
+				bs >> vel >> energia >> magia >> escudo >> terremoto >> hielo >> radio >> bolaCristal >> golem >> bombas >> transmut;
 				//Actualizo localmente
 				auto& p = pm.getPlayer(new_nick);
 				p.setVelocidad((double)vel);
@@ -1024,14 +1026,15 @@ void ServerSocket::acceptLastDo() {
 				}
 				p.setGolem(golem);
 				p.setCantBombas(bombas);
+				p.setTransmut(transmut);
 				// Avisamos a los otros jugadores 
 				for(auto it = clients_map.begin();it != clients_map.end();it++) {
 					if(it->second.nick == new_nick) continue; // Salteamos a nuestro jugador de avisarle
 					bs.clear();
 					bs << PROTO::DEF_ATT << new_nick << (float)p.getVelocidad() << p.getEnergia() << p.getMagia() << p.getEnergiaEscudo() << p.getTerremoto();
-					bs << p.getHielo() << p.getRadio() << p.getBolaDeCristal() << p.tieneGolem() << p.getCantBombas();
+					bs << p.getHielo() << p.getRadio() << p.getBolaDeCristal() << p.tieneGolem() << p.getCantBombas() << p.tieneTransmut();
 					send(it->second.sock, bs.str());
-					cout << "Mandando def vel de " << new_nick << " a " << it->second.nick << " valor " << p.getVelocidad() << endl;
+					//cout << "Mandando def vel de " << new_nick << " a " << it->second.nick << " valor " << p.getVelocidad() << endl;
 				}
 			}else if(pt == PROTO::REQUEST_POS) {
 				int x, y;
@@ -1361,6 +1364,7 @@ void ServerSocket::acceptLastDo() {
 				bs >> tipo;
 				std::string nick;
 				bs >> nick;
+				pm.getPlayer(new_nick).setTransmut(false);
 				if (tipo == TIPO::LAPIDA) {
 					// Aviso a todos que lo conviertan a lapida
 					bs.clear();

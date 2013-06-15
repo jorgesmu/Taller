@@ -37,4 +37,8 @@ void Interface::blitInterface(SDL_Surface* screen) {
 	y+=altura;
 	ss7 << "Bombas: " << (int)pjm.getPjeLocal().getCantBombas();
 	resman.getFont()->blit(screen, x, y, ss7.str(), COLOR::WHITE);
+	std::stringstream ss8;
+	y+=altura;
+	if (pjm.getPjeLocal().tieneTransmutacion()) ss8 << "Transmut: Si"; else ss8 << "Transmut: No";
+	resman.getFont()->blit(screen, x, y, ss8.str(), COLOR::WHITE);
 }

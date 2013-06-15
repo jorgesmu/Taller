@@ -824,12 +824,49 @@ void ServerSocket::acceptLastDo() {
 						bs.clear();
 						if(terminoMision){
 							//aviso a los demas que termino la mision
-							bs << PROTO::WINNER << nick_who;
+							bs << PROTO::WINNER << nick_who;							
+							send(it->second.sock,bs.str());
 						}else{
 							//aviso a los demas que murio enemigo
 							bs << PROTO::ENEMY_DEAD << nick_to;
 						}
 						send(it->second.sock,bs.str());
+					}
+					if (terminoMision) Sleep(5000);
+					for(auto it = clients_map.begin();it != clients_map.end();it++) {
+						if(terminoMision){
+							for (auto itP = pm.getPlayers().begin(); itP != pm.getPlayers().end(); itP++) {
+								bs.clear();
+								bs << PROTO::RESET_PLAYER << itP->first << itP->second.getXInicial() << itP->second.getYInicial();
+								send(it->second.sock,bs.str());
+								//std::cout << "Mandando reset de " << itP->first << " de la mision a " << it->second.nick << "\n";
+								itP->second.reiniciar();
+							}
+							for (auto itE = pm.getEnemies().begin(); itE != pm.getEnemies().end(); itE++) {
+								delete (itE->second);
+							}
+							pm.getEnemies().clear();
+							//Agregar enemigos automaticos
+							pm.addEnemy("EnemigoMaster","soldado",mapa,1);
+							//pm.addEnemy("Enemigo2","soldado",mapa,2);	
+							//pm.addEnemy("Enemigo3","soldado",mapa,2);
+							//Mato a todos los golems que quedaron
+							for (auto itG = pm.getGolems().begin(); itG != pm.getGolems().end(); itG++) {
+								delete (itG->second);
+							}
+							pm.getGolems().clear();	
+							for(auto it = clients_map.begin();it != clients_map.end();it++) {
+								for (auto itE = pm.getEnemies().begin(); itE != pm.getEnemies().end(); itE++) {							
+									bs.clear();
+									bs << PROTO::NEW_PLAYER << itE->second->getNick() << itE->second->getTipo() << itE->second->getX() << itE->second->getY() << itE->second-> isOn();
+									send(it->second.sock, bs.str());
+									//Mando los atributos principales del enemigo
+									bs.clear();
+									bs << PROTO::INIT_ATT << itE->second->getNick() << (float)itE->second->getVelocidad() << itE->second->getEnergia() << itE->second->getMagia() << itE->second->getEnergiaEscudo() << itE->second->getTerremoto() << itE->second->getHielo() << (float)itE->second->getRadio();
+									send(it->second.sock,bs.str());
+								}
+							}
+						}
 					}
 				}
 			}else if(pt == PROTO::CONGELAR) {	
@@ -1247,8 +1284,41 @@ void ServerSocket::acceptLastDo() {
 							send(it->second.sock, bs.str());
 							std::cout << "Mandando ganador de la mision a " << it->second.nick << "\n";
 						}
-						Sleep(5000);
-						exit(0);
+						Sleep(6000);
+						for(auto it = clients_map.begin();it != clients_map.end();it++) {
+							for (auto itP = pm.getPlayers().begin(); itP != pm.getPlayers().end(); itP++) {
+								bs.clear();
+								bs << PROTO::RESET_PLAYER << itP->first << itP->second.getXInicial() << itP->second.getYInicial();
+								send(it->second.sock,bs.str());
+								std::cout << "Mandando reset de " << itP->first << " de la mision a " << it->second.nick << "\n";
+								itP->second.reiniciar();
+							}
+							 
+						}
+						for (auto itE = pm.getEnemies().begin(); itE != pm.getEnemies().end(); itE++) {
+							delete (itE->second);
+						}
+						pm.getEnemies().clear();
+						//Agregar enemigos automaticos
+						pm.addEnemy("EnemigoMaster","soldado",mapa,1);
+						//pm.addEnemy("Enemigo2","soldado",mapa,2);	
+						//pm.addEnemy("Enemigo3","soldado",mapa,2);
+						//Mato a todos los golems que quedaron
+						for (auto itG = pm.getGolems().begin(); itG != pm.getGolems().end(); itG++) {
+							delete (itG->second);
+						}
+						pm.getGolems().clear();	
+						for(auto it = clients_map.begin();it != clients_map.end();it++) {
+							for (auto itE = pm.getEnemies().begin(); itE != pm.getEnemies().end(); itE++) {							
+								bs.clear();
+								bs << PROTO::NEW_PLAYER << itE->second->getNick() << itE->second->getTipo() << itE->second->getX() << itE->second->getY() << itE->second-> isOn();
+								send(it->second.sock, bs.str());
+								//Mando los atributos principales del enemigo
+								bs.clear();
+								bs << PROTO::INIT_ATT << itE->second->getNick() << (float)itE->second->getVelocidad() << itE->second->getEnergia() << itE->second->getMagia() << itE->second->getEnergiaEscudo() << itE->second->getTerremoto() << itE->second->getHielo() << (float)itE->second->getRadio();
+								send(it->second.sock,bs.str());
+							}
+						}
 					}
 				}				
 			}else if (pt == PROTO::USO_GOLEM){

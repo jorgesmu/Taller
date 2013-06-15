@@ -545,6 +545,31 @@ void ClientSocket::listenDo() {
 
 				std::cout << "Server requested revival of <" << nick << "> to " << x << ";" << y << "\n";
 			}
+		}else if(pt == PROTO::RESET_PLAYER) {
+			std::string nick;
+			int x, y;
+			bs >> nick >> x >> y;
+			if(!pjm.PjeExiste(nick) && pjm.getPjeLocal().getNick() != nick) {
+				std::cout << "Server requested move of invalid PJ: " << nick << "\n";
+			}else if (pjm.getPjeLocal().getNick() == nick) {
+				auto& p = pjm.getPjeLocal();
+				int posViejaU = p.getPosicion(&mapa)->getU();
+				int posViejaV = p.getPosicion(&mapa)->getV();
+				mapa.getTile(p.getPosicion(&mapa)->getU(), p.getPosicion(&mapa)->getV())->deleteEntidad(&p);
+				mapa.getTile(x, y)->addEntidad(&p);
+				p.setTileActual(mapa.getTile(x, y));
+				p.reiniciar();
+			} else {
+				auto& p = pjm.getPje(nick);
+				int posViejaU = p.getPosicion(&mapa)->getU();
+				int posViejaV = p.getPosicion(&mapa)->getV();
+				mapa.getTile(p.getPosicion(&mapa)->getU(), p.getPosicion(&mapa)->getV())->deleteEntidad(&p);
+				mapa.getTile(x, y)->addEntidad(&p);
+				p.setTileActual(mapa.getTile(x, y));
+				p.reiniciar();
+
+				std::cout << "Server requested reset of <" << nick << "> to " << x << ";" << y << "\n";
+			}
 		}else if(pt == PROTO::USE_ITEM) {
 			char item;
 			int posBombaX,posBombaY; //solo si es una bomba

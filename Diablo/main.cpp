@@ -568,7 +568,7 @@ int main(int argc, char* argv[]) {
 			static int estadoAnterior = Personaje::ESPERANDO_ACCION;
 			if (estadoAnterior != estadoPersonaje){
 				estadoAnterior = estadoPersonaje;
-				printf("\nEstado Personaje %i\n",estadoAnterior);
+				//printf("\nEstado Personaje %i\n",estadoAnterior);
 			}
 		}
 
@@ -795,6 +795,7 @@ int main(int argc, char* argv[]) {
 							(*it)->chocarCon(&pjm.getPjeLocal());
 							entidadesChocadas.push_back(*it);
 						}
+						yaChoco = false;
 					}
 				}
 				choco=true;

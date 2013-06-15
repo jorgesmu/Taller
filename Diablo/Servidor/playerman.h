@@ -18,7 +18,7 @@ class Player {
 	std::string nick;
 	std::string tipo_personaje;
 	bool isOnline;
-	int x, y,xSiguiente,ySiguiente; // Pos en tiles logicos en el mapa
+	int x, y,xSiguiente,ySiguiente,xInicial,yInicial; // Pos en tiles logicos en el mapa
 	bool bolaDeCristal, golem;
 	bool seMovio;
 	TilesRecorridos tiles_recorridos;
@@ -37,6 +37,9 @@ class Player {
 	void setPos(int x, int y);
 	int getX() const;
 	int getY() const;
+	int getXInicial() { return xInicial; }
+	int getYInicial() { return yInicial; }
+	void setPosInicial(int x, int y) { xInicial = x; yInicial = y; }
 	std::string getTipo() const;
 	bool isOn() const;
 	void setOffline();
@@ -89,6 +92,7 @@ class Player {
 	void addTileRecorrido(short x, short y);
 	bool Player::existsTileRecorrido(short x, short y);
 	TilesRecorridos& getTilesRecorridos();
+	void reiniciar();
 
 };
 

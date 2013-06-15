@@ -469,6 +469,9 @@ public:
 
 	void revivir();
 
+	//Reinicia los atributos para reiniciar la mision
+	void reiniciar();
+
 	void setPrecision(char new_precision) { precision=new_precision; }
 
 	char getPrecision() { return precision; }

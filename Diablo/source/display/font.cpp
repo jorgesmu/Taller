@@ -53,6 +53,7 @@ void Font::blitCentered(SDL_Surface* dest, int x, int y, const std::string& msg,
 	// Cargamos las coordenadas a donde blittear
 	SDL_Rect dest_coords; dest_coords.x = x; dest_coords.y = y;
 	SDL_Surface* txt_surf = TTF_RenderText_Solid(this->font, msg.c_str(), color);
+	if (txt_surf == NULL) std::cerr << "Error loading font <" << ">: " << TTF_GetError() << "\n";
 	assert(txt_surf != NULL);
 	// Centramos
 	dest_coords.x -= txt_surf->w/2;

@@ -126,6 +126,22 @@ bool Player::tieneBandera(int x, int y) {
 	return found;
 }
 
+void Player::reiniciar() {
+	x = xSiguiente = xInicial;
+	y = ySiguiente = yInicial;
+	bolaDeCristal = golem = false;
+	tiles_recorridos.clear();
+	velocidad = 0.18;
+	radio = 125;
+	energia = 100;
+	magia = 100;
+	congelado = false;
+	terremoto =0;
+	hielo= 0;
+	bombas = 0;
+	banderasAtrapadas.clear();
+}
+
 //////////////
 PlayerManager::PlayerManager(){
 	golem_count = 0;
@@ -164,6 +180,7 @@ void PlayerManager::addPlayer(const std::string& nick, const std::string& tipo_p
 	}else{
 		p.setOnline();
 		p.setPos(rand_x, rand_y);
+		p.setPosInicial(rand_x, rand_y);
 		//p.setPos(10,10);
 
 	}

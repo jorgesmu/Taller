@@ -1388,7 +1388,7 @@ void Personaje::updateHielo() {
 	 Tile* tilePersonaje = pjm.getPjeLocal().getPosicion(&mapa);
 	 int x = tilePersonaje->getU();
 	 int y = tilePersonaje->getV();
-	 std::cout << "Atrape bandera en pos (" << x << "," << y << ")" << endl;
+	 //std::cout << "Atrape bandera en pos (" << x << "," << y << ")" << endl;
 	 bs << PROTO::CATCH_FLAG << x << y;
 	 sock.send(bs.str());
      std::stringstream msj;
@@ -1427,6 +1427,20 @@ void Personaje::muere() {
 	 this->vivo=true;
 	 this->animacionRevivir();
 	 this->energia=this->ENERGIA_TOTAL;
+ }
+
+ void Personaje::reiniciar() {
+	 this->energia = this->ENERGIA_TOTAL;
+	 this->velocidad = VELOCIDAD_DEFAULT/(double)CLOCKS_PER_SEC;
+	 this->setRadio(125);
+	 this->terremoto = 0;
+	 this->hielo = 0;
+	 this->magia = MAGIA_TOTAL;
+	 this->bombas = 0;
+	 this->energiaEscudo = 0;
+	 this->bolaDeCristal = false;
+	 this->transmutacion = false;
+	 this->tilesExplorados.clear();
  }
  
  	

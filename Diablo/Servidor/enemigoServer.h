@@ -30,11 +30,13 @@ class Enemigo:public Player{
 			return this->ultimaAccionAtacar;
 		}
 
-		void cambiarEstrategia() {
-			if (estrategia == 1) {
-				estrategia = 2;
+		/*void cambiarEstrategia(bool bajaVel) {
+			if (bajaVel) {
+				double disminucion = 75;
+				this->velocidad*=(disminucion/100);
 			} else {
-				estrategia = 1;
+				double aumento = 25+100;
+				this->velocidad*=(aumento/100);
 			}
-		}
+		}*/
 };

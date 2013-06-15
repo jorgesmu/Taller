@@ -341,6 +341,15 @@ bool ServerSocket::removeClient(const std::string& str_id) {
 		clients_map.erase(str_id);
 		queue_buf.erase(str_id);
 		ret = true;
+		//actualizo estado de enemigos  y golem si no quedo ningun cliente
+		if(clients_map.empty()){
+			for(auto it=pm.getEnemies().begin();it!=pm.getEnemies().end();it++){
+				it ->second->setPos(it->second->getXSiguiente(),it->second->getYSiguiente());
+			}
+			for(auto it=pm.getGolems().begin();it!=pm.getGolems().end();it++){
+				it ->second->setPos(it->second->getXSiguiente(),it->second->getYSiguiente());
+			}
+		}
 	}
 	LeaveCriticalSection(&critSect);
 	return ret;

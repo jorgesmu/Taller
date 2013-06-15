@@ -1199,7 +1199,7 @@ void Personaje::utilizarTerremoto(Mapa* mapa, PjeManager* pjm, ClientSocket* soc
 	char dañoRealizado;
 	Tile* tilePersonaje;
 	int xPersonaje,yPersonaje;
-	if ((this->tieneTerremoto()) && (this->getMagia()>=this->MAGIA_HECHIZO)) {
+	//if ((this->tieneTerremoto()) && (this->getMagia()>=this->MAGIA_HECHIZO)) {
 		std::cout << "Uso terremoto\n";
 		BitStream bs;
 		bs << PROTO::USE_ITEM << this->nickname << ITEM::TERREMOTO;
@@ -1230,7 +1230,7 @@ void Personaje::utilizarTerremoto(Mapa* mapa, PjeManager* pjm, ClientSocket* soc
 			}
 		}
 		this->terremoto--; 
-	}
+	//}
 }
 
 void Personaje::utilizarHielo(Mapa* mapa, PjeManager* pjm) {

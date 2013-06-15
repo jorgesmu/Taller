@@ -172,7 +172,20 @@ int main(int argc, char* argv[]) {
 		// Multiplayer, no hace nada
 	}else if(opcion_menu == 3) {
 		// Salir
-		return 1;
+		mapa.clean();
+		resman.clean();
+		soundman.clean();
+		err_log.cerrarConexion();
+		//Test::test();
+		TTF_Quit();
+		SDL_Quit();
+		if(!sock.isOpen()){
+			cout << "Conexion cerrada por el servidor" << endl;
+			system ("PAUSE");
+		}
+		sock.close();
+		return 0;
+
 	}
 
 
@@ -182,15 +195,40 @@ int main(int argc, char* argv[]) {
 	InitializeCriticalSection(&cs_main);
 	// Socket de cliente
 	if(!sock.init(&cs_main)) {
+		mapa.clean();
+		resman.clean();
+		soundman.clean();
+		err_log.cerrarConexion();
+		//Test::test();
+		TTF_Quit();
+		SDL_Quit();
+		if(!sock.isOpen()){
+			cout << "Conexion cerrada por el servidor" << endl;
+			system ("PAUSE");
+		}
+		sock.close();
 		return 1;
 	}
 
 	//cargo ip servidor y puerto
 	config_cliente configuracion_red = parsear_red("../resources/static/red.yaml");
 	// Conectamos
-	if(!sock.connect(configuracion_red.get_ip_servidor(),configuracion_red.get_puerto()))
+	if(!sock.connect(configuracion_red.get_ip_servidor(),configuracion_red.get_puerto())){
+		mapa.clean();
+		resman.clean();
+		soundman.clean();
+		err_log.cerrarConexion();
+		//Test::test();
+		TTF_Quit();
+		SDL_Quit();
+		if(!sock.isOpen()){
+			cout << "Conexion cerrada por el servidor" << endl;
+			system ("PAUSE");
+		}
+		sock.close();
+
 		return 1;
-	
+	}
 	// Creamos el thread de listen
 	HANDLE hth1 = (HANDLE)_beginthreadex(NULL, 0, ClientSocket::listenEntry, (void*)&sock, 0, NULL);
 	// Mandamos el nick
@@ -422,9 +460,9 @@ int main(int argc, char* argv[]) {
 							break;
 						}
 						case 'g' : {
-							if (pjm.getPjeLocal().tieneGolem()) {
+							//if (pjm.getPjeLocal().tieneGolem()) {
 								pjm.getPjeLocal().utilizarGolem();
-							}
+							//}
 							break;
 						}
 						case 'p' : {
@@ -998,7 +1036,6 @@ int main(int argc, char* argv[]) {
 		Sleep(10);
 
 	}
-	
 	mapa.clean();
 	resman.clean();
 	soundman.clean();

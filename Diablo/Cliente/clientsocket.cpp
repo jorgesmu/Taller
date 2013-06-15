@@ -87,9 +87,9 @@ bool ClientSocket::init(CRITICAL_SECTION* main_cs) {
     ConnectSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	BOOL val_true = TRUE;
 	int buff_size = 0;
-	/*if(setsockopt(ConnectSocket, IPPROTO_TCP, TCP_NODELAY, (char*)&val_true, sizeof(BOOL)) != 0) {
+	if(setsockopt(ConnectSocket, IPPROTO_TCP, TCP_NODELAY, (char*)&val_true, sizeof(BOOL)) != 0) {
 		std::cerr << "ERROR SETTING SOCK OPTIONS TCP_NODELAY\n";
-	}
+	}/*
 	//if(setsockopt(ConnectSocket, SOL_SOCKET, SO_RCVBUF, (char*)&buff_size, sizeof(int)) != 0) {
 		//std::cerr << "ERROR SETTING SOCK OPTIONS SO_RCVBUF\n";
 	//}
@@ -544,6 +544,31 @@ void ClientSocket::listenDo() {
 				p.revivir();
 
 				std::cout << "Server requested revival of <" << nick << "> to " << x << ";" << y << "\n";
+			}
+		}else if(pt == PROTO::RESET_PLAYER) {
+			std::string nick;
+			int x, y;
+			bs >> nick >> x >> y;
+			if(!pjm.PjeExiste(nick) && pjm.getPjeLocal().getNick() != nick) {
+				std::cout << "Server requested move of invalid PJ: " << nick << "\n";
+			}else if (pjm.getPjeLocal().getNick() == nick) {
+				auto& p = pjm.getPjeLocal();
+				int posViejaU = p.getPosicion(&mapa)->getU();
+				int posViejaV = p.getPosicion(&mapa)->getV();
+				mapa.getTile(p.getPosicion(&mapa)->getU(), p.getPosicion(&mapa)->getV())->deleteEntidad(&p);
+				mapa.getTile(x, y)->addEntidad(&p);
+				p.setTileActual(mapa.getTile(x, y));
+				p.reiniciar();
+			} else {
+				auto& p = pjm.getPje(nick);
+				int posViejaU = p.getPosicion(&mapa)->getU();
+				int posViejaV = p.getPosicion(&mapa)->getV();
+				mapa.getTile(p.getPosicion(&mapa)->getU(), p.getPosicion(&mapa)->getV())->deleteEntidad(&p);
+				mapa.getTile(x, y)->addEntidad(&p);
+				p.setTileActual(mapa.getTile(x, y));
+				p.reiniciar();
+
+				std::cout << "Server requested reset of <" << nick << "> to " << x << ";" << y << "\n";
 			}
 		}else if(pt == PROTO::USE_ITEM) {
 			char item;

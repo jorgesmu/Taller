@@ -29,6 +29,8 @@ class SoundMan {
 	// Carga el sound manager, linkeando a la camara y al personaje local
 	// Carga la musica
 	bool init(Camara* cam, Personaje* pjl);
+	// camara ya cargada
+	void calcInit();
 	// Agrega un sonido <nombre_recurso, path>
 	bool addSound(const std::string& name, const std::string& path);
 	// Chequea si un recurso existe

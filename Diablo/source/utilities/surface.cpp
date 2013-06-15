@@ -96,11 +96,11 @@ bool Surface::load(const std::string& filename) {
 		SDL_FreeSurface(temp_surf);
 		// Apply color key
 		Uint32 ckey = SDL_MapRGB(image -> format , 0, Surface::BMP_TRANSPARENCIA, 0);
-		SDL_SetColorKey(image, SDL_SRCCOLORKEY, ckey);
+		//SDL_SetColorKey(image, SDL_SRCCOLORKEY, ckey);
 
 		imageGris = SDL_DisplayFormat(image);
 		Uint32 ckeyGris = SDL_MapRGB(imageGris -> format , 0, Surface::BMP_TRANSPARENCIA, 0);
-		SDL_SetColorKey(image, SDL_SRCCOLORKEY, ckeyGris);
+		//SDL_SetColorKey(image, SDL_SRCCOLORKEY, ckeyGris);
 
 		//convierte a escala de grises
 		for (int y=0; y < imageGris->h; y++){

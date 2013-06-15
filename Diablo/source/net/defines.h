@@ -105,6 +105,8 @@ const unsigned char LEAVE_ITEM = 'P';
 const unsigned char DEF_ATT = 'Q';
 // Agarro el item
 const unsigned char ITEM_OFF = 'R';
+// Reinicia el estado del jugador, empieza mision otra vez
+const unsigned char RESET_PLAYER = 'S';
 }
 
 // Cosas de movimiento

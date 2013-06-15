@@ -23,6 +23,7 @@
 #include "../../Cliente/clientsocket.h"
 #include "../utilities/Arma.h"
 #include "../utilities/console.h"
+#include "soundman.h"
 #include "armaBomba.h"
 #include "aux_func.h"
 #include <sstream>
@@ -34,6 +35,7 @@ extern Mapa mapa;
 extern std::vector<EntidadFija*> entidades_cargadas;
 extern ResMan resman;
 extern Console consola;
+extern SoundMan soundman;
 
 /*
 	Pre:- 
@@ -772,6 +774,7 @@ void Personaje::updateRevivir() {
 
 */
 unsigned int Personaje::ataque(Tile* tileDestino , Mapa* mapa) {
+	soundman.playSound("sword", this->getX(), this->getY());
 	return this -> ataque(tileDestino , mapa, NULL);
 }
 
@@ -1221,6 +1224,7 @@ void Personaje::utilizarTerremoto(Mapa* mapa, PjeManager* pjm, ClientSocket* soc
 		bs.clear();
 		bs << PROTO::UPDATE_ATT << ATT::MAGIA << this->getMagia();
 		sock->send(bs.str());
+		soundman.playSound("quake", this->getX(), this->getY());
 		int xActual = this->getPosicion(mapa)->getU();
 		int yActual = this->getPosicion(mapa)->getV();
 		for (int i=xActual-radio;i<=xActual+radio;i++) {
@@ -1388,7 +1392,7 @@ void Personaje::updateHielo() {
 	 Tile* tilePersonaje = pjm.getPjeLocal().getPosicion(&mapa);
 	 int x = tilePersonaje->getU();
 	 int y = tilePersonaje->getV();
-	 std::cout << "Atrape bandera en pos (" << x << "," << y << ")" << endl;
+	 //std::cout << "Atrape bandera en pos (" << x << "," << y << ")" << endl;
 	 bs << PROTO::CATCH_FLAG << x << y;
 	 sock.send(bs.str());
      std::stringstream msj;
@@ -1411,6 +1415,7 @@ void Personaje::muere() {
 	bool murioLocal = false;
 	if (this->getNick() == pjm.getPjeLocal().getNick()) murioLocal = true;
 	if (vivo) {
+		soundman.playSound("death", this->getX(), this->getY());
 		this->animacionMuerte();
 		std::cout << "Fui asesinado" << endl;
 		//Redirecciono a la posicion inicial nuevamente
@@ -1427,6 +1432,20 @@ void Personaje::muere() {
 	 this->vivo=true;
 	 this->animacionRevivir();
 	 this->energia=this->ENERGIA_TOTAL;
+ }
+
+ void Personaje::reiniciar() {
+	 this->energia = this->ENERGIA_TOTAL;
+	 this->velocidad = VELOCIDAD_DEFAULT/(double)CLOCKS_PER_SEC;
+	 this->setRadio(125);
+	 this->terremoto = 0;
+	 this->hielo = 0;
+	 this->magia = MAGIA_TOTAL;
+	 this->bombas = 0;
+	 this->energiaEscudo = 0;
+	 this->bolaDeCristal = false;
+	 this->transmutacion = false;
+	 this->tilesExplorados.clear();
  }
  
  	

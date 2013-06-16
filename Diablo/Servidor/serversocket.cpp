@@ -818,7 +818,7 @@ void ServerSocket::acceptLastDo() {
 						if(terminoMision){
 							//aviso a los demas que termino la mision
 							bs << PROTO::WINNER << nick_who;							
-							it->second.send(bs.str());
+							//it->second.send(bs.str());
 						}else{
 							//aviso a los demas que murio enemigo
 							bs << PROTO::ENEMY_DEAD << nick_to;

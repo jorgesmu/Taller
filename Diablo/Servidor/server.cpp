@@ -140,7 +140,7 @@ int main(int argc, char* argv[]) {
 	}
 	
 	//Agregar enemigos automaticos
-	//pm.addEnemy("EnemigoMaster","soldado",mapa,1);
+	pm.addEnemy("EnemigoMaster","soldado",mapa,1);
 	//pm.addEnemy("Enemigo2","soldado",mapa,2);	
 	//pm.addEnemy("Enemigo3","soldado",mapa,2);
 

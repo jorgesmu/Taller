@@ -383,7 +383,7 @@ void Enemigo::atacar(string& NickAtacado,PlayerManager& pm,ServerSocket& socks){
 	for(auto it = socks.get_clients().begin();it !=socks.get_clients().end();it++) {
 		//ataco con la danio
 		bs.clear();
-		bs << PROTO::ATACAR << this->getNick();
+		bs << PROTO::ATACAR << this->getNick() << NickAtacado;
 		it->second.send(bs.str());
 		//mando danio
 		bs.clear();

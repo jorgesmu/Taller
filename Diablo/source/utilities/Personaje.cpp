@@ -93,11 +93,11 @@ void Personaje::inicializarAtributosEnValoresDefault() {
 	this -> ordenBliteo = Entidad::ORDEN_PERSONAJE;
 	this->setRadio(125);
 	this->terremoto=0; //DESCOMENTAR
-	this->hielo=0; //DESCOMENTAR
+	this->hielo=10; //DESCOMENTAR
 	this->energia=this->ENERGIA_TOTAL;
 	this->magia=this->MAGIA_TOTAL;
 	this->flechas=0;
-	this->bombas=10;
+	this->bombas=0;
 	this->granadas=0;
 	this->varita=false;
 	this->energiaEscudo=0;
@@ -1490,7 +1490,7 @@ void Personaje::muere() {
 		//Aviso al server que me mori
 		BitStream bs;
 		bs << PROTO::DEAD << getNick();
-		sock.send(bs.str());
+		if (murioLocal) sock.send(bs.str()); // si no habria un DEAD por cada cliente
 		this->timerRevivir.start();
 	}
  }

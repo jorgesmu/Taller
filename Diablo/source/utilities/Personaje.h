@@ -153,6 +153,9 @@ protected:
 		bool varita;
 		char energiaEscudo;
 
+		//Para la espada
+		Timer timerAtaque;
+
 		//Para la bomba
 		Timer tBomba; //timer para que explote
 		int posBombaX,posBombaY;
@@ -293,6 +296,9 @@ public:
 
 	//Animaciones
 	void animacionPiedra();
+
+	// Para limitar el ataque
+	Timer& getTimerAtaque() { return timerAtaque; }
 
 	/*
 		Pre: La instancia ha sido creada.

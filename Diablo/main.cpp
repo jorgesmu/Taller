@@ -976,7 +976,13 @@ int main(int argc, char* argv[]) {
 								if (indice == caminoMinimo.size()){
 									//Veo si esta vivo antes de atacarlo
 									if (personajeObjetivo->estaVivo()) {
-										pjm.getPjeLocal().ataque(tilePersonajeObjetivo,&mapa,personajeObjetivo);
+										// Veo hace cuanto me ataco por ultima vez para no permitir tantos ataques seguidos
+										Timer& timer = pjm.getPjeLocal().getTimerAtaque();
+										if (!timer.isStarted() || timer.getTicks() > 1000) {
+											timer.start();
+											pjm.getPjeLocal().ataque(tilePersonajeObjetivo,&mapa,personajeObjetivo);
+										}
+										
 									}
 									enAtaque = false;
 									personajeObjetivo = NULL;

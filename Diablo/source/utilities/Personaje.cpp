@@ -460,25 +460,56 @@ void Personaje::calcularPosicionTentativa(unsigned int direccion ,
 */
 Tile* Personaje::obtenerTileAncla(const int posX , const int posY , 
 												const unsigned int direccion , Mapa* mapa){
-	
 	Tile* retorno = NULL;
+	bool explorado = false;
 	// Sur
 	int posImagenX = posX;
 	int posImagenY = posY + Tile::TILE_ALTO + Personaje::MARGEN_ANCLA_Y;
 	retorno = mapa -> getTilePorPixeles(posImagenX , posImagenY);
-	if (retorno == NULL){
+	// verifico si ha sido explorado
+	if (retorno != NULL) {
+		for(auto it = pjm.getPjeLocal().tilesExplorados.begin(); it != pjm.getPjeLocal().tilesExplorados.end(); ++it){
+			if ( ((*it) -> getU() == retorno -> getU()) && ( (*it) -> getV() == retorno -> getV())){
+				explorado = true;
+			}
+		}
+	}
+	if (!explorado){
 		// Sureste
 		posImagenY = posY + Tile::TILE_ALTO;
 		retorno = mapa -> getTilePorPixeles(posImagenX , posImagenY);
-		if (retorno == NULL) {
+		if (retorno != NULL) {
+			for(auto it = pjm.getPjeLocal().tilesExplorados.begin(); it != pjm.getPjeLocal().tilesExplorados.end(); ++it){
+				if ( ((*it) -> getU() == retorno -> getU()) && ( (*it) -> getV() == retorno -> getV())){
+					explorado = true;
+				}
+			}
+		}
+		if (!explorado) {
 			// Este
 			posImagenX = posX - Tile::TILE_ANCHO;
 			posImagenY = posY + Tile::TILE_ALTO/2;
-			if(retorno == NULL) {
+			// verifico si ha sido explorado
+			if (retorno != NULL) {
+				for(auto it = pjm.getPjeLocal().tilesExplorados.begin(); it != pjm.getPjeLocal().tilesExplorados.end(); ++it){
+					if ( ((*it) -> getU() == retorno -> getU()) && ( (*it) -> getV() == retorno -> getV())){
+						explorado = true;
+					}
+				}
+			}
+			if(!explorado) {
 				// tile Suroeste
 				posImagenX = posX - Tile::TILE_ANCHO/2;
 				posImagenY = posY + Tile::TILE_ALTO/2;
 				retorno = mapa -> getTilePorPixeles(posImagenX , posImagenY);
+				// verifico si ha sido explorado
+				if (retorno != NULL) {
+					for(auto it = pjm.getPjeLocal().tilesExplorados.begin(); it != pjm.getPjeLocal().tilesExplorados.end(); ++it){
+						if ( ((*it) -> getU() == retorno -> getU()) && ( (*it) -> getV() == retorno -> getV())){
+							explorado = true;
+						}
+					}
+				}
 				if(retorno == NULL) {
 					// tile Actual
 					posImagenX = posX;

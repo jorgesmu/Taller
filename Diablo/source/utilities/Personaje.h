@@ -257,7 +257,7 @@ public:
 		Post: Se ha realizado un ataque en la direccion correspondiente del tile parametro.
 
 	*/
-	virtual unsigned int ataque(Tile* tileDestino , Mapa* mapa);
+	virtual unsigned int ataque(Tile* tileDestino , Mapa* mapa, bool soloAnimacion);
 
 	/*
 		Pre: Mapa distinto de null. El parametro tileDestino es cualquier tile en la 
@@ -266,7 +266,7 @@ public:
 		Post: Se ha realizado un ataque en la direccion correspondiente del tile parametro.
 
 	*/
-	virtual unsigned int ataque(Tile* tileDestino , Mapa* mapa , Personaje* personajeObjetivo);
+	virtual unsigned int ataque(Tile* tileDestino , Mapa* mapa , Personaje* personajeObjetivo, bool soloAnimacion);
 
 	/*
 		Pre: Mapa distinto de null. El parametro tileDestino es cualquier tile en la 

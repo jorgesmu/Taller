@@ -775,7 +775,7 @@ void Personaje::updateRevivir() {
 	Post: Se ha realizado un ataque en la direccion correspondiente del tile parametro.
 
 */
-unsigned int Personaje::ataque(Tile* tileDestino , Mapa* mapa) {
+unsigned int Personaje::ataque(Tile* tileDestino , Mapa* mapa, bool soloAnimacion) {
 	soundman.playSound("sword", this->getX(), this->getY());
 	return this -> ataque(tileDestino , mapa, NULL);
 }
@@ -788,7 +788,12 @@ unsigned int Personaje::ataque(Tile* tileDestino , Mapa* mapa) {
 	Post: Se ha realizado un ataque en la direccion correspondiente del tile parametro.
 
 */
-unsigned int Personaje::ataque(Tile* tileDestino , Mapa* mapa , Personaje* personajeObjetivo) {
+unsigned int Personaje::ataque(Tile* tileDestino , Mapa* mapa , Personaje* personajeObjetivo, bool soloAnimacion) {
+	soundman.playSound("sword", this->getX(), this->getY());
+	//Solo avisa si el que ejecuto es el personaje local
+	BitStream bs;
+	bs << PROTO::ATACAR << getNick() << personajeObjetivo->getNick();
+	if (pjm.getPjeLocal().getNick() == getNick()) sock.send(bs.str());
 	unsigned int retorno = Personaje::ATACAR_COMPLETADO;
 	// chequeo que el tileDestino y el mapa sean diferentes de null
 	if ( (tileDestino != NULL) && (mapa != NULL)) {
@@ -848,7 +853,7 @@ unsigned int Personaje::ataque(Tile* tileDestino , Mapa* mapa , Personaje* perso
 	// Ataque al personaje
 	if (this -> getArmaActiva() != NULL){
 		// pone en ejecucion la animacion y quita energia al personaje de acuerdo al arma
-		this -> getArmaActiva() -> atacar(mapa,tileDestino,personajeObjetivo);
+		this -> getArmaActiva() -> atacar(mapa,tileDestino,personajeObjetivo,soloAnimacion);
 	}
 	return retorno;
 }

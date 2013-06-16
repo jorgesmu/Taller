@@ -461,15 +461,20 @@ void ClientSocket::listenDo() {
 				consola.log(ss.str());
 			}
 		}else if(pt == PROTO::ATACAR) {
-			std::string who_nick;
-			bs >> who_nick;
+			std::string nick_who,nick_to;
+			bs >> nick_who >> nick_to;
 			// Si no existe el personaje, error
-			if(!pjm.PjeExiste(who_nick)) {
-				std::cerr << "Error @ ATACAR: " << who_nick << " not found\n";
+			if(!pjm.PjeExiste(nick_who)) {
+				std::cerr << "Error @ ATACAR: " << nick_who << " not found\n";
 			}else{
-				// Si existe, lo marcamos como desconectado
-				auto& p = pjm.getPje(who_nick);
-				p.ataque(NULL, &mapa);
+				// Si existe, que ataque
+				auto& atacante = pjm.getPje(nick_who);
+				auto& atacado = pjm.getPjeLocal();
+				if (!(pjm.getPjeLocal().getNick() == nick_to)) {
+					atacado = pjm.getPje(nick_to);
+				}
+				cout << "Ataco " << nick_who << endl;
+				atacante.ataque(atacado.getPosicion(&mapa),&mapa,&atacado,true);
 			}
 		}else if(pt == PROTO::DEFENDER) {
 			std::string who_nick;

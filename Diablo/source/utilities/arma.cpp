@@ -565,7 +565,7 @@ unsigned int Arma::update(Mapa* mapa) {
 
 */
 
-unsigned int Arma::atacar(Mapa* mapa, Tile* tileDestino , Personaje* personaje) {
+unsigned int Arma::atacar(Mapa* mapa, Tile* tileDestino , Personaje* personaje, bool soloAnimacion) {
 	unsigned int retorno = Personaje::ATACAR_COMPLETADO;
 	// chequeo que el tileDestino y el mapa sean diferentes de null
 	if ( (tileDestino != NULL) && (mapa != NULL) && (personaje != NULL)) {
@@ -590,7 +590,7 @@ unsigned int Arma::atacar(Mapa* mapa, Tile* tileDestino , Personaje* personaje) 
 				if (imagenArma != NULL){
 					imagenArma -> setAccion(direccionAtaque);
 					//ataque a personaje
-					dañarPersonaje(personaje);
+					if (!soloAnimacion) dañarPersonaje(personaje);
 				}
 			}else {
 				if (deltaX < 0) {
@@ -616,7 +616,7 @@ unsigned int Arma::atacar(Mapa* mapa, Tile* tileDestino , Personaje* personaje) 
 				if (imagenArma != NULL){
 					imagenArma -> setAccion(direccionAtaque);
 					//ataque a personaje
-					dañarPersonaje(personaje);
+					if (!soloAnimacion) dañarPersonaje(personaje);
 				}
 			
 			}

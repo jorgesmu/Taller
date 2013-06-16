@@ -432,6 +432,7 @@ int main(int argc, char* argv[]) {
 					
 					switch (event.key.keysym.sym) {
 						case 'a' : {
+							/*
 							int posX = -1;	
 							int posY = -1;
 							SDL_GetMouseState(&posX, &posY);
@@ -449,13 +450,13 @@ int main(int argc, char* argv[]) {
 								}
 								if (found_pje){
 									if (personaje->getNick() != pjm.getPjeLocal().getNick()) {
-										pjm.getPjeLocal().ataque(tileDestino , &mapa , personaje);
+										pjm.getPjeLocal().ataque(tileDestino , &mapa , personaje, false);
 									}
 								}
 							} else {
-								pjm.getPjeLocal().ataque(NULL , &mapa);
+								pjm.getPjeLocal().ataque(NULL , &mapa, false);
 							}
-							
+							*/
 							//BitStream bs;
 							//bs << PROTO::ATACAR << pjm.getPjeLocal().getNick();
 							//sock.send(bs.str());
@@ -980,7 +981,7 @@ int main(int argc, char* argv[]) {
 										Timer& timer = pjm.getPjeLocal().getTimerAtaque();
 										if (!timer.isStarted() || timer.getTicks() > 1000) {
 											timer.start();
-											pjm.getPjeLocal().ataque(tilePersonajeObjetivo,&mapa,personajeObjetivo);
+											pjm.getPjeLocal().ataque(tilePersonajeObjetivo,&mapa,personajeObjetivo,false);
 										}
 										
 									}

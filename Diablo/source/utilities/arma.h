@@ -139,7 +139,7 @@ public:
 		Post: Se ha realizado un ataque en la direccion correspondiente del tile parametro.
 
 	*/
-	virtual unsigned int atacar(Mapa* mapa, Tile* tileDestino,Personaje* personaje);		 
+	virtual unsigned int atacar(Mapa* mapa, Tile* tileDestino,Personaje* personaje, bool soloAnimacion);		 
 
 	void accionEspecial();
 

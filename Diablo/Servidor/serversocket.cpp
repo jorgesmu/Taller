@@ -681,13 +681,13 @@ void ServerSocket::acceptLastDo() {
 				//std::cout << "RECEIVED NIEBLA SYNC: " << new_tile_x << "," << new_tile_y << "\n";
 			}else if(pt == PROTO::ATACAR) {
 				std::cout << "RECV: ATACAR\n";
-				std::string nick_atacante;
-				bs >> nick_atacante;
+				std::string nick_who,nick_to;
+				bs >> nick_who >> nick_to;
 				// Avisamos a los otros jugadores del nuevo jugador
 				for(auto it = clients_map.begin();it != clients_map.end();it++) {
 					if(it->second.nick == new_nick) continue; // Salteamos a nuestro jugador
 					BitStream bs;
-					bs << PROTO::ATACAR << nick_atacante;
+					bs << PROTO::ATACAR << nick_who << nick_to;
 					it->second.send(bs.str());
 				}
 			}else if(pt == PROTO::DEFENDER) {

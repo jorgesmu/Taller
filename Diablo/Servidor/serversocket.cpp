@@ -1487,13 +1487,13 @@ void ServerSocket::acceptLastDo() {
 						it->second.send(bs.str());
 					}
 
-				}/*else if(pm.golemExists(nick_who)){
+				}else if(pm.golemExists(nick_who)){
 					bs.clear();
 					bs << PROTO::ENEMY_DEAD << nick_who;
 					for(auto it = clients_map.begin();it != clients_map.end();it++) {
 						it->second.send(bs.str());
 					}
-				}*/
+				}
 			}else{
 				assert(false);
 				bs.clear();

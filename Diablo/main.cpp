@@ -800,6 +800,23 @@ int main(int argc, char* argv[]) {
 						break;
 					}
 				}
+
+				//si donde revivo hay entidades, choca
+				std::vector<Entidad*> entidades=pjm.getPjeLocal().getPosicion(&mapa)->getEntidades();
+				std::list<Entidad*> entidadesChocadas; //asi evito chocar dos veces, con la entidad y con el ancla
+				bool yaChoco=false;
+				entidadesChocadas.push_back(&pjm.getPjeLocal()); //sino choca con si mismo
+				for (auto it=entidades.begin();it!=entidades.end();it++) {
+					//Veo si ya choque con esta entidad
+					for (auto it2=entidadesChocadas.begin(); it2!=entidadesChocadas.end(); it2++) {
+						if ((*it2)==(*it)) yaChoco=true;
+					}
+					if (!yaChoco) {
+						(*it)->chocarCon(&pjm.getPjeLocal());
+						entidadesChocadas.push_back(*it);
+					}
+					yaChoco = false;
+				}
 			}
 
 			// Actualiza la camara

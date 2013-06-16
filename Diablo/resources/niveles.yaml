@@ -86,8 +86,8 @@ entidades:
     caminable: false
 
 
-  - nombre: caballeroRojo
-    imagen: ../resources/caballeroRojo.png
+  - nombre: golem
+    imagen: ../resources/golem.png
     fps: 10
     pixel_ref_x: 20
     pixel_ref_y: 20

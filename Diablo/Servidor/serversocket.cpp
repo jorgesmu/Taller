@@ -191,23 +191,13 @@ Client& ServerSocket::getClient(const std::string& id) {
 
 // Funcion de send
 bool ServerSocket::send(const std::string& cid, const std::string& msg) {
-	EnterCriticalSection(&critSect);
-	SOCKET sock = getClient(cid).sock;
-	if(sock == SOCKET_ERROR) {
-		std::cerr << "Cliente invalid pasado a send(): " << cid << "\n";
-		LeaveCriticalSection(&critSect);
-		return false;
-	}
-	LeaveCriticalSection(&critSect);
-	return this->send(sock, msg);
+	return getClient(cid).send(msg);
 }
 
 // Funcion de send
-bool ServerSocket::send(SOCKET sock, const std::string& msg) {
-	EnterCriticalSection(&critSect);
+bool Client::send(const std::string& msg) {
 	if(sock == SOCKET_ERROR) {
 		std::cerr << "Cliente invalid pasado a send(): " << sock << "\n";
-		LeaveCriticalSection(&critSect);
 		return false;
 	}
 
@@ -217,11 +207,9 @@ bool ServerSocket::send(SOCKET sock, const std::string& msg) {
 	int res = ::send(sock, bs.str().c_str(), bs.str().size(), 0);
 	if(res == SOCKET_ERROR) {
 		std::cerr << "Error enviando mensaje: " << WSAGetLastError() << "\n";
-		LeaveCriticalSection(&critSect);
 		return false;
 	}else{
 		//std::cout << "Se enviaron " << res << " bytes: " << bs.str() << "\n";
-		LeaveCriticalSection(&critSect);
 		return true;
 	}
 }
@@ -238,92 +226,85 @@ bool ServerSocket::sendAll(const std::string& msg) {
 
 // Funcion de receive
 bool ServerSocket::receive(const std::string& cid, std::string& buff) {
-	EnterCriticalSection(&critSect);
-	auto& c = getClient(cid);
-	SOCKET sock = c.sock;
-	if(sock == SOCKET_ERROR) {
-		std::cerr << "Cliente invalid pasado a receive(): " << cid << "\n";
-		LeaveCriticalSection(&critSect);
-		return false;
-	}
-	c.packet.clear();
-	c.packet_size = -1;
-	c.bytes_read = 0;
+	return getClient(cid).receive(buff);
+}
+
+// Funcion de receive
+bool Client::receive(std::string& buff) {
+
+	packet.clear();
+	packet_size = -1;
+	bytes_read = 0;
 	// Loop until we read a full packet
-	
 	while(true) {
-		c.tmp.clear();
+		tmp.clear();
 		// If we have something in the queue, push it it
-		if(c.queue_buf.size() > 0) {
-			c.tmp.append(c.queue_buf);
+		if(queue_buf.size() > 0) {
+			tmp.append(queue_buf);
 			//std::cout << "APPENDING FROM QUEUE (" << c.queue_buf.size() << ")\n";
-			c.bytes_read += c.queue_buf.size();
-			c.queue_buf.clear();
+			bytes_read += queue_buf.size();
+			queue_buf.clear();
 		}
 		// If we have an empty packet, read the size first
-		if(c.packet_size == -1 && c.tmp.size() >= 2) {
+		if(packet_size == -1 && tmp.size() >= 2) {
 			// First 2 bytes 
 			unsigned char buf[sizeof(short)];
-			std::copy(c.tmp.begin(), c.tmp.begin()+sizeof(short), buf);
-			c.packet_size = *(reinterpret_cast<short*>(&buf));
-			c.packet_size += sizeof(short); // Add the size size
-			//std::cout << "Got a packet with size: " << c.packet_size << "\n";
+			std::copy(tmp.begin(), tmp.begin()+sizeof(short), buf);
+			packet_size = *(reinterpret_cast<short*>(&buf));
+			packet_size += sizeof(short); // Add the size size
+			//std::cout << "Got a packet with size: " << packet_size << "\n";
 			//std::cout << tmp << "\n";
-			c.tmp = c.tmp.substr(sizeof(short)); // Remove the 2 byte prefix		
+			tmp = tmp.substr(sizeof(short)); // Remove the 2 byte prefix		
 		}
 
 		// We finish the loop if we've read our packet size and we've already reached it
-		if(c.packet_size != -1 ) {
-			if(c.bytes_read > c.packet_size) {
+		if(packet_size != -1 ) {
+			if(bytes_read > packet_size) {
 				//std::cout << "Got more: " << c.bytes_read << "," << c.packet_size << "-----------------------------------\n";
 				// Trim and store
 				//std::cout << "Delta: " << c.bytes_read - c.packet_size << "\n";
-				c.queue_buf = c.tmp.substr(c.tmp.size() - (c.bytes_read - c.packet_size));
+				queue_buf = tmp.substr(tmp.size() - (bytes_read - packet_size));
 				//std::cout << "STORING EXTRA (" << c.queue_buf.size() << ")\n";
-				c.packet.append(c.tmp.substr(0, c.packet_size-sizeof(short)));
+				packet.append(tmp.substr(0, packet_size-sizeof(short)));
 				//std::cout << "APPENDING " << c.packet_size << "\n";
-				buff = c.packet;
+				buff = packet;
 				//std::cout << "DONE WITH PACKET\n";
 				//std::cout << buff << "\n";
-				LeaveCriticalSection(&critSect);
 				return true;
-			}else if(c.bytes_read == c.packet_size) {
-				c.packet.append(c.tmp);
-				buff = c.packet;
+			}else if(bytes_read == packet_size) {
+				packet.append(tmp);
+				buff = packet;
 				//std::cout << "Got exact\n";
 				//std::cout << "DONE WITH PACKET\n";
 				//std::cout << buff << "\n";
-				LeaveCriticalSection(&critSect);
 				return true;
-			}else if(c.bytes_read < c.packet_size) {
+			}else if(bytes_read < packet_size) {
 				//std::cout << "Got less||||||||||||||||||||||||||||||||||||||||\n";
-				c.packet.append(c.tmp);
+				packet.append(tmp);
 			}
 		}
-		LeaveCriticalSection(&critSect);
+		std::cout << bytes_read << "==";
+		//std::cout << "RECEIVING " << cid << "...";
+		char recvbuf[DEFAULT_BUFLEN];
 		int res = ::recv(sock, recvbuf, DEFAULT_BUFLEN, 0);
-		EnterCriticalSection(&critSect);
+		//std::cout << "OK\n";
+		std::cout << bytes_read << "\n";
 		if(res > 0) {
 			//bytes_read += res;
 			//std::cout << "Read " << res << " bytes\n";
 			//std::cout << "BytesRead: " << c.bytes_read << "\n";
-			c.queue_buf.append(recvbuf, res);
-			//std::cout << "(" << c.queue_buf.size() << ") " << c.queue_buf << "\n";
+			queue_buf.append(recvbuf, res);
+			//std::cout << "(" << queue_buf.size() << ") " << queue_buf << "\n";
 		}else if(res == 0) {
 			std::cout << "Connection closed\n";
-			LeaveCriticalSection(&critSect);
 			return false;
 		}else{
 			std::cout << "Receive error: " << WSAGetLastError() << "\n";
-			LeaveCriticalSection(&critSect);
 			return false;
 		}
-		//LeaveCriticalSection(&critSect);
 	}
-	LeaveCriticalSection(&critSect);
 	return false;
 }
-
 
 // Funciones para eliminar un cliente (desconectarlo)
 bool ServerSocket::removeClient(const std::string& str_id) {
@@ -530,17 +511,17 @@ void ServerSocket::acceptLastDo() {
 			BitStream bs;
 			
 			bs << PROTO::NEW_PLAYER << new_nick << p_local.getTipo() << p_local.getX() << p_local.getY() << p_local.isOn();
-			send(it->second.sock, bs.str());
+			it->second.send(bs.str());
 			//Mando los atributos principales del jugador
 			bs.clear();
 			auto& p=pm.getPlayer(new_nick);
 			//cout << "Send a " << it->second.nick << " vel de " << new_nick << " " << p.getVelocidad() << endl;
 			bs << PROTO::INIT_ATT << new_nick << (float)p.getVelocidad() << p.getEnergia() << p.getMagia() << p.getEnergiaEscudo() << p.getTerremoto() << p.getHielo() << (float)p.getRadio() << (bool)p.getBolaDeCristal() << (bool)p.tieneGolem() << p.tieneTransmut();
-			send(it->second.sock,bs.str());
+			it->second.send(bs.str());
 			if (pm.getPlayer(new_nick).isCongelado()) {
 				bs.clear();
 				bs << PROTO::CONGELAR << std::string("RESTORE") << new_nick;
-				send(it->second.sock,bs.str());
+				it->second.send(bs.str());
 			}
 		}
 
@@ -666,7 +647,7 @@ void ServerSocket::acceptLastDo() {
 				int found_count = 0;
 				for(auto it = clients_map.begin();it != clients_map.end();it++) {
 					if(it->second.nick == nick_source || it->second.nick == nick_destino) {
-						this->send(it->second.sock, bs.str());
+						it->second.send(bs.str());
 						found_count++;
 					}
 				}
@@ -707,7 +688,7 @@ void ServerSocket::acceptLastDo() {
 					if(it->second.nick == new_nick) continue; // Salteamos a nuestro jugador
 					BitStream bs;
 					bs << PROTO::ATACAR << nick_atacante;
-					send(it->second.sock, bs.str());
+					it->second.send(bs.str());
 				}
 			}else if(pt == PROTO::DEFENDER) {
 				std::string nick_atacante;
@@ -717,7 +698,7 @@ void ServerSocket::acceptLastDo() {
 					if(it->second.nick == new_nick) continue; // Salteamos a nuestro jugador
 					BitStream bs;
 					bs << PROTO::DEFENDER << nick_atacante;
-					send(it->second.sock, bs.str());
+					it->second.send(bs.str());
 				}
 			}else if(pt == PROTO::USE_ITEM) {
 				std::string nick_who;
@@ -742,7 +723,7 @@ void ServerSocket::acceptLastDo() {
 						bs << posBombaX << posBombaY;
 						std::cout << "Update a " << it->second.nick << " bomba en pos (" << posBombaX << "," << posBombaY << ")" << endl;
 					}
-					send(it->second.sock, bs.str());
+					it->second.send(bs.str());
 				}
 			}else if(pt == PROTO::LEAVE_ITEM) {
 				char item;
@@ -753,7 +734,7 @@ void ServerSocket::acceptLastDo() {
 					if(it->second.nick == new_nick) continue; // Salteamos a nuestro jugador
 					bs.clear();
 					bs << PROTO::LEAVE_ITEM << item << posItemX << posItemY;
-					send(it->second.sock, bs.str());
+					it->second.send(bs.str());
 					std::cout << "Update a " << it->second.nick << " item en pos (" << posItemX << "," << posItemY << ")" << endl;
 				}
 				addItem(item, posItemX, posItemY);
@@ -764,7 +745,7 @@ void ServerSocket::acceptLastDo() {
 					if(it->second.nick == new_nick) continue; // Salteamos a nuestro jugador
 					bs.clear();
 					bs << PROTO::BOMB_OFF << new_nick;
-					send(it->second.sock, bs.str());
+					it->second.send(bs.str());
 					std::cout << "Update a " << it->second.nick << ": bomba explotada de " << new_nick <<endl;
 				}
 			}else if(pt == PROTO::ITEM_OFF) {
@@ -775,7 +756,7 @@ void ServerSocket::acceptLastDo() {
 					if(it->second.nick == new_nick) continue; // Salteamos a nuestro jugador
 					bs.clear();
 					bs << PROTO::ITEM_OFF << x << y;
-					send(it->second.sock, bs.str());
+					it->second.send(bs.str());
 					std::cout << " agarro item en pos " << x << y << "\n";
 				}
 				removeItem(x,y);
@@ -828,7 +809,7 @@ void ServerSocket::acceptLastDo() {
 					if(it->second.nick == new_nick) continue; // Salteamos a nuestro jugador de avisarle
 					bs.clear();
 					bs << PROTO::DAMAGE << nick_who << nick_to << dmg;
-					send(it->second.sock, bs.str());
+					it->second.send(bs.str());
 				}
 				//aviso si murio enemigo o termine mision
 				if (murioPersonaje){
@@ -837,12 +818,12 @@ void ServerSocket::acceptLastDo() {
 						if(terminoMision){
 							//aviso a los demas que termino la mision
 							bs << PROTO::WINNER << nick_who;							
-							send(it->second.sock,bs.str());
+							it->second.send(bs.str());
 						}else{
 							//aviso a los demas que murio enemigo
 							bs << PROTO::ENEMY_DEAD << nick_to;
 						}
-						send(it->second.sock,bs.str());
+						it->second.send(bs.str());
 					}
 					if (terminoMision) Sleep(5000);
 					for(auto it = clients_map.begin();it != clients_map.end();it++) {
@@ -850,7 +831,7 @@ void ServerSocket::acceptLastDo() {
 							for (auto itP = pm.getPlayers().begin(); itP != pm.getPlayers().end(); itP++) {
 								bs.clear();
 								bs << PROTO::RESET_PLAYER << itP->first << itP->second.getXInicial() << itP->second.getYInicial();
-								send(it->second.sock,bs.str());
+								it->second.send(bs.str());
 								//std::cout << "Mandando reset de " << itP->first << " de la mision a " << it->second.nick << "\n";
 								itP->second.reiniciar();
 							}
@@ -871,11 +852,11 @@ void ServerSocket::acceptLastDo() {
 								for (auto itE = pm.getEnemies().begin(); itE != pm.getEnemies().end(); itE++) {							
 									bs.clear();
 									bs << PROTO::NEW_PLAYER << itE->second->getNick() << itE->second->getTipo() << itE->second->getX() << itE->second->getY() << itE->second-> isOn();
-									send(it->second.sock, bs.str());
+									it->second.send(bs.str());
 									//Mando los atributos principales del enemigo
 									bs.clear();
 									bs << PROTO::INIT_ATT << itE->second->getNick() << (float)itE->second->getVelocidad() << itE->second->getEnergia() << itE->second->getMagia() << itE->second->getEnergiaEscudo() << itE->second->getTerremoto() << itE->second->getHielo() << (float)itE->second->getRadio();
-									send(it->second.sock,bs.str());
+									it->second.send(bs.str());
 								}
 							}
 						}
@@ -897,7 +878,7 @@ void ServerSocket::acceptLastDo() {
 					if(it->second.nick == new_nick) continue; // Salteamos a nuestro jugador de avisarle
 					bs.clear();
 					bs << PROTO::CONGELAR << nick_who << nick_to;
-					send(it->second.sock, bs.str());
+					it->second.send(bs.str());
 				}
 			}else if(pt == PROTO::DESCONGELAR) {	
 				std::string nick_to;
@@ -915,7 +896,7 @@ void ServerSocket::acceptLastDo() {
 					if(it->second.nick == new_nick) continue; // Salteamos a nuestro jugador de avisarle
 					bs.clear();
 					bs << PROTO::DESCONGELAR << nick_to;
-					send(it->second.sock, bs.str());
+					it->second.send(bs.str());
 				}
 			}else if(pt == PROTO::UPDATE_ATT) {	
 				char tipoAtt;
@@ -990,7 +971,7 @@ void ServerSocket::acceptLastDo() {
 					} else {
 						bs << PROTO::UPDATE_ATT << tipoAtt << new_nick << nuevoValor;
 					}
-					send(it->second.sock, bs.str());
+					it->second.send(bs.str());
 					
 				}
 			}else if(pt == PROTO::DEF_ATT) {	
@@ -1033,7 +1014,7 @@ void ServerSocket::acceptLastDo() {
 					bs.clear();
 					bs << PROTO::DEF_ATT << new_nick << (float)p.getVelocidad() << p.getEnergia() << p.getMagia() << p.getEnergiaEscudo() << p.getTerremoto();
 					bs << p.getHielo() << p.getRadio() << p.getBolaDeCristal() << p.tieneGolem() << p.getCantBombas() << p.tieneTransmut();
-					send(it->second.sock, bs.str());
+					it->second.send(bs.str());
 					//cout << "Mandando def vel de " << new_nick << " a " << it->second.nick << " valor " << p.getVelocidad() << endl;
 				}
 			}else if(pt == PROTO::REQUEST_POS) {
@@ -1095,7 +1076,7 @@ void ServerSocket::acceptLastDo() {
 					bs << PROTO::MOVE_PLAYER << new_nick << x << y;
 					for(auto it = clients_map.begin();it != clients_map.end();it++) {
 						if(it->second.nick == new_nick) continue; // Salteamos el jugador en cuestion
-						send(it->second.sock, bs.str());
+						it->second.send(bs.str());
 						std::cout << "Mandando update a " << it->second.nick << "\n";
 						if(pm.getPlayer(it->second.nick).getBolaDeCristal()){
 							//si tiene bola de cristal le mando los tiles explorados del que se movio para que los agregue
@@ -1105,7 +1086,7 @@ void ServerSocket::acceptLastDo() {
 								bs << it2->first << it2->second;
 								pm.getPlayer(it->second.nick).addTileRecorrido(it2->first, it2->second);
 							}
-							send(it->second.sock, bs.str());
+							it->second.send(bs.str());
 						}
 					}
 				}else{
@@ -1163,7 +1144,7 @@ void ServerSocket::acceptLastDo() {
 								for(auto it = clients_map.begin();it != clients_map.end();it++) {
 										bs.clear();
 										bs << PROTO::MOVE_PLAYER << nickPersonajeActualizado << proxTile->get_x() << proxTile->get_y() ;
-										send(it->second.sock, bs.str());
+										it->second.send(bs.str());
 										//std::cout << "Mandando update de enemigo a " << it->second.nick << "\n";
 								}
 							}
@@ -1200,7 +1181,7 @@ void ServerSocket::acceptLastDo() {
 								for(auto it = clients_map.begin();it != clients_map.end();it++) {
 										bs.clear();
 										bs << PROTO::MOVE_PLAYER << nickPersonajeActualizado << proxTile->get_x() << proxTile->get_y() ;
-										send(it->second.sock, bs.str());
+										it->second.send(bs.str());
 										std::cout << "Mandando update de enemigo a " << it->second.nick << "\n";
 								}
 							}
@@ -1219,7 +1200,7 @@ void ServerSocket::acceptLastDo() {
 					bs.clear();
 					bs << PROTO::WINNER << pm.getPlayer(new_nick).ultimoAtacante();
 					for(auto it = clients_map.begin();it != clients_map.end();it++) {
-						send(it->second.sock, bs.str());
+						it->second.send(bs.str());
 						std::cout << "Mandando ganador de la mision a " << it->second.nick << "\n";
 					}
 					Sleep(5000);
@@ -1274,7 +1255,7 @@ void ServerSocket::acceptLastDo() {
 					bs << PROTO::REV_PLAYER << new_nick << x << y;
 					for(auto it = clients_map.begin();it != clients_map.end();it++) {
 						if(it->second.nick == new_nick) continue; // Salteamos el jugador en cuestion
-						send(it->second.sock, bs.str());
+						it->second.send(bs.str());
 						std::cout << "Mandando update de revivir a " << it->second.nick << "\n";
 					}
 					pm.getPlayer(new_nick).descongelar();
@@ -1296,7 +1277,7 @@ void ServerSocket::acceptLastDo() {
 						bs.clear();
 						bs << PROTO::WINNER << new_nick;
 						for(auto it = clients_map.begin();it != clients_map.end();it++) {
-							send(it->second.sock, bs.str());
+							it->second.send(bs.str());
 							std::cout << "Mandando ganador de la mision a " << it->second.nick << "\n";
 						}
 						Sleep(6000);
@@ -1304,7 +1285,7 @@ void ServerSocket::acceptLastDo() {
 							for (auto itP = pm.getPlayers().begin(); itP != pm.getPlayers().end(); itP++) {
 								bs.clear();
 								bs << PROTO::RESET_PLAYER << itP->first << itP->second.getXInicial() << itP->second.getYInicial();
-								send(it->second.sock,bs.str());
+								it->second.send(bs.str());
 								std::cout << "Mandando reset de " << itP->first << " de la mision a " << it->second.nick << "\n";
 								itP->second.reiniciar();
 							}
@@ -1327,11 +1308,11 @@ void ServerSocket::acceptLastDo() {
 							for (auto itE = pm.getEnemies().begin(); itE != pm.getEnemies().end(); itE++) {							
 								bs.clear();
 								bs << PROTO::NEW_PLAYER << itE->second->getNick() << itE->second->getTipo() << itE->second->getX() << itE->second->getY() << itE->second-> isOn();
-								send(it->second.sock, bs.str());
+								it->second.send(bs.str());
 								//Mando los atributos principales del enemigo
 								bs.clear();
 								bs << PROTO::INIT_ATT << itE->second->getNick() << (float)itE->second->getVelocidad() << itE->second->getEnergia() << itE->second->getMagia() << itE->second->getEnergiaEscudo() << itE->second->getTerremoto() << itE->second->getHielo() << (float)itE->second->getRadio();
-								send(it->second.sock,bs.str());
+								it->second.send(bs.str());
 							}
 						}
 					}
@@ -1351,11 +1332,11 @@ void ServerSocket::acceptLastDo() {
 				for(auto it = clients_map.begin();it != clients_map.end();it++) {
 					bs.clear();
 					bs << PROTO::NEW_PLAYER << unGolem->getNick() << unGolem->getTipo() << unGolem->getX() << unGolem->getY() << unGolem-> isOn();
-					send(it->second.sock, bs.str());
+					it->second.send(bs.str());
 					//Mando los atributos principales del jugador
 					bs.clear();
 					bs << PROTO::INIT_ATT << unGolem->getNick() << (float)unGolem->getVelocidad() << unGolem->getEnergia() << unGolem->getMagia() << unGolem->getEnergiaEscudo() << unGolem->getTerremoto() << unGolem->getHielo() << (float)unGolem->getRadio();
-					send(it->second.sock,bs.str());
+					it->second.send(bs.str());
 				}
 			
 
@@ -1370,7 +1351,7 @@ void ServerSocket::acceptLastDo() {
 					bs.clear();
 					bs << PROTO::TRANSMUT << tipo << nick;
 					for(auto it = clients_map.begin();it != clients_map.end();it++) {
-						send(it->second.sock, bs.str());
+						it->second.send(bs.str());
 					}
 					// Lo congelo para que no pueda moverse
 					if (pm.enemyExists(nick)) {
@@ -1396,7 +1377,7 @@ void ServerSocket::acceptLastDo() {
 						bs.clear();
 						bs << PROTO::UPDATE_ATT << ATT::VEL << nick << (float)pm.getPlayer(nick).getVelocidad();
 						for(auto it = clients_map.begin();it != clients_map.end();it++) {
-							send(it->second.sock, bs.str());
+							it->second.send(bs.str());
 						}
 					}
 					if (pm.enemyExists(nick)) {
@@ -1412,7 +1393,7 @@ void ServerSocket::acceptLastDo() {
 						bs.clear();
 						bs << PROTO::UPDATE_ATT << ATT::VEL << nick << (float)pm.getEnemy(nick)->getVelocidad();
 						for(auto it = clients_map.begin();it != clients_map.end();it++) {
-							send(it->second.sock, bs.str());
+							it->second.send(bs.str());
 						}
 					}
 					if (pm.golemExists(nick)) {
@@ -1428,7 +1409,7 @@ void ServerSocket::acceptLastDo() {
 						bs.clear();
 						bs << PROTO::UPDATE_ATT << ATT::VEL << nick << (float)pm.getGolem(nick)->getVelocidad();
 						for(auto it = clients_map.begin();it != clients_map.end();it++) {
-							send(it->second.sock, bs.str());
+							it->second.send(bs.str());
 						}
 					}
 				}
@@ -1442,7 +1423,7 @@ void ServerSocket::acceptLastDo() {
 					bs.clear();
 					bs << PROTO::DESTRANSMUT << tipo << nick;
 					for(auto it = clients_map.begin();it != clients_map.end();it++) {
-						send(it->second.sock, bs.str());
+						it->second.send(bs.str());
 					}
 					// Lo descongelo para que pueda volver a moverse
 					if (pm.enemyExists(nick)) {
@@ -1460,7 +1441,7 @@ void ServerSocket::acceptLastDo() {
 						bs.clear();
 						bs << PROTO::UPDATE_ATT << ATT::VEL << nick << (float)pm.getPlayer(nick).getVelocidad();
 						for(auto it = clients_map.begin();it != clients_map.end();it++) {
-							send(it->second.sock, bs.str());
+							it->second.send(bs.str());
 						}
 					}
 					if (pm.enemyExists(nick)) {
@@ -1470,7 +1451,7 @@ void ServerSocket::acceptLastDo() {
 						bs.clear();
 						bs << PROTO::UPDATE_ATT << ATT::VEL << nick << (float)pm.getEnemy(nick)->getVelocidad();
 						for(auto it = clients_map.begin();it != clients_map.end();it++) {
-							send(it->second.sock, bs.str());
+							it->second.send(bs.str());
 						}
 					}
 					if (pm.golemExists(nick)) {
@@ -1480,7 +1461,7 @@ void ServerSocket::acceptLastDo() {
 						bs.clear();
 						bs << PROTO::UPDATE_ATT << ATT::VEL << nick << (float)pm.getGolem(nick)->getVelocidad();
 						for(auto it = clients_map.begin();it != clients_map.end();it++) {
-							send(it->second.sock, bs.str());
+							it->second.send(bs.str());
 						}
 					}
 				}
@@ -1499,14 +1480,14 @@ void ServerSocket::acceptLastDo() {
 					bs.clear();
 					bs << PROTO::ENEMY_DEAD << nick_who;
 					for(auto it = clients_map.begin();it != clients_map.end();it++) {
-						send(it->second.sock, bs.str());
+						it->second.send(bs.str());
 					}
 
 				}/*else if(pm.golemExists(nick_who)){
 					bs.clear();
 					bs << PROTO::ENEMY_DEAD << nick_who;
 					for(auto it = clients_map.begin();it != clients_map.end();it++) {
-						send(it->second.sock, bs.str());
+						it->second.send(bs.str());
 					}
 				}*/
 			}else{

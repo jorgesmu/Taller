@@ -461,43 +461,50 @@ void Personaje::calcularPosicionTentativa(unsigned int direccion ,
 Tile* Personaje::obtenerTileAncla(const int posX , const int posY , 
 												const unsigned int direccion , Mapa* mapa){
 	Tile* retorno = NULL;
-	bool explorado = false;
+	bool hallado = false;
 	// Sur
 	int posImagenX = posX;
-	int posImagenY = posY + Tile::TILE_ALTO + Personaje::MARGEN_ANCLA_Y;
+	int posImagenY = posY + Tile::TILE_ALTO;
 	retorno = mapa -> getTilePorPixeles(posImagenX , posImagenY);
 	// verifico si ha sido explorado
 	if (retorno != NULL) {
 		for(auto it = pjm.getPjeLocal().tilesExplorados.begin(); it != pjm.getPjeLocal().tilesExplorados.end(); ++it){
 			if ( ((*it) -> getU() == retorno -> getU()) && ( (*it) -> getV() == retorno -> getV())){
-				explorado = true;
+				int deltaX = pjm.getPjeLocal().getXAnclajeNiebla() - (*it)->getX();
+				int deltaY = pjm.getPjeLocal().getYAnclajeNiebla() - (*it)->getY();
+				hallado = ((abs(deltaX) <= pjm.getPjeLocal().getRadioX()) && (abs(deltaY) <= pjm.getPjeLocal().getRadioY()));
 			}
 		}
 	}
-	if (!explorado){
+	if (!hallado){
 		// Sureste
-		posImagenY = posY + Tile::TILE_ALTO;
+		posImagenX = posX + Tile::TILE_ANCHO/2;
+		posImagenY = posY + Tile::TILE_ALTO/2;
 		retorno = mapa -> getTilePorPixeles(posImagenX , posImagenY);
 		if (retorno != NULL) {
 			for(auto it = pjm.getPjeLocal().tilesExplorados.begin(); it != pjm.getPjeLocal().tilesExplorados.end(); ++it){
 				if ( ((*it) -> getU() == retorno -> getU()) && ( (*it) -> getV() == retorno -> getV())){
-					explorado = true;
+					int deltaX = pjm.getPjeLocal().getXAnclajeNiebla() - (*it)->getX();
+					int deltaY = pjm.getPjeLocal().getYAnclajeNiebla() - (*it)->getY();
+					hallado = ((abs(deltaX) <= pjm.getPjeLocal().getRadioX()) && (abs(deltaY) <= pjm.getPjeLocal().getRadioY()));
 				}
 			}
 		}
-		if (!explorado) {
+		if (!hallado) {
 			// Este
-			posImagenX = posX - Tile::TILE_ANCHO;
-			posImagenY = posY + Tile::TILE_ALTO/2;
+			posImagenX = posX + Tile::TILE_ANCHO;
+			posImagenY = posY;
 			// verifico si ha sido explorado
 			if (retorno != NULL) {
 				for(auto it = pjm.getPjeLocal().tilesExplorados.begin(); it != pjm.getPjeLocal().tilesExplorados.end(); ++it){
 					if ( ((*it) -> getU() == retorno -> getU()) && ( (*it) -> getV() == retorno -> getV())){
-						explorado = true;
+						int deltaX = pjm.getPjeLocal().getXAnclajeNiebla() - (*it)->getX();
+						int deltaY = pjm.getPjeLocal().getYAnclajeNiebla() - (*it)->getY();
+						hallado = ((abs(deltaX) <= pjm.getPjeLocal().getRadioX()) && (abs(deltaY) <= pjm.getPjeLocal().getRadioY()));
 					}
 				}
 			}
-			if(!explorado) {
+			if(!hallado) {
 				// tile Suroeste
 				posImagenX = posX - Tile::TILE_ANCHO/2;
 				posImagenY = posY + Tile::TILE_ALTO/2;
@@ -506,11 +513,13 @@ Tile* Personaje::obtenerTileAncla(const int posX , const int posY ,
 				if (retorno != NULL) {
 					for(auto it = pjm.getPjeLocal().tilesExplorados.begin(); it != pjm.getPjeLocal().tilesExplorados.end(); ++it){
 						if ( ((*it) -> getU() == retorno -> getU()) && ( (*it) -> getV() == retorno -> getV())){
-							explorado = true;
+							int deltaX = pjm.getPjeLocal().getXAnclajeNiebla() - (*it)->getX();
+							int deltaY = pjm.getPjeLocal().getYAnclajeNiebla() - (*it)->getY();
+							hallado = ((abs(deltaX) <= pjm.getPjeLocal().getRadioX()) && (abs(deltaY) <= pjm.getPjeLocal().getRadioY()));
 						}
 					}
 				}
-				if(retorno == NULL) {
+				if(!hallado) {
 					// tile Actual
 					posImagenX = posX;
 					posImagenY = posY;
@@ -1840,6 +1849,7 @@ void Personaje::cambiarApariencia(const std::string& name,ResMan& rm , const int
 		unsigned int accionActual = imagenPersonaje->getAccionActual();
 		unsigned int accionSiguiente = imagenPersonaje ->getAccionSiguiente();
 		delete(this -> imagen);
+		this -> name = name;
 		this -> imagen	= new ImagenPersonaje(name.c_str() , altoSprite , 
 								anchoSprite , fps , delay , rm ,colorKey);	
 		imagenPersonaje = static_cast<ImagenPersonaje*>(this->imagen);

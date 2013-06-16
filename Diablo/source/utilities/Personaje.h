@@ -297,6 +297,9 @@ public:
 	//Animaciones
 	void animacionPiedra();
 
+	//Cambio de direccion
+	void cambiarDireccion(unsigned int nuevaDir);
+
 	// Para limitar el ataque
 	Timer& getTimerAtaque() { return timerAtaque; }
 
@@ -549,6 +552,8 @@ public:
 	void setBombaY(int pos) { posBombaY=pos; }
 
 	int getBombaY() { return posBombaY; }
+
+	//virtual void actualizarImagen(const unsigned int direccion);
 
 protected:
 

@@ -107,6 +107,8 @@ const unsigned char DEF_ATT = 'Q';
 const unsigned char ITEM_OFF = 'R';
 // Reinicia el estado del jugador, empieza mision otra vez
 const unsigned char RESET_PLAYER = 'S';
+// Avisa que cambio la direccion donde mira el jugador
+const unsigned char CHANGE_DIR = 'T';
 }
 
 // Cosas de movimiento

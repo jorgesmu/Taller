@@ -97,7 +97,7 @@ void Personaje::inicializarAtributosEnValoresDefault() {
 	this->energia=this->ENERGIA_TOTAL;
 	this->magia=this->MAGIA_TOTAL;
 	this->flechas=0;
-	this->bombas=0;
+	this->bombas=10;
 	this->granadas=0;
 	this->varita=false;
 	this->energiaEscudo=0;
@@ -704,6 +704,10 @@ void Personaje::actualizarImagen(const unsigned int direccion){
 			}
 		}
 	}
+	//Aviso al server
+	/*BitStream bs;
+	bs << PROTO::CHANGE_DIR << imagenPersonaje->getAccionActual();
+	sock.send(bs.str());*/
 }
 
 /*
@@ -1010,6 +1014,14 @@ void Personaje::animacionRevivir() {
 	this -> tileDestino = NULL;
 	if (imagenPersonaje != NULL){
 		imagenPersonaje -> setAccion(ImagenPersonaje::EST_SUR);
+	}
+}
+
+void Personaje::cambiarDireccion(unsigned int nuevaDir) {
+	ImagenPersonaje* imagenPersonaje = static_cast<ImagenPersonaje*> (this -> imagen);
+	this -> tileDestino = NULL;
+	if (imagenPersonaje != NULL){
+		imagenPersonaje -> setAccion(nuevaDir);
 	}
 }
 

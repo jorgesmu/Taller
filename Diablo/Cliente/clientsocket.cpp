@@ -487,6 +487,12 @@ void ClientSocket::listenDo() {
 				auto& p = pjm.getPje(who_nick);
 				p.defender(NULL, &mapa);
 			}
+		}else if(pt == PROTO::CHANGE_DIR) {
+			std::string nick_who;
+			bs >> nick_who;
+			unsigned int nuevaDir;
+			bs >> nuevaDir;
+			//pjm.getPje(nick_who).actualizarImagen(nuevaDir);
 		}else if(pt == PROTO::POS_REQUEST_REPLY) {
 			bool reply;
 			bs >> reply;

@@ -174,7 +174,7 @@ int main(int argc, char* argv[]) {
 					std::string nick = "Enemigo1";
 					bs << PROTO::MOVE_PLAYER << nick << 2 <<2 ;
 
-					sock.send(it->second.sock, bs.str());
+					sock.it->second.send(bs.str());
 					std::cout << "Mandando update a " << it->second.nick << "\n";
 					mando = true;
 				}

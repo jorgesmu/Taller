@@ -28,6 +28,8 @@ struct Client {
 	std::string queue_buf;
 	std::string packet, tmp;
 	int bytes_read, packet_size;
+	bool receive(std::string& buff);
+	bool send(const std::string& msg);
 };
 
 class ServerSocket {
@@ -38,7 +40,6 @@ class ServerSocket {
 	static size_t ref_count;
 	// Variables para manejo del socket
 	SOCKET ListenSocket;
-	char recvbuf[DEFAULT_BUFLEN];
 	// Mutex para el acceso a la data de clientes
 	CRITICAL_SECTION critSect;
 	// Queue de clientes aceptados pero que no estan siendo escuchados
@@ -79,7 +80,6 @@ class ServerSocket {
 	bool removeClient(const SOCKET& sock);
 	// Funcion de send - toma como parametro el ID de la conexion a mandar y el mensaje
 	bool send(const std::string& cid, const std::string& msg);
-	bool send(SOCKET sock, const std::string& msg);
 	// Funcion para enviar a todos los clientes
 	bool sendAll(const std::string& msg);
 	// Cierra el socket y todas sus conexiones

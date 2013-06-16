@@ -384,11 +384,11 @@ void Enemigo::atacar(string& NickAtacado,PlayerManager& pm,ServerSocket& socks){
 		//ataco con la danio
 		bs.clear();
 		bs << PROTO::ATACAR << this->getNick();
-		socks.send(it->second.sock, bs.str());
+		it->second.send(bs.str());
 		//mando danio
 		bs.clear();
 		bs << PROTO::DAMAGE << this->getNick() << NickAtacado << danio;
-		socks.send(it->second.sock, bs.str());
+		it->second.send(bs.str());
 		//aviso si murio
 		if(murio){
 			//Veo si termino la mision
@@ -396,12 +396,12 @@ void Enemigo::atacar(string& NickAtacado,PlayerManager& pm,ServerSocket& socks){
 				if (mision.enemigoMision() == NickAtacado) {
 					bs.clear();
 					bs << PROTO::WINNER << pm.getEnemy(NickAtacado)->ultimoAtacante();
-					socks.send(it->second.sock, bs.str());
+					it->second.send(bs.str());
 				}
 			} else {
 				bs.clear();
 				bs << PROTO::ENEMY_DEAD << NickAtacado;
-				socks.send(it->second.sock, bs.str());
+				it->second.send(bs.str());
 			}
 		}
 	}

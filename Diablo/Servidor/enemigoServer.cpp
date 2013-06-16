@@ -1,6 +1,7 @@
 #include "enemigoServer.h"
 #include "playerman.h"
 #include <vector>
+#include <iostream>
 #include <algorithm>
 #include "../source/net/bitstream.h"
 #include "../source/net/defines.h"
@@ -389,6 +390,7 @@ void Enemigo::atacar(string& NickAtacado,PlayerManager& pm,ServerSocket& socks){
 		bs.clear();
 		bs << PROTO::DAMAGE << this->getNick() << NickAtacado << danio;
 		it->second.send(bs.str());
+		std::cout << "Update " << it->second.nick << " que " << this->getNick() << "->" << NickAtacado << endl;
 		//aviso si murio
 		if(murio){
 			//Veo si termino la mision

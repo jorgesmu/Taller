@@ -534,7 +534,7 @@ void ServerSocket::acceptLastDo() {
 			send(cid, bs.str());
 			//Mando los atributos principales del jugador
 			bs.clear();
-			bs << PROTO::INIT_ATT << it->first << (float)p.getVelocidad() << p.getEnergia() << p.getMagia() << p.getEnergiaEscudo() << p.getTerremoto() << p.getHielo() << (float)p.getRadio();
+			bs << PROTO::INIT_ATT << it->first << (float)p.getVelocidad() << p.getEnergia() << p.getMagia() << p.getEnergiaEscudo() << p.getTerremoto() << p.getHielo() << (float)p.getRadio() << (bool)p.getBolaDeCristal() << (bool)p.tieneGolem() << p.tieneTransmut();
 			send(cid,bs.str());
 		}
 		// Mandamos todos los enemigos al que se unio
@@ -548,7 +548,7 @@ void ServerSocket::acceptLastDo() {
 			send(cid, bs.str());
 			//Mando los atributos principales del jugador
 			bs.clear();
-			bs << PROTO::INIT_ATT << it->first << (float)unEnemigo->getVelocidad() << unEnemigo->getEnergia() << unEnemigo->getMagia() << unEnemigo->getEnergiaEscudo() << unEnemigo->getTerremoto() << unEnemigo->getHielo() << (float)unEnemigo->getRadio();
+			bs << PROTO::INIT_ATT << it->first << (float)unEnemigo->getVelocidad() << unEnemigo->getEnergia() << unEnemigo->getMagia() << unEnemigo->getEnergiaEscudo() << unEnemigo->getTerremoto() << unEnemigo->getHielo() << (float)unEnemigo->getRadio() << (bool)unEnemigo->getBolaDeCristal() << (bool)unEnemigo->tieneGolem() << unEnemigo->tieneTransmut();
 			send(cid,bs.str());
 		}
 		// Mandamos todos los Golems al que se unio
@@ -562,18 +562,18 @@ void ServerSocket::acceptLastDo() {
 			send(cid, bs.str());
 			//Mando los atributos principales del jugador
 			bs.clear();
-			bs << PROTO::INIT_ATT << it->first << (float)unGolem->getVelocidad() << unGolem->getEnergia() << unGolem->getMagia() << unGolem->getEnergiaEscudo() << unGolem->getTerremoto() << unGolem->getHielo() << (float)unGolem->getRadio();
+			bs << PROTO::INIT_ATT << it->first << (float)unGolem->getVelocidad() << unGolem->getEnergia() << unGolem->getMagia() << unGolem->getEnergiaEscudo() << unGolem->getTerremoto() << unGolem->getHielo() << (float)unGolem->getRadio() << (bool)unGolem->getBolaDeCristal() << (bool)unGolem->tieneGolem() << unGolem->tieneTransmut();
 			send(cid,bs.str());
 		}
 
-			//Le aviso todos los que estaban congelados
-			for (auto it = pm.getPlayers().begin();it != pm.getPlayers().end();it++) {
-				if (it->second.isCongelado()) {
-					bs.clear();
-					bs << PROTO::CONGELAR << std::string("RESTORE") << it->first;
-					send(cid,bs.str());
-				}
+		//Le aviso todos los que estaban congelados
+		for (auto it = pm.getPlayers().begin();it != pm.getPlayers().end();it++) {
+			if (it->second.isCongelado()) {
+				bs.clear();
+				bs << PROTO::CONGELAR << std::string("RESTORE") << it->first;
+				send(cid,bs.str());
 			}
+		}
 		//Mandamos las banderas si correponde la mision
 		if (mision.getTipo()==Misiones::MISION_BANDERAS) {
 			int contBanderas=0;
@@ -680,7 +680,7 @@ void ServerSocket::acceptLastDo() {
 
 				//std::cout << "RECEIVED NIEBLA SYNC: " << new_tile_x << "," << new_tile_y << "\n";
 			}else if(pt == PROTO::ATACAR) {
-				std::cout << "RECV: ATACAR\n";
+				//std::cout << "RECV: ATACAR\n";
 				std::string nick_who,nick_to;
 				bs >> nick_who >> nick_to;
 				// Avisamos a los otros jugadores del nuevo jugador
@@ -825,15 +825,14 @@ void ServerSocket::acceptLastDo() {
 				if (murioPersonaje){
 					for(auto it = clients_map.begin();it != clients_map.end();it++) {
 						bs.clear();
+						bs << PROTO::ENEMY_DEAD << nick_to;
+						it->second.send(bs.str());
 						if(terminoMision){
 							//aviso a los demas que termino la mision
+							bs.clear();
 							bs << PROTO::WINNER << nick_who;							
-							//it->second.send(bs.str());
-						}else{
-							//aviso a los demas que murio enemigo
-							bs << PROTO::ENEMY_DEAD << nick_to;
+							it->second.send(bs.str());
 						}
-						it->second.send(bs.str());
 					}
 					if (terminoMision) Sleep(5000);
 					for(auto it = clients_map.begin();it != clients_map.end();it++) {
@@ -1262,7 +1261,7 @@ void ServerSocket::acceptLastDo() {
 						it->second.send(bs.str());
 						std::cout << "Mandando update de revivir a " << it->second.nick << "\n";
 					}
-					pm.getPlayer(new_nick).descongelar();
+					//pm.getPlayer(new_nick).descongelar();
 				}else{
 					// Si fallo, avisamos al cliente
 					bs.clear();
@@ -1472,7 +1471,7 @@ void ServerSocket::acceptLastDo() {
 			}else if (pt == PROTO::DEAD){
 				std::string nick_who;
 				bs >> nick_who;
-				cout << nick_who << " fue asesinado por " << new_nick << endl;
+				cout << nick_who << " fue asesinado" << endl;
 				if (pm.playerExists(nick_who)) {
 					pm.getPlayer(nick_who).congelar();
 				} else if (pm.enemyExists(nick_who)) {

@@ -426,9 +426,9 @@ void ClientSocket::listenDo() {
 			}
 			std::string nick_who;
 			float vel_recv,radio;
-			bool bolaDeCristal, golem;
+			bool bolaDeCristal, golem, transmut;
 			char energia,magia,energiaEscudo,cantTerremoto,cantHielo;
-			bs >> nick_who >> vel_recv >> energia >> magia >> energiaEscudo >> cantTerremoto >> cantHielo >> radio >> bolaDeCristal >> golem;
+			bs >> nick_who >> vel_recv >> energia >> magia >> energiaEscudo >> cantTerremoto >> cantHielo >> radio >> bolaDeCristal >> golem >> transmut;
 			double vel=(double)vel_recv;
 			//Seteamos los atributos del jugador
 			pjm.getPje(nick_who).setVelocidad(vel);
@@ -440,7 +440,8 @@ void ClientSocket::listenDo() {
 			pjm.getPje(nick_who).setRadio(radio);
 			pjm.getPje(nick_who).setBolaDeCristal(bolaDeCristal);
 			pjm.getPje(nick_who).setGolem(golem);
-			cout << "Vel de player " << nick_who << " es " << vel << endl;
+			pjm.getPje(nick_who).setTransmutacion(transmut);
+			//cout << "Vel de player " << nick_who << " es " << vel << endl;
 		}else if(pt == PROTO::PLAYER_EXIT) {
 			// Esperamos a que cargue el mapa
 			while(!cargoMapa) {
@@ -473,7 +474,7 @@ void ClientSocket::listenDo() {
 				if (!(pjm.getPjeLocal().getNick() == nick_to)) {
 					atacado = pjm.getPje(nick_to);
 				}
-				cout << "Ataco " << nick_who << endl;
+				//cout << "Ataco " << nick_who << endl;
 				atacante.ataque(atacado.getPosicion(&mapa),&mapa,&atacado,true);
 			}
 		}else if(pt == PROTO::DEFENDER) {
@@ -725,19 +726,24 @@ void ClientSocket::listenDo() {
 			bs >> nick_who >> nick_to;
 			char dmg;
 			bs >> dmg;
+			cout << "Danio " << nick_who << "->" << nick_to << endl;
 			// Buscamos el personaje 
 			if(nick_to == pjm.getPjeLocal().getNick()) {
-				pjm.getPjeLocal().dañar(dmg);
-				bs.clear();
-				bs << PROTO::UPDATE_ATT << ATT::ENERGIA << pjm.getPjeLocal().getEnergia();
-				this->send(bs.str());
-				bs.clear();
-				bs << PROTO::UPDATE_ATT << ATT::ENERGIA_ESCUDO << pjm.getPjeLocal().getEnergiaEscudo();
-				this->send(bs.str());
+				if (pjm.getPjeLocal().estaVivo()) {
+					pjm.getPjeLocal().dañar(dmg);
+					bs.clear();
+					bs << PROTO::UPDATE_ATT << ATT::ENERGIA << pjm.getPjeLocal().getEnergia();
+					this->send(bs.str());
+					bs.clear();
+					bs << PROTO::UPDATE_ATT << ATT::ENERGIA_ESCUDO << pjm.getPjeLocal().getEnergiaEscudo();
+					this->send(bs.str());
+				}
 			}else{
 				for(auto it = pjm.getPjes().begin();it != pjm.getPjes().end();it++) {
 					if(it->first == nick_to) {
-						it->second.dañar(dmg);
+						if (it->second.estaVivo()) {
+							it->second.dañar(dmg);
+						}
 						break;
 					}
 				}
@@ -775,7 +781,7 @@ void ClientSocket::listenDo() {
 			bs >> tipoAtt;
 			std::string nick_who;
 			bs >> nick_who;			
-			std::cout << "CLIENT SOCKET UPDATE_ATT: " << nick_who << "\n";
+			//std::cout << "CLIENT SOCKET UPDATE_ATT: " << nick_who << "\n";
 			float nuevoVal;
 			char nuevoValor;
 			bool nuevoValorBool;
@@ -873,6 +879,7 @@ void ClientSocket::listenDo() {
 			string EnemigoNick;
 			//elimino enemigo
 			bs >> EnemigoNick;
+			cout << "Murio enemigo " << EnemigoNick << endl;
 			for(auto it = pjm.getPjes().begin();it != pjm.getPjes().end();it++) {
 				if(it->first == EnemigoNick){
 					mapa.getTilePorPixeles(it->second.getX(),it->second.getY())->deleteEntidad(&it->second);

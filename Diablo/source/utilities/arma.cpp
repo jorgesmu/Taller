@@ -777,11 +777,11 @@ void Arma::dañarPersonaje(Personaje* personajeObjetivo){
 			srand (time(NULL));
 			char danio=rand()%(this->danio_maximo+1);
 			//int aux=danio;
-			printf("\n%i\n",danio);
+			//printf("\n%i\n",danio);
 			personajeObjetivo -> dañar(danio);
 			if (danio > 0) {
 				// mensaje al servidor
-				std::cout << "Ataque\n";
+				//std::cout << "Ataque\n";
 				BitStream bs;		
 				bs << PROTO::DAMAGE << this-> propietario -> getNick() << personajeObjetivo->getNick() << danio;
 				sock.send(bs.str());

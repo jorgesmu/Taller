@@ -575,12 +575,14 @@ unsigned int Arma::atacar(Mapa* mapa, Tile* tileDestino , Personaje* personaje, 
 			unsigned int direccionAtaque = ImagenArma::ATAQUE_DIRECCION_ACTUAL;
 			int deltaX = tileDestino -> getX() - posX;
 			int deltaY = tileDestino -> getY() - posY;
+			const int TOLERANCIA_SUPERIOR = 4;
+			const int TOLERANCIA_INFERIOR = -3;
 			//calculo de direccion
-			if (deltaX > 0){
-				if(deltaY < 0){
+			if (deltaX > TOLERANCIA_SUPERIOR){
+				if(deltaY < TOLERANCIA_INFERIOR){
 					direccionAtaque = ImagenArma::AT_NORESTE;
 				} else{
-					if(deltaY == 0){
+					if((deltaY >= TOLERANCIA_INFERIOR) && (deltaY <= TOLERANCIA_SUPERIOR)){
 						direccionAtaque = ImagenArma::AT_ESTE;
 					} else {
 						direccionAtaque = ImagenArma::AT_SURESTE;
@@ -593,21 +595,21 @@ unsigned int Arma::atacar(Mapa* mapa, Tile* tileDestino , Personaje* personaje, 
 					if (!soloAnimacion) dañarPersonaje(personaje);
 				}
 			}else {
-				if (deltaX < 0) {
-					if (deltaY < 0){
+				if (deltaX < TOLERANCIA_INFERIOR) {
+					if (deltaY < TOLERANCIA_INFERIOR){
 						direccionAtaque = ImagenArma::AT_NOROESTE;
 					}else{
-						if (deltaY == 0) {
+						if ((deltaY >= TOLERANCIA_INFERIOR) && (deltaY <= TOLERANCIA_SUPERIOR)) {
 							direccionAtaque = ImagenArma::AT_OESTE;
 						}else {
 							direccionAtaque = ImagenArma::AT_SUROESTE;
 						}
 					}
 				}else{
-					if (deltaY < 0){
+					if (deltaY < TOLERANCIA_INFERIOR){
 						direccionAtaque = ImagenArma::AT_NORTE;
 					} else{
-						if(deltaY > 0){
+						if(deltaY > TOLERANCIA_SUPERIOR){
 							direccionAtaque = ImagenArma::AT_SUR;
 						}
 					}
@@ -621,16 +623,7 @@ unsigned int Arma::atacar(Mapa* mapa, Tile* tileDestino , Personaje* personaje, 
 			
 			}
 		}
-	} /*else {
-		this -> tileDestino = NULL;
-		unsigned int direccionAtaque = ImagenArma::ATAQUE_DIRECCION_ACTUAL;
-		ImagenArma* imagenArma = static_cast<ImagenArma*> (this -> imagen);
-		if (imagenArma != NULL){
-			imagenArma -> setAccion(direccionAtaque);
-			//ataque a personaje
-			dañarPersonaje(personaje);
-		}
-	}*/
+	} 
 	return retorno;
 }
 

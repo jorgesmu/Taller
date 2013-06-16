@@ -700,6 +700,16 @@ void ServerSocket::acceptLastDo() {
 					bs << PROTO::DEFENDER << nick_atacante;
 					it->second.send(bs.str());
 				}
+			}else if(pt == PROTO::CHANGE_DIR) {
+				unsigned int dirActual;
+				bs >> dirActual;
+				// Avisamos a los otros jugadores del nuevo jugador
+				for(auto it = clients_map.begin();it != clients_map.end();it++) {
+					if(it->second.nick == new_nick) continue; // Salteamos a nuestro jugador
+					BitStream bs;
+					bs << PROTO::CHANGE_DIR << new_nick << dirActual;
+					it->second.send(bs.str());
+				}
 			}else if(pt == PROTO::USE_ITEM) {
 				std::string nick_who;
 				bs >> nick_who;

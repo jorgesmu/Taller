@@ -272,7 +272,7 @@ int main(int argc, char* argv[]) {
 	// Consola
 	consola.init(&resman, 10, 10, 200, Font::SIZE_NORMAL, COLOR::WHITE);
 
-	resman.addRes("bandera","../resources/bandera.png");
+	resman.addRes("bandera","../resources/flag.png");
 	// Cargo la entidad por default
 	resman.addRes("tierraDefault", "../resources/tile.png");
 	Entidad entidadPisoPorDefecto("tierraDefault", 1 , 1 , true , 0 , 0 , NULL, resman , Imagen::COLOR_KEY);
@@ -285,7 +285,7 @@ int main(int argc, char* argv[]) {
 	}	
 
 	//Recursos para armas
-	resman.addRes("bomba","../resources/bomba.jpg");
+	resman.addRes("bomba","../resources/bomba.png");
 
 	//Prueba de carga items
 	resman.addRes("cofre","../resources/cajaEstatica.png");

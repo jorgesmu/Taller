@@ -23,6 +23,7 @@
 #include "../source/utilities/armaBomba.h"
 #include "../source/utilities/transmutItem.h"
 #include "../source/utilities/bombas.h"
+#include "../source/utilities/soundman.h"
 
 #include <iostream>
 #include <fstream>
@@ -47,6 +48,7 @@ extern ChatWindow chat_window;
 extern int estadoMovimiento;
 extern std::vector<EntidadFija*> entidades_cargadas;
 extern bool initAttCargados;
+extern SoundMan soundman;
 
 extern bool enAtaque; // indica si se encuentra en ataque
 extern bool calcularAtaque; // indica si se debe calcular el camino minimo para un ataque
@@ -691,6 +693,7 @@ void ClientSocket::listenDo() {
 			//Elimino bomba del mapa(FIX)
 			mapa.getTile(p.getBombaX(),p.getBombaY())->deleteEntidad(p.getBombaColocada());
 			std::cout << "eliminada" << endl;
+			soundman.playSound("explosion", mapa.getTile(p.getBombaX(),p.getBombaY())->getX(), mapa.getTile(p.getBombaX(),p.getBombaY())->getY());
 		}else if(pt == PROTO::ITEM_OFF) {
 			int x,y;
 			bs >> x >> y;

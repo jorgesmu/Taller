@@ -97,7 +97,7 @@ void Personaje::inicializarAtributosEnValoresDefault() {
 	this->energia=this->ENERGIA_TOTAL;
 	this->magia=this->MAGIA_TOTAL;
 	this->flechas=0;
-	this->bombas=0;
+	this->bombas=10;
 	this->granadas=0;
 	this->varita=false;
 	this->energiaEscudo=0;
@@ -1051,6 +1051,7 @@ void Personaje::dañar(char daño) {
 		
 
 void Personaje::chocarConLampara(Lampara* lampara) {
+	soundman.playSound("chest", this->getX(), this->getY());
 	this->getPosicion(&mapa)->deleteEntidad(lampara);
 	this->aumentarRadio(lampara->getProporcionAumento());
 	std::stringstream msj;
@@ -1068,6 +1069,7 @@ void Personaje::chocarConLampara(Lampara* lampara) {
 
 //Mejorar: recorrer todos los tiles y colocarlos como visitados
 void Personaje::chocarConMapa(MapaItem* mapaItem) {
+	soundman.playSound("chest", this->getX(), this->getY());
 	std::cout << "Se descubre todo el mapa" << endl; 
 	this->getPosicion(&mapa)->deleteEntidad(mapaItem);
 	std::vector<Tile> tiles = mapa.allTiles();
@@ -1109,6 +1111,7 @@ void Personaje::chocarConZapatos(Zapatos* zapatos) {
 	//std::cout << "Aumento la velocidad un " << (int)zapatos->getAumentoVelocidad() << "%\n";
 	bool sePuede = this->aumentarVelocidad(zapatos->getAumentoVelocidad());
 	if (sePuede) {
+		soundman.playSound("chest", this->getX(), this->getY());
 		this->getPosicion(&mapa)->deleteEntidad(zapatos);	
 		BitStream bs;
 		bs << PROTO::UPDATE_ATT << ATT::VEL << (float)pjm.getPjeLocal().getVelocidad();
@@ -1132,6 +1135,7 @@ void Personaje::chocarConZapatos(Zapatos* zapatos) {
 
 void Personaje::chocarConBolaDeCristal(BolaDeCristal* bolaDeCristal) {
 	if(this->magia >= MAGIA_HECHIZO){
+		soundman.playSound("chest", this->getX(), this->getY());
 		//std::cout << "veo niebla de los enemigos \n";
 		this->getPosicion(&mapa)->deleteEntidad(bolaDeCristal);
 		BitStream bs;
@@ -1160,6 +1164,7 @@ void Personaje::chocarConBolaDeCristal(BolaDeCristal* bolaDeCristal) {
 }
 
 void Personaje::chocarConGolem(GolemItem* golem) {
+	soundman.playSound("chest", this->getX(), this->getY());
 	this->getPosicion(&mapa)->deleteEntidad(golem);
 	this->golem = true;
 	BitStream bs;
@@ -1178,6 +1183,7 @@ void Personaje::chocarConGolem(GolemItem* golem) {
 }
 
 void Personaje::chocarConTerremoto(Terremoto* terremoto) {
+	soundman.playSound("chest", this->getX(), this->getY());
 	this->getPosicion(&mapa)->deleteEntidad(terremoto);
 	this->terremoto++;
 	BitStream bs;
@@ -1197,6 +1203,7 @@ void Personaje::chocarConTerremoto(Terremoto* terremoto) {
 }
 
 void Personaje::chocarConHielo(Hielo* hielo) {
+	soundman.playSound("chest", this->getX(), this->getY());
 	this->getPosicion(&mapa)->deleteEntidad(hielo);
 	this->hielo++;
 	BitStream bs;
@@ -1315,6 +1322,7 @@ void Personaje::updateHielo() {
 }
 
  void Personaje::chocarConCorazon(Corazon* corazon) {
+	soundman.playSound("chest", this->getX(), this->getY());
 	this->getPosicion(&mapa)->deleteEntidad(corazon);
 	int futura = int(this->energia)+int(corazon->getEnergiaGanada());
 	if (futura>this->ENERGIA_TOTAL)
@@ -1338,6 +1346,7 @@ void Personaje::updateHielo() {
 }
 
  void Personaje::chocarConBotella(Botella* botella) {
+	soundman.playSound("chest", this->getX(), this->getY());
 	this->getPosicion(&mapa)->deleteEntidad(botella);
 	int futura = int(this->magia)+int(botella->getMagiaGanada());
 	if (futura>=this->MAGIA_TOTAL)
@@ -1367,6 +1376,7 @@ void Personaje::updateHielo() {
  }
  
  void Personaje::chocarConBombas(Bombas* bombas) {
+	soundman.playSound("chest", this->getX(), this->getY());
 	this->getPosicion(&mapa)->deleteEntidad(bombas);
 	this->bombas+=bombas->getBombasGanadas();
 	BitStream bs;
@@ -1386,6 +1396,7 @@ void Personaje::updateHielo() {
  }
 
  void Personaje::chocarConTransmut(TransmutItem* transmut) {
+	soundman.playSound("chest", this->getX(), this->getY());
 	getPosicion(&mapa)->deleteEntidad(transmut);
 	transmutacion = true;
 	BitStream bs;
@@ -1417,6 +1428,7 @@ void Personaje::updateHielo() {
  }
 
  void Personaje::chocarConEscudo(Escudo* escudo) {
+	 soundman.playSound("chest", this->getX(), this->getY());
 	 this->getPosicion(&mapa)->deleteEntidad(escudo);
 	 int futura = int(this->energiaEscudo)+int(escudo->getEnergiaEscudo());
 	 if (futura >= Personaje::ENERGIA_TOTAL)
@@ -1440,6 +1452,7 @@ void Personaje::updateHielo() {
  }
 
  void Personaje::chocarConBandera(Bandera* bandera) {
+	 soundman.playSound("catch_flag", this->getX(), this->getY());
 	 BitStream bs;
 	 Tile* tilePersonaje = pjm.getPjeLocal().getPosicion(&mapa);
 	 int x = tilePersonaje->getU();
@@ -1483,6 +1496,7 @@ void Personaje::muere() {
  }
 
  void Personaje::revivir() {
+	 soundman.playSound("appear", this->getX(), this->getY());
 	 this->vivo=true;
 	 this->animacionRevivir();
 	 this->energia=this->ENERGIA_TOTAL;
@@ -1672,6 +1686,7 @@ void Personaje::utilizarGolem() {
 void Personaje::updateBomba() {
 	if ((this->tBomba.isStarted()) && (this->tBomba.getTicks()>3000)) {
 		std::cout << "Explota la bomba! \n";
+		soundman.playSound("explosion", this->getX(), this->getY());
 		//Daño a todo el radio
 		int radio = 2;
 		Tile* tilePersonaje;

@@ -149,6 +149,10 @@ int main(int argc, char* argv[]) {
 	soundman.addSound("sword", "../resources/static/sounds/sword.wav");
 	soundman.addSound("death", "../resources/static/sounds/death.wav");
 	soundman.addSound("quake", "../resources/static/sounds/quake.wav");
+	soundman.addSound("catch_flag", "../resources/static/sounds/capture.wav");
+	soundman.addSound("explosion", "../resources/static/sounds/grenade-explosion.wav");
+	soundman.addSound("appear", "../resources/static/sounds/appear.wav");
+	soundman.addSound("chest", "../resources/static/sounds/chest.wav");
 	soundman.playMusic();
 
 
@@ -970,7 +974,10 @@ int main(int argc, char* argv[]) {
 							} else {
 								// verifico si se llego al final de camino minimo
 								if (indice == caminoMinimo.size()){
-									pjm.getPjeLocal().ataque(tilePersonajeObjetivo,&mapa,personajeObjetivo);
+									//Veo si esta vivo antes de atacarlo
+									if (personajeObjetivo->estaVivo()) {
+										pjm.getPjeLocal().ataque(tilePersonajeObjetivo,&mapa,personajeObjetivo);
+									}
 									enAtaque = false;
 									personajeObjetivo = NULL;
 									tilePersonajeObjetivo = NULL;

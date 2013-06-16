@@ -283,12 +283,12 @@ bool Client::receive(std::string& buff) {
 				packet.append(tmp);
 			}
 		}
-		std::cout << bytes_read << "==";
+		//std::cout << bytes_read << "==";
 		//std::cout << "RECEIVING " << cid << "...";
 		char recvbuf[DEFAULT_BUFLEN];
 		int res = ::recv(sock, recvbuf, DEFAULT_BUFLEN, 0);
 		//std::cout << "OK\n";
-		std::cout << bytes_read << "\n";
+		//std::cout << bytes_read << "\n";
 		if(res > 0) {
 			//bytes_read += res;
 			//std::cout << "Read " << res << " bytes\n";

@@ -974,8 +974,8 @@ int main(int argc, char* argv[]) {
 							} else {
 								// verifico si se llego al final de camino minimo
 								if (indice == caminoMinimo.size()){
-									//Veo si esta vivo antes de atacarlo
-									if (personajeObjetivo->estaVivo()) {
+									//Veo si esta vivo antes de atacarlo y si yo estoy vivo
+									if (personajeObjetivo->estaVivo() && pjm.getPjeLocal().estaVivo()) {
 										// Veo hace cuanto me ataco por ultima vez para no permitir tantos ataques seguidos
 										Timer& timer = pjm.getPjeLocal().getTimerAtaque();
 										if (!timer.isStarted() || timer.getTicks() > 1000) {

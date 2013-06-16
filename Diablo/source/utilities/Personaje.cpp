@@ -216,8 +216,13 @@ void Personaje::init(const std::string& nickname, const std::string& name,
 		if(this -> tileAncla != NULL){
 			this -> tileAncla -> deleteEntidad(this);
 		}
-		this -> tileAncla = tile;
-		this -> tileAncla -> addEntidad(this);
+		this -> tileAncla = obtenerTileAncla(this -> posX , this -> posY , ImagenPersonaje::EST_SUR , &mapa);
+		if (this->tileAncla) {
+			this -> tileAncla -> addEntidad(this);
+		} else{	
+			this -> tileAncla = tile;
+			this -> tileAncla -> addEntidad(this);
+		}
 		//seteo posicion
 		this -> posX = tile -> getX();
 		this -> posY = tile -> getY();

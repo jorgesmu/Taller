@@ -17,18 +17,38 @@ void Tile::insertarEntidadOrdenada(Entidad* ent){
 	for(size_t i = 0; i < entidades.size();i++) {
 		// trato de insertar la entidad parametro
 		if(!insertado){
-			if((entidades[i] != ent) && 
-				(entidades[i] -> getOrdenBliteo() > ent -> getOrdenBliteo())) {
-				new_ent.push_back(ent);
-				insertado = true;
-			} else {
-				if((entidades[i] != ent) && 
-				   (entidades[i] -> getOrdenBliteo() == ent -> getOrdenBliteo()) && 
-				   (entidades[i] -> getX() >= ent -> getX()) && 
-				   (entidades[i] -> getY() >= ent -> getY())) {
+			if(entidades[i] != ent){
+				if((entidades[i] -> getOrdenBliteo() > ent -> getOrdenBliteo())) {
 					new_ent.push_back(ent);
 					insertado = true;
-				}
+				} else {
+					if(entidades[i] -> getOrdenBliteo() == ent -> getOrdenBliteo()) {
+						if(ent->getOrdenBliteo() == Entidad::ORDEN_PERSONAJE){
+							if( (entidades[i]->getX() == this ->getX()) && (entidades[i]->getY() == this ->getY()) ){
+								new_ent.push_back(ent);
+								insertado = true;
+							}
+						} else{
+							   if ( (entidades[i] -> getX() >= ent -> getX()) && 
+								   (entidades[i] -> getY() >= ent -> getY()) ){
+									new_ent.push_back(ent);
+									insertado = true;
+							   }
+						}
+					}
+				}			
+				/*
+				if((entidades[i] -> getOrdenBliteo() > ent -> getOrdenBliteo())) {
+					new_ent.push_back(ent);
+					insertado = true;
+				} else {
+					if((entidades[i] -> getOrdenBliteo() == ent -> getOrdenBliteo()) && 
+					   (entidades[i] -> getX() >= ent -> getX()) && 
+					   (entidades[i] -> getY() >= ent -> getY())) {
+						new_ent.push_back(ent);
+						insertado = true;
+					}
+				}*/
 			}
 		}
 		// inserto la anterior

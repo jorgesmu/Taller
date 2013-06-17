@@ -1220,7 +1220,7 @@ void ServerSocket::acceptLastDo() {
 						ok = false;
 						break;
 					}
-					if(it->second.getXSiguiente() == x && it->second.getYSiguiente() == y) {
+					if(it->second.getXSiguiente() == p.getXInicial() && it->second.getYSiguiente() == p.getYInicial()) {
 						//si va a ahi
 						ok = false;
 						break;

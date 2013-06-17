@@ -81,6 +81,7 @@ struct {
 // Cosas de movimiento del personaje
 pair <int,int> tileActual, proximoTile;
 int estadoMovimiento;
+int xRev, yRev;
 // Ventana de chat
 ChatWindow chat_window;
 // User Interface

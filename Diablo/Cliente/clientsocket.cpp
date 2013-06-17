@@ -46,6 +46,8 @@ extern ResMan resman;
 extern Console consola;
 extern ChatWindow chat_window;
 extern int estadoMovimiento;
+extern int xRev;
+extern int yRev;
 extern std::vector<EntidadFija*> entidades_cargadas;
 extern bool initAttCargados;
 extern SoundMan soundman;
@@ -516,6 +518,7 @@ void ClientSocket::listenDo() {
 			}else{
 				if(reply) {
 					//pjm.getPjeLocal().revivir();
+					bs >> start_pos_x >> start_pos_y;
 					estadoMovimiento = MOV::OK_REV_RECV;
 					std::cout << "GOT OK REV FROM SERVER\n";					
 				}else{

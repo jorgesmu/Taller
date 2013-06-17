@@ -1037,6 +1037,11 @@ void ServerSocket::acceptLastDo() {
 						ok = false;
 						break;
 					}
+					if(it->second.getXSiguiente() == x && it->second.getYSiguiente() == y) {
+						//si se mueve a ahi
+						ok = false;
+						break;
+					}
 				}				
 				//enemigos
 				for(auto it = pm.getEnemies().begin();it != pm.getEnemies().end();it++) {
@@ -1210,6 +1215,11 @@ void ServerSocket::acceptLastDo() {
 				for(auto it = pm.getPlayers().begin();it != pm.getPlayers().end();it++) {
 					if (it->first == new_nick) continue;
 					if(it->second.getX() == x && it->second.getY() == y) {
+						ok = false;
+						break;
+					}
+					if(it->second.getXSiguiente() == x && it->second.getYSiguiente() == y) {
+						//si va a ahi
 						ok = false;
 						break;
 					}

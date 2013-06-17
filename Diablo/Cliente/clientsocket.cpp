@@ -55,6 +55,10 @@ extern SoundMan soundman;
 extern bool enAtaque; // indica si se encuentra en ataque
 extern bool calcularAtaque; // indica si se debe calcular el camino minimo para un ataque
 extern Personaje* personajeObjetivo;
+extern Tile* tilePersonajeObjetivo;
+extern std::vector< std::pair<int,int> > caminoMinimo;
+
+extern bool abortConnection;
 
 bool ClientSocket::WSinit = false;
 size_t ClientSocket::ref_count = 0;
@@ -895,6 +899,13 @@ void ClientSocket::listenDo() {
 				ss << nick_winner << " gano esta partida, jugale una revancha!";
 			}
 			consola.log(ss.str());
+			caminoMinimo.clear();
+			tilePersonajeObjetivo = NULL;
+			personajeObjetivo = NULL;
+		}else if(pt == PROTO::NICKNAME_IN_USE) {
+			abortConnection = true;
+			std::cout << "Nickname in use, disconnected\n";
+			this->close();
 		}else if (pt == PROTO::ENEMY_DEAD){
 			string EnemigoNick;
 			//elimino enemigo
@@ -905,6 +916,7 @@ void ClientSocket::listenDo() {
 					mapa.getTilePorPixeles(it->second.getX(),it->second.getY())->deleteEntidad(&it->second);
 					if(&it->second == personajeObjetivo) {
 						personajeObjetivo = NULL;
+						tilePersonajeObjetivo = NULL;
 					}
 					pjm.getPjes().erase(it);
 					break;

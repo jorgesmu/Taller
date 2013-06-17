@@ -13,9 +13,9 @@ class Enemigo:public Player{
 		unsigned int lineaRecta;
 		void init_Enemy(const std::string& nickname,const std::string& tipo,unsigned int estrategiaElegida);
 		//getters
-		TileServidor* Enemigo::get_proximo_tile_recta_horizontal(MapaServidor& Mapa);
-		TileServidor* Enemigo::get_proximo_tile_recta_vertical(MapaServidor& Mapa);
-		TileServidor* Enemigo::get_proximo_tile_circular(MapaServidor& Mapa);
+		TileServidor* Enemigo::get_proximo_tile_recta_horizontal(MapaServidor& Mapa,PlayerManager& pm);
+		TileServidor* Enemigo::get_proximo_tile_recta_vertical(MapaServidor& Mapa,PlayerManager& pm);
+		TileServidor* Enemigo::get_proximo_tile_circular(MapaServidor& Mapa,PlayerManager& pm);
 		virtual TileServidor* get_proximo_tile_enemigo(MapaServidor& Mapa,PlayerManager& pm);
 		virtual bool personaje_en_radio(MapaServidor& mapa,PlayerManager& pm, TileServidor*& tilePersonajes);
 		virtual bool personaje_adyacente(MapaServidor& mapa,PlayerManager& pm, TileServidor*& tilePersonaje,string& enemigoAtacado);

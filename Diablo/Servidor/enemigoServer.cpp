@@ -32,7 +32,7 @@ extern Misiones mision;
 //getters
 
 
-TileServidor* Enemigo::get_proximo_tile_recta_horizontal(MapaServidor& Mapa){
+TileServidor* Enemigo::get_proximo_tile_recta_horizontal(MapaServidor& Mapa,PlayerManager& pm){
 	if (this->direccion == noSeMovio){
 		this->direccion = derecha;
 	} 
@@ -56,11 +56,11 @@ TileServidor* Enemigo::get_proximo_tile_recta_horizontal(MapaServidor& Mapa){
 		if(this ->direccion == derecha){
 			//si estoy yendo para la derecha
 			if(existeDerecha){
-				if	(tileDerecha->isCaminable()){
+				if	(tileDerecha->isCaminable() && !Mapa.tile_esta_ocupado(tileDerecha->get_x(),tileDerecha->get_y(),pm)){
 					return tileDerecha;
 				}else{
 					if (existeIzquierda){
-						if (tileIzquierda->isCaminable()){
+						if (tileIzquierda->isCaminable() && !Mapa.tile_esta_ocupado(tileIzquierda->get_x(),tileIzquierda->get_y(),pm)){
 							this->pasosCaminados = 0;
 							this->direccion = izquierda;
 							return tileIzquierda;	
@@ -70,7 +70,7 @@ TileServidor* Enemigo::get_proximo_tile_recta_horizontal(MapaServidor& Mapa){
 			}else{
 				//NO HAY MAS TILES A LA DERECHA
 				if (existeIzquierda){
-					if (tileIzquierda->isCaminable()){
+					if (tileIzquierda->isCaminable() && !Mapa.tile_esta_ocupado(tileIzquierda->get_x(),tileIzquierda->get_y(),pm)){
 						this->pasosCaminados = 0;
 						this->direccion = izquierda;					
 						return tileIzquierda;	
@@ -80,11 +80,11 @@ TileServidor* Enemigo::get_proximo_tile_recta_horizontal(MapaServidor& Mapa){
 		}else {
 			//si estoy yendo para la izquierda
 			if(existeIzquierda){
-				if	(tileIzquierda->isCaminable()){
+				if	(tileIzquierda->isCaminable() && !Mapa.tile_esta_ocupado(tileIzquierda->get_x(),tileIzquierda->get_y(),pm)){
 					return tileIzquierda;
 				}else{
 					if (existeDerecha){
-						if (tileDerecha->isCaminable()){
+						if (tileDerecha->isCaminable()  && !Mapa.tile_esta_ocupado(tileDerecha->get_x(),tileDerecha->get_y(),pm)){
 							this->pasosCaminados = 0;
 							this->direccion = derecha;
 							return tileDerecha;	
@@ -94,7 +94,7 @@ TileServidor* Enemigo::get_proximo_tile_recta_horizontal(MapaServidor& Mapa){
 			}else{
 				//NO HAY MAS TILES A LA izquierda
 				if (existeDerecha){
-					if (tileDerecha->isCaminable()){
+					if (tileDerecha->isCaminable() && !Mapa.tile_esta_ocupado(tileDerecha->get_x(),tileDerecha->get_y(),pm)){
 						this->pasosCaminados = 0;
 						this->direccion = derecha;					
 						return tileDerecha;	
@@ -107,13 +107,13 @@ TileServidor* Enemigo::get_proximo_tile_recta_horizontal(MapaServidor& Mapa){
 		this->pasosCaminados = 0 ;
 		if (this->direccion == izquierda){
 			if (existeDerecha){
-				if(tileDerecha->isCaminable()){
+				if(tileDerecha->isCaminable() && !Mapa.tile_esta_ocupado(tileDerecha->get_x(),tileDerecha->get_y(),pm)){
 					//cambio direccion
 					this->direccion = derecha;
 					return  tileDerecha;
 				}else{
 					if(existeIzquierda){
-						if (tileIzquierda->isCaminable()){
+						if (tileIzquierda->isCaminable() && !Mapa.tile_esta_ocupado(tileIzquierda->get_x(),tileIzquierda->get_y(),pm)){
 							return tileIzquierda;
 						}else{
 							return NULL;
@@ -124,13 +124,13 @@ TileServidor* Enemigo::get_proximo_tile_recta_horizontal(MapaServidor& Mapa){
 		}else{
 			//si direccion era derecha
 			if (existeIzquierda){
-				if(tileIzquierda->isCaminable()){
+				if(tileIzquierda->isCaminable() && !Mapa.tile_esta_ocupado(tileIzquierda->get_x(),tileIzquierda->get_y(),pm)){
 					//cambio direccion
 					this->direccion = izquierda;
 					return  tileIzquierda;
 				}else{
 					if(existeDerecha){
-						if (tileDerecha->isCaminable()){
+						if (tileDerecha->isCaminable() && !Mapa.tile_esta_ocupado(tileDerecha->get_x(),tileDerecha->get_y(),pm)){
 							return tileDerecha;
 						}else{
 							return NULL;
@@ -142,7 +142,7 @@ TileServidor* Enemigo::get_proximo_tile_recta_horizontal(MapaServidor& Mapa){
 	}
 		return NULL;
 }
-TileServidor* Enemigo::get_proximo_tile_recta_vertical(MapaServidor& Mapa){
+TileServidor* Enemigo::get_proximo_tile_recta_vertical(MapaServidor& Mapa,PlayerManager& pm){
 		if (this->direccion == noSeMovio){
 			this->direccion = arriba;
 	} 
@@ -168,11 +168,11 @@ TileServidor* Enemigo::get_proximo_tile_recta_vertical(MapaServidor& Mapa){
 		if(this ->direccion == arriba){
 			//si estoy yendo para la arriba
 			if(existeArriba){
-				if	(tileArriba->isCaminable()){
+				if	(tileArriba->isCaminable() && !Mapa.tile_esta_ocupado(tileArriba->get_x(),tileArriba->get_y(),pm)){
 					return tileArriba;
 				}else{
 					if (existeAbajo){
-						if (tileAbajo->isCaminable()){
+						if (tileAbajo->isCaminable() && !Mapa.tile_esta_ocupado(tileAbajo->get_x(),tileAbajo->get_y(),pm)){
 							this->pasosCaminados = 0;
 							this->direccion = abajo;
 							return tileAbajo;	
@@ -182,7 +182,7 @@ TileServidor* Enemigo::get_proximo_tile_recta_vertical(MapaServidor& Mapa){
 			}else{
 				//NO HAY MAS TILES A LA arriba
 				if (existeAbajo){
-					if (tileAbajo->isCaminable()){
+					if (tileAbajo->isCaminable() && !Mapa.tile_esta_ocupado(tileAbajo->get_x(),tileAbajo->get_y(),pm)){
 						this->pasosCaminados = 0;
 						this->direccion = abajo;					
 						return tileAbajo;	
@@ -192,11 +192,11 @@ TileServidor* Enemigo::get_proximo_tile_recta_vertical(MapaServidor& Mapa){
 		}else {
 			//si estoy yendo para la abajo
 			if(existeAbajo){
-				if	(tileAbajo->isCaminable()){
+				if	(tileAbajo->isCaminable() && !Mapa.tile_esta_ocupado(tileAbajo->get_x(),tileAbajo->get_y(),pm)){
 					return tileAbajo;
 				}else{
 					if (existeArriba){
-						if (tileArriba->isCaminable()){
+						if (tileArriba->isCaminable()  && !Mapa.tile_esta_ocupado(tileArriba->get_x(),tileArriba->get_y(),pm)){
 							this->pasosCaminados = 0;
 							this->direccion = arriba;
 							return tileArriba;	
@@ -206,7 +206,7 @@ TileServidor* Enemigo::get_proximo_tile_recta_vertical(MapaServidor& Mapa){
 			}else{
 				//NO HAY MAS TILES A LA abajo
 				if (existeArriba){
-					if (tileArriba->isCaminable()){
+					if (tileArriba->isCaminable() && !Mapa.tile_esta_ocupado(tileArriba->get_x(),tileArriba->get_y(),pm)){
 						this->pasosCaminados = 0;
 						this->direccion = arriba;					
 						return tileArriba;	
@@ -219,13 +219,13 @@ TileServidor* Enemigo::get_proximo_tile_recta_vertical(MapaServidor& Mapa){
 		this->pasosCaminados = 0 ;
 		if (this->direccion == abajo){
 			if (existeArriba){
-				if(tileArriba->isCaminable()){
+				if(tileArriba->isCaminable() && !Mapa.tile_esta_ocupado(tileArriba->get_x(),tileArriba->get_y(),pm)){
 					//cambio direccion
 					this->direccion = arriba;
 					return  tileArriba;
 				}else{
 					if(existeAbajo){
-						if (tileAbajo->isCaminable()){
+						if (tileAbajo->isCaminable() && !Mapa.tile_esta_ocupado(tileAbajo->get_x(),tileAbajo->get_y(),pm)){
 							return tileAbajo;
 						}else{
 							return NULL;
@@ -236,13 +236,13 @@ TileServidor* Enemigo::get_proximo_tile_recta_vertical(MapaServidor& Mapa){
 		}else{
 			//si direccion era arriba
 			if (existeAbajo){
-				if(tileAbajo->isCaminable()){
+				if(tileAbajo->isCaminable() && !Mapa.tile_esta_ocupado(tileAbajo->get_x(),tileAbajo->get_y(),pm)){
 					//cambio direccion
 					this->direccion = abajo;
 					return  tileAbajo;
 				}else{
 					if(existeArriba){
-						if (tileArriba->isCaminable()){
+						if (tileArriba->isCaminable() && !Mapa.tile_esta_ocupado(tileArriba->get_x(),tileArriba->get_y(),pm)){
 							return tileArriba;
 						}else{
 							return NULL;
@@ -254,7 +254,7 @@ TileServidor* Enemigo::get_proximo_tile_recta_vertical(MapaServidor& Mapa){
 	}
 		return NULL;
 }
-TileServidor * Enemigo::get_proximo_tile_circular(MapaServidor& Mapa){
+TileServidor * Enemigo::get_proximo_tile_circular(MapaServidor& Mapa,PlayerManager& pm){
 	TileServidor* res = NULL;
 	if (this->direccion == noSeMovio){
 		this->direccion = derecha;
@@ -262,24 +262,24 @@ TileServidor * Enemigo::get_proximo_tile_circular(MapaServidor& Mapa){
 	if (this->pasosCaminados >= pasosMax){
 		if (this->direccion == derecha){
 			this->direccion = abajo;
-			res = get_proximo_tile_recta_vertical(Mapa);
+			res = get_proximo_tile_recta_vertical(Mapa,pm);
 		}else if (this->direccion == abajo){
 			this->direccion = izquierda;
-			res = get_proximo_tile_recta_horizontal(Mapa);
+			res = get_proximo_tile_recta_horizontal(Mapa,pm);
 		}else if (this->direccion == izquierda){
 			this->direccion = arriba;
-			res = get_proximo_tile_recta_vertical(Mapa);
+			res = get_proximo_tile_recta_vertical(Mapa,pm);
 		}else if (this->direccion == arriba){
 			this->direccion = derecha;
-			res = get_proximo_tile_recta_horizontal(Mapa);
+			res = get_proximo_tile_recta_horizontal(Mapa,pm);
 		}
 		this->pasosCaminados = 0;
 	}else{
 		//camino en la dir que estaba
 		if (this->direccion == arriba || this->direccion == abajo){
-			res = get_proximo_tile_recta_vertical(Mapa);
+			res = get_proximo_tile_recta_vertical(Mapa,pm);
 		}else{
-			res = get_proximo_tile_recta_horizontal(Mapa);
+			res = get_proximo_tile_recta_horizontal(Mapa,pm);
 		}
 	}
 
@@ -327,11 +327,11 @@ TileServidor* Enemigo::get_proximo_tile_enemigo(MapaServidor& mapa,PlayerManager
 	}else{
 		//sigo mi camino segun mi estrategia
 		if (this->estrategia == 1){
-			res = this->get_proximo_tile_recta_horizontal(mapa);
+			res = this->get_proximo_tile_recta_horizontal(mapa,pm);
 		}else if(this->estrategia == 2){
-			res = this->get_proximo_tile_recta_vertical(mapa);
+			res = this->get_proximo_tile_recta_vertical(mapa,pm);
 		}else if(this->estrategia == 3){
-			res = this->get_proximo_tile_circular(mapa);
+			res = this->get_proximo_tile_circular(mapa,pm);
 		}
 	}
 	return res;

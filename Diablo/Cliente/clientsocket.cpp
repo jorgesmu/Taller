@@ -900,6 +900,9 @@ void ClientSocket::listenDo() {
 			for(auto it = pjm.getPjes().begin();it != pjm.getPjes().end();it++) {
 				if(it->first == EnemigoNick){
 					mapa.getTilePorPixeles(it->second.getX(),it->second.getY())->deleteEntidad(&it->second);
+					if(&it->second == personajeObjetivo) {
+						personajeObjetivo = NULL;
+					}
 					pjm.getPjes().erase(it);
 					break;
 				}

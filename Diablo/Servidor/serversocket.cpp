@@ -864,7 +864,7 @@ void ServerSocket::acceptLastDo() {
 									it->second.send(bs.str());
 									//Mando los atributos principales del enemigo
 									bs.clear();
-									bs << PROTO::INIT_ATT << itE->second->getNick() << (float)itE->second->getVelocidad() << itE->second->getEnergia() << itE->second->getMagia() << itE->second->getEnergiaEscudo() << itE->second->getTerremoto() << itE->second->getHielo() << (float)itE->second->getRadio();
+									bs << PROTO::INIT_ATT << itE->second->getNick() << (float)itE->second->getVelocidad() << itE->second->getEnergia() << itE->second->getMagia() << itE->second->getEnergiaEscudo() << itE->second->getTerremoto() << itE->second->getHielo() << (float)itE->second->getRadio()  << (bool)itE->second->getBolaDeCristal() << (bool)itE->second->tieneGolem() << itE->second->tieneTransmut();
 									it->second.send(bs.str());
 								}
 							}
@@ -1142,8 +1142,10 @@ void ServerSocket::acceptLastDo() {
 							unEnemigo->get_timer_ataque().start();
 							unEnemigo->set_ultima_accion_atacar(true);
 						}else {
-							unEnemigo->set_ultima_accion_atacar(false);
-							unEnemigo->get_timer_ataque().stop();
+							if(!personajeAdyacente){
+								unEnemigo->set_ultima_accion_atacar(false);
+								unEnemigo->get_timer_ataque().stop();
+							}
 							//si es un enemigo actualizo su posicion
 							TileServidor* proxTile = unEnemigo->get_proximo_tile_enemigo(mapa,pm);
 						
@@ -1390,7 +1392,7 @@ void ServerSocket::acceptLastDo() {
 								it->second.send(bs.str());
 								//Mando los atributos principales del enemigo
 								bs.clear();
-								bs << PROTO::INIT_ATT << itE->second->getNick() << (float)itE->second->getVelocidad() << itE->second->getEnergia() << itE->second->getMagia() << itE->second->getEnergiaEscudo() << itE->second->getTerremoto() << itE->second->getHielo() << (float)itE->second->getRadio();
+								bs << PROTO::INIT_ATT << itE->second->getNick() << (float)itE->second->getVelocidad() << itE->second->getEnergia() << itE->second->getMagia() << itE->second->getEnergiaEscudo() << itE->second->getTerremoto() << itE->second->getHielo() << (float)itE->second->getRadio()  << (bool)itE->second->getBolaDeCristal() << (bool)itE->second->tieneGolem() << itE->second->tieneTransmut();
 								it->second.send(bs.str());
 							}
 						}
@@ -1414,7 +1416,7 @@ void ServerSocket::acceptLastDo() {
 					it->second.send(bs.str());
 					//Mando los atributos principales del jugador
 					bs.clear();
-					bs << PROTO::INIT_ATT << unGolem->getNick() << (float)unGolem->getVelocidad() << unGolem->getEnergia() << unGolem->getMagia() << unGolem->getEnergiaEscudo() << unGolem->getTerremoto() << unGolem->getHielo() << (float)unGolem->getRadio();
+					bs << PROTO::INIT_ATT << unGolem->getNick() << (float)unGolem->getVelocidad() << unGolem->getEnergia() << unGolem->getMagia() << unGolem->getEnergiaEscudo() << unGolem->getTerremoto() << unGolem->getHielo() << (float)unGolem->getRadio()  << (bool)unGolem->getBolaDeCristal() << (bool)unGolem->tieneGolem() << unGolem->tieneTransmut();
 					it->second.send(bs.str());
 				}
 			

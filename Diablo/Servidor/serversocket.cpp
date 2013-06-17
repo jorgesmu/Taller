@@ -768,7 +768,7 @@ void ServerSocket::acceptLastDo() {
 					bs.clear();
 					bs << PROTO::ITEM_OFF << x << y;
 					it->second.send(bs.str());
-					std::cout << " agarro item en pos " << x << y << "\n";
+					//std::cout << " agarro item en pos " << x << y << "\n";
 				}
 				removeItem(x,y);
 			}else if(pt == PROTO::DAMAGE) {	
@@ -855,6 +855,11 @@ void ServerSocket::acceptLastDo() {
 								bs << PROTO::ENEMY_DEAD << itG->second->getNick();
 								it->second.send(bs.str());
 							}
+							for (auto itI = items.begin(); itI != items.end(); itI++) {
+								bs.clear();
+								bs << PROTO::ITEM_OFF << itI->getX() << itI->getY();
+								it->second.send(bs.str());
+							}	
 						}
 						for (auto itE = pm.getEnemies().begin(); itE != pm.getEnemies().end(); itE++) {
 							delete (itE->second);
@@ -869,6 +874,7 @@ void ServerSocket::acceptLastDo() {
 							delete (itG->second);
 						}
 						pm.getGolems().clear();	
+						items.clear();
 						for(auto it = clients_map.begin();it != clients_map.end();it++) {
 							for (auto itE = pm.getEnemies().begin(); itE != pm.getEnemies().end(); itE++) {							
 								bs.clear();
@@ -1401,6 +1407,11 @@ void ServerSocket::acceptLastDo() {
 								bs << PROTO::ENEMY_DEAD << itG->second->getNick();
 								it->second.send(bs.str());
 							}
+							for (auto itI = items.begin(); itI != items.end(); itI++) {
+								bs.clear();
+								bs << PROTO::ITEM_OFF << itI->getX() << itI->getY();
+								it->second.send(bs.str());
+							}	
 						}
 						for (auto itE = pm.getEnemies().begin(); itE != pm.getEnemies().end(); itE++) {
 							delete (itE->second);
@@ -1414,7 +1425,8 @@ void ServerSocket::acceptLastDo() {
 						for (auto itG = pm.getGolems().begin(); itG != pm.getGolems().end(); itG++) {
 							delete (itG->second);
 						}
-						pm.getGolems().clear();	
+						pm.getGolems().clear();
+						items.clear();
 						for(auto it = clients_map.begin();it != clients_map.end();it++) {
 							for (auto itE = pm.getEnemies().begin(); itE != pm.getEnemies().end(); itE++) {							
 								bs.clear();

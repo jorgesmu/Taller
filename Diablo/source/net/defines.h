@@ -109,6 +109,8 @@ const unsigned char ITEM_OFF = 'R';
 const unsigned char RESET_PLAYER = 'S';
 // Avisa que cambio la direccion donde mira el jugador
 const unsigned char CHANGE_DIR = 'T';
+// Nickname en use srv->client
+const unsigned char NICKNAME_IN_USE = 'U';
 }
 
 // Cosas de movimiento

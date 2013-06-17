@@ -93,11 +93,11 @@ TileServidor* Golem::get_proximo_tile_enemigo(MapaServidor& mapa,PlayerManager& 
 	}else{
 		//sigo mi camino segun mi estrategia
 		if (this->estrategia == 1){
-			res = this->get_proximo_tile_recta_horizontal(mapa);
+			res = this->get_proximo_tile_recta_horizontal(mapa,pm);
 		}else if(this->estrategia == 2){
-			res = this->get_proximo_tile_recta_vertical(mapa);
+			res = this->get_proximo_tile_recta_vertical(mapa,pm);
 		}else if(this->estrategia == 3){
-			res = this->get_proximo_tile_circular(mapa);
+			res = this->get_proximo_tile_circular(mapa,pm);
 		}
 	}
 	return res;

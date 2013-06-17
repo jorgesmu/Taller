@@ -23,11 +23,13 @@ void Tile::insertarEntidadOrdenada(Entidad* ent){
 					insertado = true;
 				} else {
 					if(entidades[i] -> getOrdenBliteo() == ent -> getOrdenBliteo()) {
-						if(ent->getOrdenBliteo() == Entidad::ORDEN_PERSONAJE){
-							if( (entidades[i]->getX() == this ->getX()) && (entidades[i]->getY() == this ->getY()) ){
+						// son ambos personajes
+						if(entidades[i]->getOrdenBliteo() == Entidad::ORDEN_PERSONAJE){
+							// es la posicion del personaje a insertar
+							if( (entidades[i]->getX() != this ->getX()) && (entidades[i]->getY() != this ->getY()) ){
 								new_ent.push_back(ent);
 								insertado = true;
-							}
+							} 
 						} else{
 							   if ( (entidades[i] -> getX() >= ent -> getX()) && 
 								   (entidades[i] -> getY() >= ent -> getY()) ){

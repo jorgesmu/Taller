@@ -470,12 +470,13 @@ void ClientSocket::listenDo() {
 			}else{
 				// Si existe, que ataque
 				auto& atacante = pjm.getPje(nick_who);
-				auto& atacado = pjm.getPjeLocal();
+				Personaje* atacado;
 				if (!(pjm.getPjeLocal().getNick() == nick_to)) {
-					atacado = pjm.getPje(nick_to);
+				atacado = &pjm.getPje(nick_to);
+				}else{
+				atacado = &pjm.getPjeLocal();
 				}
-				//cout << "Ataco " << nick_who << endl;
-				atacante.ataque(atacado.getPosicion(&mapa),&mapa,&atacado,true);
+				atacante.ataque(atacado->getPosicion(&mapa),&mapa,atacado,true);
 			}
 		}else if(pt == PROTO::DEFENDER) {
 			std::string who_nick;

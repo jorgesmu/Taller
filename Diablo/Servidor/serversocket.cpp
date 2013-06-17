@@ -1142,8 +1142,10 @@ void ServerSocket::acceptLastDo() {
 							unEnemigo->get_timer_ataque().start();
 							unEnemigo->set_ultima_accion_atacar(true);
 						}else {
-							unEnemigo->set_ultima_accion_atacar(false);
-							unEnemigo->get_timer_ataque().stop();
+							if(!personajeAdyacente){
+								unEnemigo->set_ultima_accion_atacar(false);
+								unEnemigo->get_timer_ataque().stop();
+							}
 							//si es un enemigo actualizo su posicion
 							TileServidor* proxTile = unEnemigo->get_proximo_tile_enemigo(mapa,pm);
 						

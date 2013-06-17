@@ -864,7 +864,7 @@ void ServerSocket::acceptLastDo() {
 									it->second.send(bs.str());
 									//Mando los atributos principales del enemigo
 									bs.clear();
-									bs << PROTO::INIT_ATT << itE->second->getNick() << (float)itE->second->getVelocidad() << itE->second->getEnergia() << itE->second->getMagia() << itE->second->getEnergiaEscudo() << itE->second->getTerremoto() << itE->second->getHielo() << (float)itE->second->getRadio();
+									bs << PROTO::INIT_ATT << itE->second->getNick() << (float)itE->second->getVelocidad() << itE->second->getEnergia() << itE->second->getMagia() << itE->second->getEnergiaEscudo() << itE->second->getTerremoto() << itE->second->getHielo() << (float)itE->second->getRadio()  << (bool)itE->second->getBolaDeCristal() << (bool)itE->second->tieneGolem() << itE->second->tieneTransmut();
 									it->second.send(bs.str());
 								}
 							}
@@ -1205,16 +1205,18 @@ void ServerSocket::acceptLastDo() {
 					}
 				}
 			}else if(pt == PROTO::REQUEST_REV_POS) {
-				int x, y;
-				bs >> x >> y;
+				//int x, y;
+				//bs >> x >> y;
 				bool ok = true;
-				std::cout << "GOT REQUEST_REV_POS <" << new_nick << ">: " << x << ";" << y << "\n";
+				std::cout << "GOT REQUEST_REV_POS <" << new_nick << ">: \n";
 				//Veo si era el enemigo a matar
 				bool terminoPartida=false;
+				auto &p = pm.getPlayer(new_nick);
+
 				// Iteramos para ver si hay algun personaje
 				for(auto it = pm.getPlayers().begin();it != pm.getPlayers().end();it++) {
 					if (it->first == new_nick) continue;
-					if(it->second.getX() == x && it->second.getY() == y) {
+					if(it->second.getX() == p.getXInicial() && it->second.getY() == p.getYInicial()) {
 						ok = false;
 						break;
 					}
@@ -1226,12 +1228,12 @@ void ServerSocket::acceptLastDo() {
 				}
 				//para enemigos
 				for(auto it = pm.getEnemies().begin();it != pm.getEnemies().end();it++) {
-					if(it->second->getX() == x && it->second->getY() == y) {
+					if(it->second->getX() == p.getXInicial() && it->second->getY() == p.getYInicial()) {
 						//si esta ahi
 						ok = false;
 						break;
 					}
-					if(it->second->getXSiguiente() == x && it->second->getYSiguiente() == y) {
+					if(it->second->getXSiguiente() == p.getXInicial() && it->second->getYSiguiente() == p.getYInicial()) {
 						//si va a ahi
 						ok = false;
 						break;
@@ -1239,12 +1241,12 @@ void ServerSocket::acceptLastDo() {
 				}
 				// para golem
 				for(auto it = pm.getGolems().begin();it != pm.getGolems().end();it++) {
-					if(it->second->getX() == x && it->second->getY() == y) {
+					if(it->second->getX() == p.getXInicial() && it->second->getY() == p.getYInicial()) {
 						//si esta ahi
 						ok = false;
 						break;
 					}
-					if(it->second->getXSiguiente() == x && it->second->getYSiguiente() == y) {
+					if(it->second->getXSiguiente() == p.getXInicial() && it->second->getYSiguiente() == p.getYInicial()) {
 						//si va a ahi
 						ok = false;
 						break;
@@ -1252,7 +1254,7 @@ void ServerSocket::acceptLastDo() {
 				}
 				if(ok) {
 					// Si el movimiento esta ok, actualizamos la posicion
-					pm.getPlayer(new_nick).setPos(x, y);
+					pm.getPlayer(new_nick).setPos(p.getXInicial(), p.getYInicial());
 					// Lo descongelamos si estaba congelado y avisamos a todos
 					pm.getPlayer(new_nick).descongelar();
 					bs.clear();
@@ -1262,12 +1264,12 @@ void ServerSocket::acceptLastDo() {
 					}
 					// Informamos al jugador que esta ok
 					bs.clear();
-					bs << PROTO::POS_REQUEST_REV_REPLY << true;
+					bs << PROTO::POS_REQUEST_REV_REPLY << true  << p.getXInicial() << p.getYInicial();
 					std::cout << "REPLY_REV: OK\n";
 					this->send(cid, bs.str());
 					// Informamos a los demas del movimiento
 					bs.clear();
-					bs << PROTO::REV_PLAYER << new_nick << x << y;
+					bs << PROTO::REV_PLAYER << new_nick << p.getXInicial() << p.getYInicial();
 					for(auto it = clients_map.begin();it != clients_map.end();it++) {
 						if(it->second.nick == new_nick) continue; // Salteamos el jugador en cuestion
 						it->second.send(bs.str());
@@ -1275,11 +1277,85 @@ void ServerSocket::acceptLastDo() {
 					}
 					//pm.getPlayer(new_nick).descongelar();
 				}else{
-					// Si fallo, avisamos al cliente
-					bs.clear();
-					bs << PROTO::POS_REQUEST_REV_REPLY << false;
-					std::cout << "REPLY: FAIL\n";
-					this->send(cid, bs.str());
+					bool found = false;
+					// Limitamos la cantidad de iteraciones
+					TileServidor* unTile;
+					int cantIteraciones = 10;
+					int xRev, yRev;
+					for (int i = 0 ; i< cantIteraciones;i++){
+						//busco un tile cercano libre
+						if(mapa.tileExists(p.getXInicial() + i ,p.getYInicial())){
+							//derecha
+							unTile = mapa.getTile(p.getXInicial() + i ,p.getYInicial());
+							if (unTile->isCaminable() && !mapa.tile_esta_ocupado(p.getXInicial() + i ,p.getYInicial(),pm)){
+								found = true;
+								xRev = p.getXInicial() + i;
+								yRev = p.getYInicial();
+								break;
+							}
+						}
+						if(mapa.tileExists(p.getXInicial() - i ,p.getYInicial())){
+							//izquierda
+							unTile = mapa.getTile(p.getXInicial() - i ,p.getYInicial());
+							if (unTile->isCaminable() && !mapa.tile_esta_ocupado(p.getXInicial() - i ,p.getYInicial(),pm)){
+								xRev = p.getXInicial() - i;
+								yRev = p.getYInicial();
+								found = true;
+								break;
+							}
+						}
+						if(mapa.tileExists(p.getXInicial() ,p.getYInicial() + i)){
+							//abajo
+							unTile = mapa.getTile(p.getXInicial(),p.getYInicial() + i );
+							if (unTile->isCaminable() && !mapa.tile_esta_ocupado(p.getXInicial(),p.getYInicial() + i ,pm)){
+								xRev = p.getXInicial();
+								yRev = p.getYInicial() + i;
+								found = true;
+								break;
+							}
+						}
+						if(mapa.tileExists(p.getXInicial() ,p.getYInicial() - i)){
+							//arriba
+							unTile = mapa.getTile(p.getXInicial(),p.getYInicial() - i );
+							if (unTile->isCaminable() && !mapa.tile_esta_ocupado(p.getXInicial(),p.getYInicial() - i ,pm)){
+								xRev = p.getXInicial();
+								yRev = p.getYInicial() - i;
+								found = true;
+								break;
+							}
+						}
+					}
+					if(!found) {
+						// Si fallo, avisamos al cliente
+						bs.clear();
+						bs << PROTO::POS_REQUEST_REV_REPLY << false;
+						std::cout << "REPLY: FAIL\n";
+						this->send(cid, bs.str());
+					}else{
+						// Si el movimiento esta ok, actualizamos la posicion
+						pm.getPlayer(new_nick).setPos(xRev, yRev);
+						// Lo descongelamos si estaba congelado y avisamos a todos
+						pm.getPlayer(new_nick).descongelar();
+						bs.clear();
+						bs << PROTO::DESCONGELAR << new_nick;
+						for(auto it = clients_map.begin();it != clients_map.end();it++) {
+							it->second.send(bs.str());
+						}
+						// Informamos al jugador que esta ok
+						bs.clear();
+						bs << PROTO::POS_REQUEST_REV_REPLY << true  << xRev << yRev;
+						std::cout << "REPLY_REV: OK\n";
+						this->send(cid, bs.str());
+						// Informamos a los demas del movimiento
+						bs.clear();
+						bs << PROTO::REV_PLAYER << new_nick << xRev << yRev;
+						for(auto it = clients_map.begin();it != clients_map.end();it++) {
+							if(it->second.nick == new_nick) continue; // Salteamos el jugador en cuestion
+							it->second.send(bs.str());
+							std::cout << "Mandando update de revivir a " << it->second.nick << "\n";
+						}
+						//pm.getPlayer(new_nick).descongelar();
+					}
 				}
 			}else if(pt == PROTO::CATCH_FLAG) {
 				int x,y;
@@ -1326,7 +1402,7 @@ void ServerSocket::acceptLastDo() {
 								it->second.send(bs.str());
 								//Mando los atributos principales del enemigo
 								bs.clear();
-								bs << PROTO::INIT_ATT << itE->second->getNick() << (float)itE->second->getVelocidad() << itE->second->getEnergia() << itE->second->getMagia() << itE->second->getEnergiaEscudo() << itE->second->getTerremoto() << itE->second->getHielo() << (float)itE->second->getRadio();
+								bs << PROTO::INIT_ATT << itE->second->getNick() << (float)itE->second->getVelocidad() << itE->second->getEnergia() << itE->second->getMagia() << itE->second->getEnergiaEscudo() << itE->second->getTerremoto() << itE->second->getHielo() << (float)itE->second->getRadio()  << (bool)itE->second->getBolaDeCristal() << (bool)itE->second->tieneGolem() << itE->second->tieneTransmut();
 								it->second.send(bs.str());
 							}
 						}
@@ -1350,7 +1426,7 @@ void ServerSocket::acceptLastDo() {
 					it->second.send(bs.str());
 					//Mando los atributos principales del jugador
 					bs.clear();
-					bs << PROTO::INIT_ATT << unGolem->getNick() << (float)unGolem->getVelocidad() << unGolem->getEnergia() << unGolem->getMagia() << unGolem->getEnergiaEscudo() << unGolem->getTerremoto() << unGolem->getHielo() << (float)unGolem->getRadio();
+					bs << PROTO::INIT_ATT << unGolem->getNick() << (float)unGolem->getVelocidad() << unGolem->getEnergia() << unGolem->getMagia() << unGolem->getEnergiaEscudo() << unGolem->getTerremoto() << unGolem->getHielo() << (float)unGolem->getRadio()  << (bool)unGolem->getBolaDeCristal() << (bool)unGolem->tieneGolem() << unGolem->tieneTransmut();
 					it->second.send(bs.str());
 				}
 			

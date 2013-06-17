@@ -810,7 +810,7 @@ void Personaje::updateRevivir() {
 	if ((this->timerRevivir.isStarted()) && (this->timerRevivir.getTicks()>this->TIEMPO_REVIVIR)) {
 		std::cout << "pidiendo al server q me reviva \n";
 		BitStream bs;
-		bs << PROTO::REQUEST_REV_POS << start_pos_x << start_pos_y;
+		bs << PROTO::REQUEST_REV_POS;
 		sock.send(bs.str());
 		estadoMovimiento=MOV::ESPERANDO_OK;
 		this->timerRevivir.stop();

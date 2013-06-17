@@ -682,7 +682,9 @@ int main(int argc, char* argv[]) {
 				pjm.getPjeLocal().revivir();
 				ultimoMovimientoX=NOSEMOVIO;
 				ultimoMovimientoY=NOSEMOVIO;
-
+				caminoMinimo.clear();
+				tilePersonajeObjetivo = NULL;
+				personajeObjetivo = NULL;
 				//meto el item que deja cuando muere
 				int cant_items = 9;//cantidad de items que implementamos
 				int random;

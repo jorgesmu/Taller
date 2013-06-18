@@ -445,8 +445,10 @@ void ServerSocket::acceptLastDo() {
 		if(pm.playerExists(new_nick)) {
 			std::string tipo = pm.getPlayer(new_nick).getTipo();
 			//BitStream bs;
+			bs.clear();
 			bs << PROTO::PREVIOUSTYPE << tipo;
 			send(cid, bs.str());
+			cout << "sendind type " << tipo << endl;
 		}else{
 			bool found=false;
 			for (auto it=entidades.begin();it!=entidades.end();it++) {

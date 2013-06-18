@@ -333,10 +333,12 @@ void ClientSocket::listenDo() {
 			std::string tipo;
 			bs >> tipo;
 			pje_local_tipo=tipo;
+			cout << "Recieved type " << tipo << endl;
 		}else if(pt == PROTO::DEFTYPE) {
 			std::string tipo;
 			bs >> tipo;
 			pje_local_tipo=tipo;
+			cout << "Recieved def type " << tipo << endl;
 		}else if(pt == PROTO::INITPOS) {
 			bs >> start_pos_x;
 			bs >> start_pos_y;

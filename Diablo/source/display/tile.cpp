@@ -22,35 +22,22 @@ void Tile::insertarEntidadOrdenada(Entidad* ent){
 					new_ent.push_back(ent);
 					insertado = true;
 				} else {
+					// tienen el mismo orden de bliteo
 					if(entidades[i] -> getOrdenBliteo() == ent -> getOrdenBliteo()) {
-						// son ambos personajes
-						if(entidades[i]->getOrdenBliteo() == Entidad::ORDEN_PERSONAJE){
-							// es la posicion del personaje a insertar
-							if( (entidades[i]->getX() != this ->getX()) && (entidades[i]->getY() != this ->getY()) ){
-								new_ent.push_back(ent);
-								insertado = true;
-							} 
-						} else{
-							   if ( (entidades[i] -> getX() >= ent -> getX()) && 
-								   (entidades[i] -> getY() >= ent -> getY()) ){
+						// la que se inserta se blitea primero
+						if(entidades[i]->getY() > ent->getY()){
+							new_ent.push_back(ent);
+							insertado = true;
+						} else {
+							if(entidades[i]->getY() == ent ->getY()){
+								if(entidades[i]->getX() > ent->getX()){
 									new_ent.push_back(ent);
 									insertado = true;
-							   }
+								}
+							}
 						}
 					}
-				}			
-				/*
-				if((entidades[i] -> getOrdenBliteo() > ent -> getOrdenBliteo())) {
-					new_ent.push_back(ent);
-					insertado = true;
-				} else {
-					if((entidades[i] -> getOrdenBliteo() == ent -> getOrdenBliteo()) && 
-					   (entidades[i] -> getX() >= ent -> getX()) && 
-					   (entidades[i] -> getY() >= ent -> getY())) {
-						new_ent.push_back(ent);
-						insertado = true;
-					}
-				}*/
+				}
 			}
 		}
 		// inserto la anterior

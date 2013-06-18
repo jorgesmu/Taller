@@ -288,6 +288,10 @@ public:
 	//Colision con personaje
 	virtual void chocarCon(Personaje* personaje);
 
+	virtual Tile* getTileAncla(){
+		return this -> tileAncla;
+	}
+
 protected:	
 		
 	/*

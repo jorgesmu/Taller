@@ -104,12 +104,15 @@ bool calcularAtaque = false; // indica si se debe calcular el camino minimo para
 // Variables especiales para ataque
 Personaje* personajeObjetivo = NULL;
 Tile* tilePersonajeObjetivo =  NULL;
+vector< pair<int,int> > caminoMinimo;
 //Socket
 ClientSocket sock;
 // Cargo las entidades en un vector
 std::vector<EntidadFija*> entidades_cargadas;
 // Recibi todos los atributos default del server
 bool initAttCargados = false;
+// Para abortar la conexion al momento de mandar nick+type
+bool abortConnection = false;
 
 int main(int argc, char* argv[]) {
 	// Verificamos que se pase el nick y el tipo
@@ -251,6 +254,22 @@ int main(int argc, char* argv[]) {
 	// Esperamos el paso de archivos
 	while (!pasoArchivos){
 		Sleep(50);
+		if(abortConnection) {
+			mapa.clean();
+			resman.clean();
+			soundman.clean();
+			err_log.cerrarConexion();
+			//Test::test();
+			TTF_Quit();
+			SDL_Quit();
+			if(!sock.isOpen()){
+				cout << "Conexion cerrada por el servidor" << endl;
+				system ("PAUSE");
+			}
+			sock.close();
+
+			return 1;
+		}
 	}
 	//Empieza a dibujar
 	// Parseo el nivel
@@ -397,7 +416,6 @@ int main(int argc, char* argv[]) {
 	bool quit = false;
 
 	//variables para el control del movimiento
-	vector< pair<int,int> > caminoMinimo;
 	int indice = 0; //indica que paso del movimiento se encuentra
 	int estadoPersonaje = 0; //estado del personaje
 	bool puedeMoverse = false; // indica si el personaje ya termino un movimiento anterior y puede seguir su camino o esta esperando un nuevo camino 
@@ -465,7 +483,7 @@ int main(int argc, char* argv[]) {
 							break;
 						}
 						case 'b' : {
-							if (pjm.getPjeLocal().getCantBombas()>0) {
+							if (pjm.getPjeLocal().getCantBombas()>0 && !pjm.getPjeLocal().getTimerBomba().isStarted()) {
 								int x = pjm.getPjeLocal().getPosicion(&mapa)->getU();
 								int y = pjm.getPjeLocal().getPosicion(&mapa)->getV();
 								pjm.getPjeLocal().utilizarBomba(x,y);
@@ -924,16 +942,41 @@ int main(int argc, char* argv[]) {
 							std::cout << "TILE PERSONAJE: " << tilePersonaje << "\n";
 						}
 						std::cout << "ULTIMO DESTINO: " << ultimoDestinoX << ";" << ultimoDestinoY << "\n";
-						Tile* tileDestino = mapa.getTile(ultimoDestinoX ,ultimoDestinoY);
-						std::cout << "TILE DESTINO - PERSONAJE: " << tileDestino << " - " << tilePersonaje << "\n";
-						//calculo el camino
-						caminoMinimo.clear();
-						caminoMinimo = mapa.getCaminoMinimo(tilePersonaje, tileDestino);
+
+						if(enAtaque) {
+							printf("\nCalculo del camino de ataque %s\n", pjm.getPjeLocal().getNick().c_str());
+							if (personajeObjetivo != NULL) {
+								tilePersonajeObjetivo = mapa.getTilePorPixeles(personajeObjetivo->getX(),personajeObjetivo->getY());
+								if ((tilePersonaje != NULL) && (tilePersonajeObjetivo != NULL)){
+									caminoMinimo = mapa.getCaminoMinimo(tilePersonaje,tilePersonajeObjetivo);
+									caminoMinimo.pop_back();
+									enAtaque = true;
+									std::cout << "enAtaque = true\n";
+								}else {
+									enAtaque = false;
+									personajeObjetivo = NULL;
+									tilePersonajeObjetivo = NULL;
+								}
+							} else {
+								enAtaque = false;
+								personajeObjetivo = NULL;
+							}
+						}else{
+							Tile* tileDestino = mapa.getTile(ultimoDestinoX ,ultimoDestinoY);
+							std::cout << "TILE DESTINO - PERSONAJE: " << tileDestino << " - " << tilePersonaje << "\n";
+							//calculo el camino
+							caminoMinimo.clear();
+							caminoMinimo = mapa.getCaminoMinimo(tilePersonaje, tileDestino);
+						}
 						std::cout << "NUEVO CAMINO MINIMO:\n";
-						//for(auto it = caminoMinimo.begin();it != caminoMinimo.end();it++) {
-							//std::cout << "- " << it->first << ";" << it->second << "\n";
-						//}
+						for(auto it = caminoMinimo.begin();it != caminoMinimo.end();it++) {
+							std::cout << "- " << it->first << ";" << it->second << "\n";
+						}
+
+
+
 						indice = 1;
+						estadoMovimiento = MOV::MANDAR_POS;
 						// Despues de actualizar el grafo, desmarco el tile
 						tProx->setCaminable();
 						mapa.actualizarGrafo(tProx->getU(),tProx->getV());

@@ -55,6 +55,10 @@ extern SoundMan soundman;
 extern bool enAtaque; // indica si se encuentra en ataque
 extern bool calcularAtaque; // indica si se debe calcular el camino minimo para un ataque
 extern Personaje* personajeObjetivo;
+extern Tile* tilePersonajeObjetivo;
+extern std::vector< std::pair<int,int> > caminoMinimo;
+
+extern bool abortConnection;
 
 bool ClientSocket::WSinit = false;
 size_t ClientSocket::ref_count = 0;
@@ -329,10 +333,12 @@ void ClientSocket::listenDo() {
 			std::string tipo;
 			bs >> tipo;
 			pje_local_tipo=tipo;
+			cout << "Recieved type " << tipo << endl;
 		}else if(pt == PROTO::DEFTYPE) {
 			std::string tipo;
 			bs >> tipo;
 			pje_local_tipo=tipo;
+			cout << "Recieved def type " << tipo << endl;
 		}else if(pt == PROTO::INITPOS) {
 			bs >> start_pos_x;
 			bs >> start_pos_y;
@@ -466,14 +472,19 @@ void ClientSocket::listenDo() {
 		}else if(pt == PROTO::ATACAR) {
 			std::string nick_who,nick_to;
 			bs >> nick_who >> nick_to;
-			// Si no existe el personaje, error
+			bool atacadoLocal = false;
+			if (pjm.getPjeLocal().getNick() == nick_to)
+				atacadoLocal = true;
+			// Veo si existe el atacante
 			if(!pjm.PjeExiste(nick_who)) {
-				std::cerr << "Error @ ATACAR: " << nick_who << " not found\n";
-			}else{
-				// Si existe, que ataque
+				std::cerr << "Error @ ATACANTE: " << nick_who << " not found\n";
+			} else if(!pjm.PjeExiste(nick_to) && !atacadoLocal) {
+				std::cerr << "Error @ ATACADO: " << nick_to << " not found\n";
+			} else {
+				// Si existen ambos, que ataque
 				auto& atacante = pjm.getPje(nick_who);
 				Personaje* atacado;
-				if (!(pjm.getPjeLocal().getNick() == nick_to)) {
+				if (!atacadoLocal) {
 				atacado = &pjm.getPje(nick_to);
 				}else{
 				atacado = &pjm.getPjeLocal();
@@ -895,6 +906,13 @@ void ClientSocket::listenDo() {
 				ss << nick_winner << " gano esta partida, jugale una revancha!";
 			}
 			consola.log(ss.str());
+			caminoMinimo.clear();
+			tilePersonajeObjetivo = NULL;
+			personajeObjetivo = NULL;
+		}else if(pt == PROTO::NICKNAME_IN_USE) {
+			abortConnection = true;
+			std::cout << "Nickname in use, disconnected\n";
+			this->close();
 		}else if (pt == PROTO::ENEMY_DEAD){
 			string EnemigoNick;
 			//elimino enemigo
@@ -905,6 +923,7 @@ void ClientSocket::listenDo() {
 					mapa.getTilePorPixeles(it->second.getX(),it->second.getY())->deleteEntidad(&it->second);
 					if(&it->second == personajeObjetivo) {
 						personajeObjetivo = NULL;
+						tilePersonajeObjetivo = NULL;
 					}
 					pjm.getPjes().erase(it);
 					break;

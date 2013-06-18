@@ -421,7 +421,8 @@ void ServerSocket::acceptLastDo() {
 			//std::cout << "NICK: " << it->second.nick << "\n";
 			if(it->second.nick == new_nick) {
 				BitStream reply;
-				reply << PROTO::TEXTMSG << std::string("Nickname already connected");
+				reply << PROTO::NICKNAME_IN_USE;
+				//reply << PROTO::TEXTMSG << std::string("Nickname already connected");
 				this->send(cid, reply.str());
 				removeClient(cid);
 				LeaveCriticalSection(&critSect);
@@ -444,8 +445,10 @@ void ServerSocket::acceptLastDo() {
 		if(pm.playerExists(new_nick)) {
 			std::string tipo = pm.getPlayer(new_nick).getTipo();
 			//BitStream bs;
+			bs.clear();
 			bs << PROTO::PREVIOUSTYPE << tipo;
 			send(cid, bs.str());
+			cout << "sendind type " << tipo << endl;
 		}else{
 			bool found=false;
 			for (auto it=entidades.begin();it!=entidades.end();it++) {
@@ -767,7 +770,7 @@ void ServerSocket::acceptLastDo() {
 					bs.clear();
 					bs << PROTO::ITEM_OFF << x << y;
 					it->second.send(bs.str());
-					std::cout << " agarro item en pos " << x << y << "\n";
+					//std::cout << " agarro item en pos " << x << y << "\n";
 				}
 				removeItem(x,y);
 			}else if(pt == PROTO::DAMAGE) {	
@@ -834,9 +837,9 @@ void ServerSocket::acceptLastDo() {
 							it->second.send(bs.str());
 						}
 					}
-					if (terminoMision) Sleep(5000);
-					for(auto it = clients_map.begin();it != clients_map.end();it++) {
-						if(terminoMision){
+					if(terminoMision){
+						Sleep(5000);
+						for(auto it = clients_map.begin();it != clients_map.end();it++) {
 							for (auto itP = pm.getPlayers().begin(); itP != pm.getPlayers().end(); itP++) {
 								bs.clear();
 								bs << PROTO::RESET_PLAYER << itP->first << itP->second.getXInicial() << itP->second.getYInicial();
@@ -845,28 +848,44 @@ void ServerSocket::acceptLastDo() {
 								itP->second.reiniciar();
 							}
 							for (auto itE = pm.getEnemies().begin(); itE != pm.getEnemies().end(); itE++) {
-								delete (itE->second);
-							}
-							pm.getEnemies().clear();
-							//Agregar enemigos automaticos
-							pm.addEnemy("EnemigoMaster","soldado",mapa,1);
-							//pm.addEnemy("Enemigo2","soldado",mapa,2);	
-							//pm.addEnemy("Enemigo3","soldado",mapa,2);
-							//Mato a todos los golems que quedaron
+								bs.clear();
+								bs << PROTO::ENEMY_DEAD << itE->second->getNick();
+								it->second.send(bs.str());
+							}	
 							for (auto itG = pm.getGolems().begin(); itG != pm.getGolems().end(); itG++) {
-								delete (itG->second);
+								bs.clear();
+								bs << PROTO::ENEMY_DEAD << itG->second->getNick();
+								it->second.send(bs.str());
 							}
-							pm.getGolems().clear();	
-							for(auto it = clients_map.begin();it != clients_map.end();it++) {
-								for (auto itE = pm.getEnemies().begin(); itE != pm.getEnemies().end(); itE++) {							
-									bs.clear();
-									bs << PROTO::NEW_PLAYER << itE->second->getNick() << itE->second->getTipo() << itE->second->getX() << itE->second->getY() << itE->second-> isOn();
-									it->second.send(bs.str());
-									//Mando los atributos principales del enemigo
-									bs.clear();
-									bs << PROTO::INIT_ATT << itE->second->getNick() << (float)itE->second->getVelocidad() << itE->second->getEnergia() << itE->second->getMagia() << itE->second->getEnergiaEscudo() << itE->second->getTerremoto() << itE->second->getHielo() << (float)itE->second->getRadio()  << (bool)itE->second->getBolaDeCristal() << (bool)itE->second->tieneGolem() << itE->second->tieneTransmut();
-									it->second.send(bs.str());
-								}
+							for (auto itI = items.begin(); itI != items.end(); itI++) {
+								bs.clear();
+								bs << PROTO::ITEM_OFF << itI->getX() << itI->getY();
+								it->second.send(bs.str());
+							}	
+						}
+						for (auto itE = pm.getEnemies().begin(); itE != pm.getEnemies().end(); itE++) {
+							delete (itE->second);
+						}
+						pm.getEnemies().clear();
+						//Agregar enemigos automaticos
+						pm.addEnemy("EnemigoMaster","soldado",mapa,1);
+						//pm.addEnemy("Enemigo2","soldado",mapa,2);	
+						//pm.addEnemy("Enemigo3","soldado",mapa,2);
+						//Mato a todos los golems que quedaron
+						for (auto itG = pm.getGolems().begin(); itG != pm.getGolems().end(); itG++) {
+							delete (itG->second);
+						}
+						pm.getGolems().clear();	
+						items.clear();
+						for(auto it = clients_map.begin();it != clients_map.end();it++) {
+							for (auto itE = pm.getEnemies().begin(); itE != pm.getEnemies().end(); itE++) {							
+								bs.clear();
+								bs << PROTO::NEW_PLAYER << itE->second->getNick() << itE->second->getTipo() << itE->second->getX() << itE->second->getY() << itE->second-> isOn();
+								it->second.send(bs.str());
+								//Mando los atributos principales del enemigo
+								bs.clear();
+								bs << PROTO::INIT_ATT << itE->second->getNick() << (float)itE->second->getVelocidad() << itE->second->getEnergia() << itE->second->getMagia() << itE->second->getEnergiaEscudo() << itE->second->getTerremoto() << itE->second->getHielo() << (float)itE->second->getRadio()  << (bool)itE->second->getBolaDeCristal() << (bool)itE->second->tieneGolem() << itE->second->tieneTransmut();
+								it->second.send(bs.str());
 							}
 						}
 					}
@@ -1257,6 +1276,7 @@ void ServerSocket::acceptLastDo() {
 					pm.getPlayer(new_nick).setPos(p.getXInicial(), p.getYInicial());
 					// Lo descongelamos si estaba congelado y avisamos a todos
 					pm.getPlayer(new_nick).descongelar();
+					pm.getPlayer(new_nick).setEnergia(100); //sino hasta que no lo ataquen voy a tenerlo con energia 0
 					bs.clear();
 					bs << PROTO::DESCONGELAR << new_nick;
 					for(auto it = clients_map.begin();it != clients_map.end();it++) {
@@ -1371,16 +1391,30 @@ void ServerSocket::acceptLastDo() {
 							it->second.send(bs.str());
 							std::cout << "Mandando ganador de la mision a " << it->second.nick << "\n";
 						}
-						Sleep(6000);
+						Sleep(5000);
 						for(auto it = clients_map.begin();it != clients_map.end();it++) {
 							for (auto itP = pm.getPlayers().begin(); itP != pm.getPlayers().end(); itP++) {
 								bs.clear();
 								bs << PROTO::RESET_PLAYER << itP->first << itP->second.getXInicial() << itP->second.getYInicial();
 								it->second.send(bs.str());
-								std::cout << "Mandando reset de " << itP->first << " de la mision a " << it->second.nick << "\n";
+								//std::cout << "Mandando reset de " << itP->first << " de la mision a " << it->second.nick << "\n";
 								itP->second.reiniciar();
 							}
-							 
+							for (auto itE = pm.getEnemies().begin(); itE != pm.getEnemies().end(); itE++) {
+								bs.clear();
+								bs << PROTO::ENEMY_DEAD << itE->second->getNick();
+								it->second.send(bs.str());
+							}	
+							for (auto itG = pm.getGolems().begin(); itG != pm.getGolems().end(); itG++) {
+								bs.clear();
+								bs << PROTO::ENEMY_DEAD << itG->second->getNick();
+								it->second.send(bs.str());
+							}
+							for (auto itI = items.begin(); itI != items.end(); itI++) {
+								bs.clear();
+								bs << PROTO::ITEM_OFF << itI->getX() << itI->getY();
+								it->second.send(bs.str());
+							}	
 						}
 						for (auto itE = pm.getEnemies().begin(); itE != pm.getEnemies().end(); itE++) {
 							delete (itE->second);
@@ -1394,7 +1428,8 @@ void ServerSocket::acceptLastDo() {
 						for (auto itG = pm.getGolems().begin(); itG != pm.getGolems().end(); itG++) {
 							delete (itG->second);
 						}
-						pm.getGolems().clear();	
+						pm.getGolems().clear();
+						items.clear();
 						for(auto it = clients_map.begin();it != clients_map.end();it++) {
 							for (auto itE = pm.getEnemies().begin(); itE != pm.getEnemies().end(); itE++) {							
 								bs.clear();

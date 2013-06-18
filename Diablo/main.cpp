@@ -942,16 +942,41 @@ int main(int argc, char* argv[]) {
 							std::cout << "TILE PERSONAJE: " << tilePersonaje << "\n";
 						}
 						std::cout << "ULTIMO DESTINO: " << ultimoDestinoX << ";" << ultimoDestinoY << "\n";
-						Tile* tileDestino = mapa.getTile(ultimoDestinoX ,ultimoDestinoY);
-						std::cout << "TILE DESTINO - PERSONAJE: " << tileDestino << " - " << tilePersonaje << "\n";
-						//calculo el camino
-						caminoMinimo.clear();
-						caminoMinimo = mapa.getCaminoMinimo(tilePersonaje, tileDestino);
+
+						if(enAtaque) {
+							printf("\nCalculo del camino de ataque %s\n", pjm.getPjeLocal().getNick().c_str());
+							if (personajeObjetivo != NULL) {
+								tilePersonajeObjetivo = mapa.getTilePorPixeles(personajeObjetivo->getX(),personajeObjetivo->getY());
+								if ((tilePersonaje != NULL) && (tilePersonajeObjetivo != NULL)){
+									caminoMinimo = mapa.getCaminoMinimo(tilePersonaje,tilePersonajeObjetivo);
+									caminoMinimo.pop_back();
+									enAtaque = true;
+									std::cout << "enAtaque = true\n";
+								}else {
+									enAtaque = false;
+									personajeObjetivo = NULL;
+									tilePersonajeObjetivo = NULL;
+								}
+							} else {
+								enAtaque = false;
+								personajeObjetivo = NULL;
+							}
+						}else{
+							Tile* tileDestino = mapa.getTile(ultimoDestinoX ,ultimoDestinoY);
+							std::cout << "TILE DESTINO - PERSONAJE: " << tileDestino << " - " << tilePersonaje << "\n";
+							//calculo el camino
+							caminoMinimo.clear();
+							caminoMinimo = mapa.getCaminoMinimo(tilePersonaje, tileDestino);
+						}
 						std::cout << "NUEVO CAMINO MINIMO:\n";
-						//for(auto it = caminoMinimo.begin();it != caminoMinimo.end();it++) {
-							//std::cout << "- " << it->first << ";" << it->second << "\n";
-						//}
+						for(auto it = caminoMinimo.begin();it != caminoMinimo.end();it++) {
+							std::cout << "- " << it->first << ";" << it->second << "\n";
+						}
+
+
+
 						indice = 1;
+						estadoMovimiento = MOV::MANDAR_POS;
 						// Despues de actualizar el grafo, desmarco el tile
 						tProx->setCaminable();
 						mapa.actualizarGrafo(tProx->getU(),tProx->getV());

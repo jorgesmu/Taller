@@ -1274,6 +1274,7 @@ void ServerSocket::acceptLastDo() {
 					pm.getPlayer(new_nick).setPos(p.getXInicial(), p.getYInicial());
 					// Lo descongelamos si estaba congelado y avisamos a todos
 					pm.getPlayer(new_nick).descongelar();
+					pm.getPlayer(new_nick).setEnergia(100); //sino hasta que no lo ataquen voy a tenerlo con energia 0
 					bs.clear();
 					bs << PROTO::DESCONGELAR << new_nick;
 					for(auto it = clients_map.begin();it != clients_map.end();it++) {

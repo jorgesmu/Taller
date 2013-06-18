@@ -470,14 +470,19 @@ void ClientSocket::listenDo() {
 		}else if(pt == PROTO::ATACAR) {
 			std::string nick_who,nick_to;
 			bs >> nick_who >> nick_to;
-			// Si no existe el personaje, error
-			if(!pjm.PjeExiste(nick_who) || !pjm.PjeExiste(nick_to)) {
-				std::cerr << "Error @ ATACAR: " << nick_who << " o " << nick_to << " not found\n";
-			}else{
-				// Si existe, que ataque
+			bool atacadoLocal = false;
+			if (pjm.getPjeLocal().getNick() == nick_to)
+				atacadoLocal = true;
+			// Veo si existe el atacante
+			if(!pjm.PjeExiste(nick_who)) {
+				std::cerr << "Error @ ATACANTE: " << nick_who << " not found\n";
+			} else if(!pjm.PjeExiste(nick_to) && !atacadoLocal) {
+				std::cerr << "Error @ ATACADO: " << nick_to << " not found\n";
+			} else {
+				// Si existen ambos, que ataque
 				auto& atacante = pjm.getPje(nick_who);
 				Personaje* atacado;
-				if (!(pjm.getPjeLocal().getNick() == nick_to)) {
+				if (!atacadoLocal) {
 				atacado = &pjm.getPje(nick_to);
 				}else{
 				atacado = &pjm.getPjeLocal();

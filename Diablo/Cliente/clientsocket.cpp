@@ -471,8 +471,8 @@ void ClientSocket::listenDo() {
 			std::string nick_who,nick_to;
 			bs >> nick_who >> nick_to;
 			// Si no existe el personaje, error
-			if(!pjm.PjeExiste(nick_who)) {
-				std::cerr << "Error @ ATACAR: " << nick_who << " not found\n";
+			if(!pjm.PjeExiste(nick_who) || !pjm.PjeExiste(nick_to)) {
+				std::cerr << "Error @ ATACAR: " << nick_who << " o " << nick_to << " not found\n";
 			}else{
 				// Si existe, que ataque
 				auto& atacante = pjm.getPje(nick_who);

@@ -537,6 +537,8 @@ public:
 
 	void utilizarBomba(int xPersonaje, int yPersonaje);
 
+	Timer getTimerBomba() { return tBomba; }
+
 	void Personaje::utilizarGolem() ;
 
 	void updateBomba();

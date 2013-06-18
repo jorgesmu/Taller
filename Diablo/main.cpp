@@ -483,7 +483,7 @@ int main(int argc, char* argv[]) {
 							break;
 						}
 						case 'b' : {
-							if (pjm.getPjeLocal().getCantBombas()>0) {
+							if (pjm.getPjeLocal().getCantBombas()>0 && !pjm.getPjeLocal().getTimerBomba().isStarted()) {
 								int x = pjm.getPjeLocal().getPosicion(&mapa)->getU();
 								int y = pjm.getPjeLocal().getPosicion(&mapa)->getV();
 								pjm.getPjeLocal().utilizarBomba(x,y);

@@ -90,16 +90,27 @@ vector<pair<int,int> > grafo::reconstruir_camino(int posXOrigen,int posYOrigen, 
 	vector<pair<int,int> > resultado;
 	int padreVerticeX = posXDestino;
 	int padreVerticeY = posYDestino;
+	bool error = false; //para caso borde que ocurre a veces de que no haya camino
 	while (!((padreVerticeX == posXOrigen) && (padreVerticeY == posYOrigen))){
-		pair<int,int> padreVertice = padre[padreVerticeX][padreVerticeY];
-		if(!((padreVerticeX == posXOrigen) && (padreVerticeY == posYOrigen)))
-			resultado.push_back(padreVertice);
-		padreVerticeX = padreVertice.first;
-		padreVerticeY = padreVertice.second;
+		pair<int,int> padreVertice;
+		//validacion para caso borde de que no haya camino
+		if(padreVerticeX >= 0 && padreVerticeY >= 0 ){
+			padreVertice = padre[padreVerticeX][padreVerticeY];
+			if(!((padreVerticeX == posXOrigen) && (padreVerticeY == posYOrigen)))
+				resultado.push_back(padreVertice);
+			padreVerticeX = padreVertice.first;
+			padreVerticeY = padreVertice.second;
+		}else{
+			error = true;
+		}
 	}
 	reverse(resultado.begin(),resultado.end());
 	pair<int,int> destino = make_pair<int,int> (posXDestino,posYDestino);
 	resultado.push_back(destino);
+	if (error){
+		vector<pair<int,int> > resVacio;
+		return resVacio;
+	}
 	return resultado;
 }
 

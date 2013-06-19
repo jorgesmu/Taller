@@ -340,6 +340,10 @@ void Mapa::actualizarGrafo(int pos_x, int pos_y){
 
 }
 vector <pair<int,int> > Mapa::getCaminoMinimo(Tile* tileOrigen, Tile* tileDestino){
+	if (tileOrigen == NULL || tileDestino == NULL){
+		std::vector<pair<int, int>> vacio;
+		return vacio;
+	}
 	if(tileOrigen == tileDestino){
 		std::vector<pair<int, int>> vacio;
 		return vacio;

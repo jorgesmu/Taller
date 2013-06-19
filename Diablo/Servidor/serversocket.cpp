@@ -26,7 +26,7 @@ extern bool puedeMoverseEnemigo;
 extern bool conectandose;
 bool ServerSocket::WSinit = false;
 size_t ServerSocket::ref_count = 0;
-const int tiempoAtaque = 1000;
+const int tiempoAtaque = 2000;
 BitStream bs;
 extern Misiones mision;
 extern bool crearMision;

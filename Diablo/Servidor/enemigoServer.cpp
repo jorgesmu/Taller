@@ -363,6 +363,7 @@ void Enemigo::atacar(string& NickAtacado,PlayerManager& pm,ServerSocket& socks){
 			encontro = true;
 			if(!it->second->estaVivo()){
 				murio = true;
+				pm.getEnemies().erase(it);
 				break;
 			}
 		}
@@ -373,10 +374,13 @@ void Enemigo::atacar(string& NickAtacado,PlayerManager& pm,ServerSocket& socks){
 			Golem* unGolem = it->second;
 			if(unGolem->getNick() == NickAtacado){
 				unGolem->hacerDanio(danio);
-			}
-			if(!it->second->estaVivo()){
-				//aviso a los demas que murio enemigo
-				murio = true;
+			
+				if(!it->second->estaVivo()){
+					//aviso a los demas que murio enemigo
+					murio = true;
+					pm.getGolems().erase(it);
+					break;
+				}
 			}
 		}
 	}

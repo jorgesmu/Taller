@@ -55,6 +55,7 @@ logErrores err_log("log_cliente.txt");
 bool pasoArchivos = false;
 bool cargoMapa = false;
 const int NOSEMOVIO = -1;
+
 // Variables globales
 // Critical section
 CRITICAL_SECTION cs_main;
@@ -101,6 +102,8 @@ bool choco;
 // Flags ataque
 bool enAtaque = false; // indica si se encuentra en ataque
 bool calcularAtaque = false; // indica si se debe calcular el camino minimo para un ataque
+bool respondioDestino = false; //bool para usar de semaforo para saber si el destino es valido
+bool respuestaDestino = false; //respuesta
 // Variables especiales para ataque
 Personaje* personajeObjetivo = NULL;
 Tile* tilePersonajeObjetivo =  NULL;
@@ -678,7 +681,76 @@ int main(int argc, char* argv[]) {
 		accum += frame_time;
 
 		// Aca se hace el timestep, aka avanzar la fisica usando Euler en un delta t fijo
-		while(accum >= CONST_DT) {			
+		while(accum >= CONST_DT) {		
+			//verifico si recibi el flag de respuesta del destino del servidor, logica de un loop anterior no finalizado
+			if(respondioDestino){
+				if (!respuestaDestino){
+					ultimoDestinoX = ultimoMovimientoX;
+					ultimoDestinoY = ultimoMovimientoY;
+					caminoMinimo.clear();
+					estadoMovimiento = MOV::IDLE;
+				}else{
+					estadoMovimiento = MOV::MANDAR_POS;
+					// Marco el tile como no caminable temporalmente
+					Tile* tProx = mapa.getTile(proximoTile.first, proximoTile.second);
+					tProx->setNoCaminable();
+					// Actualizo el grafo
+					mapa.actualizarGrafo(tProx->getU(),tProx->getV());
+					// recalculo el camino
+					//el camino va desde ultimo tile al que me movi, hasta el que hice click que es el ultimo del camino anterior
+					Tile* tilePersonaje = mapa.getTile(ultimoMovimientoX, ultimoMovimientoY);
+						
+					if(!mapa.tileExists(ultimoMovimientoX, ultimoMovimientoY)) {
+						tilePersonaje = mapa.getTile(start_pos_x, start_pos_y);
+						//std::cout << "POS PJE: " << pjm.getPjeLocal().getX() << ";" << pjm.getPjeLocal().getY() << "\n";
+						std::cout << "TILE PERSONAJE: " << tilePersonaje << "\n";
+					}
+					std::cout << "ULTIMO DESTINO: " << ultimoDestinoX << ";" << ultimoDestinoY << "\n";
+					caminoMinimo.clear();
+							
+					if(enAtaque) {
+						printf("\nCalculo del camino de ataque %s\n", pjm.getPjeLocal().getNick().c_str());
+						if (personajeObjetivo != NULL) {
+							tilePersonajeObjetivo = mapa.getTilePorPixeles(personajeObjetivo->getX(),personajeObjetivo->getY());
+							if ((tilePersonaje != NULL) && (tilePersonajeObjetivo != NULL)){
+								caminoMinimo = mapa.getCaminoMinimo(tilePersonaje,tilePersonajeObjetivo);
+								caminoMinimo.pop_back();
+								enAtaque = true;
+								std::cout << "enAtaque = true\n";
+							}else {
+								enAtaque = false;
+								personajeObjetivo = NULL;
+								tilePersonajeObjetivo = NULL;
+							}
+						} else {
+							enAtaque = false;
+							personajeObjetivo = NULL;
+						}
+					}else{
+						Tile* tileDestino = mapa.getTile(ultimoDestinoX ,ultimoDestinoY);
+						std::cout << "TILE DESTINO - PERSONAJE: " << tileDestino << " - " << tilePersonaje << "\n";
+						//calculo el camino
+						caminoMinimo.clear();
+						caminoMinimo = mapa.getCaminoMinimo(tilePersonaje, tileDestino);
+					}
+					std::cout << "NUEVO CAMINO MINIMO:\n";
+					for(auto it = caminoMinimo.begin();it != caminoMinimo.end();it++) {
+						std::cout << "- " << it->first << ";" << it->second << "\n";
+					}
+
+
+
+					indice = 1;
+					estadoMovimiento = MOV::MANDAR_POS;
+					// Despues de actualizar el grafo, desmarco el tile
+					tProx->setCaminable();
+					mapa.actualizarGrafo(tProx->getU(),tProx->getV());
+					pjm.getPjeLocal().mover(pjm.getPjeLocal().getPosicion(&mapa));
+				
+				}
+				respondioDestino = false;
+			}
+			//hasta aca verifico respuesta destino
 			// Veo si me tengo que relocalizar en el mapa
 			if (estadoMovimiento == MOV::OK_REV_RECV) {
 				std::cout << "Relocalizando al jugador..." << endl;
@@ -883,7 +955,6 @@ int main(int argc, char* argv[]) {
 
 			//Para que vuelva atras la transmutacion
 			pjm.getPjeLocal().updateTransmutacion();
-			
 			if (puedeMoverse) {				
 				if (!choco) {
 					std::vector<Entidad*> entidades=pjm.getPjeLocal().getPosicion(&mapa)->getEntidades();
@@ -926,61 +997,9 @@ int main(int argc, char* argv[]) {
 						estadoMovimiento = MOV::MANDAR_POS;
 					}else if(estadoMovimiento == MOV::FAIL_RECV) {
 						std::cout << "FAIL_RECV\n";
-						estadoMovimiento = MOV::MANDAR_POS;
-						// Marco el tile como no caminable temporalmente
-						Tile* tProx = mapa.getTile(proximoTile.first, proximoTile.second);
-						tProx->setNoCaminable();
-						// Actualizo el grafo
-						mapa.actualizarGrafo(tProx->getU(),tProx->getV());
-						// recalculo el camino
-						//el camino va desde ultimo tile al que me movi, hasta el que hice click que es el ultimo del camino anterior
-						Tile* tilePersonaje = mapa.getTile(ultimoMovimientoX, ultimoMovimientoY);
-						
-						if(!mapa.tileExists(ultimoMovimientoX, ultimoMovimientoY)) {
-							tilePersonaje = mapa.getTile(start_pos_x, start_pos_y);
-							//std::cout << "POS PJE: " << pjm.getPjeLocal().getX() << ";" << pjm.getPjeLocal().getY() << "\n";
-							std::cout << "TILE PERSONAJE: " << tilePersonaje << "\n";
-						}
-						std::cout << "ULTIMO DESTINO: " << ultimoDestinoX << ";" << ultimoDestinoY << "\n";
-
-						if(enAtaque) {
-							printf("\nCalculo del camino de ataque %s\n", pjm.getPjeLocal().getNick().c_str());
-							if (personajeObjetivo != NULL) {
-								tilePersonajeObjetivo = mapa.getTilePorPixeles(personajeObjetivo->getX(),personajeObjetivo->getY());
-								if ((tilePersonaje != NULL) && (tilePersonajeObjetivo != NULL)){
-									caminoMinimo = mapa.getCaminoMinimo(tilePersonaje,tilePersonajeObjetivo);
-									caminoMinimo.pop_back();
-									enAtaque = true;
-									std::cout << "enAtaque = true\n";
-								}else {
-									enAtaque = false;
-									personajeObjetivo = NULL;
-									tilePersonajeObjetivo = NULL;
-								}
-							} else {
-								enAtaque = false;
-								personajeObjetivo = NULL;
-							}
-						}else{
-							Tile* tileDestino = mapa.getTile(ultimoDestinoX ,ultimoDestinoY);
-							std::cout << "TILE DESTINO - PERSONAJE: " << tileDestino << " - " << tilePersonaje << "\n";
-							//calculo el camino
-							caminoMinimo.clear();
-							caminoMinimo = mapa.getCaminoMinimo(tilePersonaje, tileDestino);
-						}
-						std::cout << "NUEVO CAMINO MINIMO:\n";
-						for(auto it = caminoMinimo.begin();it != caminoMinimo.end();it++) {
-							std::cout << "- " << it->first << ";" << it->second << "\n";
-						}
-
-
-
-						indice = 1;
-						estadoMovimiento = MOV::MANDAR_POS;
-						// Despues de actualizar el grafo, desmarco el tile
-						tProx->setCaminable();
-						mapa.actualizarGrafo(tProx->getU(),tProx->getV());
-						
+						bs.clear();
+						bs << PROTO::REQ_DESTINY << ultimoDestinoX << ultimoDestinoY;
+						sock.send(bs.str());
 					}else if(estadoMovimiento == MOV::ESPERANDO_OK) {
 						//std::cout << "ESPERANDO_OK\n";
 						// Nada

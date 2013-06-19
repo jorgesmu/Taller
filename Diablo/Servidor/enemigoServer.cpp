@@ -352,7 +352,7 @@ bool Enemigo::personaje_adyacente(MapaServidor& mapa,PlayerManager& pm, TileServ
 }
 void Enemigo::atacar(string& NickAtacado,PlayerManager& pm,ServerSocket& socks){
 	BitStream bs;
-	int danio = intRand(0,30);
+	int danio = intRand(0,1);
 	//resto danio si ataca a un golem o a un enemigo
 	bool encontro = false;
 	bool murio = false;

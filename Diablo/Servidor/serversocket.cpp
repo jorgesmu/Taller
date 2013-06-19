@@ -1616,6 +1616,20 @@ void ServerSocket::acceptLastDo() {
 						it->second.send(bs.str());
 					}
 				}
+			}else if (PROTO::REQ_DESTINY){
+				int x,y;
+				bs >> x >>y;
+				bool destinoOcupado = mapa.tile_esta_ocupado(x,y,pm);
+				bool resultado;
+				if(destinoOcupado){
+					resultado = false;
+				}else{
+					resultado = true;
+				}
+				bs.clear();
+				bs << PROTO::REPLY_DESTINY << resultado;
+				this->send(cid, bs.str());
+
 			}else{
 				assert(false);
 				bs.clear();

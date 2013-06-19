@@ -538,13 +538,20 @@ Tile* Personaje::obtenerTileAncla(const int posX , const int posY ,
 }
 
 void Personaje::setTileActual(Tile* tile) {
-	if ( (tile != NULL) && (!this->actualizandoPosicion)){
-		if(this -> tileAncla != tile) {
-			this -> posX = tile -> getX();
-			this -> posY = tile -> getY();
-			this -> tileDestino = tile;
+	if (tile != NULL) {
+		if(this -> tileAncla != NULL){
+			this -> tileAncla -> deleteEntidad(this);
 		}
-		this -> tileAncla = tile;
+		this -> tileAncla = obtenerTileAncla(this -> posX , this -> posY , ImagenPersonaje::EST_SUR , &mapa);
+		if (this->tileAncla) {
+			this -> tileAncla -> addEntidad(this);
+		} else{	
+			this -> tileAncla = tile;
+			this -> tileAncla -> addEntidad(this);
+		}
+		//seteo posicion
+		this -> posX = tile -> getX();
+		this -> posY = tile -> getY();
 	}
 }
 

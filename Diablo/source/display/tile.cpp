@@ -5,7 +5,7 @@
 #include "../../Cliente/clientsocket.h"
 extern PjeManager pjm;
 extern ClientSocket sock;
-
+extern Mapa mapa;
 Tile::Tile() {
 	force_no_caminable = false;
 }
@@ -24,18 +24,42 @@ void Tile::insertarEntidadOrdenada(Entidad* ent){
 				} else {
 					// tienen el mismo orden de bliteo
 					if(entidades[i] -> getOrdenBliteo() == ent -> getOrdenBliteo()) {
-						// la que se inserta se blitea primero
-						if(entidades[i]->getY() > ent->getY()){
-							new_ent.push_back(ent);
-							insertado = true;
-						} else {
-							if(entidades[i]->getY() == ent ->getY()){
-								if(entidades[i]->getX() > ent->getX()){
+						if(entidades[i] -> getTileAncla()!= this) {
+							// si ambos no son anclas comparo posiciones
+							if(ent->getTileAncla()!= this){
+								// la que se inserta se blitea primero
+								if(entidades[i]->getY() > ent->getY()){
 									new_ent.push_back(ent);
 									insertado = true;
+								} else {
+									if(entidades[i]->getY() == ent ->getY()){
+										if(entidades[i]->getX() > ent->getX()){
+											new_ent.push_back(ent);
+											insertado = true;
+										}
+									}
+								}
+							} else {
+								new_ent.push_back(ent);
+								insertado = true;
+							}
+						} else{
+							//ambos se encuentra posicion actual, comparo posciones
+							if(ent->getTileAncla() == this){
+								// la que se inserta se blitea primero
+								if(entidades[i]->getY() > ent->getY()){
+									new_ent.push_back(ent);
+									insertado = true;
+								} else {
+									if(entidades[i]->getY() == ent ->getY()){
+										if(entidades[i]->getX() > ent->getX()){
+											new_ent.push_back(ent);
+											insertado = true;
+										}
+									}
 								}
 							}
-						}
+						}							
 					}
 				}
 			}

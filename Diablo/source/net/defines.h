@@ -111,11 +111,7 @@ const unsigned char RESET_PLAYER = 'S';
 const unsigned char CHANGE_DIR = 'T';
 // Nickname en use srv->client
 const unsigned char NICKNAME_IN_USE = 'U';
-//manda destino para preguntar si no hay nadie ahi
-const unsigned char REQ_DESTINY = 'V';
-//RESPONDE SI PUEDE IR O NO
-const unsigned char REPLY_DESTINY = 'W';
-} 
+}
 
 // Cosas de movimiento
 namespace MOV {

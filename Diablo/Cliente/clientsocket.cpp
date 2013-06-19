@@ -30,8 +30,6 @@
 
 using namespace std;
 // Variables globales
-extern bool respondioDestino;
-extern bool respuestaDestino;
 extern bool pasoArchivos;
 extern bool cargoMapa;
 extern Mapa mapa;
@@ -962,10 +960,6 @@ void ClientSocket::listenDo() {
 			} else if (tipo == TIPO::ESTRATEGIA_ENEMY) {
 				std::cout << "Enemigo " << nick << "cambiando de estrategia" << endl;
 			}				
-		}else if (pt == PROTO::REPLY_DESTINY){
-			bs >> respuestaDestino;
-			respondioDestino = true;
-
 		}else{
 			std::cout << "Unknown packet type " << int(pt) << " received\n";
 		}
